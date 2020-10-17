@@ -1,0 +1,24 @@
+{
+    "name": "Unity.XR.HoloKit.Editor",
+    "references": [
+        "Unity.XR.ARSubsystems.Editor",
+        "Unity.XR.ARSubsystems",
+        "Unity.XR.Management.Editor",
+        "Unity.XR.Management",
+        "Unity.XR.HoloKit"
+    ],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.management",
+            "expression": "3.2.0",
+            "define": "XR_MGMT_SUPPORTS_FILTERING"
+        }
+    ]
+}

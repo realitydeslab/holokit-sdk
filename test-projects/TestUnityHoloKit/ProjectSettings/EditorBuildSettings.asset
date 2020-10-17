@@ -1,0 +1,14 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes: []
+  m_configObjects:
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: b63a620f869404f78a01a947b326b206, type: 2}
+    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 8ac7c8b93aa2a4d049d119343420d335, type: 2}
+    UnityEditor.XR.HoloKit.HoloKitSettings: {fileID: 11400000, guid: aefa4534dde9b4480938e0eafaeffae4, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 8d0de13ba209f4cda91784cc211398d7, type: 2}
+    xr.sdk.holokit.settings: {fileID: 11400000, guid: 789858a7b7f9d491e9c7f86f4527b674, type: 2}
+    xr.sdk.mock-hmd.settings: {fileID: 11400000, guid: 43a1137e0adda4317a3d7ee034f3c5ec, type: 2}

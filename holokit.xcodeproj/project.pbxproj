@@ -1,0 +1,1422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9644C039253AF80E0000B682 /* holokit_xr_unity.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */; };
+		9644C03A253AF80E0000B682 /* input.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95491253AA8BE007CE50B /* input.cc */; };
+		9644C03B253AF80E0000B682 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95492253AA8C0007CE50B /* display.cc */; };
+		9644C03C253AF80E0000B682 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
+		965D7EE2253AED44000B1B60 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
+		965D7EEA253AED4C000B1B60 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
+		965D7F07253AEE56000B1B60 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9660219F25393723004019A5 /* main.cc */; };
+		965D7F1D253AEF9C000B1B60 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9660219F25393723004019A5 /* main.cc */; };
+		965D7F41253AF29F000B1B60 /* holokit_xr_unity.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */; };
+		965D7F42253AF29F000B1B60 /* input.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95491253AA8BE007CE50B /* input.cc */; };
+		965D7F43253AF29F000B1B60 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95492253AA8C0007CE50B /* display.cc */; };
+		965D7F4B253AF2A6000B1B60 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
+		966021ED25393723004019A5 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A525393723004019A5 /* display.cc */; };
+		966021EF25393723004019A5 /* lowpass_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AB25393723004019A5 /* lowpass_filter.cc */; };
+		966021F025393723004019A5 /* median_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AC25393723004019A5 /* median_filter.cc */; };
+		966021F125393723004019A5 /* neck_model.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AD25393723004019A5 /* neck_model.cc */; };
+		966021F225393723004019A5 /* pose_prediction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AE25393723004019A5 /* pose_prediction.cc */; };
+		966021F325393723004019A5 /* sensor_fusion_ekf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021B025393723004019A5 /* sensor_fusion_ekf.cc */; };
+		966021F425393723004019A5 /* device_gyroscope_sensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 966021B425393723004019A5 /* device_gyroscope_sensor.mm */; };
+		966021F525393723004019A5 /* device_accelerometer_sensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 966021B625393723004019A5 /* device_accelerometer_sensor.mm */; };
+		966021F625393723004019A5 /* sensor_event_producer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 966021B725393723004019A5 /* sensor_event_producer.mm */; };
+		966021F725393723004019A5 /* sensor_helper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 966021B825393723004019A5 /* sensor_helper.mm */; };
+		966021FA25393723004019A5 /* sensor_event_producer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021C125393723004019A5 /* sensor_event_producer.cc */; };
+		966021FB25393723004019A5 /* gyroscope_bias_estimator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021C225393723004019A5 /* gyroscope_bias_estimator.cc */; };
+		966021FC25393723004019A5 /* mean_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021C725393723004019A5 /* mean_filter.cc */; };
+		966021FD25393723004019A5 /* rotation.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021C925393723004019A5 /* rotation.cc */; };
+		966021FE25393723004019A5 /* vectorutils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021CA25393723004019A5 /* vectorutils.cc */; };
+		966021FF25393723004019A5 /* matrix_4x4.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021CC25393723004019A5 /* matrix_4x4.cc */; };
+		9660220025393723004019A5 /* matrixutils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021D325393723004019A5 /* matrixutils.cc */; };
+		9660220125393723004019A5 /* matrix_3x3.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021D425393723004019A5 /* matrix_3x3.cc */; };
+		96602214253943DA004019A5 /* libholokit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9660213D253930CC004019A5 /* libholokit.a */; };
+		96602216253943F8004019A5 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
+		96602217253943F8004019A5 /* input.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A325393723004019A5 /* input.cc */; };
+		96602218253943F8004019A5 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A525393723004019A5 /* display.cc */; };
+		96602219253943F8004019A5 /* holokit_xr_unity.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A825393723004019A5 /* holokit_xr_unity.cc */; };
+		968D697C253AC0FC00CFBBB3 /* holokit.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D697B253AC0FC00CFBBB3 /* holokit.cc */; };
+		968D69CC253AC4C900CFBBB3 /* distortion_renderer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D69CB253AC4C900CFBBB3 /* distortion_renderer.cc */; };
+		968D6A18253AC56E00CFBBB3 /* distortion_renderer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D69CB253AC4C900CFBBB3 /* distortion_renderer.cc */; };
+		968D6A19253AC56E00CFBBB3 /* head_tracker.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC684325394820008B557A /* head_tracker.cc */; };
+		968D6A1A253AC56E00CFBBB3 /* holokit.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D697B253AC0FC00CFBBB3 /* holokit.cc */; };
+		968D6A1B253AC56E00CFBBB3 /* lens_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BA25396851008B557A /* lens_distortion.cc */; };
+		968D6A1C253AC56E00CFBBB3 /* polynomial_radial_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BC25396851008B557A /* polynomial_radial_distortion.cc */; };
+		968D6A1D253AC56E00CFBBB3 /* distortion_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BD25396851008B557A /* distortion_mesh.cc */; };
+		968D6A1E253AC56E00CFBBB3 /* holokit_xr_unity.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */; };
+		968D6A1F253AC56E00CFBBB3 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
+		968D6A23253AC56E00CFBBB3 /* lowpass_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AB25393723004019A5 /* lowpass_filter.cc */; };
+		968D6A24253AC56E00CFBBB3 /* median_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AC25393723004019A5 /* median_filter.cc */; };
+		968D6A25253AC56E00CFBBB3 /* neck_model.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AD25393723004019A5 /* neck_model.cc */; };
+		968D6A26253AC56E00CFBBB3 /* pose_prediction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AE25393723004019A5 /* pose_prediction.cc */; };
+		968D6A27253AC56E00CFBBB3 /* sensor_fusion_ekf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021B025393723004019A5 /* sensor_fusion_ekf.cc */; };
+		968D6A28253AC56E00CFBBB3 /* device_gyroscope_sensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 966021B425393723004019A5 /* device_gyroscope_sensor.mm */; };
+		968D6A29253AC56E00CFBBB3 /* device_accelerometer_sensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 966021B625393723004019A5 /* device_accelerometer_sensor.mm */; };
+		968D6A2A253AC56E00CFBBB3 /* sensor_event_producer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 966021B725393723004019A5 /* sensor_event_producer.mm */; };
+		968D6A2B253AC56E00CFBBB3 /* sensor_helper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 966021B825393723004019A5 /* sensor_helper.mm */; };
+		968D6A2F253AC56E00CFBBB3 /* gyroscope_bias_estimator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021C225393723004019A5 /* gyroscope_bias_estimator.cc */; };
+		968D6A30253AC56E00CFBBB3 /* mean_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021C725393723004019A5 /* mean_filter.cc */; };
+		968D6A31253AC56E00CFBBB3 /* rotation.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021C925393723004019A5 /* rotation.cc */; };
+		968D6A32253AC56E00CFBBB3 /* vectorutils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021CA25393723004019A5 /* vectorutils.cc */; };
+		968D6A3A253AC57800CFBBB3 /* matrix_4x4.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021CC25393723004019A5 /* matrix_4x4.cc */; };
+		968D6A3B253AC57800CFBBB3 /* matrixutils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021D325393723004019A5 /* matrixutils.cc */; };
+		968D6A3C253AC57800CFBBB3 /* matrix_3x3.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021D425393723004019A5 /* matrix_3x3.cc */; };
+		968D6A6E253AC5B200CFBBB3 /* screen_params.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68CE25396B40008B557A /* screen_params.mm */; };
+		96BC68202539459C008B557A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BC681F2539459C008B557A /* AppDelegate.m */; };
+		96BC68222539459C008B557A /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 96BC68212539459C008B557A /* art.scnassets */; };
+		96BC68252539459C008B557A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68242539459C008B557A /* ViewController.m */; };
+		96BC68282539459C008B557A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 96BC68262539459C008B557A /* Main.storyboard */; };
+		96BC682A2539459C008B557A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96BC68292539459C008B557A /* Assets.xcassets */; };
+		96BC682D2539459C008B557A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 96BC682B2539459C008B557A /* LaunchScreen.storyboard */; };
+		96BC68302539459C008B557A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BC682F2539459C008B557A /* main.m */; };
+		96BC684425394820008B557A /* head_tracker.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC684325394820008B557A /* head_tracker.cc */; };
+		96BC688525394970008B557A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BC688425394970008B557A /* AppDelegate.m */; };
+		96BC688725394970008B557A /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96BC688625394970008B557A /* Shaders.metal */; };
+		96BC688B25394970008B557A /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BC688A25394970008B557A /* Renderer.m */; };
+		96BC688E25394970008B557A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BC688D25394970008B557A /* ViewController.m */; };
+		96BC689125394970008B557A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 96BC688F25394970008B557A /* Main.storyboard */; };
+		96BC689325394971008B557A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96BC689225394971008B557A /* Assets.xcassets */; };
+		96BC689625394971008B557A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 96BC689425394971008B557A /* LaunchScreen.storyboard */; };
+		96BC689925394971008B557A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 96BC689825394971008B557A /* main.m */; };
+		96BC68C025396851008B557A /* lens_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BA25396851008B557A /* lens_distortion.cc */; };
+		96BC68C125396851008B557A /* polynomial_radial_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BC25396851008B557A /* polynomial_radial_distortion.cc */; };
+		96BC68C225396851008B557A /* distortion_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BD25396851008B557A /* distortion_mesh.cc */; };
+		96BC68CF25396B40008B557A /* screen_params.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68CE25396B40008B557A /* screen_params.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		96BC6813253944BC008B557A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 96602135253930CC004019A5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9660213C253930CC004019A5;
+			remoteInfo = holokit;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9660213B253930CC004019A5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9660214F253934A4004019A5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		965D7EC9253AECD7000B1B60 /* printc.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = printc.mm; sourceTree = "<group>"; };
+		965D7ED2253AECFB000B1B60 /* printc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = printc.h; sourceTree = "<group>"; };
+		9660213D253930CC004019A5 /* libholokit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libholokit.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		96602151253934A4004019A5 /* libholokit-xr-plugin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-xr-plugin.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9660219F25393723004019A5 /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
+		966021A025393723004019A5 /* math_tools.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = math_tools.cc; sourceTree = "<group>"; };
+		966021A125393723004019A5 /* math_tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = math_tools.h; sourceTree = "<group>"; };
+		966021A225393723004019A5 /* load.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = load.h; sourceTree = "<group>"; };
+		966021A325393723004019A5 /* input.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cc; sourceTree = "<group>"; };
+		966021A425393723004019A5 /* holokit_xr_plugin.lds */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = holokit_xr_plugin.lds; sourceTree = "<group>"; };
+		966021A525393723004019A5 /* display.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = display.cc; sourceTree = "<group>"; };
+		966021A725393723004019A5 /* holokit_xr_unity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = holokit_xr_unity.h; sourceTree = "<group>"; };
+		966021A825393723004019A5 /* holokit_xr_unity.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = holokit_xr_unity.cc; sourceTree = "<group>"; };
+		966021AA25393723004019A5 /* device_accelerometer_sensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = device_accelerometer_sensor.h; sourceTree = "<group>"; };
+		966021AB25393723004019A5 /* lowpass_filter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lowpass_filter.cc; sourceTree = "<group>"; };
+		966021AC25393723004019A5 /* median_filter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = median_filter.cc; sourceTree = "<group>"; };
+		966021AD25393723004019A5 /* neck_model.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = neck_model.cc; sourceTree = "<group>"; };
+		966021AE25393723004019A5 /* pose_prediction.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pose_prediction.cc; sourceTree = "<group>"; };
+		966021AF25393723004019A5 /* pose_prediction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pose_prediction.h; sourceTree = "<group>"; };
+		966021B025393723004019A5 /* sensor_fusion_ekf.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor_fusion_ekf.cc; sourceTree = "<group>"; };
+		966021B125393723004019A5 /* lowpass_filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lowpass_filter.h; sourceTree = "<group>"; };
+		966021B225393723004019A5 /* sensor_fusion_ekf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensor_fusion_ekf.h; sourceTree = "<group>"; };
+		966021B425393723004019A5 /* device_gyroscope_sensor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_gyroscope_sensor.mm; sourceTree = "<group>"; };
+		966021B525393723004019A5 /* sensor_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensor_helper.h; sourceTree = "<group>"; };
+		966021B625393723004019A5 /* device_accelerometer_sensor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_accelerometer_sensor.mm; sourceTree = "<group>"; };
+		966021B725393723004019A5 /* sensor_event_producer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_event_producer.mm; sourceTree = "<group>"; };
+		966021B825393723004019A5 /* sensor_helper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_helper.mm; sourceTree = "<group>"; };
+		966021B925393723004019A5 /* gyroscope_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gyroscope_data.h; sourceTree = "<group>"; };
+		966021BA25393723004019A5 /* accelerometer_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = accelerometer_data.h; sourceTree = "<group>"; };
+		966021BB25393723004019A5 /* device_gyroscope_sensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = device_gyroscope_sensor.h; sourceTree = "<group>"; };
+		966021BC25393723004019A5 /* neck_model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = neck_model.h; sourceTree = "<group>"; };
+		966021BD25393723004019A5 /* mean_filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mean_filter.h; sourceTree = "<group>"; };
+		966021BF25393723004019A5 /* device_accelerometer_sensor.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = device_accelerometer_sensor.cc; sourceTree = "<group>"; };
+		966021C025393723004019A5 /* device_gyroscope_sensor.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = device_gyroscope_sensor.cc; sourceTree = "<group>"; };
+		966021C125393723004019A5 /* sensor_event_producer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor_event_producer.cc; sourceTree = "<group>"; };
+		966021C225393723004019A5 /* gyroscope_bias_estimator.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gyroscope_bias_estimator.cc; sourceTree = "<group>"; };
+		966021C325393723004019A5 /* gyroscope_bias_estimator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gyroscope_bias_estimator.h; sourceTree = "<group>"; };
+		966021C425393723004019A5 /* pose_state.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pose_state.h; sourceTree = "<group>"; };
+		966021C525393723004019A5 /* sensor_event_producer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensor_event_producer.h; sourceTree = "<group>"; };
+		966021C625393723004019A5 /* median_filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = median_filter.h; sourceTree = "<group>"; };
+		966021C725393723004019A5 /* mean_filter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mean_filter.cc; sourceTree = "<group>"; };
+		966021C925393723004019A5 /* rotation.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rotation.cc; sourceTree = "<group>"; };
+		966021CA25393723004019A5 /* vectorutils.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vectorutils.cc; sourceTree = "<group>"; };
+		966021CB25393723004019A5 /* rotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rotation.h; sourceTree = "<group>"; };
+		966021CC25393723004019A5 /* matrix_4x4.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix_4x4.cc; sourceTree = "<group>"; };
+		966021CD25393723004019A5 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
+		966021CE25393723004019A5 /* matrixutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrixutils.h; sourceTree = "<group>"; };
+		966021CF25393723004019A5 /* vectorutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vectorutils.h; sourceTree = "<group>"; };
+		966021D025393723004019A5 /* matrix_3x3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix_3x3.h; sourceTree = "<group>"; };
+		966021D125393723004019A5 /* matrix_4x4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix_4x4.h; sourceTree = "<group>"; };
+		966021D225393723004019A5 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
+		966021D325393723004019A5 /* matrixutils.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrixutils.cc; sourceTree = "<group>"; };
+		966021D425393723004019A5 /* matrix_3x3.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix_3x3.cc; sourceTree = "<group>"; };
+		966021D725393723004019A5 /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityInterface.h; sourceTree = "<group>"; };
+		966021D925393723004019A5 /* IUnityXRDisplayShadingRateExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityXRDisplayShadingRateExt.h; sourceTree = "<group>"; };
+		966021DA25393723004019A5 /* IUnityXRInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityXRInput.h; sourceTree = "<group>"; };
+		966021DB25393723004019A5 /* IUnitySubsystemExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnitySubsystemExample.h; sourceTree = "<group>"; };
+		966021DC25393723004019A5 /* UnityTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnityTypes.h; sourceTree = "<group>"; };
+		966021DD25393723004019A5 /* IUnityXRDisplay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityXRDisplay.h; sourceTree = "<group>"; };
+		966021DE25393723004019A5 /* IUnityXRAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityXRAudio.h; sourceTree = "<group>"; };
+		966021DF25393723004019A5 /* UnityXRDisplayStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnityXRDisplayStats.h; sourceTree = "<group>"; };
+		966021E025393723004019A5 /* UnityXRSubsystemTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnityXRSubsystemTypes.h; sourceTree = "<group>"; };
+		966021E125393723004019A5 /* IUnityXRMeshing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityXRMeshing.h; sourceTree = "<group>"; };
+		966021E225393723004019A5 /* IUnityXRTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityXRTrace.h; sourceTree = "<group>"; };
+		966021E325393723004019A5 /* IUnityXRPreInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityXRPreInit.h; sourceTree = "<group>"; };
+		966021E425393723004019A5 /* IUnityXRStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityXRStats.h; sourceTree = "<group>"; };
+		966021E525393723004019A5 /* UnityXRTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnityXRTypes.h; sourceTree = "<group>"; };
+		966021E625393723004019A5 /* UnitySubsystemTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnitySubsystemTypes.h; sourceTree = "<group>"; };
+		966021E725393723004019A5 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphics.h; sourceTree = "<group>"; };
+		966021E825393723004019A5 /* IUnityRenderingExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityRenderingExtensions.h; sourceTree = "<group>"; };
+		966021E925393723004019A5 /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
+		968D6932253ABEB300CFBBB3 /* UnityHoloKit.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = UnityHoloKit.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = holokit_xr_unity.cc; sourceTree = "<group>"; };
+		968D697B253AC0FC00CFBBB3 /* holokit.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = holokit.cc; sourceTree = "<group>"; };
+		968D69CA253AC4C900CFBBB3 /* distortion_renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = distortion_renderer.h; sourceTree = "<group>"; };
+		968D69CB253AC4C900CFBBB3 /* distortion_renderer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = distortion_renderer.cc; sourceTree = "<group>"; };
+		968D69F7253AC51400CFBBB3 /* libholokit-macOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-macOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96BC681C2539459C008B557A /* test-headtracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-headtracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96BC681E2539459C008B557A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		96BC681F2539459C008B557A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		96BC68212539459C008B557A /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
+		96BC68232539459C008B557A /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		96BC68242539459C008B557A /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		96BC68272539459C008B557A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		96BC68292539459C008B557A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		96BC682C2539459C008B557A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		96BC682E2539459C008B557A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		96BC682F2539459C008B557A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		96BC684225394820008B557A /* head_tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = head_tracker.h; sourceTree = "<group>"; };
+		96BC684325394820008B557A /* head_tracker.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = head_tracker.cc; sourceTree = "<group>"; };
+		96BC688125394970008B557A /* test-metalrender.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-metalrender.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96BC688325394970008B557A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		96BC688425394970008B557A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		96BC688625394970008B557A /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		96BC688825394970008B557A /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		96BC688925394970008B557A /* Renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
+		96BC688A25394970008B557A /* Renderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Renderer.m; sourceTree = "<group>"; };
+		96BC688C25394970008B557A /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		96BC688D25394970008B557A /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		96BC689025394970008B557A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		96BC689225394971008B557A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		96BC689525394971008B557A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		96BC689725394971008B557A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		96BC689825394971008B557A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		96BC68BA25396851008B557A /* lens_distortion.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lens_distortion.cc; sourceTree = "<group>"; };
+		96BC68BB25396851008B557A /* lens_distortion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lens_distortion.h; sourceTree = "<group>"; };
+		96BC68BC25396851008B557A /* polynomial_radial_distortion.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = polynomial_radial_distortion.cc; sourceTree = "<group>"; };
+		96BC68BD25396851008B557A /* distortion_mesh.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = distortion_mesh.cc; sourceTree = "<group>"; };
+		96BC68BE25396851008B557A /* polynomial_radial_distortion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polynomial_radial_distortion.h; sourceTree = "<group>"; };
+		96BC68BF25396851008B557A /* distortion_mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = distortion_mesh.h; sourceTree = "<group>"; };
+		96BC68CC25396B40008B557A /* device_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = device_params.h; sourceTree = "<group>"; };
+		96BC68CD25396B40008B557A /* screen_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = screen_params.h; sourceTree = "<group>"; };
+		96BC68CE25396B40008B557A /* screen_params.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = screen_params.mm; sourceTree = "<group>"; };
+		96BC68D625396BF5008B557A /* holokit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = holokit.h; sourceTree = "<group>"; };
+		96F95491253AA8BE007CE50B /* input.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = input.cc; sourceTree = "<group>"; };
+		96F95492253AA8C0007CE50B /* display.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = display.cc; sourceTree = "<group>"; };
+		96F95561253AAB9A007CE50B /* UnityHoloKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = UnityHoloKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9660213A253930CC004019A5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9660214E253934A4004019A5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96602214253943DA004019A5 /* libholokit.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		968D6930253ABEB300CFBBB3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		968D69F5253AC51400CFBBB3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96BC68192539459C008B557A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96BC687E25394970008B557A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96F9555B253AAB9A007CE50B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		96602134253930CC004019A5 = {
+			isa = PBXGroup;
+			children = (
+				9660219C25393723004019A5 /* sdk */,
+				9660218425393591004019A5 /* test-apps */,
+				9660213E253930CC004019A5 /* Products */,
+				96602188253935D7004019A5 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		9660213E253930CC004019A5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9660213D253930CC004019A5 /* libholokit.a */,
+				96602151253934A4004019A5 /* libholokit-xr-plugin.a */,
+				96BC681C2539459C008B557A /* test-headtracking.app */,
+				96BC688125394970008B557A /* test-metalrender.app */,
+				96F95561253AAB9A007CE50B /* UnityHoloKit.a */,
+				968D6932253ABEB300CFBBB3 /* UnityHoloKit.dylib */,
+				968D69F7253AC51400CFBBB3 /* libholokit-macOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9660218425393591004019A5 /* test-apps */ = {
+			isa = PBXGroup;
+			children = (
+				96BC688225394970008B557A /* test-metalrender */,
+				96BC681D2539459C008B557A /* test-headtracking */,
+			);
+			path = "test-apps";
+			sourceTree = "<group>";
+		};
+		96602188253935D7004019A5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9660219C25393723004019A5 /* sdk */ = {
+			isa = PBXGroup;
+			children = (
+				968D69CB253AC4C900CFBBB3 /* distortion_renderer.cc */,
+				968D69CA253AC4C900CFBBB3 /* distortion_renderer.h */,
+				96BC684325394820008B557A /* head_tracker.cc */,
+				96BC684225394820008B557A /* head_tracker.h */,
+				968D697B253AC0FC00CFBBB3 /* holokit.cc */,
+				96BC68D425396B9A008B557A /* include */,
+				96BC68CB25396B40008B557A /* params */,
+				96BC68B925396851008B557A /* calibrations */,
+				9660219D25393723004019A5 /* unity */,
+				966021A925393723004019A5 /* sensors */,
+				966021C825393723004019A5 /* utils */,
+				966021D525393723004019A5 /* third_party */,
+			);
+			path = sdk;
+			sourceTree = "<group>";
+		};
+		9660219D25393723004019A5 /* unity */ = {
+			isa = PBXGroup;
+			children = (
+				96F95490253AA8A9007CE50B /* xr_dummy */,
+				9660219E25393723004019A5 /* xr_provider */,
+				966021A625393723004019A5 /* xr_unity_plugin */,
+			);
+			path = unity;
+			sourceTree = "<group>";
+		};
+		9660219E25393723004019A5 /* xr_provider */ = {
+			isa = PBXGroup;
+			children = (
+				9660219F25393723004019A5 /* main.cc */,
+				966021A025393723004019A5 /* math_tools.cc */,
+				966021A125393723004019A5 /* math_tools.h */,
+				966021A225393723004019A5 /* load.h */,
+				966021A325393723004019A5 /* input.cc */,
+				966021A425393723004019A5 /* holokit_xr_plugin.lds */,
+				966021A525393723004019A5 /* display.cc */,
+			);
+			path = xr_provider;
+			sourceTree = "<group>";
+		};
+		966021A625393723004019A5 /* xr_unity_plugin */ = {
+			isa = PBXGroup;
+			children = (
+				966021A825393723004019A5 /* holokit_xr_unity.cc */,
+				966021A725393723004019A5 /* holokit_xr_unity.h */,
+			);
+			path = xr_unity_plugin;
+			sourceTree = "<group>";
+		};
+		966021A925393723004019A5 /* sensors */ = {
+			isa = PBXGroup;
+			children = (
+				966021AA25393723004019A5 /* device_accelerometer_sensor.h */,
+				966021AB25393723004019A5 /* lowpass_filter.cc */,
+				966021AC25393723004019A5 /* median_filter.cc */,
+				966021AD25393723004019A5 /* neck_model.cc */,
+				966021AE25393723004019A5 /* pose_prediction.cc */,
+				966021AF25393723004019A5 /* pose_prediction.h */,
+				966021B025393723004019A5 /* sensor_fusion_ekf.cc */,
+				966021B125393723004019A5 /* lowpass_filter.h */,
+				966021B225393723004019A5 /* sensor_fusion_ekf.h */,
+				966021B325393723004019A5 /* ios */,
+				966021B925393723004019A5 /* gyroscope_data.h */,
+				966021BA25393723004019A5 /* accelerometer_data.h */,
+				966021BB25393723004019A5 /* device_gyroscope_sensor.h */,
+				966021BC25393723004019A5 /* neck_model.h */,
+				966021BD25393723004019A5 /* mean_filter.h */,
+				966021BE25393723004019A5 /* android */,
+				966021C225393723004019A5 /* gyroscope_bias_estimator.cc */,
+				966021C325393723004019A5 /* gyroscope_bias_estimator.h */,
+				966021C425393723004019A5 /* pose_state.h */,
+				966021C525393723004019A5 /* sensor_event_producer.h */,
+				966021C625393723004019A5 /* median_filter.h */,
+				966021C725393723004019A5 /* mean_filter.cc */,
+			);
+			path = sensors;
+			sourceTree = "<group>";
+		};
+		966021B325393723004019A5 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				966021B425393723004019A5 /* device_gyroscope_sensor.mm */,
+				966021B525393723004019A5 /* sensor_helper.h */,
+				966021B625393723004019A5 /* device_accelerometer_sensor.mm */,
+				966021B725393723004019A5 /* sensor_event_producer.mm */,
+				966021B825393723004019A5 /* sensor_helper.mm */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+		966021BE25393723004019A5 /* android */ = {
+			isa = PBXGroup;
+			children = (
+				966021BF25393723004019A5 /* device_accelerometer_sensor.cc */,
+				966021C025393723004019A5 /* device_gyroscope_sensor.cc */,
+				966021C125393723004019A5 /* sensor_event_producer.cc */,
+			);
+			path = android;
+			sourceTree = "<group>";
+		};
+		966021C825393723004019A5 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				966021C925393723004019A5 /* rotation.cc */,
+				966021CA25393723004019A5 /* vectorutils.cc */,
+				966021CB25393723004019A5 /* rotation.h */,
+				966021CC25393723004019A5 /* matrix_4x4.cc */,
+				966021CD25393723004019A5 /* logging.h */,
+				966021CE25393723004019A5 /* matrixutils.h */,
+				966021CF25393723004019A5 /* vectorutils.h */,
+				966021D025393723004019A5 /* matrix_3x3.h */,
+				966021D125393723004019A5 /* matrix_4x4.h */,
+				966021D225393723004019A5 /* vector.h */,
+				966021D325393723004019A5 /* matrixutils.cc */,
+				966021D425393723004019A5 /* matrix_3x3.cc */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
+		966021D525393723004019A5 /* third_party */ = {
+			isa = PBXGroup;
+			children = (
+				966021D625393723004019A5 /* unity_plugin_api */,
+			);
+			path = third_party;
+			sourceTree = "<group>";
+		};
+		966021D625393723004019A5 /* unity_plugin_api */ = {
+			isa = PBXGroup;
+			children = (
+				966021D725393723004019A5 /* IUnityInterface.h */,
+				966021D825393723004019A5 /* XR */,
+				966021E725393723004019A5 /* IUnityGraphics.h */,
+				966021E825393723004019A5 /* IUnityRenderingExtensions.h */,
+				966021E925393723004019A5 /* IUnityGraphicsD3D11.h */,
+			);
+			path = unity_plugin_api;
+			sourceTree = "<group>";
+		};
+		966021D825393723004019A5 /* XR */ = {
+			isa = PBXGroup;
+			children = (
+				966021D925393723004019A5 /* IUnityXRDisplayShadingRateExt.h */,
+				966021DA25393723004019A5 /* IUnityXRInput.h */,
+				966021DB25393723004019A5 /* IUnitySubsystemExample.h */,
+				966021DC25393723004019A5 /* UnityTypes.h */,
+				966021DD25393723004019A5 /* IUnityXRDisplay.h */,
+				966021DE25393723004019A5 /* IUnityXRAudio.h */,
+				966021DF25393723004019A5 /* UnityXRDisplayStats.h */,
+				966021E025393723004019A5 /* UnityXRSubsystemTypes.h */,
+				966021E125393723004019A5 /* IUnityXRMeshing.h */,
+				966021E225393723004019A5 /* IUnityXRTrace.h */,
+				966021E325393723004019A5 /* IUnityXRPreInit.h */,
+				966021E425393723004019A5 /* IUnityXRStats.h */,
+				966021E525393723004019A5 /* UnityXRTypes.h */,
+				966021E625393723004019A5 /* UnitySubsystemTypes.h */,
+			);
+			path = XR;
+			sourceTree = "<group>";
+		};
+		96BC681D2539459C008B557A /* test-headtracking */ = {
+			isa = PBXGroup;
+			children = (
+				96BC681E2539459C008B557A /* AppDelegate.h */,
+				96BC681F2539459C008B557A /* AppDelegate.m */,
+				96BC68212539459C008B557A /* art.scnassets */,
+				96BC68232539459C008B557A /* ViewController.h */,
+				96BC68242539459C008B557A /* ViewController.m */,
+				96BC68262539459C008B557A /* Main.storyboard */,
+				96BC68292539459C008B557A /* Assets.xcassets */,
+				96BC682B2539459C008B557A /* LaunchScreen.storyboard */,
+				96BC682E2539459C008B557A /* Info.plist */,
+				96BC682F2539459C008B557A /* main.m */,
+			);
+			path = "test-headtracking";
+			sourceTree = "<group>";
+		};
+		96BC688225394970008B557A /* test-metalrender */ = {
+			isa = PBXGroup;
+			children = (
+				96BC688325394970008B557A /* AppDelegate.h */,
+				96BC688425394970008B557A /* AppDelegate.m */,
+				96BC688625394970008B557A /* Shaders.metal */,
+				96BC688825394970008B557A /* ShaderTypes.h */,
+				96BC688925394970008B557A /* Renderer.h */,
+				96BC688A25394970008B557A /* Renderer.m */,
+				96BC688C25394970008B557A /* ViewController.h */,
+				96BC688D25394970008B557A /* ViewController.m */,
+				96BC688F25394970008B557A /* Main.storyboard */,
+				96BC689225394971008B557A /* Assets.xcassets */,
+				96BC689425394971008B557A /* LaunchScreen.storyboard */,
+				96BC689725394971008B557A /* Info.plist */,
+				96BC689825394971008B557A /* main.m */,
+			);
+			path = "test-metalrender";
+			sourceTree = "<group>";
+		};
+		96BC68B925396851008B557A /* calibrations */ = {
+			isa = PBXGroup;
+			children = (
+				96BC68BA25396851008B557A /* lens_distortion.cc */,
+				96BC68BB25396851008B557A /* lens_distortion.h */,
+				96BC68BC25396851008B557A /* polynomial_radial_distortion.cc */,
+				96BC68BE25396851008B557A /* polynomial_radial_distortion.h */,
+				96BC68BD25396851008B557A /* distortion_mesh.cc */,
+				96BC68BF25396851008B557A /* distortion_mesh.h */,
+			);
+			path = calibrations;
+			sourceTree = "<group>";
+		};
+		96BC68CB25396B40008B557A /* params */ = {
+			isa = PBXGroup;
+			children = (
+				96BC68CC25396B40008B557A /* device_params.h */,
+				96BC68CD25396B40008B557A /* screen_params.h */,
+				96BC68CE25396B40008B557A /* screen_params.mm */,
+			);
+			path = params;
+			sourceTree = "<group>";
+		};
+		96BC68D425396B9A008B557A /* include */ = {
+			isa = PBXGroup;
+			children = (
+				96BC68D625396BF5008B557A /* holokit.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		96F95490253AA8A9007CE50B /* xr_dummy */ = {
+			isa = PBXGroup;
+			children = (
+				968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */,
+				96F95491253AA8BE007CE50B /* input.cc */,
+				965D7EC9253AECD7000B1B60 /* printc.mm */,
+				965D7ED2253AECFB000B1B60 /* printc.h */,
+				96F95492253AA8C0007CE50B /* display.cc */,
+			);
+			path = xr_dummy;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		968D692E253ABEB300CFBBB3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		968D69F3253AC51400CFBBB3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		9660213C253930CC004019A5 /* holokit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96602146253930CC004019A5 /* Build configuration list for PBXNativeTarget "holokit" */;
+			buildPhases = (
+				96602139253930CC004019A5 /* Sources */,
+				9660213A253930CC004019A5 /* Frameworks */,
+				9660213B253930CC004019A5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = holokit;
+			productName = UnityHolokit;
+			productReference = 9660213D253930CC004019A5 /* libholokit.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		96602150253934A4004019A5 /* holokit-xr-plugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96602157253934A4004019A5 /* Build configuration list for PBXNativeTarget "holokit-xr-plugin" */;
+			buildPhases = (
+				9660214D253934A4004019A5 /* Sources */,
+				9660214E253934A4004019A5 /* Frameworks */,
+				9660214F253934A4004019A5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				96BC6814253944BC008B557A /* PBXTargetDependency */,
+			);
+			name = "holokit-xr-plugin";
+			productName = "holokit-unity-xr-sdk";
+			productReference = 96602151253934A4004019A5 /* libholokit-xr-plugin.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		968D6931253ABEB300CFBBB3 /* holokit-xr-plugin-dummy-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 968D6935253ABEB300CFBBB3 /* Build configuration list for PBXNativeTarget "holokit-xr-plugin-dummy-macOS" */;
+			buildPhases = (
+				968D692E253ABEB300CFBBB3 /* Headers */,
+				968D692F253ABEB300CFBBB3 /* Sources */,
+				968D6930253ABEB300CFBBB3 /* Frameworks */,
+				968D6948253ABF2000CFBBB3 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "holokit-xr-plugin-dummy-macOS";
+			productName = "holokit-xr-plugin-dummy-macOS-2";
+			productReference = 968D6932253ABEB300CFBBB3 /* UnityHoloKit.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		968D69F6253AC51400CFBBB3 /* holokit-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 968D69F8253AC51400CFBBB3 /* Build configuration list for PBXNativeTarget "holokit-macOS" */;
+			buildPhases = (
+				968D69F3253AC51400CFBBB3 /* Headers */,
+				968D69F4253AC51400CFBBB3 /* Sources */,
+				968D69F5253AC51400CFBBB3 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "holokit-macOS";
+			productName = holokit2;
+			productReference = 968D69F7253AC51400CFBBB3 /* libholokit-macOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		96BC681B2539459C008B557A /* test-headtracking */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96BC68312539459C008B557A /* Build configuration list for PBXNativeTarget "test-headtracking" */;
+			buildPhases = (
+				96BC68182539459C008B557A /* Sources */,
+				96BC68192539459C008B557A /* Frameworks */,
+				96BC681A2539459C008B557A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "test-headtracking";
+			productName = "test-headtracking";
+			productReference = 96BC681C2539459C008B557A /* test-headtracking.app */;
+			productType = "com.apple.product-type.application";
+		};
+		96BC688025394970008B557A /* test-metalrender */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96BC689A25394971008B557A /* Build configuration list for PBXNativeTarget "test-metalrender" */;
+			buildPhases = (
+				96BC687D25394970008B557A /* Sources */,
+				96BC687E25394970008B557A /* Frameworks */,
+				96BC687F25394970008B557A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "test-metalrender";
+			productName = "test-metalrender";
+			productReference = 96BC688125394970008B557A /* test-metalrender.app */;
+			productType = "com.apple.product-type.application";
+		};
+		96F95555253AAB9A007CE50B /* holokit-xr-plugin-dummy-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96F9555E253AAB9A007CE50B /* Build configuration list for PBXNativeTarget "holokit-xr-plugin-dummy-iOS" */;
+			buildPhases = (
+				96F95556253AAB9A007CE50B /* Sources */,
+				96F9555B253AAB9A007CE50B /* Frameworks */,
+				96F955B5253AAF2A007CE50B /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "holokit-xr-plugin-dummy-iOS";
+			productName = "holokit-xr-plugin-dummy";
+			productReference = 96F95561253AAB9A007CE50B /* UnityHoloKit.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		96602135253930CC004019A5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1220;
+				TargetAttributes = {
+					9660213C253930CC004019A5 = {
+						CreatedOnToolsVersion = 12.2;
+					};
+					96602150253934A4004019A5 = {
+						CreatedOnToolsVersion = 12.2;
+					};
+					968D6931253ABEB300CFBBB3 = {
+						CreatedOnToolsVersion = 12.2;
+					};
+					968D69F6253AC51400CFBBB3 = {
+						CreatedOnToolsVersion = 12.2;
+					};
+					96BC681B2539459C008B557A = {
+						CreatedOnToolsVersion = 12.2;
+					};
+					96BC688025394970008B557A = {
+						CreatedOnToolsVersion = 12.2;
+					};
+				};
+			};
+			buildConfigurationList = 96602138253930CC004019A5 /* Build configuration list for PBXProject "holokit" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 96602134253930CC004019A5;
+			productRefGroup = 9660213E253930CC004019A5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9660213C253930CC004019A5 /* holokit */,
+				968D69F6253AC51400CFBBB3 /* holokit-macOS */,
+				96602150253934A4004019A5 /* holokit-xr-plugin */,
+				96F95555253AAB9A007CE50B /* holokit-xr-plugin-dummy-iOS */,
+				968D6931253ABEB300CFBBB3 /* holokit-xr-plugin-dummy-macOS */,
+				96BC681B2539459C008B557A /* test-headtracking */,
+				96BC688025394970008B557A /* test-metalrender */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		96BC681A2539459C008B557A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96BC68222539459C008B557A /* art.scnassets in Resources */,
+				96BC682D2539459C008B557A /* LaunchScreen.storyboard in Resources */,
+				96BC682A2539459C008B557A /* Assets.xcassets in Resources */,
+				96BC68282539459C008B557A /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96BC687F25394970008B557A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96BC689625394971008B557A /* LaunchScreen.storyboard in Resources */,
+				96BC689325394971008B557A /* Assets.xcassets in Resources */,
+				96BC689125394970008B557A /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		968D6948253ABF2000CFBBB3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"osx/x64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/${EXECUTABLE_NAME}\"\n\n";
+		};
+		96F955B5253AAF2A007CE50B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios/arm64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/${EXECUTABLE_NAME}\"\n\nDESTDIR=\"${SRCROOT}/test-projects/TestUnityHoloKit/Build/Libraries/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/${EXECUTABLE_NAME}\"\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		96602139253930CC004019A5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				968D697C253AC0FC00CFBBB3 /* holokit.cc in Sources */,
+				966021F425393723004019A5 /* device_gyroscope_sensor.mm in Sources */,
+				966021FC25393723004019A5 /* mean_filter.cc in Sources */,
+				966021F325393723004019A5 /* sensor_fusion_ekf.cc in Sources */,
+				966021F025393723004019A5 /* median_filter.cc in Sources */,
+				966021FF25393723004019A5 /* matrix_4x4.cc in Sources */,
+				96BC68CF25396B40008B557A /* screen_params.mm in Sources */,
+				96BC68C125396851008B557A /* polynomial_radial_distortion.cc in Sources */,
+				966021F125393723004019A5 /* neck_model.cc in Sources */,
+				966021F525393723004019A5 /* device_accelerometer_sensor.mm in Sources */,
+				966021ED25393723004019A5 /* display.cc in Sources */,
+				96BC684425394820008B557A /* head_tracker.cc in Sources */,
+				96BC68C025396851008B557A /* lens_distortion.cc in Sources */,
+				968D69CC253AC4C900CFBBB3 /* distortion_renderer.cc in Sources */,
+				966021FB25393723004019A5 /* gyroscope_bias_estimator.cc in Sources */,
+				966021F725393723004019A5 /* sensor_helper.mm in Sources */,
+				966021FA25393723004019A5 /* sensor_event_producer.cc in Sources */,
+				9660220025393723004019A5 /* matrixutils.cc in Sources */,
+				966021F625393723004019A5 /* sensor_event_producer.mm in Sources */,
+				966021EF25393723004019A5 /* lowpass_filter.cc in Sources */,
+				9660220125393723004019A5 /* matrix_3x3.cc in Sources */,
+				96BC68C225396851008B557A /* distortion_mesh.cc in Sources */,
+				966021F225393723004019A5 /* pose_prediction.cc in Sources */,
+				966021FE25393723004019A5 /* vectorutils.cc in Sources */,
+				966021FD25393723004019A5 /* rotation.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9660214D253934A4004019A5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96602216253943F8004019A5 /* math_tools.cc in Sources */,
+				96602217253943F8004019A5 /* input.cc in Sources */,
+				96602218253943F8004019A5 /* display.cc in Sources */,
+				96602219253943F8004019A5 /* holokit_xr_unity.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		968D692F253ABEB300CFBBB3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9644C039253AF80E0000B682 /* holokit_xr_unity.cc in Sources */,
+				9644C03A253AF80E0000B682 /* input.cc in Sources */,
+				9644C03B253AF80E0000B682 /* display.cc in Sources */,
+				9644C03C253AF80E0000B682 /* math_tools.cc in Sources */,
+				965D7F07253AEE56000B1B60 /* main.cc in Sources */,
+				965D7EE2253AED44000B1B60 /* printc.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		968D69F4253AC51400CFBBB3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				968D6A6E253AC5B200CFBBB3 /* screen_params.mm in Sources */,
+				968D6A3A253AC57800CFBBB3 /* matrix_4x4.cc in Sources */,
+				968D6A3B253AC57800CFBBB3 /* matrixutils.cc in Sources */,
+				968D6A3C253AC57800CFBBB3 /* matrix_3x3.cc in Sources */,
+				968D6A18253AC56E00CFBBB3 /* distortion_renderer.cc in Sources */,
+				968D6A19253AC56E00CFBBB3 /* head_tracker.cc in Sources */,
+				968D6A1A253AC56E00CFBBB3 /* holokit.cc in Sources */,
+				968D6A1B253AC56E00CFBBB3 /* lens_distortion.cc in Sources */,
+				968D6A1C253AC56E00CFBBB3 /* polynomial_radial_distortion.cc in Sources */,
+				968D6A1D253AC56E00CFBBB3 /* distortion_mesh.cc in Sources */,
+				968D6A1E253AC56E00CFBBB3 /* holokit_xr_unity.cc in Sources */,
+				968D6A1F253AC56E00CFBBB3 /* math_tools.cc in Sources */,
+				968D6A23253AC56E00CFBBB3 /* lowpass_filter.cc in Sources */,
+				968D6A24253AC56E00CFBBB3 /* median_filter.cc in Sources */,
+				968D6A25253AC56E00CFBBB3 /* neck_model.cc in Sources */,
+				968D6A26253AC56E00CFBBB3 /* pose_prediction.cc in Sources */,
+				968D6A27253AC56E00CFBBB3 /* sensor_fusion_ekf.cc in Sources */,
+				968D6A28253AC56E00CFBBB3 /* device_gyroscope_sensor.mm in Sources */,
+				968D6A29253AC56E00CFBBB3 /* device_accelerometer_sensor.mm in Sources */,
+				968D6A2A253AC56E00CFBBB3 /* sensor_event_producer.mm in Sources */,
+				968D6A2B253AC56E00CFBBB3 /* sensor_helper.mm in Sources */,
+				968D6A2F253AC56E00CFBBB3 /* gyroscope_bias_estimator.cc in Sources */,
+				968D6A30253AC56E00CFBBB3 /* mean_filter.cc in Sources */,
+				968D6A31253AC56E00CFBBB3 /* rotation.cc in Sources */,
+				968D6A32253AC56E00CFBBB3 /* vectorutils.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96BC68182539459C008B557A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96BC68252539459C008B557A /* ViewController.m in Sources */,
+				96BC68302539459C008B557A /* main.m in Sources */,
+				96BC68202539459C008B557A /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96BC687D25394970008B557A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96BC689925394971008B557A /* main.m in Sources */,
+				96BC688725394970008B557A /* Shaders.metal in Sources */,
+				96BC688525394970008B557A /* AppDelegate.m in Sources */,
+				96BC688E25394970008B557A /* ViewController.m in Sources */,
+				96BC688B25394970008B557A /* Renderer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96F95556253AAB9A007CE50B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				965D7F4B253AF2A6000B1B60 /* math_tools.cc in Sources */,
+				965D7F41253AF29F000B1B60 /* holokit_xr_unity.cc in Sources */,
+				965D7F42253AF29F000B1B60 /* input.cc in Sources */,
+				965D7F43253AF29F000B1B60 /* display.cc in Sources */,
+				965D7F1D253AEF9C000B1B60 /* main.cc in Sources */,
+				965D7EEA253AED4C000B1B60 /* printc.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		96BC6814253944BC008B557A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9660213C253930CC004019A5 /* holokit */;
+			targetProxy = 96BC6813253944BC008B557A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		96BC68262539459C008B557A /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96BC68272539459C008B557A /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		96BC682B2539459C008B557A /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96BC682C2539459C008B557A /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		96BC688F25394970008B557A /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96BC689025394970008B557A /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		96BC689425394971008B557A /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96BC689525394971008B557A /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		96602144253930CC004019A5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		96602145253930CC004019A5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		96602147253930CC004019A5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/sdk";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		96602148253930CC004019A5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/sdk";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		96602158253934A4004019A5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/sdk",
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		96602159253934A4004019A5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/sdk",
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		968D6933253ABEB300CFBBB3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = UnityHoloKit;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		968D6934253ABEB300CFBBB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = UnityHoloKit;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		968D69F9253AC51400CFBBB3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/sdk";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		968D69FA253AC51400CFBBB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/sdk";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		96BC68322539459C008B557A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				INFOPLIST_FILE = "test-apps/test-headtracking/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-headtracking";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		96BC68332539459C008B557A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				INFOPLIST_FILE = "test-apps/test-headtracking/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-headtracking";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		96BC689B25394971008B557A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "test-metalrender.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				INFOPLIST_FILE = "test-apps/test-metalrender/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-metalrender";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		96BC689C25394971008B557A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "test-metalrender.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				INFOPLIST_FILE = "test-apps/test-metalrender/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-metalrender";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		96F9555F253AAB9A007CE50B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				EXECUTABLE_PREFIX = "";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = UnityHoloKit;
+			};
+			name = Debug;
+		};
+		96F95560253AAB9A007CE50B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				EXECUTABLE_PREFIX = "";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = UnityHoloKit;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		96602138253930CC004019A5 /* Build configuration list for PBXProject "holokit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96602144253930CC004019A5 /* Debug */,
+				96602145253930CC004019A5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96602146253930CC004019A5 /* Build configuration list for PBXNativeTarget "holokit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96602147253930CC004019A5 /* Debug */,
+				96602148253930CC004019A5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96602157253934A4004019A5 /* Build configuration list for PBXNativeTarget "holokit-xr-plugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96602158253934A4004019A5 /* Debug */,
+				96602159253934A4004019A5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		968D6935253ABEB300CFBBB3 /* Build configuration list for PBXNativeTarget "holokit-xr-plugin-dummy-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				968D6933253ABEB300CFBBB3 /* Debug */,
+				968D6934253ABEB300CFBBB3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		968D69F8253AC51400CFBBB3 /* Build configuration list for PBXNativeTarget "holokit-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				968D69F9253AC51400CFBBB3 /* Debug */,
+				968D69FA253AC51400CFBBB3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96BC68312539459C008B557A /* Build configuration list for PBXNativeTarget "test-headtracking" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96BC68322539459C008B557A /* Debug */,
+				96BC68332539459C008B557A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96BC689A25394971008B557A /* Build configuration list for PBXNativeTarget "test-metalrender" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96BC689B25394971008B557A /* Debug */,
+				96BC689C25394971008B557A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96F9555E253AAB9A007CE50B /* Build configuration list for PBXNativeTarget "holokit-xr-plugin-dummy-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96F9555F253AAB9A007CE50B /* Debug */,
+				96F95560253AAB9A007CE50B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 96602135253930CC004019A5 /* Project object */;
+}
