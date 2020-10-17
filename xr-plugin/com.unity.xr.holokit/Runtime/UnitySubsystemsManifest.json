@@ -4,7 +4,9 @@
 	"libraryName": "UnityHoloKit",
 	"displays": [
 		{
-			"id": "HoloKit-Display"
+			"id": "HoloKit-Display",
+			"supportedMirrorBlitReservedModes" : ["leftEye","rightEye", "sideBySide"],
+			"disablesLegacyVr": true
 		}
 	],
 	"inputs": [

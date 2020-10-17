@@ -29,6 +29,9 @@
 
 #include "include/holokit.h"
 
+#import <Metal/Metal.h>
+
+
 // The following block makes log macros available for Android and iOS.
 //#if __APPLE__
 //#include <CoreFoundation/CFString.h>
@@ -172,6 +175,8 @@ const char kWidgetFragmentShader[] =
     gl_FragColor = texture2D(uTexture, vTexCoords);
   }
   )glsl";
+
+
 
 }  // namespace
 

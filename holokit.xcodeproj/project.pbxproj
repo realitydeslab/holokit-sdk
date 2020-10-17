@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9644C039253AF80E0000B682 /* holokit_xr_unity.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */; };
+		9644C039253AF80E0000B682 /* holokit_xr_unity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.mm */; };
 		9644C03A253AF80E0000B682 /* input.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95491253AA8BE007CE50B /* input.cc */; };
 		9644C03B253AF80E0000B682 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95492253AA8C0007CE50B /* display.cc */; };
 		9644C03C253AF80E0000B682 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
@@ -15,7 +15,7 @@
 		965D7EEA253AED4C000B1B60 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
 		965D7F07253AEE56000B1B60 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9660219F25393723004019A5 /* main.cc */; };
 		965D7F1D253AEF9C000B1B60 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9660219F25393723004019A5 /* main.cc */; };
-		965D7F41253AF29F000B1B60 /* holokit_xr_unity.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */; };
+		965D7F41253AF29F000B1B60 /* holokit_xr_unity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.mm */; };
 		965D7F42253AF29F000B1B60 /* input.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95491253AA8BE007CE50B /* input.cc */; };
 		965D7F43253AF29F000B1B60 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95492253AA8C0007CE50B /* display.cc */; };
 		965D7F4B253AF2A6000B1B60 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
@@ -50,7 +50,7 @@
 		968D6A1B253AC56E00CFBBB3 /* lens_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BA25396851008B557A /* lens_distortion.cc */; };
 		968D6A1C253AC56E00CFBBB3 /* polynomial_radial_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BC25396851008B557A /* polynomial_radial_distortion.cc */; };
 		968D6A1D253AC56E00CFBBB3 /* distortion_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BD25396851008B557A /* distortion_mesh.cc */; };
-		968D6A1E253AC56E00CFBBB3 /* holokit_xr_unity.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */; };
+		968D6A1E253AC56E00CFBBB3 /* holokit_xr_unity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.mm */; };
 		968D6A1F253AC56E00CFBBB3 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
 		968D6A23253AC56E00CFBBB3 /* lowpass_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AB25393723004019A5 /* lowpass_filter.cc */; };
 		968D6A24253AC56E00CFBBB3 /* median_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AC25393723004019A5 /* median_filter.cc */; };
@@ -125,6 +125,7 @@
 /* Begin PBXFileReference section */
 		965D7EC9253AECD7000B1B60 /* printc.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = printc.mm; sourceTree = "<group>"; };
 		965D7ED2253AECFB000B1B60 /* printc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = printc.h; sourceTree = "<group>"; };
+		965D7FD8253B16C3000B1B60 /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsMetal.h; sourceTree = "<group>"; };
 		9660213D253930CC004019A5 /* libholokit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libholokit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		96602151253934A4004019A5 /* libholokit-xr-plugin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-xr-plugin.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9660219F25393723004019A5 /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
@@ -195,7 +196,7 @@
 		966021E825393723004019A5 /* IUnityRenderingExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityRenderingExtensions.h; sourceTree = "<group>"; };
 		966021E925393723004019A5 /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
 		968D6932253ABEB300CFBBB3 /* UnityHoloKit.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = UnityHoloKit.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = holokit_xr_unity.cc; sourceTree = "<group>"; };
+		968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = holokit_xr_unity.mm; sourceTree = "<group>"; };
 		968D697B253AC0FC00CFBBB3 /* holokit.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = holokit.cc; sourceTree = "<group>"; };
 		968D69CA253AC4C900CFBBB3 /* distortion_renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = distortion_renderer.h; sourceTree = "<group>"; };
 		968D69CB253AC4C900CFBBB3 /* distortion_renderer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = distortion_renderer.cc; sourceTree = "<group>"; };
@@ -472,6 +473,7 @@
 				966021D725393723004019A5 /* IUnityInterface.h */,
 				966021D825393723004019A5 /* XR */,
 				966021E725393723004019A5 /* IUnityGraphics.h */,
+				965D7FD8253B16C3000B1B60 /* IUnityGraphicsMetal.h */,
 				966021E825393723004019A5 /* IUnityRenderingExtensions.h */,
 				966021E925393723004019A5 /* IUnityGraphicsD3D11.h */,
 			);
@@ -570,7 +572,7 @@
 		96F95490253AA8A9007CE50B /* xr_dummy */ = {
 			isa = PBXGroup;
 			children = (
-				968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.cc */,
+				968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.mm */,
 				96F95491253AA8BE007CE50B /* input.cc */,
 				965D7EC9253AECD7000B1B60 /* printc.mm */,
 				965D7ED2253AECFB000B1B60 /* printc.h */,
@@ -881,7 +883,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9644C039253AF80E0000B682 /* holokit_xr_unity.cc in Sources */,
+				9644C039253AF80E0000B682 /* holokit_xr_unity.mm in Sources */,
 				9644C03A253AF80E0000B682 /* input.cc in Sources */,
 				9644C03B253AF80E0000B682 /* display.cc in Sources */,
 				9644C03C253AF80E0000B682 /* math_tools.cc in Sources */,
@@ -904,7 +906,7 @@
 				968D6A1B253AC56E00CFBBB3 /* lens_distortion.cc in Sources */,
 				968D6A1C253AC56E00CFBBB3 /* polynomial_radial_distortion.cc in Sources */,
 				968D6A1D253AC56E00CFBBB3 /* distortion_mesh.cc in Sources */,
-				968D6A1E253AC56E00CFBBB3 /* holokit_xr_unity.cc in Sources */,
+				968D6A1E253AC56E00CFBBB3 /* holokit_xr_unity.mm in Sources */,
 				968D6A1F253AC56E00CFBBB3 /* math_tools.cc in Sources */,
 				968D6A23253AC56E00CFBBB3 /* lowpass_filter.cc in Sources */,
 				968D6A24253AC56E00CFBBB3 /* median_filter.cc in Sources */,
@@ -949,7 +951,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				965D7F4B253AF2A6000B1B60 /* math_tools.cc in Sources */,
-				965D7F41253AF29F000B1B60 /* holokit_xr_unity.cc in Sources */,
+				965D7F41253AF29F000B1B60 /* holokit_xr_unity.mm in Sources */,
 				965D7F42253AF29F000B1B60 /* input.cc in Sources */,
 				965D7F43253AF29F000B1B60 /* display.cc in Sources */,
 				965D7F1D253AEF9C000B1B60 /* main.cc in Sources */,

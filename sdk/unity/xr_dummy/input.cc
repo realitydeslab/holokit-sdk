@@ -29,12 +29,12 @@ class HoloKitInputProvider {
 
   void Init() {
       //holokit_api_->InitHeadTracker();
-      
+      HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "holokit_api_->InitHeadTracker()");
   }
 
   /// Callback executed when a subsystem should become active.
   UnitySubsystemErrorCode Start(UnitySubsystemHandle handle) {
-    HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "Lifecycle started");
+    HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "Lifecycle started!!");
     input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
    // holokit_api_->ResumeHeadTracker();
     return kUnitySubsystemErrorCodeSuccess;
@@ -42,27 +42,48 @@ class HoloKitInputProvider {
 
   /// Callback executed when a subsystem should become inactive.
   void Stop(UnitySubsystemHandle handle) {
-    HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "Lifecycle stopped");
+    HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "Lifecycle stopped!!");
     input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
 //    holokit_api_->PauseHeadTracker();
   }
 
-  UnitySubsystemErrorCode Tick() {
-    std::array<float, 4> out_orientation;
-    std::array<float, 3> out_position;
+  float s_Time = 0.0f;
+
+  UnitySubsystemErrorCode Tick(UnityXRInputUpdateType updateType) {
+//    std::array<float, 4> out_orientation;
+//    std::array<float, 3> out_position;
+//
  //   holokit_api_->GetHeadTrackerPose(out_position.data(),
  //                                      out_orientation.data());
     // TODO(b/151817737): Compute pose position within SDK with custom rotation.
-    head_pose_ = holokit::unity::HoloKitRotationToUnityPose(out_orientation);
+
+     s_Time += 0.01f;
+     if (s_Time > 1.0f)
+         s_Time -= 2.0f;
+  
+      HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), " Tick");
+      
+      // Sets Unity Pose's rotation. Unity expects forward as positive z axis,
+      // whereas OpenGL expects forward as negative z.
+      head_pose_.position.x = s_Time;
+      head_pose_.position.y = s_Time;
+      head_pose_.position.z = s_Time;
+
+      head_pose_.rotation.x = 0;
+      head_pose_.rotation.y = 0;
+      head_pose_.rotation.z = 0;
+      head_pose_.rotation.w = 1;
     return kUnitySubsystemErrorCodeSuccess;
   }
 
   UnitySubsystemErrorCode FillDeviceDefinition(
       UnityXRInternalInputDeviceId device_id,
       UnityXRInputDeviceDefinition* definition) {
+  
     if (device_id != kDeviceIdHoloKitHmd) {
       return kUnitySubsystemErrorCodeFailure;
     }
+    HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), "FillDeviceDefinition %d", device_id);
 
     input_->DeviceDefinition_SetName(definition, "HoloKit HMD");
     input_->DeviceDefinition_SetCharacteristics(definition,
@@ -79,9 +100,11 @@ class HoloKitInputProvider {
 
   UnitySubsystemErrorCode UpdateDeviceState(
       UnityXRInternalInputDeviceId device_id, UnityXRInputDeviceState* state) {
+      
     if (device_id != kDeviceIdHoloKitHmd) {
       return kUnitySubsystemErrorCodeFailure;
     }
+    HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), "UpdateDeviceState %d", device_id);
 
     UnityXRInputFeatureIndex feature_index = 0;
     input_->DeviceState_SetAxis3DValue(state, feature_index++,
@@ -142,8 +165,8 @@ LifecycleInitialize(UnitySubsystemHandle handle, void* data) {
   UnityXRInputProvider input_provider;
   input_provider.userData = nullptr;
   input_provider.Tick = [](UnitySubsystemHandle, void*,
-                           UnityXRInputUpdateType) {
-    return holokit_input_provider->Tick();
+                           UnityXRInputUpdateType updateType) {
+    return holokit_input_provider->Tick(updateType);
   };
   input_provider.FillDeviceDefinition =
       [](UnitySubsystemHandle, void*, UnityXRInternalInputDeviceId device_id,
@@ -181,13 +204,14 @@ LifecycleInitialize(UnitySubsystemHandle handle, void* data) {
         return holokit_input_provider->HandleSetTrackingOriginMode(
             tracking_origin_mode);
       };
+
   input_provider.HandleRecenter = nullptr;
   input_provider.HandleHapticImpulse = nullptr;
   input_provider.HandleHapticBuffer = nullptr;
   input_provider.QueryHapticCapabilities = nullptr;
   input_provider.HandleHapticStop = nullptr;
   holokit_input_provider->GetInput()->RegisterInputProvider(handle,
-                                                              &input_provider);
+                                                            &input_provider);
 
   // Initializes HoloKit's Head Tracker module.
   holokit_input_provider->Init();
@@ -210,16 +234,19 @@ UnitySubsystemErrorCode LoadInput(IUnityInterfaces* xr_interfaces) {
   input_lifecycle_handler.userData = NULL;
   input_lifecycle_handler.Initialize = &LifecycleInitialize;
   input_lifecycle_handler.Start = [](UnitySubsystemHandle handle, void*) {
+    HOLOKIT_INPUT_XR_TRACE_LOG(holokit_input_provider->GetTrace(),
+                                      "Lifecycle started");
     return holokit_input_provider->Start(handle);
   };
   input_lifecycle_handler.Stop = [](UnitySubsystemHandle handle, void*) {
+    HOLOKIT_INPUT_XR_TRACE_LOG(holokit_input_provider->GetTrace(),
+                                   "Lifecycle stopped");
     return holokit_input_provider->Stop(handle);
   };
   input_lifecycle_handler.Shutdown = [](UnitySubsystemHandle, void*) {
     HOLOKIT_INPUT_XR_TRACE_LOG(holokit_input_provider->GetTrace(),
                                  "Lifecycle finished");
-    holokit_input_provider.reset();
   };
-  return input->RegisterLifecycleProvider("HoloKit", "HoloKit-Input",
+  return input->RegisterLifecycleProvider("HoloKit XR Plugin", "HoloKit-Input",
                                           &input_lifecycle_handler);
 }

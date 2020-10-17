@@ -11,6 +11,7 @@ namespace HoloKit.Input
     /// HoloKit Mixed Reality XR headset.
     /// </summary>
     [Preserve]
+    [InputControlLayout(displayName = "HoloKit HME")]
     public class HoloKitHME : XRHMD
     {
         [Preserve]

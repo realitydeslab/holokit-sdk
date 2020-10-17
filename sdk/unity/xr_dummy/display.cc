@@ -62,8 +62,8 @@ class HoloKitDisplayProvider {
           trace_, "Skip the rendering because HoloKit SDK is uninitialized.");
       return kUnitySubsystemErrorCodeFailure;
     }
-  //  holokit_api_->RenderEyesToDisplay(holokit_api_->GetBoundFramebuffer());
-  //  holokit_api_->RenderWidgets();
+    //holokit_api_->RenderEyesToDisplay(holokit_api_->GetBoundFramebuffer());
+    //holokit_api_->RenderWidgets();
     return kUnitySubsystemErrorCodeSuccess;
   }
 
@@ -96,7 +96,7 @@ class HoloKitDisplayProvider {
         texture_descriptors_[i] = {};
         texture_descriptors_[i].width = width_ / 2;
         texture_descriptors_[i].height = height_;
-        texture_descriptors_[i].depthFormat = kUnityXRDepthTextureFormatNone;
+        texture_descriptors_[i].colorFormat = kUnityXRRenderTextureFormatBGRA32;
         texture_descriptors_[i].flags = 0;
         texture_descriptors_[i].depthFormat = kUnityXRDepthTextureFormat16bit;
       }
@@ -105,10 +105,10 @@ class HoloKitDisplayProvider {
     // Setup render passes + texture ids for eye textures and layers.
     for (int i = 0; i < texture_descriptors_.size(); ++i) {
       // Sets the color texture ID to Unity texture descriptors.
-        const int gl_colorname = i == 0; //? holokit_api_->GetLeftTextureId()
-                                      //: holokit_api_->GetRightTextureId();
-        const int gl_depthname = i == 0; //? holokit_api_->GetLeftDepthBufferId()
-                                      //: holokit_api_->GetRightDepthBufferId();
+        const int gl_colorname = i == 0 ? holokit_api_->GetLeftTextureId()
+                                      : holokit_api_->GetRightTextureId();
+        const int gl_depthname = i == 0 ? holokit_api_->GetLeftDepthBufferId()
+                                      : holokit_api_->GetRightDepthBufferId();
 
       UnityXRRenderTextureId unity_texture_id = 0;
       auto found = tex_map_.find(gl_colorname);
@@ -132,7 +132,7 @@ class HoloKitDisplayProvider {
       for (int i = 0; i < 2; ++i) {
         std::array<float, 4> fov;
         std::array<float, 16> eye_from_head;
-       // holokit_api_->GetEyeMatrices(i, eye_from_head.data(), fov.data());
+        holokit_api_->GetEyeMatrices(i, eye_from_head.data(), fov.data());
 
         auto* eye_params = i == 0 ? left_eye_params : right_eye_params;
         // Update pose for rendering.
@@ -241,19 +241,22 @@ DisplayInitialize(UnitySubsystemHandle handle, void*) {
   gfx_thread_provider.userData = NULL;
   gfx_thread_provider.Start = [](UnitySubsystemHandle, void*,
                                  UnityXRRenderingCapabilities* rendering_caps)
-      -> UnitySubsystemErrorCode {
+                                -> UnitySubsystemErrorCode {
     return display_provider->GfxThread_Start(rendering_caps);
   };
-  gfx_thread_provider.SubmitCurrentFrame =
-      [](UnitySubsystemHandle, void*) -> UnitySubsystemErrorCode {
-          return kUnitySubsystemErrorCodeSuccess; //display_provider->GfxThread_SubmitCurrentFrame();
-  };
-  gfx_thread_provider.PopulateNextFrameDesc =
-      [](UnitySubsystemHandle, void*, const UnityXRFrameSetupHints* frame_hints,
+    gfx_thread_provider.SubmitCurrentFrame = nullptr;
+//    [](UnitySubsystemHandle,
+//                                               void*) -> UnitySubsystemErrorCode {
+//     return display_provider->GfxThread_SubmitCurrentFrame();
+//  };
+    gfx_thread_provider.PopulateNextFrameDesc = nullptr;
+ /*[](UnitySubsystemHandle, void*, const UnityXRFrameSetupHints* frame_hints,
          UnityXRNextFrameDesc* next_frame) -> UnitySubsystemErrorCode {
-          return kUnitySubsystemErrorCodeSuccess; // display_provider->GfxThread_PopulateNextFrameDesc(frame_hints,
-                                                //             next_frame);
-  };
+        return display_provider->GfxThread_PopulateNextFrameDesc(frame_hints,
+                                                                    next_frame);
+  };*/
+  gfx_thread_provider.BlitToMirrorViewRenderTarget = nullptr;
+
   gfx_thread_provider.Stop = [](UnitySubsystemHandle,
                                 void*) -> UnitySubsystemErrorCode {
     return display_provider->GfxThread_Stop();
@@ -263,8 +266,6 @@ DisplayInitialize(UnitySubsystemHandle handle, void*) {
 
   UnityXRDisplayProvider provider{NULL, NULL, NULL};
   display_provider->GetDisplay()->RegisterProvider(handle, &provider);
-
-  printout("display_provider->GetDisplay()->RegisterProvider");
     
   return display_provider->Initialize();
 }
@@ -280,35 +281,36 @@ DisplayInitialize(UnitySubsystemHandle handle, void*) {
 /// @return kUnitySubsystemErrorCodeSuccess when the registration is successful.
 ///         Otherwise, a value in UnitySubsystemErrorCode flagging the error.
 UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
-  printout("xr_interfaces->Get<IUnityXRDisplayInterface>()");
   auto* display = xr_interfaces->Get<IUnityXRDisplayInterface>();
   if (display == NULL) {
     return kUnitySubsystemErrorCodeFailure;
   }
-    printout("xr_interfaces->Get<IUnityXRTrace>()");
-    auto* trace = xr_interfaces->Get<IUnityXRTrace>();
+  auto* trace = xr_interfaces->Get<IUnityXRTrace>();
   if (trace == NULL) {
     return kUnitySubsystemErrorCodeFailure;
   }
   display_provider.reset(new HoloKitDisplayProvider(trace, display));
-    printout("HoloKitDisplayProvider)");
 
   UnityLifecycleProvider display_lifecycle_handler;
   display_lifecycle_handler.userData = NULL;
   display_lifecycle_handler.Initialize = &DisplayInitialize;
   display_lifecycle_handler.Start = [](UnitySubsystemHandle,
                                        void*) -> UnitySubsystemErrorCode {
+    HOLOKIT_DISPLAY_XR_TRACE_LOG(display_provider->GetTrace(),
+                                     "Lifecycle started");
     return display_provider->Start();
   };
   display_lifecycle_handler.Stop = [](UnitySubsystemHandle, void*) -> void {
+    HOLOKIT_DISPLAY_XR_TRACE_LOG(display_provider->GetTrace(),
+                                     "Lifecycle stopped");
     display_provider->Stop();
   };
   display_lifecycle_handler.Shutdown = [](UnitySubsystemHandle, void*) -> void {
+    HOLOKIT_DISPLAY_XR_TRACE_LOG(display_provider->GetTrace(),
+                                     "Lifecycle shutdown");
     display_provider->Shutdown();
-    display_provider.reset();
   };
-    printout("display_lifecycle_handler end");
 
   return display_provider->GetDisplay()->RegisterLifecycleProvider(
-      "HoloKit", "HoloKit-Display", &display_lifecycle_handler);
+      "HoloKit XR Plugin", "HoloKit-Display", &display_lifecycle_handler);
 }

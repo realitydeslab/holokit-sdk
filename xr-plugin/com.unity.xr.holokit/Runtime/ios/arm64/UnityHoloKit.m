@@ -2,7 +2,7 @@
 #include "IUnityInterface.h"
 #include "UnityAppController.h"
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityHoloKitXRPlugin_PluginLoad(IUnityInterfaces* unityInterfaces);
+//void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces);
 
 @interface UnityHoloKit : NSObject
 
@@ -15,7 +15,7 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityHoloKitXRPlugin_PluginLoad(
 + (void)loadPlugin
 {
     // This registers our plugin with Unity
-    UnityRegisterRenderingPluginV5(UnityHoloKitXRPlugin_PluginLoad, NULL);
+    UnityRegisterRenderingPluginV5(UnityPluginLoad, NULL);
 }
 
 @end

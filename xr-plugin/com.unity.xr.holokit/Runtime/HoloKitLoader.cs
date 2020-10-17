@@ -35,7 +35,7 @@ namespace UnityEngine.XR.HoloKit
             UnityEngine.InputSystem.InputSystem.RegisterLayout<HoloKitHMD>(
                 matches: new InputDeviceMatcher()
                     .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
-                    .WithProduct("(HoloKit)")
+                    .WithProduct("(HoloKit HMD)")
             );
 
             UnityEngine.InputSystem.InputSystem.RegisterLayout<HoloKitHand>(
@@ -60,12 +60,8 @@ namespace UnityEngine.XR.HoloKit
 #if UNITY_INPUT_SYSTEM
             InputLayoutLoader.RegisterInputLayouts();
 #endif
-            Debug.Log("Create HoloKit-Display");
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(s_DisplaySubsystemDescriptors, "HoloKit-Display");
-            Debug.Log("Create HoloKit-Input");
             CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "HoloKit-Input");
-            Debug.Log("displaySubsystem " + (displaySubsystem != null));
-            Debug.Log("inputSubsystem " + (inputSubsystem != null));
             
             return displaySubsystem != null && inputSubsystem != null;
         }
