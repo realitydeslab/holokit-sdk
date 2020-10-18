@@ -5,63 +5,40 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.Scripting;
 
-namespace HoloKit.Input
+namespace UnityEngine.XR.HoloKit.Input
 {
     /// <summary>
     /// HoloKit Mixed Reality XR headset.
     /// </summary>
     [Preserve]
-    [InputControlLayout(displayName = "HoloKit HME")]
-    public class HoloKitHME : XRHMD
+    [InputControlLayout(displayName = "HoloKit HMD")]
+    public class HoloKitHMD : XRHMD
     {
         [Preserve]
         [InputControl]
-        public ButtonControl userPresence { get; private set; }
+        public new IntegerControl trackingState { get; private set; }
         [Preserve]
         [InputControl]
-        public IntegerControl trackingState { get; private set; }
-        [Preserve]
-        [InputControl]
-        public ButtonControl isTracked { get; private set; }
+        public new ButtonControl isTracked { get; private set; }
         [Preserve]
         [InputControl(aliases = new[] { "HeadPosition" })]
-        public Vector3Control devicePosition { get; private set; }
+        public new Vector3Control devicePosition { get; private set; }
         [Preserve]
         [InputControl(aliases = new[] { "HeadRotation" })]
-        public QuaternionControl deviceRotation { get; private set; }
+        public new QuaternionControl deviceRotation { get; private set; }
+        [Preserve]
+        public new Vector3Control centerEyePosition { get; private set; }
         [Preserve]
         [InputControl]
-        public Vector3Control leftEyePosition { get; private set; }
-        [Preserve]
-        [InputControl]
-        public QuaternionControl leftEyeRotation { get; private set; }
-        [Preserve]
-        [InputControl]
-        public Vector3Control rightEyePosition { get; private set; }
-        [Preserve]
-        [InputControl]
-        public QuaternionControl rightEyeRotation { get; private set; }
-        [Preserve]
-        [InputControl]
-        public Vector3Control centerEyePosition { get; private set; }
-        [Preserve]
-        [InputControl]
-        public QuaternionControl centerEyeRotation { get; private set; }
+        public new QuaternionControl centerEyeRotation { get; private set; }
 
 
         protected override void FinishSetup()
         {
             base.FinishSetup();
 
-            userPresence = GetChildControl<ButtonControl>("userPresence");
             trackingState = GetChildControl<IntegerControl>("trackingState");
             isTracked = GetChildControl<ButtonControl>("isTracked");
-            devicePosition = GetChildControl<Vector3Control>("devicePosition");
-            deviceRotation = GetChildControl<QuaternionControl>("deviceRotation");
-            leftEyePosition = GetChildControl<Vector3Control>("leftEyePosition");
-            leftEyeRotation = GetChildControl<QuaternionControl>("leftEyeRotation");
-            rightEyePosition = GetChildControl<Vector3Control>("rightEyePosition");
-            rightEyeRotation = GetChildControl<QuaternionControl>("rightEyeRotation");
             centerEyePosition = GetChildControl<Vector3Control>("centerEyePosition");
             centerEyeRotation = GetChildControl<QuaternionControl>("centerEyeRotation");
         }
@@ -73,16 +50,16 @@ namespace HoloKit.Input
     {
         [Preserve]
         [InputControl]
-        public IntegerControl trackingState { get; private set; }
+        public new IntegerControl trackingState { get; private set; }
         [Preserve]
         [InputControl]
-        public ButtonControl isTracked { get; private set; }
+        public new ButtonControl isTracked { get; private set; }
         [Preserve]
         [InputControl(aliases = new[] { "gripPosition" })]
-        public Vector3Control devicePosition { get; private set; }
+        public new Vector3Control devicePosition { get; private set; }
         [Preserve]
         [InputControl(aliases = new[] { "gripOrientation" })]
-        public QuaternionControl deviceRotation { get; private set; }
+        public new QuaternionControl  deviceRotation { get; private set; }
         [Preserve]
         [InputControl(aliases = new[] { "gripVelocity" })]
         public Vector3Control deviceVelocity { get; private set; }

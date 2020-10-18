@@ -7,9 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		961B8AEF253BB99F0025BA7D /* arsession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* arsession.mm */; };
+		961B8AF0253BB99F0025BA7D /* arsession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* arsession.mm */; };
+		961B8B00253BBABF0025BA7D /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 961B8AFF253BBABF0025BA7D /* Metal.framework */; };
+		961B8B01253BBAC70025BA7D /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 961B8AFF253BBABF0025BA7D /* Metal.framework */; };
+		961B8B03253BBACC0025BA7D /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 961B8B02253BBACC0025BA7D /* ARKit.framework */; };
 		9644C039253AF80E0000B682 /* holokit_xr_unity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.mm */; };
 		9644C03A253AF80E0000B682 /* input.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95491253AA8BE007CE50B /* input.cc */; };
-		9644C03B253AF80E0000B682 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95492253AA8C0007CE50B /* display.cc */; };
+		9644C03B253AF80E0000B682 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96F95492253AA8C0007CE50B /* display.mm */; };
 		9644C03C253AF80E0000B682 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
 		965D7EE2253AED44000B1B60 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
 		965D7EEA253AED4C000B1B60 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
@@ -17,7 +22,7 @@
 		965D7F1D253AEF9C000B1B60 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9660219F25393723004019A5 /* main.cc */; };
 		965D7F41253AF29F000B1B60 /* holokit_xr_unity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 968D6961253ABF8B00CFBBB3 /* holokit_xr_unity.mm */; };
 		965D7F42253AF29F000B1B60 /* input.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95491253AA8BE007CE50B /* input.cc */; };
-		965D7F43253AF29F000B1B60 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96F95492253AA8C0007CE50B /* display.cc */; };
+		965D7F43253AF29F000B1B60 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96F95492253AA8C0007CE50B /* display.mm */; };
 		965D7F4B253AF2A6000B1B60 /* math_tools.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A025393723004019A5 /* math_tools.cc */; };
 		966021ED25393723004019A5 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A525393723004019A5 /* display.cc */; };
 		966021EF25393723004019A5 /* lowpass_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AB25393723004019A5 /* lowpass_filter.cc */; };
@@ -123,6 +128,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		961B8AD8253B40110025BA7D /* UnityXRNativePtrs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnityXRNativePtrs.h; sourceTree = "<group>"; };
+		961B8AEE253BB99F0025BA7D /* arsession.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = arsession.mm; sourceTree = "<group>"; };
+		961B8AFF253BBABF0025BA7D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
+		961B8B02253BBACC0025BA7D /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		965D7EC9253AECD7000B1B60 /* printc.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = printc.mm; sourceTree = "<group>"; };
 		965D7ED2253AECFB000B1B60 /* printc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = printc.h; sourceTree = "<group>"; };
 		965D7FD8253B16C3000B1B60 /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsMetal.h; sourceTree = "<group>"; };
@@ -239,7 +248,7 @@
 		96BC68CE25396B40008B557A /* screen_params.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = screen_params.mm; sourceTree = "<group>"; };
 		96BC68D625396BF5008B557A /* holokit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = holokit.h; sourceTree = "<group>"; };
 		96F95491253AA8BE007CE50B /* input.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = input.cc; sourceTree = "<group>"; };
-		96F95492253AA8C0007CE50B /* display.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = display.cc; sourceTree = "<group>"; };
+		96F95492253AA8C0007CE50B /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 		96F95561253AAB9A007CE50B /* UnityHoloKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = UnityHoloKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -263,6 +272,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				961B8B01253BBAC70025BA7D /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,6 +301,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				961B8B03253BBACC0025BA7D /* ARKit.framework in Frameworks */,
+				961B8B00253BBABF0025BA7D /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -333,6 +345,8 @@
 		96602188253935D7004019A5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				961B8B02253BBACC0025BA7D /* ARKit.framework */,
+				961B8AFF253BBABF0025BA7D /* Metal.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -497,6 +511,7 @@
 				966021E425393723004019A5 /* IUnityXRStats.h */,
 				966021E525393723004019A5 /* UnityXRTypes.h */,
 				966021E625393723004019A5 /* UnitySubsystemTypes.h */,
+				961B8AD8253B40110025BA7D /* UnityXRNativePtrs.h */,
 			);
 			path = XR;
 			sourceTree = "<group>";
@@ -576,7 +591,8 @@
 				96F95491253AA8BE007CE50B /* input.cc */,
 				965D7EC9253AECD7000B1B60 /* printc.mm */,
 				965D7ED2253AECFB000B1B60 /* printc.h */,
-				96F95492253AA8C0007CE50B /* display.cc */,
+				96F95492253AA8C0007CE50B /* display.mm */,
+				961B8AEE253BB99F0025BA7D /* arsession.mm */,
 			);
 			path = xr_dummy;
 			sourceTree = "<group>";
@@ -711,7 +727,7 @@
 			buildPhases = (
 				96F95556253AAB9A007CE50B /* Sources */,
 				96F9555B253AAB9A007CE50B /* Frameworks */,
-				96F955B5253AAF2A007CE50B /* ShellScript */,
+				96F955B5253AAF2A007CE50B /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -816,7 +832,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"osx/x64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/${EXECUTABLE_NAME}\"\n\n";
 		};
-		96F955B5253AAF2A007CE50B /* ShellScript */ = {
+		96F955B5253AAF2A007CE50B /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -825,6 +841,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -885,9 +902,10 @@
 			files = (
 				9644C039253AF80E0000B682 /* holokit_xr_unity.mm in Sources */,
 				9644C03A253AF80E0000B682 /* input.cc in Sources */,
-				9644C03B253AF80E0000B682 /* display.cc in Sources */,
+				9644C03B253AF80E0000B682 /* display.mm in Sources */,
 				9644C03C253AF80E0000B682 /* math_tools.cc in Sources */,
 				965D7F07253AEE56000B1B60 /* main.cc in Sources */,
+				961B8AF0253BB99F0025BA7D /* arsession.mm in Sources */,
 				965D7EE2253AED44000B1B60 /* printc.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -953,8 +971,9 @@
 				965D7F4B253AF2A6000B1B60 /* math_tools.cc in Sources */,
 				965D7F41253AF29F000B1B60 /* holokit_xr_unity.mm in Sources */,
 				965D7F42253AF29F000B1B60 /* input.cc in Sources */,
-				965D7F43253AF29F000B1B60 /* display.cc in Sources */,
+				965D7F43253AF29F000B1B60 /* display.mm in Sources */,
 				965D7F1D253AEF9C000B1B60 /* main.cc in Sources */,
+				961B8AEF253BB99F0025BA7D /* arsession.mm in Sources */,
 				965D7EEA253AED4C000B1B60 /* printc.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

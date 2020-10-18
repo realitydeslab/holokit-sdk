@@ -249,7 +249,7 @@ class HoloKitApi::HoloKitApiImpl {
     uint8_t* data;
     int size;
 //    HoloKitQrCode_getSavedDeviceParams(&data, &size);
-    HoloKitLensDistortion* lens_distortion;
+//    HoloKitLensDistortion* lens_distortion;
 //    if (size == 0) {
       // Loads HoloKit V1 device parameters when no device parameters are
       // available.
@@ -275,15 +275,15 @@ class HoloKitApi::HoloKitApiImpl {
 //    HoloKitLensDistortion_getDistortionMesh(
 //        lens_distortion, HoloKitEye::kRight,
 //        &eye_data_[HoloKitEye::kRight].distortion_mesh);
-//
+////
 //    HoloKitDistortionRenderer_setMesh(
 //        distortion_renderer_.get(),
 //        &eye_data_[HoloKitEye::kLeft].distortion_mesh, HoloKitEye::kLeft);
 //    HoloKitDistortionRenderer_setMesh(
 //        distortion_renderer_.get(),
 //        &eye_data_[HoloKitEye::kRight].distortion_mesh, HoloKitEye::kRight);
-
-    // Get eye matrices
+//
+//   //  Get eye matrices
 //    HoloKitLensDistortion_getEyeFromHeadMatrix(
 //        lens_distortion, HoloKitEye::kLeft,
 //        eye_data_[HoloKitEye::kLeft].eye_from_head_matrix);
@@ -438,26 +438,23 @@ class HoloKitApi::HoloKitApiImpl {
   // @details Loads a color texture, then a depth buffer an finally a
   //          frame buffer for an eye.
   // @param gl_framebuffer A GlFramebuffer to load its resources.
-//  void CreateGlFramebuffer(GlFramebuffer* gl_framebuffer) {
-//    // Create color texture.
-//    glGenTextures(1, &gl_framebuffer->color_texture);
-//    glBindTexture(GL_TEXTURE_2D, gl_framebuffer->color_texture);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_params_.width / 2,
-//                 screen_params_.height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-//    CHECKGLERROR("Create a color texture.");
+  void CreateGlFramebuffer(GlFramebuffer* gl_framebuffer) {
+    // Create color texture.
+      
+   // id<MTLDevice> metalDevice = GetInterfaces()->Get<IUnityGraphicsMetal>()->MetalDevice();
+        
+//    MTLTextureDescriptor *color_texture_desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm width:screen_params_.width / 2  height:screen_params_.height mipmapped:NO];
+//      color_texture_desc.usage = MTLTextureUsageShaderWrite | MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
 //
-//    // Create depth buffer.
-//    glGenRenderbuffers(1, &gl_framebuffer->depth_render_buffer);
-//    glBindRenderbuffer(GL_RENDERBUFFER, gl_framebuffer->depth_render_buffer);
-//    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16,
-//                          screen_params_.width / 2, screen_params_.height);
-//    CHECKGLERROR("Create depth render buffer.");
-//
-//    // Create a frame buffer
+//    void* color_texture = (__bridge_retained void*) [metalDevice newTextureWithDescriptor:color_texture_desc];
+            
+//    MTLTextureDescriptor *depth_texture_desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth16Unorm width:screen_params_/2 height:screen_params_.height mipmapped:NO];
+//    depth_texture_desc.usage = MTLTextureUsageShaderWrite | MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
+        
+//    void* depth_texture = (__bridge_retained void*) [metalDevice newTextureWithDescriptor:depth_texture_desc];
+      
+      
+    // Create a frame buffer
 //    glGenFramebuffers(1, &gl_framebuffer->frame_buffer);
 //    glBindFramebuffer(GL_FRAMEBUFFER, gl_framebuffer->frame_buffer);
 //    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
@@ -466,15 +463,15 @@ class HoloKitApi::HoloKitApiImpl {
 //                              GL_RENDERBUFFER,
 //                              gl_framebuffer->depth_render_buffer);
 //    CHECKGLERROR("Create frame buffer.");
-//  }
+  }
 
   // @brief Configures GL resources.
-//  void GlSetup() {
+  void GlSetup() {
 //    if (gl_framebuffer_[0].frame_buffer != 0) {
 //      GlTeardown();
 //    }
-//
-//    // Create render texture, depth buffer and frame buffer for both eyes.
+
+    // Create render texture, depth buffer and frame buffer for both eyes.
 //    CreateGlFramebuffer(&gl_framebuffer_[HoloKitEye::kLeft]);
 //    CreateGlFramebuffer(&gl_framebuffer_[HoloKitEye::kRight]);
 //
@@ -491,19 +488,19 @@ class HoloKitApi::HoloKitApiImpl {
 //    eye_data_[HoloKitEye::kRight].texture.right_u = 1;
 //    eye_data_[HoloKitEye::kRight].texture.top_v = 1;
 //    eye_data_[HoloKitEye::kRight].texture.bottom_v = 0;
-//
-//    // Load widget state
+
+    // Load widget state
 //    widget_program_ = CreateProgram(kWidgetVertexShader, kWidgetFragmentShader);
 //    widget_attrib_position_ = glGetAttribLocation(widget_program_, "aPosition");
 //    widget_attrib_tex_coords_ = glGetAttribLocation(widget_program_,
 //                                                    "aTexCoords");
 //    widget_uniform_texture_ = glGetUniformLocation(widget_program_, "uTexture");
-//  }
+  }
 
   // @brief Releases Gl resources in a GlFramebuffer.
   //
   // @param gl_framebuffer A GlFramebuffer to release its resources.
-//  void DestroyGlFramebuffer(GlFramebuffer* gl_framebuffer) {
+  void DestroyGlFramebuffer(GlFramebuffer* gl_framebuffer) {
 //    glDeleteRenderbuffers(1, &gl_framebuffer->depth_render_buffer);
 //    gl_framebuffer->depth_render_buffer = 0;
 //
@@ -512,7 +509,7 @@ class HoloKitApi::HoloKitApiImpl {
 //
 //    glDeleteTextures(1, &gl_framebuffer->color_texture);
 //    gl_framebuffer->color_texture = 0;
-//  }
+  }
 
   // @brief Frees GL resources.
   void GlTeardown() {

@@ -1,5 +1,7 @@
 #include "unity/xr_provider/load.h"
 #include "XR/IUnityXRTrace.h"
+#include "XR/UnityXRNativePtrs.h"
+
 
 // @def Logs to @p trace the @p message.
 #define HOLOKIT_MAIN_XR_TRACE_LOG(trace, message) \
@@ -12,7 +14,7 @@
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
   auto* xr_trace = unity_interfaces->Get<IUnityXRTrace>();
-
+      
   if (LoadDisplay(unity_interfaces) != kUnitySubsystemErrorCodeSuccess) {
       XR_TRACE_LOG(xr_trace, "Error loading display subsystem.");
     return;
@@ -25,4 +27,9 @@ UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
     return;
   }
   HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "Input subsystem successfully loaded.");
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
+    SetARSession(ar_native_session);
 }

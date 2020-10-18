@@ -11,7 +11,7 @@ using UnityEngine.XR.HoloKit;
 namespace UnityEditor.XR.HoloKit
 {
     [System.Serializable]
-    [XRConfigurationData("HoloKit", "UnityEditor.XR.HoloKit.HoloKitSettings")]
+    [XRConfigurationData("HoloKit", "UnityEditor.XR.HoloKit.HoloKitPackageSettings")]
     public class HoloKitPackageSettings : ScriptableObject
     {
         public enum Requirement

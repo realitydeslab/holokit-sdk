@@ -18,7 +18,6 @@ namespace HoloKit
     [RequireComponent(typeof(Camera))]
     public class HoloKitPoseDriver: MonoBehaviour
     {
-
         static internal InputDevice? s_InputTrackingDevice = null;
 
         protected void Awake()
@@ -27,9 +26,7 @@ namespace HoloKit
 
         protected void OnEnable()
         {
-
             Application.onBeforeRender += OnBeforeRender;
-                Debug.Log("Hi");
 
             List<InputDevice> devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice, devices);
@@ -38,7 +35,6 @@ namespace HoloKit
                 Debug.Log($"{device.name}");
                 CheckConnectedDevice(device, false);
             }
-
             InputDevices.deviceConnected += OnInputDeviceConnected;
         }
 
@@ -60,7 +56,6 @@ namespace HoloKit
 //            Debug.Log("OnBeforeRender at " + HoloKitHeadTracking.Instance.GetCurrentTime());
 
             PerformUpdate();
-
         }
 
         protected void PerformUpdate()
@@ -88,8 +83,11 @@ namespace HoloKit
 
         void CheckConnectedDevice(InputDevice device, bool displayWarning = true)
         {
-            Debug.Log($"{device.name} added");
             if (!device.characteristics.HasFlag(InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice)) {
+                return;
+            }
+
+            if (device.name != "HoloKit HMD") {
                 return;
             }
 
@@ -101,7 +99,7 @@ namespace HoloKit
                 if (s_InputTrackingDevice == null)
                 {
                     s_InputTrackingDevice = device;
-                    Debug.Log($"{device.name}");
+                    Debug.Log($"{device.name} added");
                 }
                 else
                 {
@@ -131,17 +129,5 @@ namespace HoloKit
 
             return resultPose;
         }
-
-
-        // void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
-        // {
-        //     long lastFrameTimestamp = eventArgs.timestampNs.Value;
-        //     double exposureDuration = eventArgs.exposureDuration.Value;
-        //     Matrix4x4 displayMatrix = eventArgs.displayMatrix.Value;
-
-        //     var updatedPose = GetPoseData();
-            
-        //     //HoloKitHeadTracking.Instance.UpdateFramePose(lastFrameTimestamp, updatedPose, displayMatrix);
-        // }
     }
 }

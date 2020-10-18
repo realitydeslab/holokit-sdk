@@ -7,11 +7,17 @@
 #include "unity/xr_provider/load.h"
 #include "unity/xr_provider/math_tools.h"
 #include "IUnityInterface.h"
+#include "IUnityGraphics.h"
+
 #include "XR/IUnityXRDisplay.h"
 #include "XR/IUnityXRTrace.h"
 #include "XR/UnitySubsystemTypes.h"
 
 #include "unity/xr_dummy/printc.h"
+
+#import "IUnityGraphicsMetal.h"
+#import <Metal/Metal.h>
+
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, message, ...)                \
@@ -23,9 +29,11 @@ namespace {
 //        UnityXRDisplayGraphicsThreadProvider
 class HoloKitDisplayProvider {
  public:
-  HoloKitDisplayProvider(IUnityXRTrace* trace,
+  HoloKitDisplayProvider(IUnityInterfaces* interfaces, IUnityXRTrace* trace,
                            IUnityXRDisplayInterface* display)
-      : trace_(trace), display_(display) {}
+      : interfaces_(interfaces), trace_(trace), display_(display) {}
+
+  IUnityInterfaces* GetInterfaces() { return interfaces_; }
 
   IUnityXRDisplayInterface* GetDisplay() { return display_; }
 
@@ -99,9 +107,28 @@ class HoloKitDisplayProvider {
         texture_descriptors_[i].colorFormat = kUnityXRRenderTextureFormatBGRA32;
         texture_descriptors_[i].flags = 0;
         texture_descriptors_[i].depthFormat = kUnityXRDepthTextureFormat16bit;
+          
+        id<MTLDevice> metalDevice = GetInterfaces()->Get<IUnityGraphicsMetal>()->MetalDevice();
+               
+        MTLTextureDescriptor *color_texture_desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm width:width_ / 2 height:height_ mipmapped:NO];
+        color_texture_desc.usage = MTLTextureUsageShaderWrite | MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
+
+        void* color_texture = (__bridge_retained void*) [metalDevice newTextureWithDescriptor:color_texture_desc];
+        texture_descriptors_[i].color.nativePtr = color_texture;
+          
+        MTLTextureDescriptor *depth_texture_desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth16Unorm width:width_/2 height:height_ mipmapped:NO];
+        depth_texture_desc.usage = MTLTextureUsageShaderWrite | MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
+
+        void* depth_texture = (__bridge_retained void*) [metalDevice newTextureWithDescriptor:depth_texture_desc];
+        texture_descriptors_[i].depth.nativePtr = depth_texture;
+          UnityXRRenderTextureId unity_texture_id = 0;
+          UnityXRRenderTextureDesc texture_descriptor = texture_descriptors_[i];
+          display_->CreateTexture(handle_, &texture_descriptor,
+                              &unity_texture_id);
+//          tex_map_[color_texture] = unity_texture_id;
       }
     }
-
+      
     // Setup render passes + texture ids for eye textures and layers.
     for (int i = 0; i < texture_descriptors_.size(); ++i) {
       // Sets the color texture ID to Unity texture descriptors.
@@ -191,6 +218,9 @@ class HoloKitDisplayProvider {
     projection->data.halfAngles.right = std::abs(tan(holokit_fov[1]));
   }
 
+  /// @brief Points to Unity interfaces.
+  IUnityInterfaces* interfaces_ = nullptr;
+    
   /// @brief Points to Unity XR Trace interface.
   IUnityXRTrace* trace_ = nullptr;
 
@@ -250,11 +280,11 @@ DisplayInitialize(UnitySubsystemHandle handle, void*) {
 //     return display_provider->GfxThread_SubmitCurrentFrame();
 //  };
     gfx_thread_provider.PopulateNextFrameDesc = nullptr;
- /*[](UnitySubsystemHandle, void*, const UnityXRFrameSetupHints* frame_hints,
-         UnityXRNextFrameDesc* next_frame) -> UnitySubsystemErrorCode {
-        return display_provider->GfxThread_PopulateNextFrameDesc(frame_hints,
-                                                                    next_frame);
-  };*/
+//    gfx_thread_provider.PopulateNextFrameDesc = [](UnitySubsystemHandle, void*, const UnityXRFrameSetupHints* frame_hints,
+//         UnityXRNextFrameDesc* next_frame) -> UnitySubsystemErrorCode {
+//        return display_provider->GfxThread_PopulateNextFrameDesc(frame_hints,
+//                                                                    next_frame);
+//    };
   gfx_thread_provider.BlitToMirrorViewRenderTarget = nullptr;
 
   gfx_thread_provider.Stop = [](UnitySubsystemHandle,
@@ -281,6 +311,8 @@ DisplayInitialize(UnitySubsystemHandle handle, void*) {
 /// @return kUnitySubsystemErrorCodeSuccess when the registration is successful.
 ///         Otherwise, a value in UnitySubsystemErrorCode flagging the error.
 UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
+    
+    
   auto* display = xr_interfaces->Get<IUnityXRDisplayInterface>();
   if (display == NULL) {
     return kUnitySubsystemErrorCodeFailure;
@@ -289,7 +321,23 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
   if (trace == NULL) {
     return kUnitySubsystemErrorCodeFailure;
   }
-  display_provider.reset(new HoloKitDisplayProvider(trace, display));
+  auto* graphics = xr_interfaces->Get<IUnityGraphics>();
+        
+      //TODO(should fix for more than METAL)
+  if (graphics->GetRenderer() != kUnityGfxRendererMetal) {
+     HOLOKIT_DISPLAY_XR_TRACE_LOG(trace,
+                                  "Current render is not Metal");
+     return kUnitySubsystemErrorCodeFailure;
+  }
+
+  auto* metalGraphics = xr_interfaces->Get<IUnityGraphicsMetal>();
+  if (metalGraphics == NULL) {
+     HOLOKIT_DISPLAY_XR_TRACE_LOG(trace,
+                                  "cannot get metal");
+     return kUnitySubsystemErrorCodeFailure;
+  }
+    
+  display_provider.reset(new HoloKitDisplayProvider(xr_interfaces, trace, display));
 
   UnityLifecycleProvider display_lifecycle_handler;
   display_lifecycle_handler.userData = NULL;

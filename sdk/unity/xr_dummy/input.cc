@@ -61,7 +61,9 @@ class HoloKitInputProvider {
      if (s_Time > 1.0f)
          s_Time -= 2.0f;
   
-      HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), " Tick");
+      if (s_Time > -0.01 && s_Time < 0.01) {
+          HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), " Tick");
+      }
       
       // Sets Unity Pose's rotation. Unity expects forward as positive z axis,
       // whereas OpenGL expects forward as negative z.
@@ -135,7 +137,7 @@ class HoloKitInputProvider {
   }
 
  private:
-  static constexpr int kDeviceIdHoloKitHmd = 0;
+  static constexpr int kDeviceIdHoloKitHmd = 1234;
 
   static constexpr UnityXRInputDeviceCharacteristics kHmdCharacteristics =
       static_cast<UnityXRInputDeviceCharacteristics>(

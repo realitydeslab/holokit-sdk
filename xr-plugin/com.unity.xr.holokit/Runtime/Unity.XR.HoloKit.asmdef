@@ -5,6 +5,7 @@
         "Unity.XR.Management",
         "Unity.XR.InteractionSubsystems",
         "Unity.XR.ARSubsystems",
+        "Unity.XR.ARFoundation",
         "Unity.InputSystem"
     ],
     "includePlatforms": [
@@ -28,6 +29,11 @@
             "name": "com.unity.inputsystem",
             "expression": "",
             "define": "UNITY_INPUT_SYSTEM"
+        },
+        {
+            "name": "com.unity.xr.arfoundation",
+            "expression": "4.1.0",
+            "define": "UNITY_ARFOUNDATION"
         }
     ],
     "noEngineReferences": false

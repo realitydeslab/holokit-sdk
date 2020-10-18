@@ -74,7 +74,7 @@ PluginImporter:
         AddToEmbeddedBinaries: false
         CPU: ARM64
         CompileFlags: 
-        FrameworkDependencies: 
+        FrameworkDependencies: ARKit;Metal;
   userData: 
   assetBundleName: 
   assetBundleVariant: 
