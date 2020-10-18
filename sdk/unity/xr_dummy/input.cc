@@ -110,14 +110,36 @@ class HoloKitInputProvider {
         input_->DeviceDefinition_SetName(definition, "HoloKit Hand");
         input_->DeviceDefinition_SetCharacteristics(definition, kHandCharacteristics);
         input_->DeviceDefinition_SetManufacturer(definition, "Holo Interactive");
+        
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Wrist", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "ThumbStart", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Thumb1", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Thumb2", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "ThumbEnd", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "MidStart", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Mid1", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Mid2", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "MidEnd", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "RingStart", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Ring1", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Ring2", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "RingEnd", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "PinkyStart", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Pinky1", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Pinky2", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "PinkyEnd", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+        
         input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
         input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageTrackingState);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Handedness", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageHandData);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Air Tap", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+        
 
         
 //        UnityXRInputFeatureIndex hand_structure = input_->DeviceDefinition_AddFeatureWithUsage(
 //            definition, "Hand Indices", kUnityXRInputFeatureTypeHand, kUnityXRInputFeatureUsageHandData);
-        UnityXRInputFeatureIndex LeftHand = input_->DeviceDefinition_AddFeatureWithUsage(
-            definition, "LeftHand", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+//        UnityXRInputFeatureIndex LeftHand = input_->DeviceDefinition_AddFeatureWithUsage(
+//            definition, "LeftHand", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
 
         
         return kUnitySubsystemErrorCodeSuccess;
@@ -143,101 +165,39 @@ class HoloKitInputProvider {
         return kUnitySubsystemErrorCodeSuccess;
     } else if (device_id == kDeviceIdHoloKitHand) {
         
-        UnityXRInputFeatureIndex feature_index = 0;
-        UnityXRBone bone;
-        bone.parentBoneIndex = 0;
-        bone.position = {0, 0, 0};
-        bone.rotation = {0, 0, 0, 1};
+        HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), "UpdateDeviceState kDeviceIdHoloKitHand %d", device_id);
+        
+        input_->DeviceState_SetBoneValue(state, 0, UnityXRBone {.parentBoneIndex = 0, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 1, UnityXRBone {.parentBoneIndex = 0, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 2, UnityXRBone {.parentBoneIndex = 1, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 3, UnityXRBone {.parentBoneIndex = 2, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 4, UnityXRBone {.parentBoneIndex = 3, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 5, UnityXRBone {.parentBoneIndex = 0, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 6, UnityXRBone {.parentBoneIndex = 5, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 7, UnityXRBone {.parentBoneIndex = 6, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 8, UnityXRBone {.parentBoneIndex = 7, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 9, UnityXRBone {.parentBoneIndex = 0, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 10, UnityXRBone {.parentBoneIndex = 9, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 11, UnityXRBone {.parentBoneIndex = 10, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 12, UnityXRBone {.parentBoneIndex = 11, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 13, UnityXRBone {.parentBoneIndex = 0, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 14, UnityXRBone {.parentBoneIndex = 13, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 15, UnityXRBone {.parentBoneIndex = 14, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 16, UnityXRBone {.parentBoneIndex = 15, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 17, UnityXRBone {.parentBoneIndex = 0, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 18, UnityXRBone {.parentBoneIndex = 17, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 19, UnityXRBone {.parentBoneIndex = 18, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+        input_->DeviceState_SetBoneValue(state, 20, UnityXRBone {.parentBoneIndex = 19, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
+
+        UnityXRInputFeatureIndex feature_index = 21;
         
         input_->DeviceState_SetBinaryValue(state, feature_index++, true);
         input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
-        input_->DeviceState_SetBoneValue(state, feature_index++, bone);
+        input_->DeviceState_SetDiscreteStateValue(state, feature_index++, 0); //handedness
+        input_->DeviceState_SetBinaryValue(state, feature_index++, false); //AirTag
+
         
         return kUnitySubsystemErrorCodeSuccess;
-        //        UnityXRHand hand;
-
-//
-//        /*
-//         LeftHand = 22, // parent: LeftForearm [21]
-//         LeftHandIndexStart = 23, // parent: LeftHand [22]
-//         LeftHandIndex1 = 24, // parent: LeftHandIndexStart [23]
-//         LeftHandIndex2 = 25, // parent: LeftHandIndex1 [24]
-//         LeftHandIndex3 = 26, // parent: LeftHandIndex2 [25]
-//         LeftHandIndexEnd = 27, // parent: LeftHandIndex3 [26]
-//         LeftHandMidStart = 28, // parent: LeftHand [22]
-//         LeftHandMid1 = 29, // parent: LeftHandMidStart [28]
-//         LeftHandMid2 = 30, // parent: LeftHandMid1 [29]
-//         LeftHandMid3 = 31, // parent: LeftHandMid2 [30]
-//         LeftHandMidEnd = 32, // parent: LeftHandMid3 [31]
-//         LeftHandPinkyStart = 33, // parent: LeftHand [22]
-//         LeftHandPinky1 = 34, // parent: LeftHandPinkyStart [33]
-//         LeftHandPinky2 = 35, // parent: LeftHandPinky1 [34]
-//         LeftHandPinky3 = 36, // parent: LeftHandPinky2 [35]
-//         LeftHandPinkyEnd = 37, // parent: LeftHandPinky3 [36]
-//         LeftHandRingStart = 38, // parent: LeftHand [22]
-//         LeftHandRing1 = 39, // parent: LeftHandRingStart [38]
-//         LeftHandRing2 = 40, // parent: LeftHandRing1 [39]
-//         LeftHandRing3 = 41, // parent: LeftHandRing2 [40]
-//         LeftHandRingEnd = 42, // parent: LeftHandRing3 [41]
-//         LeftHandThumbStart = 43, // parent: LeftHand [22]
-//         LeftHandThumb1 = 44, // parent: LeftHandThumbStart [43]
-//         LeftHandThumb2 = 45, // parent: LeftHandThumb1 [44]
-//         LeftHandThumbEnd = 46, // parent: LeftHandThumb2 [45]
-//
-//        RightHand = 66, // parent: RightForearm [65]
-//        RightHandIndexStart = 67, // parent: RightHand [66]
-//        RightHandIndex1 = 68, // parent: RightHandIndexStart [67]
-//        RightHandIndex2 = 69, // parent: RightHandIndex1 [68]
-//        RightHandIndex3 = 70, // parent: RightHandIndex2 [69]
-//        RightHandIndexEnd = 71, // parent: RightHandIndex3 [70]
-//        RightHandMidStart = 72, // parent: RightHand [66]
-//        RightHandMid1 = 73, // parent: RightHandMidStart [72]
-//        RightHandMid2 = 74, // parent: RightHandMid1 [73]
-//        RightHandMid3 = 75, // parent: RightHandMid2 [74]
-//        RightHandMidEnd = 76, // parent: RightHandMid3 [75]
-//        RightHandPinkyStart = 77, // parent: RightHand [66]
-//        RightHandPinky1 = 78, // parent: RightHandPinkyStart [77]
-//        RightHandPinky2 = 79, // parent: RightHandPinky1 [78]
-//        RightHandPinky3 = 80, // parent: RightHandPinky2 [79]
-//        RightHandPinkyEnd = 81, // parent: RightHandPinky3 [80]
-//        RightHandRingStart = 82, // parent: RightHand [66]
-//        RightHandRing1 = 83, // parent: RightHandRingStart [82]
-//        RightHandRing2 = 84, // parent: RightHandRing1 [83]
-//        RightHandRing3 = 85, // parent: RightHandRing2 [84]
-//        RightHandRingEnd = 86, // parent: RightHandRing3 [85]
-//        RightHandThumbStart = 87, // parent: RightHand [66]
-//        RightHandThumb1 = 88, // parent: RightHandThumbStart [87]
-//        RightHandThumb2 = 89, // parent: RightHandThumb1 [88]
-//        RightHandThumbEnd = 90, // parent: RightHandThumb2 [89]
-//        */
-//
-//        hand.fingerBonesIndices[UnityXRFingerThumb] = {0, 1, 2};
-//        hand.fingerBonesIndices[UnityXRFingerIndex] = {0, 1, 2};
-//        hand.fingerBonesIndices[UnityXRFingerMiddle] = {0, 1, 2};
-//        hand.fingerBonesIndices[UnityXRFingerRing] = {0, 1, 2};
-//        hand.fingerBonesIndices[UnityXRFingerPinky] = {0, 1, 2};
-//        hand.rootBoneIndex = 22;
-//        UnityXRBone {parentBoneIndex = 1, position={}, rotation={}};
-//
-//        input_DeviceState_SetBoneValue(state, , );
-//
-//      //  hand.fingerBonesIndices[UnityXRHandFinger]
-////        UnityXRBone
-////        hand.rootBoneIndex
-////        hand.fingerBonesIndices[5]
-////        UnityXRBone bone;
-////        bone.position
-////        bone.rotation
-////        bone.parentBoneIndex
-////
-//        UnityXRHandFinger finger;
-//        finger.
-//        input_->DeviceState_
-//        input_->DeviceState_SetHandValue(state, feature_index++,
-//                                           head_pose_.position);
-//        input_->DeviceState_SetBoneValue(state, feature_index++,
-//                                           head_pose_.position);
-//
     }
     else {
         return kUnitySubsystemErrorCodeFailure;

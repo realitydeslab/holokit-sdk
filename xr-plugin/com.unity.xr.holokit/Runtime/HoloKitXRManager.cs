@@ -159,15 +159,15 @@ namespace UnityEngine.XR.HoloKit
 
             if (!holokitDisplayStarted)
             {
-                // var holokitDisplaySubsystemDescriptor = GetHoloKitDisplaySubsystemDescriptor();
-                // if (holokitDisplaySubsystemDescriptor != null)
-                // {
-                //     var holokitDisplaySubsystem = holokitDisplaySubsystemDescriptor.Create();
-                //     if (holokitDisplaySubsystem != null)
-                //     {
-                //        holokitDisplaySubsystem.Start();
-                //     }
-                // }
+                var holokitDisplaySubsystemDescriptor = GetHoloKitDisplaySubsystemDescriptor();
+                if (holokitDisplaySubsystemDescriptor != null)
+                {
+                    var holokitDisplaySubsystem = holokitDisplaySubsystemDescriptor.Create();
+                    if (holokitDisplaySubsystem != null)
+                    {
+                       holokitDisplaySubsystem.Start();
+                    }
+                }
             }
 
             bool holokitInputStarted = false;
