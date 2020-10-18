@@ -1,264 +1,229 @@
-// using System;
-// using System.Collections;
-// using System.Collections.Generic;
-// using System.Reflection;
-// using System.Runtime.CompilerServices;
-// using System.Runtime.InteropServices;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
-// using UnityEngine;
-// using UnityEngine.XR;
-// using UnityEngine.XR.Management;
-// using UnityEngine.XR.ARSubsystems;
+using UnityEngine;
+using UnityEngine.XR;
+using UnityEngine.XR.Management;
+using UnityEngine.XR.ARSubsystems;
 
-// #if UNITY_ARFOUNDATION
-// using UnityEngine.XR.ARFoundation;
-// #endif 
+#if UNITY_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Layouts;
+using UnityEngine.InputSystem.XR;
+#endif
 
-// namespace UnityEngine.XR.HoloKit
-// {
-//     public class DisableXRManager 
-//     {
-//         public  const string kHoloKitDisplayProviderId = "HoloKit-Display";
-//         public  const string kHoloKitInputProviderId = "HoloKit-Input";
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
-//         static XRDisplaySubsystemDescriptor GetHoloKitDisplaySubsystemDescriptor()
-//         {
-//             List<XRDisplaySubsystemDescriptor> displayProviders = new List<XRDisplaySubsystemDescriptor>();
-//             SubsystemManager.GetSubsystemDescriptors(displayProviders);
+namespace UnityEngine.XR.HoloKit
+{
+#if UNITY_INPUT_SYSTEM
+    using UnityEngine.XR.HoloKit.Input;
 
-//             foreach (var d in displayProviders)
-//             {
-//                 if (d.id.Equals(kHoloKitDisplayProviderId))
-//                 {
-//                     return d;
-//                 }
-//             }
-//             return null;
-//         }
+#if UNITY_EDITOR
+      [InitializeOnLoad]
+#endif
+    static class InputLayoutLoader
+    {
+        static InputLayoutLoader()
+        {
+            RegisterInputLayouts();
+        }
 
-//         static XRInputSubsystemDescriptor GetHoloKitInputSubsystemDescriptor()
-//         {
-//             List<XRInputSubsystemDescriptor> inputProviders = new List<XRInputSubsystemDescriptor>();
-//             SubsystemManager.GetSubsystemDescriptors(inputProviders);
+        public static void RegisterInputLayouts()
+        {
+            UnityEngine.InputSystem.InputSystem.RegisterLayout<HoloKitHMD>(
+                matches: new InputDeviceMatcher()
+                    .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
+                    .WithProduct("(HoloKit HMD)")
+            );
 
-//             foreach (var d in inputProviders)
-//             {
-//                 if (d.id.Equals(kHoloKitInputProviderId))
-//                 {
-//                     return d;
-//                 }
-//             }
-//             return null;
-//         }
+            UnityEngine.InputSystem.InputSystem.RegisterLayout<HoloKitHand>(
+                matches: new InputDeviceMatcher()
+                    .WithInterface(XRUtilities.InterfaceMatchAnyVersion)
+                    .WithProduct("(HoloKit Hand)")
+            );
+        }
+    }
+#endif
 
-//         static XRSessionSubsystem GetLoadedXRSessionSubsystem()
-//         {
-//             List<XRSessionSubsystem> xrSessionSubsystems = new List<XRSessionSubsystem>();
-//             SubsystemManager.GetSubsystems(xrSessionSubsystems);
+    public class HoloKitXRManager
+    {
+        public  const string kHoloKitDisplayProviderId = "HoloKit-Display";
+        public  const string kHoloKitInputProviderId = "HoloKit-Input";
 
-//             foreach (var d in xrSessionSubsystems)
-//             {
-//                 // if (d.running) 
-//                 // {
-//                     Debug.Log("xrSession is founded. id" + d.subsystemDescriptor.id + "session id" + d.sessionId + "nativePtr" + d.nativePtr);
-//                     return d;
-// //                }
-//             }
-//             return null;
-//         }
+        static XRDisplaySubsystemDescriptor GetHoloKitDisplaySubsystemDescriptor()
+        {
+            List<XRDisplaySubsystemDescriptor> displayProviders = new List<XRDisplaySubsystemDescriptor>();
+            SubsystemManager.GetSubsystemDescriptors(displayProviders);
+
+            foreach (var d in displayProviders)
+            {
+                if (d.id.Equals(kHoloKitDisplayProviderId))
+                {
+                    return d;
+                }
+            }
+            return null;
+        }
+
+        static XRInputSubsystemDescriptor GetHoloKitInputSubsystemDescriptor()
+        {
+            List<XRInputSubsystemDescriptor> inputProviders = new List<XRInputSubsystemDescriptor>();
+            SubsystemManager.GetSubsystemDescriptors(inputProviders);
+
+            foreach (var d in inputProviders)
+            {
+                if (d.id.Equals(kHoloKitInputProviderId))
+                {
+                    return d;
+                }
+            }
+            return null;
+        }
+
+        static XRSessionSubsystem GetLoadedXRSessionSubsystem()
+        {
+            List<XRSessionSubsystem> xrSessionSubsystems = new List<XRSessionSubsystem>();
+            SubsystemManager.GetSubsystems(xrSessionSubsystems);
+
+            foreach (var d in xrSessionSubsystems)
+            {
+                // if (d.running) 
+                // {
+                    Debug.Log("xrSession is founded. id" + d.subsystemDescriptor.id + "running" + d.running + " session id" + d.sessionId + " nativePtr" + d.nativePtr + " state" + d.trackingState);
+                    return d;
+//                }
+            }
+            return null;
+        }
 
 
 
-//         //Before AfterAssembliesLoaded
-//         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-//         static void OnSubsystemRegistration ()
-//         {
-//             Debug.LogWarning("OnSubsystemRegistration");
+        //Before AfterAssembliesLoaded
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void OnSubsystemRegistration ()
+        {
+            Debug.LogWarning("OnSubsystemRegistration");
         
-//             var xrSettings = XRGeneralSettings.Instance;
-//             if (xrSettings == null)
-//             {
-//                 Debug.Log($"XRGeneralSettings is null.");
-//                 return;
-//             }
+            var xrSettings = XRGeneralSettings.Instance;
+            if (xrSettings == null)
+            {
+                Debug.Log($"XRGeneralSettings is null.");
+                return;
+            }
 
-//             var xrManager = xrSettings.Manager;
-//             if (xrManager == null)
-//             {
-//                 Debug.Log($"XRManagerSettings is null.");
-//                 return;
-//             }
-//             Debug.Log($"Set automaticloading = false.");
-//             xrManager.automaticLoading = false;
-//          }
+            var xrManager = xrSettings.Manager;
+            if (xrManager == null)
+            {
+                Debug.Log($"XRManagerSettings is null.");
+                return;
+            }
+            Debug.Log($"Set automaticloading = false.");
+            xrManager.automaticLoading = false;
+         }
         
-//         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-//         static void OnAfterAssembliesLoaded() {
-//            Debug.LogWarning("OnAfterAssembliesLoaded");
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void OnAfterAssembliesLoaded() {
+           Debug.LogWarning("OnAfterAssembliesLoaded");
+        }
 
-//         }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        static void OnBeforeSplashScreen() {
+           Debug.LogWarning("OnBeforeSplashScreen");
 
-//         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-//         static void OnBeforeSplashScreen() {
-//            Debug.LogWarning("OnBeforeSplashScreen");
+             bool holokitDisplayStarted = false;
+            List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
+            SubsystemManager.GetSubsystems(displaySubsystems);
+            foreach (var d in displaySubsystems)
+            {
+                 Debug.Log("BeforeSplashScreen Current" + d.subsystemDescriptor.id);
 
-//              bool holokitDisplayStarted = false;
-//             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
-//             SubsystemManager.GetSubsystems(displaySubsystems);
-//             foreach (var d in displaySubsystems)
-//             {
-//                  Debug.Log("BeforeSplashScreen Current" + d.subsystemDescriptor.id);
+                if (d.running)
+                {
+                    if (!d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
+                    {                        
+                        d.Stop();
+                    }
+                    else
+                    {
+                        holokitDisplayStarted = true;
+                    }
+                }
+            }
 
-//                 if (d.running)
-//                 {
-//                     if (!d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
-//                     {                        
-//                        // d.Stop();
-//                     }
-//                     else
-//                     {
-//                         holokitDisplayStarted = true;
-//                     }
-//                 }
-//             }
+            if (!holokitDisplayStarted)
+            {
+                // var holokitDisplaySubsystemDescriptor = GetHoloKitDisplaySubsystemDescriptor();
+                // if (holokitDisplaySubsystemDescriptor != null)
+                // {
+                //     var holokitDisplaySubsystem = holokitDisplaySubsystemDescriptor.Create();
+                //     if (holokitDisplaySubsystem != null)
+                //     {
+                //        holokitDisplaySubsystem.Start();
+                //     }
+                // }
+            }
 
-//             if (!holokitDisplayStarted)
-//             {
-//                 var holokitDisplaySubsystemDescriptor = GetHoloKitDisplaySubsystemDescriptor();
-//                 // if (holokitDisplaySubsystemDescriptor != null)
-//                 // {
-//                 //     var holokitDisplaySubsystem = holokitDisplaySubsystemDescriptor.Create();
-//                 //     if (holokitDisplaySubsystem != null)
-//                 //     {
-//                 //        holokitDisplaySubsystem.Start();
-//                 //     }
-//                 // }
-//             }
+            bool holokitInputStarted = false;
+            List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
+            SubsystemManager.GetSubsystems(inputSubsystems);
+            foreach (var d in inputSubsystems)
+            {
+                if (d.running)
+                {
+                    if (d.subsystemDescriptor.id.Equals(kHoloKitInputProviderId))
+                    {
+                        holokitInputStarted = true;
+                    }
+                }
+            }
 
-//             bool holokitInputStarted = false;
-//             List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
-//             SubsystemManager.GetSubsystems(inputSubsystems);
-//             foreach (var d in inputSubsystems)
-//             {
-//                 if (d.running)
-//                 {
-//                     if (d.subsystemDescriptor.id.Equals(kHoloKitInputProviderId))
-//                     {
-//                       //  holokitInputStarted = true;
-//                     }
-//                 }
-//             }
+            if (!holokitInputStarted)
+            {
+                var holokitInputSubsystemDescriptor = GetHoloKitInputSubsystemDescriptor();
+                if (holokitInputSubsystemDescriptor != null)
+                {
+                    var holokitInputSubsystem = holokitInputSubsystemDescriptor.Create();
+                    if (holokitInputSubsystem != null)
+                    {
+                        holokitInputSubsystem.Start();
+                    }
+                }
+            }
 
-//             if (!holokitInputStarted)
-//             {
-//                 var holokitInputSubsystemDescriptor = GetHoloKitInputSubsystemDescriptor();
-//                 // if (holokitInputSubsystemDescriptor != null)
-//                 // {
-//                 //     var holokitInputSubsystem = holokitInputSubsystemDescriptor.Create();
-//                 //     if (holokitInputSubsystem != null)
-//                 //     {
-//                 //         holokitInputSubsystem.Start();
-//                 //     }
-//                 // }
-//             }
+            var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
+            if (xrSessionSubsystem != null) {
+                Debug.Log("xrSessionSubsystem" + xrSessionSubsystem.sessionId + " " + xrSessionSubsystem.trackingState + " " + xrSessionSubsystem.nativePtr);
+                Debug.Log("Setup xrSessionSubsystem");
+                UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
+            }
 
-//             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
-//             if (xrSessionSubsystem != null) {
-//                 Debug.Log("xrSessionSubsystem" + xrSessionSubsystem.sessionId + " " + xrSessionSubsystem.trackingState + " " + xrSessionSubsystem.nativePtr);
-//             }
-//         }
+#if UNITY_INPUT_SYSTEM
+            InputLayoutLoader.RegisterInputLayouts();
+#endif
+        }
  
-//         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-//         static void OnBeforeSceneLoad() {
-//             Debug.LogWarning("OnBeforeSceneLoad ======> " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + ".unity");
-//             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
-//             if (xrSessionSubsystem != null) {
-//                 Debug.Log("xrSessionSubsystem" + xrSessionSubsystem.sessionId + " " + xrSessionSubsystem.trackingState + " " + xrSessionSubsystem.nativePtr);
-//             }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void OnBeforeSceneLoad() {
+            Debug.LogWarning("OnBeforeSceneLoad ======> " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + ".unity");
+            
+        }
 
-//         }
-
-//         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-//         static void OnAfterSceneLoad() {
-//             Debug.LogWarning("OnAfterSceneLoad ======> " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + ".unity");
-//             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
-//             if (xrSessionSubsystem != null) {
-//                 Debug.Log("xrSessionSubsystem" + xrSessionSubsystem.sessionId + " " + xrSessionSubsystem.trackingState + " " + xrSessionSubsystem.nativePtr);
-//             }
-//         }
-//     }
-
-//     [DisallowMultipleComponent]
-//     public class HoloKitXRManager: MonoBehaviour
-//     {
-//         public const string kHoloKitDisplayProviderId = "HoloKit-Display";
-//         public const string kHoloKitInputProviderId = "HoloKit-Input";
-
-//         void WarnIfMultipleHoloKitXRManager()
-//         {
-//             var xrManagers = FindObjectsOfType<HoloKitXRManager>();
-//             if (xrManagers.Length > 1)
-//             {
-//                 Debug.LogWarningFormat(
-//                     "Multiple active AR Sessions found. " +
-//                     "These will conflict with each other, so " +
-//                     "you should only have one active HoloKitXRManager at a time. ");
-//             }
-//         }
-
-// #if UNITY_ARFOUNDATION
-        
-//         static internal ARSession s_ARSession;
-//         static internal IntPtr s_ARSessionNativePtr = IntPtr.Zero;
-
-// #endif 
-
-//         protected void Awake()
-//         {
-// #if UNITY_ARFOUNDATION
-//             s_ARSession = GetComponent<ARSession>();
-// #endif 
-         
-//         }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void OnAfterSceneLoad() {
+            Debug.LogWarning("OnAfterSceneLoad ======> " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + ".unity");
+            
+        }
 
 
-//         protected void OnEnable()
-//         {
-// #if DEVELOPMENT_BUILD || UNITY_EDITOR
-//             WarnIfMultipleHoloKitXRManager();
-// #endif
-// #if UNITY_ARFOUNDATION
-//              ARSession.stateChanged += OnARSessionStateChanged;
-// #endif
-//         }
+        [DllImport("__Internal")]
+        public static extern void UnityHoloKit_SetARSession(IntPtr ptr);
 
-//         protected void OnDisable()
-//         {  
-// #if UNITY_ARFOUNDATION
-//             ARSession.stateChanged -= OnARSessionStateChanged;
-// #endif
-//         }
-// #if UNITY_ARFOUNDATION
-//         void OnARSessionStateChanged(ARSessionStateChangedEventArgs args) {
-//             if (args.state == ARSessionState.SessionTracking) {
-                
-//                 if (s_ARSessionNativePtr == IntPtr.Zero && s_ARSession.subsystem != null) {
-//                     s_ARSessionNativePtr = s_ARSession.subsystem.nativePtr;
-//                     if (s_ARSessionNativePtr != IntPtr.Zero) {
-//                         UnityHoloKit_SetARSession(s_ARSessionNativePtr);
-//                         Debug.Log("ArSession Setted");
-//                     }
-//                 }
-//             } else {
-//                 if (s_ARSessionNativePtr != IntPtr.Zero) {
-//                     s_ARSessionNativePtr = IntPtr.Zero;
-//                     UnityHoloKit_SetARSession(IntPtr.Zero);
-//                 }
-//             }
-//         }
-// #endif
-
-//         [DllImport("__Internal")]
-//         public static extern void UnityHoloKit_SetARSession(IntPtr ptr);
-//     }
-// }
+    }
+}

@@ -8,4 +8,5 @@ EditorBuildSettings:
   m_configObjects:
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 8ac7c8b93aa2a4d049d119343420d335, type: 2}
     UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: aefa4534dde9b4480938e0eafaeffae4, type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: 662000f9ae4ac48479fbee85238ed9b2, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 8d0de13ba209f4cda91784cc211398d7, type: 2}

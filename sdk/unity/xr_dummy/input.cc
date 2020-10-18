@@ -36,6 +36,7 @@ class HoloKitInputProvider {
   UnitySubsystemErrorCode Start(UnitySubsystemHandle handle) {
     HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "Lifecycle started!!");
     input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
+    input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHand);
    // holokit_api_->ResumeHeadTracker();
     return kUnitySubsystemErrorCodeSuccess;
   }
@@ -44,7 +45,8 @@ class HoloKitInputProvider {
   void Stop(UnitySubsystemHandle handle) {
     HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "Lifecycle stopped!!");
     input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
-//    holokit_api_->PauseHeadTracker();
+    input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHand);
+      //    holokit_api_->PauseHeadTracker();
   }
 
   float s_Time = 0.0f;
@@ -82,39 +84,164 @@ class HoloKitInputProvider {
       UnityXRInternalInputDeviceId device_id,
       UnityXRInputDeviceDefinition* definition) {
   
-    if (device_id != kDeviceIdHoloKitHmd) {
-      return kUnitySubsystemErrorCodeFailure;
+    if (device_id == kDeviceIdHoloKitHmd) {
+        HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), "FillDeviceDefinition %d", device_id);
+
+        input_->DeviceDefinition_SetName(definition, "HoloKit HMD");
+        input_->DeviceDefinition_SetCharacteristics(definition,
+                                                    kHmdCharacteristics);
+        input_->DeviceDefinition_SetManufacturer(definition, "Holo Interactive");
+
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary,
+                                                     kUnityXRInputFeatureUsageIsTracked);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates,
+                                                     kUnityXRInputFeatureUsageTrackingState);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Center Eye Position", kUnityXRInputFeatureTypeAxis3D,
+                                                     kUnityXRInputFeatureUsageCenterEyePosition);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Center Eye Rotation", kUnityXRInputFeatureTypeRotation,
+            
+                                                     kUnityXRInputFeatureUsageCenterEyeRotation);
+
+        return kUnitySubsystemErrorCodeSuccess;
+        
+    } else if (device_id == kDeviceIdHoloKitHand) {
+        HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), "FillDeviceDefinition %d", device_id);
+
+        input_->DeviceDefinition_SetName(definition, "HoloKit Hand");
+        input_->DeviceDefinition_SetCharacteristics(definition, kHandCharacteristics);
+        input_->DeviceDefinition_SetManufacturer(definition, "Holo Interactive");
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
+        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageTrackingState);
+
+        
+//        UnityXRInputFeatureIndex hand_structure = input_->DeviceDefinition_AddFeatureWithUsage(
+//            definition, "Hand Indices", kUnityXRInputFeatureTypeHand, kUnityXRInputFeatureUsageHandData);
+        UnityXRInputFeatureIndex LeftHand = input_->DeviceDefinition_AddFeatureWithUsage(
+            definition, "LeftHand", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
+
+        
+        return kUnitySubsystemErrorCodeSuccess;
+        
+    } else {
+        return kUnitySubsystemErrorCodeFailure;
     }
-    HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), "FillDeviceDefinition %d", device_id);
-
-    input_->DeviceDefinition_SetName(definition, "HoloKit HMD");
-    input_->DeviceDefinition_SetCharacteristics(definition,
-                                                kHmdCharacteristics);
-    input_->DeviceDefinition_AddFeatureWithUsage(
-        definition, "Center Eye Position", kUnityXRInputFeatureTypeAxis3D,
-        kUnityXRInputFeatureUsageCenterEyePosition);
-    input_->DeviceDefinition_AddFeatureWithUsage(
-        definition, "Center Eye Rotation", kUnityXRInputFeatureTypeRotation,
-        kUnityXRInputFeatureUsageCenterEyeRotation);
-
-    return kUnitySubsystemErrorCodeSuccess;
   }
 
   UnitySubsystemErrorCode UpdateDeviceState(
       UnityXRInternalInputDeviceId device_id, UnityXRInputDeviceState* state) {
       
-    if (device_id != kDeviceIdHoloKitHmd) {
-      return kUnitySubsystemErrorCodeFailure;
+    if (device_id == kDeviceIdHoloKitHmd) {
+        
+        //HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), "UpdateDeviceState %d", device_id);
+
+        UnityXRInputFeatureIndex feature_index = 0;
+        input_->DeviceState_SetBinaryValue(state, feature_index++, true);
+        input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStatePosition | kUnityXRInputTrackingStateRotation);
+        input_->DeviceState_SetAxis3DValue(state, feature_index++, head_pose_.position);
+        input_->DeviceState_SetRotationValue(state, feature_index++, head_pose_.rotation);
+        
+        return kUnitySubsystemErrorCodeSuccess;
+    } else if (device_id == kDeviceIdHoloKitHand) {
+        
+        UnityXRInputFeatureIndex feature_index = 0;
+        UnityXRBone bone;
+        bone.parentBoneIndex = 0;
+        bone.position = {0, 0, 0};
+        bone.rotation = {0, 0, 0, 1};
+        
+        input_->DeviceState_SetBinaryValue(state, feature_index++, true);
+        input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
+        input_->DeviceState_SetBoneValue(state, feature_index++, bone);
+        
+        return kUnitySubsystemErrorCodeSuccess;
+        //        UnityXRHand hand;
+
+//
+//        /*
+//         LeftHand = 22, // parent: LeftForearm [21]
+//         LeftHandIndexStart = 23, // parent: LeftHand [22]
+//         LeftHandIndex1 = 24, // parent: LeftHandIndexStart [23]
+//         LeftHandIndex2 = 25, // parent: LeftHandIndex1 [24]
+//         LeftHandIndex3 = 26, // parent: LeftHandIndex2 [25]
+//         LeftHandIndexEnd = 27, // parent: LeftHandIndex3 [26]
+//         LeftHandMidStart = 28, // parent: LeftHand [22]
+//         LeftHandMid1 = 29, // parent: LeftHandMidStart [28]
+//         LeftHandMid2 = 30, // parent: LeftHandMid1 [29]
+//         LeftHandMid3 = 31, // parent: LeftHandMid2 [30]
+//         LeftHandMidEnd = 32, // parent: LeftHandMid3 [31]
+//         LeftHandPinkyStart = 33, // parent: LeftHand [22]
+//         LeftHandPinky1 = 34, // parent: LeftHandPinkyStart [33]
+//         LeftHandPinky2 = 35, // parent: LeftHandPinky1 [34]
+//         LeftHandPinky3 = 36, // parent: LeftHandPinky2 [35]
+//         LeftHandPinkyEnd = 37, // parent: LeftHandPinky3 [36]
+//         LeftHandRingStart = 38, // parent: LeftHand [22]
+//         LeftHandRing1 = 39, // parent: LeftHandRingStart [38]
+//         LeftHandRing2 = 40, // parent: LeftHandRing1 [39]
+//         LeftHandRing3 = 41, // parent: LeftHandRing2 [40]
+//         LeftHandRingEnd = 42, // parent: LeftHandRing3 [41]
+//         LeftHandThumbStart = 43, // parent: LeftHand [22]
+//         LeftHandThumb1 = 44, // parent: LeftHandThumbStart [43]
+//         LeftHandThumb2 = 45, // parent: LeftHandThumb1 [44]
+//         LeftHandThumbEnd = 46, // parent: LeftHandThumb2 [45]
+//
+//        RightHand = 66, // parent: RightForearm [65]
+//        RightHandIndexStart = 67, // parent: RightHand [66]
+//        RightHandIndex1 = 68, // parent: RightHandIndexStart [67]
+//        RightHandIndex2 = 69, // parent: RightHandIndex1 [68]
+//        RightHandIndex3 = 70, // parent: RightHandIndex2 [69]
+//        RightHandIndexEnd = 71, // parent: RightHandIndex3 [70]
+//        RightHandMidStart = 72, // parent: RightHand [66]
+//        RightHandMid1 = 73, // parent: RightHandMidStart [72]
+//        RightHandMid2 = 74, // parent: RightHandMid1 [73]
+//        RightHandMid3 = 75, // parent: RightHandMid2 [74]
+//        RightHandMidEnd = 76, // parent: RightHandMid3 [75]
+//        RightHandPinkyStart = 77, // parent: RightHand [66]
+//        RightHandPinky1 = 78, // parent: RightHandPinkyStart [77]
+//        RightHandPinky2 = 79, // parent: RightHandPinky1 [78]
+//        RightHandPinky3 = 80, // parent: RightHandPinky2 [79]
+//        RightHandPinkyEnd = 81, // parent: RightHandPinky3 [80]
+//        RightHandRingStart = 82, // parent: RightHand [66]
+//        RightHandRing1 = 83, // parent: RightHandRingStart [82]
+//        RightHandRing2 = 84, // parent: RightHandRing1 [83]
+//        RightHandRing3 = 85, // parent: RightHandRing2 [84]
+//        RightHandRingEnd = 86, // parent: RightHandRing3 [85]
+//        RightHandThumbStart = 87, // parent: RightHand [66]
+//        RightHandThumb1 = 88, // parent: RightHandThumbStart [87]
+//        RightHandThumb2 = 89, // parent: RightHandThumb1 [88]
+//        RightHandThumbEnd = 90, // parent: RightHandThumb2 [89]
+//        */
+//
+//        hand.fingerBonesIndices[UnityXRFingerThumb] = {0, 1, 2};
+//        hand.fingerBonesIndices[UnityXRFingerIndex] = {0, 1, 2};
+//        hand.fingerBonesIndices[UnityXRFingerMiddle] = {0, 1, 2};
+//        hand.fingerBonesIndices[UnityXRFingerRing] = {0, 1, 2};
+//        hand.fingerBonesIndices[UnityXRFingerPinky] = {0, 1, 2};
+//        hand.rootBoneIndex = 22;
+//        UnityXRBone {parentBoneIndex = 1, position={}, rotation={}};
+//
+//        input_DeviceState_SetBoneValue(state, , );
+//
+//      //  hand.fingerBonesIndices[UnityXRHandFinger]
+////        UnityXRBone
+////        hand.rootBoneIndex
+////        hand.fingerBonesIndices[5]
+////        UnityXRBone bone;
+////        bone.position
+////        bone.rotation
+////        bone.parentBoneIndex
+////
+//        UnityXRHandFinger finger;
+//        finger.
+//        input_->DeviceState_
+//        input_->DeviceState_SetHandValue(state, feature_index++,
+//                                           head_pose_.position);
+//        input_->DeviceState_SetBoneValue(state, feature_index++,
+//                                           head_pose_.position);
+//
     }
-    HOLOKIT_INPUT_XR_TRACE_LOG(GetTrace(), "UpdateDeviceState %d", device_id);
-
-    UnityXRInputFeatureIndex feature_index = 0;
-    input_->DeviceState_SetAxis3DValue(state, feature_index++,
-                                       head_pose_.position);
-    input_->DeviceState_SetRotationValue(state, feature_index++,
-                                         head_pose_.rotation);
-
-    return kUnitySubsystemErrorCodeSuccess;
+    else {
+        return kUnitySubsystemErrorCodeFailure;
+    }
   }
 
   UnitySubsystemErrorCode QueryTrackingOriginMode(
@@ -138,12 +265,17 @@ class HoloKitInputProvider {
 
  private:
   static constexpr int kDeviceIdHoloKitHmd = 1234;
+  static constexpr int kDeviceIdHoloKitHand = 4321;
 
   static constexpr UnityXRInputDeviceCharacteristics kHmdCharacteristics =
       static_cast<UnityXRInputDeviceCharacteristics>(
           kUnityXRInputDeviceCharacteristicsHeadMounted |
           kUnityXRInputDeviceCharacteristicsTrackedDevice);
-
+    
+    static constexpr UnityXRInputDeviceCharacteristics kHandCharacteristics =
+        static_cast<UnityXRInputDeviceCharacteristics>(
+            kUnityXRInputDeviceCharacteristicsHandTracking);
+    
   IUnityXRTrace* trace_ = nullptr;
 
   IUnityXRInputInterface* input_ = nullptr;
@@ -245,7 +377,7 @@ UnitySubsystemErrorCode LoadInput(IUnityInterfaces* xr_interfaces) {
                                    "Lifecycle stopped");
     return holokit_input_provider->Stop(handle);
   };
-  input_lifecycle_handler.Shutdown = [](UnitySubsystemHandle, void*) {
+  input_lifecycle_handler.Shutdown = [](UnitySubsystemHandle handle, void*) {
     HOLOKIT_INPUT_XR_TRACE_LOG(holokit_input_provider->GetTrace(),
                                  "Lifecycle finished");
   };

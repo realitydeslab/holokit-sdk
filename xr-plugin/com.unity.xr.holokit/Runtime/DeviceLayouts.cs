@@ -21,12 +21,6 @@ namespace UnityEngine.XR.HoloKit.Input
         [InputControl]
         public new ButtonControl isTracked { get; private set; }
         [Preserve]
-        [InputControl(aliases = new[] { "HeadPosition" })]
-        public new Vector3Control devicePosition { get; private set; }
-        [Preserve]
-        [InputControl(aliases = new[] { "HeadRotation" })]
-        public new QuaternionControl deviceRotation { get; private set; }
-        [Preserve]
         public new Vector3Control centerEyePosition { get; private set; }
         [Preserve]
         [InputControl]
@@ -50,41 +44,41 @@ namespace UnityEngine.XR.HoloKit.Input
     {
         [Preserve]
         [InputControl]
-        public new IntegerControl trackingState { get; private set; }
+        public IntegerControl trackingState { get; private set; }
         [Preserve]
         [InputControl]
-        public new ButtonControl isTracked { get; private set; }
-        [Preserve]
-        [InputControl(aliases = new[] { "gripPosition" })]
-        public new Vector3Control devicePosition { get; private set; }
-        [Preserve]
-        [InputControl(aliases = new[] { "gripOrientation" })]
-        public new QuaternionControl  deviceRotation { get; private set; }
-        [Preserve]
-        [InputControl(aliases = new[] { "gripVelocity" })]
-        public Vector3Control deviceVelocity { get; private set; }
-        [Preserve]
-        [InputControl(aliases = new[] { "triggerbutton" })]
-        public ButtonControl airTap { get; private set; }
-        [Preserve]
-        [InputControl]
-        public AxisControl sourceLossRisk { get; private set; }
-        [Preserve]
-        [InputControl]
-        public Vector3Control sourceLossMitigationDirection { get; private set; }
+        public ButtonControl isTracked { get; private set; }
+        // [Preserve]
+        // [InputControl(aliases = new[] { "gripPosition" })]
+        // public Vector3Control devicePosition { get; private set; }
+        // [Preserve]
+        // [InputControl(aliases = new[] { "gripOrientation" })]
+        // public QuaternionControl  deviceRotation { get; private set; }
+        // [Preserve]
+        // [InputControl(aliases = new[] { "gripVelocity" })]
+        // public Vector3Control deviceVelocity { get; private set; }
+        // [Preserve]
+        // [InputControl(aliases = new[] { "triggerbutton" })]
+        // public ButtonControl airTap { get; private set; }
+        // [Preserve]
+        // [InputControl]
+        // public AxisControl sourceLossRisk { get; private set; }
+        // [Preserve]
+        // [InputControl]
+        // public Vector3Control sourceLossMitigationDirection { get; private set; }
 
         protected override void FinishSetup()
         {
             base.FinishSetup();
 
-            airTap = GetChildControl<ButtonControl>("airTap");
+            //airTap = GetChildControl<ButtonControl>("airTap");
             trackingState = GetChildControl<IntegerControl>("trackingState");
             isTracked = GetChildControl<ButtonControl>("isTracked");
-            devicePosition = GetChildControl<Vector3Control>("devicePosition");
-            deviceRotation = GetChildControl<QuaternionControl>("deviceRotation");
-            deviceVelocity = GetChildControl<Vector3Control>("deviceVelocity");
-            sourceLossRisk = GetChildControl<AxisControl>("sourceLossRisk");
-            sourceLossMitigationDirection = GetChildControl<Vector3Control>("sourceLossMitigationDirection");
+            // devicePosition = GetChildControl<Vector3Control>("devicePosition");
+            // deviceRotation = GetChildControl<QuaternionControl>("deviceRotation");
+            // deviceVelocity = GetChildControl<Vector3Control>("deviceVelocity");
+            // sourceLossRisk = GetChildControl<AxisControl>("sourceLossRisk");
+            // sourceLossMitigationDirection = GetChildControl<Vector3Control>("sourceLossMitigationDirection");
         }
     }
 }

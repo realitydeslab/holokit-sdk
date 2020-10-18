@@ -31,28 +31,29 @@ namespace UnityEditor.XR.HoloKit
             public List<IXRLoaderMetadata> loaderMetadata { get; set; } 
         }
         
-        //  private static IXRPackageMetadata s_Metadata = new PackageMetadata(){
-        //         packageName = "HoloKit XR Plugin",
-        //         packageId = "com.unity.xr.holokit",
-        //         settingsType = typeof(HoloKitPackageSettings).FullName,
-        //         loaderMetadata = new List<IXRLoaderMetadata>() {
-        //         new LoaderMetadata() {
-        //                 loaderName = "HoloKit",
-        //                 loaderType = typeof(HoloKitLoader).FullName,
-        //                 supportedBuildTargets = new List<BuildTargetGroup>() {
-        //                     //BuildTargetGroup.iOS, 
-        //                     //BuildTargetGroup.Standalone //TODO(for dummy test)
-        //                 }
-        //             },
-        //         }
-        //     };
-        private static IXRPackageMetadata s_Metadata = new PackageMetadata(){
-            packageName = "HoloKit XR Plugin",
-            packageId = "com.unity.xr.holokit",
-            settingsType = typeof(HoloKitPackageSettings).FullName,
-            loaderMetadata = new List<IXRLoaderMetadata>() {
-            }
-        };
+         private static IXRPackageMetadata s_Metadata = new PackageMetadata(){
+                packageName = "HoloKit XR Plugin",
+                packageId = "com.unity.xr.holokit",
+                settingsType = typeof(HoloKitPackageSettings).FullName,
+                loaderMetadata = new List<IXRLoaderMetadata>() {
+                    new LoaderMetadata() {
+                        loaderName = "HoloKit",
+                        loaderType = typeof(HoloKitLoader).FullName,
+                        supportedBuildTargets = new List<BuildTargetGroup>() {
+                            //BuildTargetGroup.iOS, 
+                            //BuildTargetGroup.Standalone //TODO(for dummy test)
+                        }
+                    },
+                }
+            };
+
+        // private static IXRPackageMetadata s_Metadata = new PackageMetadata(){
+        //     packageName = "HoloKit XR Plugin",
+        //     packageId = "com.unity.xr.holokit",
+        //     settingsType = typeof(HoloKitPackageSettings).FullName,
+        //     loaderMetadata = new List<IXRLoaderMetadata>() {
+        //     }
+        // };
         public IXRPackageMetadata metadata => s_Metadata;
 
         public bool PopulateNewSettingsInstance(ScriptableObject obj)

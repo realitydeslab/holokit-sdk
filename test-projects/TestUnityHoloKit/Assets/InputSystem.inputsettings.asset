@@ -13,13 +13,12 @@ MonoBehaviour:
   m_Name: InputSystem.inputsettings
   m_EditorClassIdentifier: 
   m_SupportedDevices:
-  - DaydreamHMD
-  - HololensHand
+  - HoloKitHMD
+  - HoloKitHand
   - iOSGameController
-  - XboxOneGampadiOS
-  - DualShock4GampadiOS
+  - XInputController
+  - DualShockGamepad
   - Keyboard
-  - Touchscreen
   m_UpdateMode: 1
   m_CompensateForScreenOrientation: 1
   m_FilterNoiseOnCurrent: 0
