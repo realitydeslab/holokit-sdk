@@ -128,12 +128,12 @@ class HoloKitInputProvider {
         input_->DeviceDefinition_AddFeatureWithUsage(definition, "Pinky1", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
         input_->DeviceDefinition_AddFeatureWithUsage(definition, "Pinky2", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
         input_->DeviceDefinition_AddFeatureWithUsage(definition, "PinkyEnd", kUnityXRInputFeatureTypeBone, kUnityXRInputFeatureUsageHandData);
-        
-        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
-        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageTrackingState);
-        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Handedness", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageHandData);
-        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Air Tap", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-        
+//        
+//        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
+//        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageTrackingState);
+//        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Handedness", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageHandData);
+//        input_->DeviceDefinition_AddFeatureWithUsage(definition, "Air Tap", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//        
 
         
 //        UnityXRInputFeatureIndex hand_structure = input_->DeviceDefinition_AddFeatureWithUsage(
@@ -190,11 +190,11 @@ class HoloKitInputProvider {
         input_->DeviceState_SetBoneValue(state, 20, UnityXRBone {.parentBoneIndex = 19, .position = {0, 0, 0}, .rotation = {0, 0, 0, 1}});
 
         UnityXRInputFeatureIndex feature_index = 21;
-        
-        input_->DeviceState_SetBinaryValue(state, feature_index++, true);
-        input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
-        input_->DeviceState_SetDiscreteStateValue(state, feature_index++, 0); //handedness
-        input_->DeviceState_SetBinaryValue(state, feature_index++, false); //AirTag
+//        
+//        input_->DeviceState_SetBinaryValue(state, feature_index++, true);
+//        input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
+//        input_->DeviceState_SetDiscreteStateValue(state, feature_index++, 0); //handedness
+//        input_->DeviceState_SetBinaryValue(state, feature_index++, false); //AirTag
 
         
         return kUnitySubsystemErrorCodeSuccess;

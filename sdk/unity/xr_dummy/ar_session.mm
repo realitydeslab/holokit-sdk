@@ -12,15 +12,25 @@
 #if TARGET_OS_IPHONE
 #import <Foundation/Foundation.h>
 #import <ARKit/ARKit.h>
+#import <CoreVideo/CoreVideo.h>
+#import <HandTracker/HandTracker.h>
 
-@interface ARSessionDelegateController : NSObject <ARSessionDelegate>
+@interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
 {}
+@property (weak, nonatomic) HandTracker* _handTracker;
+
 //- (instancetype)initWithARSessionDelegate:(ARSessionDelegate *)unityARSessionDelegate;
 @end
 
 
 @implementation ARSessionDelegateController
 {}
+
+
+- (instancetype) init {
+    handTracker = [[HandTracker alloc] init];
+    handTracker.delegate = self;
+}
 
 + (id) sharedARSessionDelegateController {
     static dispatch_once_t onceToken = 0;
@@ -30,10 +40,60 @@
     });
     return _sharedObject;
 }
+
+
+#pragma mark - ARSessionDelegate
+
+- (void)handTracker: (HandTracker*)handTracker didOutputLandmarks: (NSArray<Landmark *> *)landmarks {
+    
+}
+
+- (void)handTracker: (HandTracker*)handTracker didOutputPixelBuffer: (CVPixelBufferRef)pixelBuffer {
+        
+}
+
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
     NSLog(@"frame.timestamp: %f,  systemuptime: %f", frame.timestamp, [[NSProcessInfo processInfo] systemUptime]);
+    OSType type = CVPixelBufferGetPixelFormatType(frame.capturedImage);
+    OSType type2 = CVPixelBufferGetPixelFormatType(frame.smoothedSceneDepth.depthMap);
+    NSLog(@"type %d", type);
+    NSLog(@"type depth %d", type2);
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [handTracker processVideoFrame: frame.capturedImage];
+    });
+
+    
+//    
+//    switch (format) {
+//        case kCVPixelFormatType_32BGRA:
+//          return GpuBufferFormat::kBGRA32;
+//        case kCVPixelFormatType_DepthFloat32:
+//          return GpuBufferFormat::kGrayFloat32;
+//        case kCVPixelFormatType_OneComponent16Half:
+//          return GpuBufferFormat::kGrayHalf16;
+//        case kCVPixelFormatType_OneComponent32Float:
+//          return GpuBufferFormat::kGrayFloat32;
+//        case kCVPixelFormatType_OneComponent8:
+//          return GpuBufferFormat::kOneComponent8;
+//        case kCVPixelFormatType_TwoComponent16Half:
+//          return GpuBufferFormat::kTwoComponentHalf16;
+//        case kCVPixelFormatType_TwoComponent32Float:
+//          return GpuBufferFormat::kTwoComponentFloat32;
+//        case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
+//          return GpuBufferFormat::kBiPlanar420YpCbCr8VideoRange;
+//        case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
+//          return GpuBufferFormat::kBiPlanar420YpCbCr8FullRange;
+//        case kCVPixelFormatType_24RGB:
+//          return GpuBufferFormat::kRGB24;
+//        case kCVPixelFormatType_64RGBAHalf:
+//          return GpuBufferFormat::kRGBAHalf64;
+//        case kCVPixelFormatType_128RGBAFloat:
+//          return GpuBufferFormat::kRGBAFloat128;
+//      }
+    
 }
 @end
 
