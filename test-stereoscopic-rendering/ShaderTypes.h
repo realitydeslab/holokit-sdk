@@ -1,8 +1,8 @@
 //
 //  ShaderTypes.h
-//  test-stereoscopic-rendering
+//  HoloKitStereoscopicRendering
 //
-//  Created by Yuchen on 2021/2/10.
+//  Created by Yuchen on 2021/2/4.
 //
 
 //
@@ -45,6 +45,10 @@ typedef struct {
     // Camera Uniforms
     matrix_float4x4 projectionMatrix;
     matrix_float4x4 viewMatrix;
+    
+    // for stereoscopic rendering (SR)
+    matrix_float4x4 projectionMatrixPerEye[2];
+    matrix_float4x4 viewMatrixPerEye[2];
     
     // Lighting Properties
     vector_float3 ambientLightColor;

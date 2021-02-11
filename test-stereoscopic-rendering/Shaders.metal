@@ -1,8 +1,8 @@
 //
 //  Shaders.metal
-//  test-stereoscopic-rendering
+//  HoloKitStereoscopicRendering
 //
-//  Created by Yuchen on 2021/2/10.
+//  Created by Yuchen on 2021/2/4.
 //
 
 #include <metal_stdlib>
@@ -22,18 +22,25 @@ typedef struct {
 typedef struct {
     float4 position [[position]];
     float2 texCoord;
+    ushort viewport [[viewport_array_index]];
 } ImageColorInOut;
 
 
 // Captured image vertex function
-vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]]) {
+vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]],
+                                                    ushort amp_id [[amplification_id]],
+                                                    ushort amp_count [[amplification_count]]) {
     ImageColorInOut out;
     
     // Pass through the image vertex's position
+    // manually set z value to zero
     out.position = float4(in.position, 0.0, 1.0);
     
     // Pass through the texture coordinate
     out.texCoord = in.texCoord;
+    
+    out.viewport = amp_id;
+    //out.viewport = 0;
     
     return out;
 }
@@ -59,7 +66,9 @@ fragment float4 capturedImageFragmentShader(ImageColorInOut in [[stage_in]],
                           capturedImageTextureCbCr.sample(colorSampler, in.texCoord).rg, 1.0);
     
     // Return converted RGB color
+    // now everything is red, and I can also set everything to black
     return ycbcrToRGBTransform * ycbcr;
+    //return float4(0.0, 0.0, 1.0, 1.0);
 }
 
 
@@ -75,25 +84,31 @@ typedef struct {
     float4 color;
     half3  eyePosition;
     half3  normal;
+    // for stereoscopic rendering (SR)
+    ushort viewport [[viewport_array_index]];
 } ColorInOut;
 
 
 // Anchor geometry vertex function
+// @param amp_id specifies which viewport to render into
+// @param amp_count this is 2
 vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
                                                 constant SharedUniforms &sharedUniforms [[ buffer(kBufferIndexSharedUniforms) ]],
                                                 constant InstanceUniforms *instanceUniforms [[ buffer(kBufferIndexInstanceUniforms) ]],
                                                 ushort vid [[vertex_id]],
-                                                ushort iid [[instance_id]]) {
+                                                ushort iid [[instance_id]],
+                                                ushort amp_id [[amplification_id]],
+                                                ushort amp_count [[amplification_count]]) {
     ColorInOut out;
     
     // Make position a float4 to perform 4x4 matrix math on it
     float4 position = float4(in.position, 1.0);
     
     float4x4 modelMatrix = instanceUniforms[iid].modelMatrix;
-    float4x4 modelViewMatrix = sharedUniforms.viewMatrix * modelMatrix;
+    float4x4 modelViewMatrix = sharedUniforms.viewMatrixPerEye[amp_id] * modelMatrix;
     
     // Calculate the position of our vertex in clip space and output for clipping and rasterization
-    out.position = sharedUniforms.projectionMatrix * modelViewMatrix * position;
+    out.position = sharedUniforms.projectionMatrixPerEye[amp_id] * modelViewMatrix * position;
     
     // Color each face a different color
     ushort colorID = vid / 4 % 6;
@@ -110,6 +125,9 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     // Rotate our normals to world coordinates
     float4 normal = modelMatrix * float4(in.normal.x, in.normal.y, in.normal.z, 0.0f);
     out.normal = normalize(half3(normal.xyz));
+    
+    // which viewport to draw?
+    out.viewport = amp_id;
     
     return out;
 }

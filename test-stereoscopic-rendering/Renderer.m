@@ -1,8 +1,8 @@
 //
 //  Renderer.m
-//  test-stereoscopic-rendering
+//  HoloKitStereoscopicRendering
 //
-//  Created by Yuchen on 2021/2/10.
+//  Created by Yuchen on 2021/2/4.
 //
 
 #import <simd/simd.h>
@@ -32,6 +32,8 @@ static const float kImagePlaneVertexData[16] = {
     1.0,  1.0,  1.0, 0.0,
 };
 
+// for SR
+const float kUserInterpupillaryDistance = 0.064;
 
 @implementation Renderer {
     // The session the renderer will render
@@ -40,6 +42,7 @@ static const float kImagePlaneVertexData[16] = {
     // The object controlling the ultimate render destination
     __weak id<RenderDestinationProvider> _renderDestination;
     
+    // Q?
     dispatch_semaphore_t _inFlightSemaphore;
 
     // Metal objects
@@ -54,6 +57,8 @@ static const float kImagePlaneVertexData[16] = {
     id <MTLDepthStencilState> _anchorDepthState;
     CVMetalTextureRef _capturedImageTextureYRef;
     CVMetalTextureRef _capturedImageTextureCbCrRef;
+    // dual viewports
+    MTLViewport _viewportPerEye[2];
     
     // Captured image texture cache
     CVMetalTextureCacheRef _capturedImageTextureCache;
@@ -89,6 +94,9 @@ static const float kImagePlaneVertexData[16] = {
     
     // Flag for viewport size changes
     BOOL _viewportSizeDidChange;
+    
+    // Q?
+    CGSize _drawableSize;
 }
 
 - (instancetype)initWithSession:(ARSession *)session metalDevice:(id<MTLDevice>)device renderDestinationProvider:(id<RenderDestinationProvider>)renderDestinationProvider {
@@ -110,8 +118,10 @@ static const float kImagePlaneVertexData[16] = {
     CVBufferRelease(_capturedImageTextureCbCrRef);
 }
 
-- (void)drawRectResized:(CGSize)size {
+- (void)drawRectResized:(CGSize)size drawableSize:(CGSize)drawableSize{
     _viewportSize = size;
+    
+    _drawableSize = drawableSize;
     _viewportSizeDidChange = YES;
 }
 
@@ -180,6 +190,9 @@ static const float kImagePlaneVertexData[16] = {
     _renderDestination.colorPixelFormat = MTLPixelFormatBGRA8Unorm;
     _renderDestination.sampleCount = 1;
     
+    // for SR
+    //_drawableSize = CGSizeMake(2778.0, 1284.0);
+    
     // Calculate our uniform buffer sizes. We allocate kMaxBuffersInFlight instances for uniform
     //   storage in a single buffer. This allows us to update uniforms in a ring (i.e. triple
     //   buffer the uniforms) so that the GPU reads from one slot in the ring wil the CPU writes
@@ -236,6 +249,9 @@ static const float kImagePlaneVertexData[16] = {
     capturedImagePipelineStateDescriptor.vertexFunction = capturedImageVertexFunction;
     capturedImagePipelineStateDescriptor.fragmentFunction = capturedImageFragmentFunction;
     capturedImagePipelineStateDescriptor.vertexDescriptor = imagePlaneVertexDescriptor;
+    // for SR
+    capturedImagePipelineStateDescriptor.maxVertexAmplificationCount = 2;
+    
     capturedImagePipelineStateDescriptor.colorAttachments[0].pixelFormat = _renderDestination.colorPixelFormat;
     capturedImagePipelineStateDescriptor.depthAttachmentPixelFormat = _renderDestination.depthStencilPixelFormat;
     capturedImagePipelineStateDescriptor.stencilAttachmentPixelFormat = _renderDestination.depthStencilPixelFormat;
@@ -295,6 +311,8 @@ static const float kImagePlaneVertexData[16] = {
     anchorPipelineStateDescriptor.vertexFunction = anchorGeometryVertexFunction;
     anchorPipelineStateDescriptor.fragmentFunction = anchorGeometryFragmentFunction;
     anchorPipelineStateDescriptor.vertexDescriptor = _geometryVertexDescriptor;
+    // for SR
+    anchorPipelineStateDescriptor.maxVertexAmplificationCount = 2;
     anchorPipelineStateDescriptor.colorAttachments[0].pixelFormat = _renderDestination.colorPixelFormat;
     anchorPipelineStateDescriptor.depthAttachmentPixelFormat = _renderDestination.depthStencilPixelFormat;
     anchorPipelineStateDescriptor.stencilAttachmentPixelFormat = _renderDestination.depthStencilPixelFormat;
@@ -385,11 +403,88 @@ static const float kImagePlaneVertexData[16] = {
 }
 
 - (void)_updateSharedUniformsWithFrame:(ARFrame *)frame {
+    
+    // parameters for SR
+    const struct PhoneModel phone = [Renderer initializePhoneModel];
+    const struct HoloKitModel hme = [Renderer initializeHoloKitModel];
+    
+    const float centerX = 0.5 * phone.screenWidth + phone.centerLineOffset;
+    const float centerY = phone.screenHeight - (hme.axisToBottom - phone.screenBottom);
+    
+    const float fullWidth = hme.viewportOuter * 2 + hme.opticalAxisDistance + hme.viewportCushion * 4;
+    const float width = hme.viewportOuter + hme.viewportInner + hme.viewportCushion * 2;
+    const float height = hme.viewportTop + hme.viewportBottom + hme.viewportCushion * 2;
+    
+    const float ipd = kUserInterpupillaryDistance;
+    const float near = hme.lensToEye;
+    const float far = 1000.0;
+    
+    // math for left eye
+    matrix_float4x4 leftEyeProjectionMatrix = matrix_identity_float4x4;
+    leftEyeProjectionMatrix.columns[0].x = 2 * near / width;
+    leftEyeProjectionMatrix.columns[1].y = 2 * near / height;
+    leftEyeProjectionMatrix.columns[2].x = (fullWidth - ipd - width) / width;
+    leftEyeProjectionMatrix.columns[2].y = (hme.viewportTop - hme.viewportBottom) / height;
+    leftEyeProjectionMatrix.columns[2].z = -(far + near) / (far - near);
+    leftEyeProjectionMatrix.columns[3].z = -(2.0 * far * near) / (far - near);
+    leftEyeProjectionMatrix.columns[2].w = -1.0;
+    
+    // right eye matrix
+    matrix_float4x4 rightEyeProjectionMatrix = leftEyeProjectionMatrix;
+    rightEyeProjectionMatrix.columns[2].x = (width + ipd - fullWidth) / width;
+    
+    // at this stage, _drawableSize is empty!
+    NSLog(@"%f, %f", _drawableSize.width, _drawableSize.height);
+    // define left viewport and right viewport
+    const double yMinInPixel = (double)((centerY - (hme.viewportTop + hme.viewportCushion)) / phone.screenHeight * (float)_drawableSize.height);
+    const double xMinRightInPixel = (double)((centerX + fullWidth / 2 - width) / phone.screenWidth * (float)_drawableSize.width);
+    const double xMinLeftInPixel = (double)((centerX - fullWidth / 2) / phone.screenWidth * (float)_drawableSize.width);
+    
+    const double widthInPixel = (double)(width / phone.screenWidth * (float)_drawableSize.width);
+    const double heightInPixel = (double)(height / phone.screenHeight * (float)_drawableSize.height);
+    
+    MTLViewport rightViewport;
+    rightViewport.originX = xMinRightInPixel;
+    rightViewport.originY = yMinInPixel;
+    rightViewport.width = widthInPixel;
+    rightViewport.height = heightInPixel;
+    rightViewport.znear = 0;
+    rightViewport.zfar = 1;
+    MTLViewport leftViewport;
+    leftViewport.originX = xMinLeftInPixel;
+    leftViewport.originY = yMinInPixel;
+    leftViewport.width = widthInPixel;
+    leftViewport.height = heightInPixel;
+    leftViewport.znear = 0;
+    leftViewport.zfar = 1;
+    
+    _viewportPerEye[0] = leftViewport;
+    _viewportPerEye[1] = rightViewport;
+    
     // Update the shared uniforms of the frame
     SharedUniforms *uniforms = (SharedUniforms *)_sharedUniformBufferAddress;
     
     uniforms->viewMatrix = [frame.camera viewMatrixForOrientation:UIInterfaceOrientationLandscapeRight];
     uniforms->projectionMatrix = [frame.camera projectionMatrixForOrientation:UIInterfaceOrientationLandscapeRight viewportSize:_viewportSize zNear:0.001 zFar:1000];
+    
+    // update the left and right eye matrices for SR
+    const simd_float3 offset = hme.mrOffset + phone.cameraOffset;
+    const simd_float4x4 cameraTransform = frame.camera.transform;
+    [Renderer logMatrix4x4:cameraTransform];
+    const simd_float4 translation_left = [Renderer matrixVectorMultiplication:cameraTransform vector:simd_make_float4(offset.x - ipd / 2, offset.y, offset.z, 1)];
+    // test the accuracy of the matrix vector multiplication function
+    [Renderer logVector4:translation_left];
+    const simd_float4 translation_right = [Renderer matrixVectorMultiplication:cameraTransform vector:simd_make_float4(offset.x + ipd / 2, offset.y, offset.z, 1)];
+    simd_float4x4 cameraTransform_left = cameraTransform;
+    cameraTransform_left.columns[3] = translation_left;
+    simd_float4x4 cameraTransform_right = cameraTransform;
+    cameraTransform_right.columns[3] = translation_right;
+    
+    // update view and projection matrices for both eyes
+    uniforms->viewMatrixPerEye[0] = simd_inverse(cameraTransform_left);
+    uniforms->viewMatrixPerEye[1] = simd_inverse(cameraTransform_right);
+    uniforms->projectionMatrixPerEye[0] = leftEyeProjectionMatrix;
+    uniforms->projectionMatrixPerEye[1] = rightEyeProjectionMatrix;
 
     // Set up lighting for the scene using the ambient intensity if provided
     float ambientIntensity = 1.0;
@@ -405,7 +500,7 @@ static const float kImagePlaneVertexData[16] = {
     directionalLightDirection = vector_normalize(directionalLightDirection);
     uniforms->directionalLightDirection = directionalLightDirection;
     
-    vector_float3 directionalLightColor = { 0.6, 0.6, 0.6};
+    vector_float3 directionalLightColor = { 0.6, 0.6, 0.6 };
     uniforms->directionalLightColor = directionalLightColor * ambientIntensity;
     
     uniforms->materialShininess = 30;
@@ -484,11 +579,15 @@ static const float kImagePlaneVertexData[16] = {
     
     // Push a debug group allowing us to identify render commands in the GPU Frame Capture tool
     [renderEncoder pushDebugGroup:@"DrawCapturedImage"];
+    // for stereoscopic rendering
+    [renderEncoder setVertexAmplificationCount:2 viewMappings:nil];
     
     // Set render command encoder state
     [renderEncoder setCullMode:MTLCullModeNone];
     [renderEncoder setRenderPipelineState:_capturedImagePipelineState];
     [renderEncoder setDepthStencilState:_capturedImageDepthState];
+    // for stereoscipic rendering (SR)
+    [renderEncoder setViewports:_viewportPerEye count:2];
     
     // Set mesh's vertex buffers
     [renderEncoder setVertexBuffer:_imagePlaneVertexBuffer offset:0 atIndex:kBufferIndexMeshPositions];
@@ -499,6 +598,7 @@ static const float kImagePlaneVertexData[16] = {
     
     // Draw each submesh of our mesh
     [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
+    NSLog(@"Draw captured image...");
     
     [renderEncoder popDebugGroup];
 }
@@ -511,10 +611,15 @@ static const float kImagePlaneVertexData[16] = {
     // Push a debug group allowing us to identify render commands in the GPU Frame Capture tool
     [renderEncoder pushDebugGroup:@"DrawAnchors"];
     
+    // for SR
+    [renderEncoder setVertexAmplificationCount:2 viewMappings:nil];
+    
     // Set render command encoder state
     [renderEncoder setCullMode:MTLCullModeBack];
     [renderEncoder setRenderPipelineState:_anchorPipelineState];
     [renderEncoder setDepthStencilState:_anchorDepthState];
+    // for SR
+    [renderEncoder setViewports:_viewportPerEye count:2];
     
     // Set any buffers fed into our render pipeline
     [renderEncoder setVertexBuffer:_anchorUniformBuffer offset:_anchorUniformBufferOffset atIndex:kBufferIndexInstanceUniforms];
@@ -536,6 +641,62 @@ static const float kImagePlaneVertexData[16] = {
     }
     
     [renderEncoder popDebugGroup];
+}
+
+- (BOOL)supportsMultipleViewports {
+    return [_device supportsFamily: MTLGPUFamilyMac1] || [_device supportsFamily: MTLGPUFamilyApple5];
+}
+
++ (struct HoloKitModel)initializeHoloKitModel {
+    struct HoloKitModel holoKitModel;
+    holoKitModel.opticalAxisDistance = 0.064;
+    holoKitModel.mrOffset = simd_make_float3(0, -0.02894, 0.07055);
+    holoKitModel.distortion = 0.0;
+    holoKitModel.viewportInner = 0.0292;
+    holoKitModel.viewportOuter = 0.0292;
+    holoKitModel.viewportTop = 0.02386;
+    holoKitModel.viewportBottom = 0.02386;
+    holoKitModel.focalLength = 0.065;
+    holoKitModel.screenToLens = 0.02715 + 0.03136 + 0.002;
+    holoKitModel.lensToEye = 0.02497 + 0.03898;
+    holoKitModel.axisToBottom = 0.02990;
+    holoKitModel.viewportCushion = 0.0000;
+    holoKitModel.horizontalAlignmentMarkerOffset = 0.05075;
+    
+    return holoKitModel;
+}
+
++ (struct PhoneModel)initializePhoneModel {
+    struct PhoneModel phoneModel;
+    phoneModel.screenWidth = 0.13977;
+    phoneModel.screenHeight = 0.06458;
+    phoneModel.screenBottom = 0.00347;
+    phoneModel.centerLineOffset = 0.0;
+    phoneModel.cameraOffset = simd_make_float3(0.05996, -0.02364 - 0.03494, 0.00591);
+    
+    return phoneModel;
+}
+
++ (simd_float4)matrixVectorMultiplication:(simd_float4x4)mat vector:(simd_float4)vec {
+    simd_float4 ret;
+    ret.x = mat.columns[0].x * vec.x + mat.columns[1].x * vec.y + mat.columns[2].x * vec.z + mat.columns[3].x * vec.w;
+    ret.y = mat.columns[0].y * vec.x + mat.columns[1].y * vec.y + mat.columns[2].y * vec.z + mat.columns[3].y * vec.w;
+    ret.z = mat.columns[0].z * vec.x + mat.columns[1].z * vec.y + mat.columns[2].z * vec.z + mat.columns[3].z * vec.w;
+    ret.w = mat.columns[0].w * vec.x + mat.columns[1].w * vec.y + mat.columns[2].w * vec.z + mat.columns[3].w * vec.w;
+    return ret;
+}
+
++ (void)logVector4:(simd_float4)vec {
+    NSLog(@"simd_float4: [%f %f %f %f]", vec.x, vec.y, vec.z, vec.w);
+}
+
+// print out the matrix column by column
++ (void)logMatrix4x4:(simd_float4x4)mat {
+    NSLog(@"simd_float4x4;");
+    NSLog(@"[%f %f %f %f]", mat.columns[0].x, mat.columns[0].y, mat.columns[0].z, mat.columns[0].w);
+    NSLog(@"[%f %f %f %f]", mat.columns[1].x, mat.columns[1].y, mat.columns[1].z, mat.columns[1].w);
+    NSLog(@"[%f %f %f %f]", mat.columns[2].x, mat.columns[2].y, mat.columns[2].z, mat.columns[2].w);
+    NSLog(@"[%f %f %f %f]", mat.columns[3].x, mat.columns[3].y, mat.columns[3].z, mat.columns[3].w);
 }
 
 @end

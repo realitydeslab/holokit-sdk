@@ -1,8 +1,8 @@
 //
 //  ViewController.m
-//  test-stereoscopic-rendering
+//  HoloKitStereoscopicRendering
 //
-//  Created by Yuchen on 2021/2/10.
+//  Created by Yuchen on 2021/2/4.
 //
 
 #import "ViewController.h"
@@ -44,7 +44,7 @@
     // Configure the renderer to draw to the view
     self.renderer = [[Renderer alloc] initWithSession:self.session metalDevice:view.device renderDestinationProvider:view];
     
-    [self.renderer drawRectResized:view.bounds.size];
+    [self.renderer drawRectResized:view.bounds.size drawableSize:view.drawableSize];
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     NSMutableArray *gestureRecognizers = [NSMutableArray array];
@@ -75,6 +75,7 @@
         
         // Create a transform with a translation of 0.2 meters in front of the camera
         matrix_float4x4 translation = matrix_identity_float4x4;
+        // TODO: place the geometry on a physical plane
         translation.columns[3].z = -0.2;
         matrix_float4x4 transform = matrix_multiply(currentFrame.camera.transform, translation);
         
@@ -88,7 +89,7 @@
 
 // Called whenever view changes orientation or layout is changed
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size {
-    [self.renderer drawRectResized:view.bounds.size];
+    [self.renderer drawRectResized:view.bounds.size drawableSize:size];
 }
 
 // Called whenever the view needs to render
