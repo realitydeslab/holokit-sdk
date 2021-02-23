@@ -61,6 +61,8 @@ typedef struct {
 //    Metal shaders matches the layout of uniform data set in C code
 typedef struct {
     matrix_float4x4 modelMatrix;
+    simd_float4 anchorColor;
+    float scale;
 } InstanceUniforms;
 
 #endif /* ShaderTypes_h */

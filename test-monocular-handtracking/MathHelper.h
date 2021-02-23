@@ -10,3 +10,9 @@
 
 
 #endif /* MathHelper_h */
+
+@interface MathHelper : NSObject
+
++ (void)logMatrix4x4:(simd_float4x4)mat;
+
+@end

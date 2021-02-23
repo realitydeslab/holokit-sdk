@@ -7,11 +7,18 @@
 
 #import "ViewController.h"
 #import "Renderer.h"
+#import "MathHelper.h"
 
-@interface ViewController () <MTKViewDelegate, ARSessionDelegate>
+@interface ViewController () <MTKViewDelegate, ARSessionDelegate, TrackerDelegate>
 
 @property (nonatomic, strong) ARSession *session;
 @property (nonatomic, strong) Renderer *renderer;
+// for handtracking
+@property (nonatomic, strong) HandTracker *handTracker;
+@property (nonatomic, strong) NSArray<NSArray<Landmark *> *> *landmarks;
+// for handtracking debug
+@property (assign) double landmarkZMin;
+@property (assign) double landmarkZMax;
 
 @end
 
@@ -29,6 +36,13 @@
     // Create an ARSession
     self.session = [ARSession new];
     self.session.delegate = self;
+    
+    // Set hand tracker
+    _landmarkZMin = 1000;
+    _landmarkZMax = -1000;
+    self.handTracker = [[HandTracker alloc] init];
+    self.handTracker.delegate = self;
+    [self.handTracker startGraph];
     
     // Set the view to use the default device
     MTKView *view = (MTKView *)self.view;
@@ -75,7 +89,7 @@
         
         // Create a transform with a translation of 0.2 meters in front of the camera
         matrix_float4x4 translation = matrix_identity_float4x4;
-        translation.columns[3].z = -0.2;
+        translation.columns[3].z = -0.5;
         matrix_float4x4 transform = matrix_multiply(currentFrame.camera.transform, translation);
         
         // Add a new anchor to the session
@@ -97,6 +111,13 @@
 }
 
 #pragma mark - ARSessionDelegate
+- (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
+    // process capturedImage for handtracking
+    
+    //NSLog(@"handTracker.processVideoFrame is called");
+    [_handTracker processVideoFrame: frame.capturedImage];
+}
+
 
 - (void)session:(ARSession *)session didFailWithError:(NSError *)error {
     // Present an error message to the user
@@ -113,4 +134,94 @@
     
 }
 
+- (void)handTracker:(HandTracker *)handTracker didOutputLandmarks:(NSArray<NSArray<Landmark *> *> *)multiLandmarks {
+    
+    //NSLog(@"handTracker function is called");
+    _landmarks = multiLandmarks;
+    
+    if(_session.currentFrame == nil){
+        return;
+    }
+    ARFrame *currentFrame = _session.currentFrame;
+    // remove all handtracking anchors from last frame
+    for(ARAnchor *anchor in currentFrame.anchors){
+        if([anchor.name isEqual:@"handtracking"]) {
+            [_session removeAnchor:anchor];
+        }
+    }
+    
+    for(NSArray<Landmark *> *landmarks in multiLandmarks){
+        int idx = 0;
+        for(Landmark *landmark in landmarks){
+            
+            int x = (CGFloat)landmark.x * currentFrame.camera.imageResolution.width;
+            int y = (CGFloat)landmark.y * currentFrame.camera.imageResolution.height;
+            CGPoint screenPoint = CGPointMake(x, y);
+            
+            // TODO: rendering these anchors in 2D screen space
+            
+            // solving the depth problem
+            //NSLog(@"%f %f %f", landmark.x, landmark.y, landmark.z);
+            //NSLog(@"z value: %f", landmark.z);
+            if(landmark.z < _landmarkZMin) {
+                _landmarkZMin = landmark.z;
+            }
+            if(landmark.z > _landmarkZMax) {
+                _landmarkZMax = landmark.z;
+            }
+            if(YES) {
+                NSLog(@"%f %f %f", landmark.x, landmark.y, landmark.z);
+                NSLog(@"Landmark Z Min is: %f", _landmarkZMin);
+                NSLog(@"Landmakr Z Max is: %f", _landmarkZMax);
+            }
+            
+            simd_float4x4 translation = matrix_identity_float4x4;
+            // set z values for different landmarks
+            translation.columns[3].z = -0.5;
+            // TODO: find a better constant
+            float handDepthConstant = 0.13 / 0.75;
+            // the z value of the wrist landmark is temporarily fixed
+            if (idx != 0) {
+                translation.columns[3].z += landmark.z * handDepthConstant;
+            }
+            idx++;
+            
+            simd_float4x4 planeOrigin = simd_mul(currentFrame.camera.transform, translation);
+            simd_float3 xAxis = simd_make_float3(1, 0, 0);
+            //simd_float4x4 rotation = simd_quaternion(0.5 * M_PI, xAxis);
+            //NSLog(@"%f", simd_quaternion(0.5 * M_PI, xAxis).vector.x);
+            //NSLog(@"%f", simd_quaternion(0.5 * M_PI, xAxis).vector.y);
+            //NSLog(@"%f", simd_quaternion(0.5 * M_PI, xAxis).vector.z);
+            //NSLog(@"%f", simd_quaternion(0.5 * M_PI, xAxis).vector.w);
+            simd_float4x4 rotation = simd_matrix4x4(simd_quaternion(0.5 * M_PI, xAxis));
+            //NSLog(@"rotation");
+            //[MathHelper logMatrix4x4:rotation];
+            simd_float4x4 plane = simd_mul(planeOrigin, rotation);
+            // make sure this plane matrix is correct
+            //[MathHelper logMatrix4x4:plane];
+            simd_float3 unprojectedPoint = [currentFrame.camera unprojectPoint:screenPoint ontoPlaneWithTransform:plane orientation:UIInterfaceOrientationLandscapeRight viewportSize:currentFrame.camera.imageResolution];
+            //NSLog(@"image resolution: %d %d", (int)currentFrame.camera.imageResolution.width, (int)currentFrame.camera.imageResolution.height);
+            // TODO: if unprojectedPoint is nil?
+            simd_float4x4 tempTransform = matrix_identity_float4x4;
+            tempTransform.columns[3].x = unprojectedPoint.x;
+            tempTransform.columns[3].y = unprojectedPoint.y;
+            tempTransform.columns[3].z = unprojectedPoint.z;
+            simd_float4x4 landmarkTransform = simd_mul(currentFrame.camera.transform, tempTransform);
+            
+            // manually set anchor's transform in screen space
+            //landmarkTransform.columns[0].x = x;
+            //landmarkTransform.columns[0].y = y;
+            
+            ARAnchor *anchor = [[ARAnchor alloc] initWithName:@"handtracking" transform:tempTransform];
+            
+            [_session addAnchor:anchor];
+        }
+    }
+}
+- (void)handTracker: (HandTracker*)handTracker didOutputHandednesses: (NSArray<Handedness *> *)handednesses {
+    
+}
+- (void)handTracker: (HandTracker*)handTracker didOutputPixelBuffer: (CVPixelBufferRef)pixelBuffer {
+    
+}
 @end

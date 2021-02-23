@@ -13,6 +13,7 @@
 
 // Include header shared between C code here, which executes Metal API commands, and .metal files
 #import "ShaderTypes.h"
+#import "MathHelper.h"
 
 // The max number of command buffers in flight
 static const NSUInteger kMaxBuffersInFlight = 3;
@@ -429,6 +430,12 @@ static const float kImagePlaneVertexData[16] = {
         coordinateSpaceTransform.columns[2].z = -1.0;
         
         anchorUniforms->modelMatrix = matrix_multiply(anchor.transform, coordinateSpaceTransform);
+        
+        // for handtracking anchors
+        if ([anchor.name isEqual: @"handtracking"]) {
+            anchorUniforms->anchorColor = simd_make_float4(0.0, 0.0, 1.0, 1.0);
+        }
+        
     }
     
     _anchorInstanceCount = anchorInstanceCount;

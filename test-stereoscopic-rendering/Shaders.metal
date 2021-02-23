@@ -48,7 +48,9 @@ vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]],
 // Captured image fragment function
 fragment float4 capturedImageFragmentShader(ImageColorInOut in [[stage_in]],
                                             texture2d<float, access::sample> capturedImageTextureY [[ texture(kTextureIndexY) ]],
-                                            texture2d<float, access::sample> capturedImageTextureCbCr [[ texture(kTextureIndexCbCr) ]]) {
+                                            texture2d<float, access::sample> capturedImageTextureCbCr [[ texture(kTextureIndexCbCr) ]],
+                                            depth2d<float, access::sample> arDepthTexture [[texture(3)]],
+                                            texture2d<uint> arDepthConfidence [[texture(4)]]) {
     
     constexpr sampler colorSampler(mip_filter::linear,
                                    mag_filter::linear,
@@ -65,10 +67,15 @@ fragment float4 capturedImageFragmentShader(ImageColorInOut in [[stage_in]],
     float4 ycbcr = float4(capturedImageTextureY.sample(colorSampler, in.texCoord).r,
                           capturedImageTextureCbCr.sample(colorSampler, in.texCoord).rg, 1.0);
     
+    constexpr sampler depthSampler(address::clamp_to_edge, filter::linear);
+    float depth = arDepthTexture.sample(depthSampler, in.texCoord);
+    return float4(depth, depth, depth, 1.0);
+    
     // Return converted RGB color
-    // now everything is red, and I can also set everything to black
-    return ycbcrToRGBTransform * ycbcr;
-    //return float4(0.0, 0.0, 1.0, 1.0);
+    //return ycbcrToRGBTransform * ycbcr;
+    
+    // render black background
+    //return float4(0.0, 0.0, 0.0, 1.0);
 }
 
 
@@ -105,6 +112,15 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     float4 position = float4(in.position, 1.0);
     
     float4x4 modelMatrix = instanceUniforms[iid].modelMatrix;
+    // use this matrix to scale down the anchor size
+    float4x4 scaleMatrix = float4x4(0);
+    scaleMatrix.columns[0].x = 0.1;
+    scaleMatrix.columns[1].y = 0.1;
+    scaleMatrix.columns[2].z = 0.1;
+    scaleMatrix.columns[3].w = 1;
+    // the order matters
+    modelMatrix = modelMatrix * scaleMatrix;
+    
     float4x4 modelViewMatrix = sharedUniforms.viewMatrixPerEye[amp_id] * modelMatrix;
     
     // Calculate the position of our vertex in clip space and output for clipping and rasterization
@@ -118,6 +134,8 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
               : colorID == 3 ? float4(1.0, 0.5, 0.0, 1.0) // Bottom face
               : colorID == 4 ? float4(1.0, 1.0, 0.0, 1.0) // Back face
               : float4(1.0, 1.0, 1.0, 1.0); // Front face
+    // set landmark anchor color
+    out.color = instanceUniforms[iid].anchorColor;
     
     // Calculate the position of our vertex in eye space
     out.eyePosition = half3((modelViewMatrix * position).xyz);

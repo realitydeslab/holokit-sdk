@@ -90,6 +90,15 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     float4 position = float4(in.position, 1.0);
     
     float4x4 modelMatrix = instanceUniforms[iid].modelMatrix;
+    // use this matrix to scale down the anchor size
+    float4x4 scaleMatrix = float4x4(0);
+    scaleMatrix.columns[0].x = 0.1;
+    scaleMatrix.columns[1].y = 0.1;
+    scaleMatrix.columns[2].z = 0.1;
+    scaleMatrix.columns[3].w = 1;
+    // the order matters
+    modelMatrix = modelMatrix * scaleMatrix;
+    
     float4x4 modelViewMatrix = sharedUniforms.viewMatrix * modelMatrix;
     
     // Calculate the position of our vertex in clip space and output for clipping and rasterization
@@ -103,6 +112,8 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
               : colorID == 3 ? float4(1.0, 0.5, 0.0, 1.0) // Bottom face
               : colorID == 4 ? float4(1.0, 1.0, 0.0, 1.0) // Back face
               : float4(1.0, 1.0, 1.0, 1.0); // Front face
+    // set landmark anchor color
+    out.color = instanceUniforms[iid].anchorColor;
     
     // Calculate the position of our vertex in eye space
     out.eyePosition = half3((modelViewMatrix * position).xyz);
@@ -110,6 +121,15 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     // Rotate our normals to world coordinates
     float4 normal = modelMatrix * float4(in.normal.x, in.normal.y, in.normal.z, 0.0f);
     out.normal = normalize(half3(normal.xyz));
+    
+    // manually set the position according to the screen space
+    //out.position.x = instanceUniforms->modelMatrix.columns[0].x * 2 - 1;
+    //out.position.y = instanceUniforms->modelMatrix.columns[0].y * 2 - 1;
+    //out.position.x = 0;
+    //out.position.y = 0;
+    //out.position.z = -1;
+    //out.position.w = 1;
+    //out.position.x = out.position.x / 2;
     
     return out;
 }

@@ -13,6 +13,7 @@
 
 // Include header shared between C code here, which executes Metal API commands, and .metal files
 #import "ShaderTypes.h"
+#import "MathHelper.h"
 
 // The max number of command buffers in flight
 static const NSUInteger kMaxBuffersInFlight = 3;
@@ -57,6 +58,11 @@ const float kUserInterpupillaryDistance = 0.064;
     id <MTLDepthStencilState> _anchorDepthState;
     CVMetalTextureRef _capturedImageTextureYRef;
     CVMetalTextureRef _capturedImageTextureCbCrRef;
+    // for depth data
+    CVMetalTextureRef _depthTextureRef;
+    CVMetalTextureRef _confidenceTextureRef;
+    id<MTLTexture> _filteredDepthTexture;
+    
     // dual viewports
     MTLViewport _viewportPerEye[2];
     
@@ -395,6 +401,11 @@ const float kUserInterpupillaryDistance = 0.064;
     [self _updateAnchorsWithFrame:currentFrame];
     [self _updateCapturedImageTexturesWithFrame:currentFrame];
     
+    // Prepare the current frame's depth and confidence images for transfer to the GPU.
+    [self _updateARDepthTextures:currentFrame];
+    // TODO: pass the depth data to other classes
+    
+    
     if (_viewportSizeDidChange) {
         _viewportSizeDidChange = NO;
         
@@ -411,7 +422,9 @@ const float kUserInterpupillaryDistance = 0.064;
     const float centerX = 0.5 * phone.screenWidth + phone.centerLineOffset;
     const float centerY = phone.screenHeight - (hme.axisToBottom - phone.screenBottom);
     
-    const float fullWidth = hme.viewportOuter * 2 + hme.opticalAxisDistance + hme.viewportCushion * 4;
+    // TODO: I think there should be only 2 cushion offsets
+    //const float fullWidth = hme.viewportOuter * 2 + hme.opticalAxisDistance + hme.viewportCushion * 4;
+    const float fullWidth = hme.viewportOuter * 2 + hme.opticalAxisDistance + hme.viewportCushion * 2;
     const float width = hme.viewportOuter + hme.viewportInner + hme.viewportCushion * 2;
     const float height = hme.viewportTop + hme.viewportBottom + hme.viewportCushion * 2;
     
@@ -419,22 +432,31 @@ const float kUserInterpupillaryDistance = 0.064;
     const float near = hme.lensToEye;
     const float far = 1000.0;
     
-    // math for left eye
+    // math for left eye projection matrix
     matrix_float4x4 leftEyeProjectionMatrix = matrix_identity_float4x4;
     leftEyeProjectionMatrix.columns[0].x = 2 * near / width;
     leftEyeProjectionMatrix.columns[1].y = 2 * near / height;
+    // TODO: modified
     leftEyeProjectionMatrix.columns[2].x = (fullWidth - ipd - width) / width;
+    //leftEyeProjectionMatrix.columns[2].x = (fullWidth / 2 + ipd - hme.viewportCushion) / width;
+    //NSLog(@"1: %f", (fullWidth - ipd - width));
+    //NSLog(@"2: %f", (fullWidth / 2 + ipd - hme.viewportCushion));
     leftEyeProjectionMatrix.columns[2].y = (hme.viewportTop - hme.viewportBottom) / height;
     leftEyeProjectionMatrix.columns[2].z = -(far + near) / (far - near);
     leftEyeProjectionMatrix.columns[3].z = -(2.0 * far * near) / (far - near);
     leftEyeProjectionMatrix.columns[2].w = -1.0;
+    // TODO: should this value be 0?
+    leftEyeProjectionMatrix.columns[3].w = 0.0;
+    //[MathHelper logMatrix4x4:leftEyeProjectionMatrix];
     
-    // right eye matrix
+    // right eye projection matrix
     matrix_float4x4 rightEyeProjectionMatrix = leftEyeProjectionMatrix;
-    rightEyeProjectionMatrix.columns[2].x = (width + ipd - fullWidth) / width;
+    // TODO: modified
+    //rightEyeProjectionMatrix.columns[2].x = (width + ipd - fullWidth) / width;
+    rightEyeProjectionMatrix.columns[2].x = -rightEyeProjectionMatrix.columns[2].x;
+    //[MathHelper logMatrix4x4:rightEyeProjectionMatrix];
     
-    // at this stage, _drawableSize is empty!
-    NSLog(@"%f, %f", _drawableSize.width, _drawableSize.height);
+    //NSLog(@"%f, %f", _drawableSize.width, _drawableSize.height);
     // define left viewport and right viewport
     const double yMinInPixel = (double)((centerY - (hme.viewportTop + hme.viewportCushion)) / phone.screenHeight * (float)_drawableSize.height);
     const double xMinRightInPixel = (double)((centerX + fullWidth / 2 - width) / phone.screenWidth * (float)_drawableSize.width);
@@ -457,6 +479,8 @@ const float kUserInterpupillaryDistance = 0.064;
     leftViewport.height = heightInPixel;
     leftViewport.znear = 0;
     leftViewport.zfar = 1;
+    NSLog(@"leftViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", leftViewport.originX, leftViewport.originY, leftViewport.width, leftViewport.height, leftViewport.znear, leftViewport.zfar);
+    NSLog(@"rightViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", rightViewport.originX, rightViewport.originY, rightViewport.width, rightViewport.height, rightViewport.znear, rightViewport.zfar);
     
     _viewportPerEye[0] = leftViewport;
     _viewportPerEye[1] = rightViewport;
@@ -467,13 +491,15 @@ const float kUserInterpupillaryDistance = 0.064;
     uniforms->viewMatrix = [frame.camera viewMatrixForOrientation:UIInterfaceOrientationLandscapeRight];
     uniforms->projectionMatrix = [frame.camera projectionMatrixForOrientation:UIInterfaceOrientationLandscapeRight viewportSize:_viewportSize zNear:0.001 zFar:1000];
     
-    // update the left and right eye matrices for SR
+    // for left and right view matrices for SR
+    // pointing from the phone camera to the center of two eyes
     const simd_float3 offset = hme.mrOffset + phone.cameraOffset;
+    // the world coordinate of the camera
     const simd_float4x4 cameraTransform = frame.camera.transform;
-    [Renderer logMatrix4x4:cameraTransform];
+    //[Renderer logMatrix4x4:cameraTransform];
     const simd_float4 translation_left = [Renderer matrixVectorMultiplication:cameraTransform vector:simd_make_float4(offset.x - ipd / 2, offset.y, offset.z, 1)];
     // test the accuracy of the matrix vector multiplication function
-    [Renderer logVector4:translation_left];
+    //[Renderer logVector4:translation_left];
     const simd_float4 translation_right = [Renderer matrixVectorMultiplication:cameraTransform vector:simd_make_float4(offset.x + ipd / 2, offset.y, offset.z, 1)];
     simd_float4x4 cameraTransform_left = cameraTransform;
     cameraTransform_left.columns[3] = translation_left;
@@ -524,6 +550,11 @@ const float kUserInterpupillaryDistance = 0.064;
         coordinateSpaceTransform.columns[2].z = -1.0;
         
         anchorUniforms->modelMatrix = matrix_multiply(anchor.transform, coordinateSpaceTransform);
+        
+        // for handtracking anchors
+        if ([anchor.name isEqual: @"handtracking"]) {
+            anchorUniforms->anchorColor = simd_make_float4(0.0, 0.0, 1.0, 1.0);
+        }
     }
     
     _anchorInstanceCount = anchorInstanceCount;
@@ -556,6 +587,36 @@ const float kUserInterpupillaryDistance = 0.064;
     }
     
     return mtlTextureRef;
+}
+
+- (void)_setMTLPixelFormat:(MTLPixelFormat **)texturePixelFormat basedOn:(CVPixelBufferRef)pixelBuffer {
+    if (CVPixelBufferGetPixelFormatType(pixelBuffer) == kCVPixelFormatType_DepthFloat32) {
+        *texturePixelFormat = MTLPixelFormatR32Float;
+    } else if (CVPixelBufferGetPixelFormatType(pixelBuffer) == kCVPixelFormatType_OneComponent8) {
+        *texturePixelFormat = MTLPixelFormatR8Uint;
+    } else {
+        NSLog(@"Unsupported ARDepthData pixel-buffer format.");
+    }
+}
+
+- (void)_updateARDepthTextures:(ARFrame *)frame {
+    // Get the scene depth or smoothed scene depth from the current frame
+    // TODO: what is the difference?
+    ARDepthData* sceneDepth = frame.smoothedSceneDepth;
+    //ARDepthData* sceneDepth = frame.sceneDepth;
+    if (!sceneDepth){
+        NSLog(@"Failed to acquire scene depth.");
+        return;
+    }
+    CVPixelBufferRef pixelBuffer = sceneDepth.depthMap;
+    
+    MTLPixelFormat texturePixelFormat;
+    [self _setMTLPixelFormat:&texturePixelFormat basedOn:pixelBuffer];
+    _depthTextureRef = [self _createTextureFromPixelBuffer:pixelBuffer pixelFormat:texturePixelFormat planeIndex:0];
+    
+    pixelBuffer = sceneDepth.confidenceMap;
+    [self _setMTLPixelFormat:&texturePixelFormat basedOn:pixelBuffer];
+    _confidenceTextureRef = [self _createTextureFromPixelBuffer:pixelBuffer pixelFormat:texturePixelFormat planeIndex:0];
 }
 
 - (void)_updateImagePlaneWithFrame:(ARFrame *)frame {
@@ -595,10 +656,13 @@ const float kUserInterpupillaryDistance = 0.064;
     // Set any textures read/sampled from our render pipeline
     [renderEncoder setFragmentTexture:CVMetalTextureGetTexture(_capturedImageTextureYRef) atIndex:kTextureIndexY];
     [renderEncoder setFragmentTexture:CVMetalTextureGetTexture(_capturedImageTextureCbCrRef) atIndex:kTextureIndexCbCr];
+    // for depth data
+    [renderEncoder setFragmentTexture:CVMetalTextureGetTexture(_depthTextureRef) atIndex:3];
+    [renderEncoder setFragmentTexture:CVMetalTextureGetTexture(_confidenceTextureRef) atIndex:4];
     
     // Draw each submesh of our mesh
     [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
-    NSLog(@"Draw captured image...");
+    //NSLog(@"Draw captured image...");
     
     [renderEncoder popDebugGroup];
 }
@@ -668,11 +732,18 @@ const float kUserInterpupillaryDistance = 0.064;
 
 + (struct PhoneModel)initializePhoneModel {
     struct PhoneModel phoneModel;
-    phoneModel.screenWidth = 0.13977;
-    phoneModel.screenHeight = 0.06458;
+    //phoneModel.screenWidth = 0.13977;
+    //phoneModel.screenHeight = 0.06458;
+    //phoneModel.screenBottom = 0.00347;
+    //phoneModel.centerLineOffset = 0.0;
+    //phoneModel.cameraOffset = simd_make_float3(0.05996, -0.02364 - 0.03494, 0.00591);
+    
+    // iPhone12ProMax phone model
+    phoneModel.screenWidth = 0.15390;
+    phoneModel.screenHeight = 0.07113;
     phoneModel.screenBottom = 0.00347;
     phoneModel.centerLineOffset = 0.0;
-    phoneModel.cameraOffset = simd_make_float3(0.05996, -0.02364 - 0.03494, 0.00591);
+    phoneModel.cameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
     
     return phoneModel;
 }
