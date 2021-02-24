@@ -37,6 +37,7 @@ static const float kImagePlaneVertexData[16] = {
 const float kUserInterpupillaryDistance = 0.064;
 
 @implementation Renderer {
+    
     // The session the renderer will render
     ARSession *_session;
     
@@ -61,7 +62,7 @@ const float kUserInterpupillaryDistance = 0.064;
     // for depth data
     CVMetalTextureRef _depthTextureRef;
     CVMetalTextureRef _confidenceTextureRef;
-    id<MTLTexture> _filteredDepthTexture;
+    id <MTLTexture> _filteredDepthTexture;
     
     // dual viewports
     MTLViewport _viewportPerEye[2];
@@ -404,8 +405,7 @@ const float kUserInterpupillaryDistance = 0.064;
     // Prepare the current frame's depth and confidence images for transfer to the GPU.
     [self _updateARDepthTextures:currentFrame];
     // TODO: pass the depth data to other classes
-    
-    
+        
     if (_viewportSizeDidChange) {
         _viewportSizeDidChange = NO;
         
@@ -479,8 +479,8 @@ const float kUserInterpupillaryDistance = 0.064;
     leftViewport.height = heightInPixel;
     leftViewport.znear = 0;
     leftViewport.zfar = 1;
-    NSLog(@"leftViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", leftViewport.originX, leftViewport.originY, leftViewport.width, leftViewport.height, leftViewport.znear, leftViewport.zfar);
-    NSLog(@"rightViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", rightViewport.originX, rightViewport.originY, rightViewport.width, rightViewport.height, rightViewport.znear, rightViewport.zfar);
+    //NSLog(@"leftViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", leftViewport.originX, leftViewport.originY, leftViewport.width, leftViewport.height, leftViewport.znear, leftViewport.zfar);
+    //NSLog(@"rightViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", rightViewport.originX, rightViewport.originY, rightViewport.width, rightViewport.height, rightViewport.znear, rightViewport.zfar);
     
     _viewportPerEye[0] = leftViewport;
     _viewportPerEye[1] = rightViewport;
@@ -589,11 +589,14 @@ const float kUserInterpupillaryDistance = 0.064;
     return mtlTextureRef;
 }
 
-- (void)_setMTLPixelFormat:(MTLPixelFormat **)texturePixelFormat basedOn:(CVPixelBufferRef)pixelBuffer {
+// TODO: this is supposed to be non static
++ (void)setMTLPixelFormat:(MTLPixelFormat **)texturePixelFormat basedOn:(CVPixelBufferRef)pixelBuffer {
     if (CVPixelBufferGetPixelFormatType(pixelBuffer) == kCVPixelFormatType_DepthFloat32) {
         *texturePixelFormat = MTLPixelFormatR32Float;
+        //NSLog(@"R32Float");
     } else if (CVPixelBufferGetPixelFormatType(pixelBuffer) == kCVPixelFormatType_OneComponent8) {
         *texturePixelFormat = MTLPixelFormatR8Uint;
+        //NSLog(@"R8Uint");
     } else {
         NSLog(@"Unsupported ARDepthData pixel-buffer format.");
     }
@@ -611,12 +614,18 @@ const float kUserInterpupillaryDistance = 0.064;
     CVPixelBufferRef pixelBuffer = sceneDepth.depthMap;
     
     MTLPixelFormat texturePixelFormat;
-    [self _setMTLPixelFormat:&texturePixelFormat basedOn:pixelBuffer];
+    //NSLog(@"depthMap");
+    [Renderer setMTLPixelFormat:&texturePixelFormat basedOn:pixelBuffer];
     _depthTextureRef = [self _createTextureFromPixelBuffer:pixelBuffer pixelFormat:texturePixelFormat planeIndex:0];
     
     pixelBuffer = sceneDepth.confidenceMap;
-    [self _setMTLPixelFormat:&texturePixelFormat basedOn:pixelBuffer];
+    //NSLog(@"confidenceMap");
+    [Renderer setMTLPixelFormat:&texturePixelFormat basedOn:pixelBuffer];
     _confidenceTextureRef = [self _createTextureFromPixelBuffer:pixelBuffer pixelFormat:texturePixelFormat planeIndex:0];
+}
+
+- (CVMetalTextureRef)depthTextureRef {
+    return _depthTextureRef;
 }
 
 - (void)_updateImagePlaneWithFrame:(ARFrame *)frame {

@@ -8,6 +8,16 @@
 #import "ViewController.h"
 #import "Renderer.h"
 
+#define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
+#define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
+
+#define CLAMP(x, low, high) ({\
+  __typeof__(x) __x = (x); \
+  __typeof__(low) __low = (low);\
+  __typeof__(high) __high = (high);\
+  __x > __high ? __high : (__x < __low ? __low : __x);\
+  })
+
 @interface ViewController () <MTKViewDelegate, ARSessionDelegate, TrackerDelegate>
 
 @property (nonatomic, strong) ARSession *session;
@@ -156,20 +166,38 @@
         }
     }
     
+    // get the scene depth
+    ARDepthData* sceneDepth = _session.currentFrame.smoothedSceneDepth;
+    //ARDepthData* sceneDepth = frame.sceneDepth;
+    if (!sceneDepth){
+        NSLog(@"Failed to acquire scene depth.");
+        return;
+    }
+    CVPixelBufferRef pixelBuffer = sceneDepth.depthMap;
+    
+    // from https://stackoverflow.com/questions/34569750/get-pixel-value-from-cvpixelbufferref-in-swift
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    size_t bufferWidth = CVPixelBufferGetWidth(pixelBuffer);
+    size_t bufferHeight = CVPixelBufferGetHeight(pixelBuffer);
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
+    NSLog(@"bufferWidth: %d, bufferHeight: %d, bytesPerRow: %d", bufferWidth, bufferHeight, bytesPerRow);
+    
+    Float32* baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
+    
     for(NSArray<Landmark *> *landmarks in multiLandmarks){
         int idx = 0;
         for(Landmark *landmark in landmarks){
             
             int x = (CGFloat)landmark.x * currentFrame.camera.imageResolution.width;
             int y = (CGFloat)landmark.y * currentFrame.camera.imageResolution.height;
-            //int x = (CGFloat)landmark.x * 1160.729858;
-            //int y = (CGFloat)landmark.y * 948.784119;
             CGPoint screenPoint = CGPointMake(x, y);
             
-            // TODO: rendering these anchors in 2D screen space
+            // get the depth value of the landmark from the depthMap
+            int depthX = CLAMP(landmark.x, 0, 1) * bufferWidth;
+            int depthY = CLAMP(landmark.y, 0, 1) * bufferHeight;
+            float landmarkDepth = baseAddress[depthY * bufferWidth + depthX];
             
-            // TODO: get the depth map and give each landmark correct z value in world coordinate
-            
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
             
             // solving the depth problem
             //NSLog(@"%f %f %f", landmark.x, landmark.y, landmark.z);
@@ -188,13 +216,13 @@
             
             simd_float4x4 translation = matrix_identity_float4x4;
             // set z values for different landmarks
-            translation.columns[3].z = -0.2;
+            translation.columns[3].z = -landmarkDepth;
             // TODO: find a better constant
-            float handDepthConstant = 0.13 / 0.75;
-            // the z value of the wrist landmark is temporarily fixed
-            if (idx != 0) {
-                translation.columns[3].z += landmark.z * handDepthConstant;
-            }
+            //float handDepthConstant = 0.13 / 0.75;
+            //// the z value of the wrist landmark is temporarily fixed
+            //if (idx != 0) {
+            //    translation.columns[3].z += landmark.z * handDepthConstant;
+            //}
             idx++;
             
             simd_float4x4 planeOrigin = simd_mul(currentFrame.camera.transform, translation);
@@ -210,8 +238,7 @@
             simd_float4x4 plane = simd_mul(planeOrigin, rotation);
             // make sure this plane matrix is correct
             //[MathHelper logMatrix4x4:plane];
-            //simd_float3 unprojectedPoint = [currentFrame.camera unprojectPoint:screenPoint ontoPlaneWithTransform:plane orientation:UIInterfaceOrientationLandscapeRight viewportSize:currentFrame.camera.imageResolution];
-            simd_float3 unprojectedPoint = [currentFrame.camera unprojectPoint:screenPoint ontoPlaneWithTransform:plane orientation:UIInterfaceOrientationLandscapeRight viewportSize:CGSizeMake(1160.729858, 948.784119)];
+            simd_float3 unprojectedPoint = [currentFrame.camera unprojectPoint:screenPoint ontoPlaneWithTransform:plane orientation:UIInterfaceOrientationLandscapeRight viewportSize:currentFrame.camera.imageResolution];
             //NSLog(@"image resolution: %d %d", (int)currentFrame.camera.imageResolution.width, (int)currentFrame.camera.imageResolution.height);
             // TODO: if unprojectedPoint is nil?
             simd_float4x4 tempTransform = matrix_identity_float4x4;
@@ -219,10 +246,6 @@
             tempTransform.columns[3].y = unprojectedPoint.y;
             tempTransform.columns[3].z = unprojectedPoint.z;
             simd_float4x4 landmarkTransform = simd_mul(currentFrame.camera.transform, tempTransform);
-            
-            // manually set anchor's transform in screen space
-            //landmarkTransform.columns[0].x = x;
-            //landmarkTransform.columns[0].y = y;
             
             ARAnchor *anchor = [[ARAnchor alloc] initWithName:@"handtracking" transform:tempTransform];
             

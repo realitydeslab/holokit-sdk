@@ -71,9 +71,13 @@ struct PhoneModel {
 // test for support
 - (BOOL)supportsMultipleViewports;
 
+- (CVMetalTextureRef)depthTextureRef;
+
 + (struct HoloKitModel)initializeHoloKitModel;
 
 + (struct PhoneModel)initializePhoneModel;
+
++ (void)setMTLPixelFormat:(MTLPixelFormat **)texturePixelFormat basedOn:(CVPixelBufferRef)pixelBuffer;
 
 @end
 
