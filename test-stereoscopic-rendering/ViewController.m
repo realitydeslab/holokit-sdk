@@ -85,7 +85,8 @@
     
     ARWorldTrackingConfiguration *configuration = [ARWorldTrackingConfiguration new];
     // for scene depth
-    configuration.frameSemantics = ARFrameSemanticSmoothedSceneDepth;
+    //configuration.frameSemantics = ARFrameSemanticSmoothedSceneDepth;
+    configuration.frameSemantics = ARFrameSemanticSceneDepth;
 
     [self.session runWithConfiguration:configuration];
 }
@@ -150,6 +151,8 @@
     
 }
 
+#pragma mark - HandTracking
+
 - (void)handTracker:(HandTracker *)handTracker didOutputLandmarks:(NSArray<NSArray<Landmark *> *> *)multiLandmarks {
     
     //NSLog(@"handTracker function is called");
@@ -167,9 +170,10 @@
     }
     
     // get the scene depth
-    ARDepthData* sceneDepth = _session.currentFrame.smoothedSceneDepth;
-    //ARDepthData* sceneDepth = frame.sceneDepth;
+    //ARDepthData* sceneDepth = _session.currentFrame.smoothedSceneDepth;
+    ARDepthData* sceneDepth = _session.currentFrame.sceneDepth;
     if (!sceneDepth){
+        NSLog(@"ViewController");
         NSLog(@"Failed to acquire scene depth.");
         return;
     }
@@ -197,7 +201,7 @@
             int depthY = CLAMP(landmark.y, 0, 1) * bufferHeight;
             float landmarkDepth = baseAddress[depthY * bufferWidth + depthX];
             
-            CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+            //CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
             
             // solving the depth problem
             //NSLog(@"%f %f %f", landmark.x, landmark.y, landmark.z);
@@ -211,8 +215,6 @@
             //NSLog(@"%f %f %f", landmark.x, landmark.y, landmark.z);
             //NSLog(@"Landmark Z Min is: %f", _landmarkZMin);
             //NSLog(@"Landmakr Z Max is: %f", _landmarkZMax);
-
-            
             
             simd_float4x4 translation = matrix_identity_float4x4;
             // set z values for different landmarks
@@ -252,6 +254,7 @@
             [_session addAnchor:anchor];
         }
     }
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
 }
 
 - (void)handTracker: (HandTracker*)handTracker didOutputHandednesses: (NSArray<Handedness *> *)handednesses {

@@ -62,7 +62,7 @@ const float kUserInterpupillaryDistance = 0.064;
     // for depth data
     CVMetalTextureRef _depthTextureRef;
     CVMetalTextureRef _confidenceTextureRef;
-    id <MTLTexture> _filteredDepthTexture;
+    //id <MTLTexture> _filteredDepthTexture;
     
     // dual viewports
     MTLViewport _viewportPerEye[2];
@@ -123,6 +123,8 @@ const float kUserInterpupillaryDistance = 0.064;
 - (void)dealloc {
     CVBufferRelease(_capturedImageTextureYRef);
     CVBufferRelease(_capturedImageTextureCbCrRef);
+    CVBufferRelease(_depthTextureRef);
+    CVBufferRelease(_confidenceTextureRef);
 }
 
 - (void)drawRectResized:(CGSize)size drawableSize:(CGSize)drawableSize{
@@ -152,10 +154,15 @@ const float kUserInterpupillaryDistance = 0.064;
     //   cycle, we must retain them separately here.
     CVBufferRef capturedImageTextureYRef = CVBufferRetain(_capturedImageTextureYRef);
     CVBufferRef capturedImageTextureCbCrRef = CVBufferRetain(_capturedImageTextureCbCrRef);
+    // TODO: don't know if this is good
+    CVBufferRef depthTextureRef = CVBufferRetain(_depthTextureRef);
+    CVBufferRef confidenceTextureRef = CVBufferRetain(_confidenceTextureRef);
     [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
         dispatch_semaphore_signal(block_sema);
         CVBufferRelease(capturedImageTextureYRef);
         CVBufferRelease(capturedImageTextureCbCrRef);
+        CVBufferRelease(depthTextureRef);
+        CVBufferRelease(confidenceTextureRef);
     }];
     
     [self _updateBufferStates];
@@ -589,6 +596,8 @@ const float kUserInterpupillaryDistance = 0.064;
     return mtlTextureRef;
 }
 
+#pragma mark - ARSceneDepth
+
 // TODO: this is supposed to be non static
 + (void)setMTLPixelFormat:(MTLPixelFormat **)texturePixelFormat basedOn:(CVPixelBufferRef)pixelBuffer {
     if (CVPixelBufferGetPixelFormatType(pixelBuffer) == kCVPixelFormatType_DepthFloat32) {
@@ -605,9 +614,10 @@ const float kUserInterpupillaryDistance = 0.064;
 - (void)_updateARDepthTextures:(ARFrame *)frame {
     // Get the scene depth or smoothed scene depth from the current frame
     // TODO: what is the difference?
-    ARDepthData* sceneDepth = frame.smoothedSceneDepth;
-    //ARDepthData* sceneDepth = frame.sceneDepth;
+    //ARDepthData* sceneDepth = frame.smoothedSceneDepth;
+    ARDepthData* sceneDepth = frame.sceneDepth;
     if (!sceneDepth){
+        NSLog(@"Renderer");
         NSLog(@"Failed to acquire scene depth.");
         return;
     }
@@ -616,16 +626,14 @@ const float kUserInterpupillaryDistance = 0.064;
     MTLPixelFormat texturePixelFormat;
     //NSLog(@"depthMap");
     [Renderer setMTLPixelFormat:&texturePixelFormat basedOn:pixelBuffer];
+    CVBufferRelease(_depthTextureRef);
     _depthTextureRef = [self _createTextureFromPixelBuffer:pixelBuffer pixelFormat:texturePixelFormat planeIndex:0];
     
     pixelBuffer = sceneDepth.confidenceMap;
     //NSLog(@"confidenceMap");
     [Renderer setMTLPixelFormat:&texturePixelFormat basedOn:pixelBuffer];
+    CVBufferRelease(_confidenceTextureRef);
     _confidenceTextureRef = [self _createTextureFromPixelBuffer:pixelBuffer pixelFormat:texturePixelFormat planeIndex:0];
-}
-
-- (CVMetalTextureRef)depthTextureRef {
-    return _depthTextureRef;
 }
 
 - (void)_updateImagePlaneWithFrame:(ARFrame *)frame {
