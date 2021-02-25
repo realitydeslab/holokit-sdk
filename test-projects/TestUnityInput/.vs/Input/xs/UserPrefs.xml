@@ -1,0 +1,43 @@
+﻿<Properties StartupConfiguration="{FF9BDCE5-C9C3-8213-2EA8-F798E7F80DA2}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../Packages/com.unity.xr.sdk.inputsample/package.json">
+    <Files>
+      <File FileName="../../Packages/com.unity.xr.sdk.inputsample/package.json" Line="1" Column="1" />
+      <File FileName="Assets/Tests/Camera and TrackedPoseDriver/TPDToText.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Input" expanded="True">
+            <Node name="Assets" expanded="True">
+              <Node name="AllInOne" expanded="True" />
+              <Node name="Resources" expanded="True" />
+              <Node name="Test Driver" expanded="True" />
+              <Node name="Tests" expanded="True">
+                <Node name="Camera and TrackedPoseDriver" expanded="True">
+                  <Node name="TPDToText.cs" selected="True" />
+                </Node>
+              </Node>
+              <Node name="XR" expanded="True" />
+            </Node>
+            <Node name="Packages" expanded="True">
+              <Node name="com.unity.xr.sdk.inputsample" expanded="True">
+                <Node name="Runtime" expanded="True">
+                  <Node name="ios" expanded="True" />
+                  <Node name="osx" expanded="True" />
+                  <Node name="windows" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="a1467e26-aceb-406b-ba97-96104d2c6b3c" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

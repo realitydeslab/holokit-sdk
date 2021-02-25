@@ -184,19 +184,35 @@
     size_t bufferWidth = CVPixelBufferGetWidth(pixelBuffer);
     size_t bufferHeight = CVPixelBufferGetHeight(pixelBuffer);
     size_t bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
-    NSLog(@"bufferWidth: %d, bufferHeight: %d, bytesPerRow: %d", bufferWidth, bufferHeight, bytesPerRow);
+    //NSLog(@"bufferWidth: %d, bufferHeight: %d, bytesPerRow: %d", bufferWidth, bufferHeight, bytesPerRow);
     
     Float32* baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
     
     for(NSArray<Landmark *> *landmarks in multiLandmarks){
-        int idx = 0;
+        int landmarkIndex = 0;
+        // for each hand, we only need to get the depth of the wrist
+        float wristDepth = 0.5;
+        float zValueOffset = 0.0;
         for(Landmark *landmark in landmarks){
             
+            NSLog(@"idx: %d", landmarkIndex);
             int x = (CGFloat)landmark.x * currentFrame.camera.imageResolution.width;
             int y = (CGFloat)landmark.y * currentFrame.camera.imageResolution.height;
             CGPoint screenPoint = CGPointMake(x, y);
             
+            float offsetLandmarkZ = 0.0;
             // get the depth value of the landmark from the depthMap
+            if (landmarkIndex == 0) {
+                int depthX = CLAMP(landmark.x, 0, 1) * bufferWidth;
+                int depthY = CLAMP(landmark.y, 0, 1) * bufferHeight;
+                wristDepth = baseAddress[depthY * bufferWidth + depthX];
+                zValueOffset = landmark.z;
+                offsetLandmarkZ = 0;
+            } else {
+                offsetLandmarkZ = landmark.z - zValueOffset;
+            }
+            
+            // fetch the depth value of this landamrk
             int depthX = CLAMP(landmark.x, 0, 1) * bufferWidth;
             int depthY = CLAMP(landmark.y, 0, 1) * bufferHeight;
             float landmarkDepth = baseAddress[depthY * bufferWidth + depthX];
@@ -215,17 +231,24 @@
             //NSLog(@"%f %f %f", landmark.x, landmark.y, landmark.z);
             //NSLog(@"Landmark Z Min is: %f", _landmarkZMin);
             //NSLog(@"Landmakr Z Max is: %f", _landmarkZMax);
+            NSLog(@"Distance between this landmark to wrist: %f", landmarkDepth - wristDepth);
+            NSLog(@"Z value: %f", offsetLandmarkZ);
+            NSLog(@"Ratio: %f", fabsf(landmarkDepth - wristDepth) / fabsf(offsetLandmarkZ));
             
             simd_float4x4 translation = matrix_identity_float4x4;
             // set z values for different landmarks
+            if (landmarkIndex == 0) {
+                translation.columns[3].z = -wristDepth;
+            } else {
+                // the distance between the wrist and the tip of the middle finger
+                // TODO: use a better number
+                const float handSizeConstant = 15;
+                translation.columns[3].z = offsetLandmarkZ * handSizeConstant;
+            }
+            
             translation.columns[3].z = -landmarkDepth;
-            // TODO: find a better constant
-            //float handDepthConstant = 0.13 / 0.75;
-            //// the z value of the wrist landmark is temporarily fixed
-            //if (idx != 0) {
-            //    translation.columns[3].z += landmark.z * handDepthConstant;
-            //}
-            idx++;
+            
+            landmarkIndex++;
             
             simd_float4x4 planeOrigin = simd_mul(currentFrame.camera.transform, translation);
             simd_float3 xAxis = simd_make_float3(1, 0, 0);

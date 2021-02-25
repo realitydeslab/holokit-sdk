@@ -1,0 +1,22 @@
+﻿<Properties StartupConfiguration="{511A4443-A082-7E16-F184-0FCACB11928E}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../xr-plugin/com.unity.xr.sdk.inputsample/Runtime/InputSampleXRLoader.cs">
+    <Files>
+      <File FileName="Assets/Test Driver/Editor/XRSdkDescription.cs" Line="6" Column="1" IsPinned="True" />
+      <File FileName="../../xr-plugin/com.unity.xr.sdk.inputsample/Runtime/InputSampleXRLoader.cs" Line="15" Column="15" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="TestUnityInput" expanded="True" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="6c430f54-90a5-499e-bdba-8252b2cdf746" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

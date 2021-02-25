@@ -7,6 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
+		4B2B2FE825E23588002AC24F /* HandTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FF925E23E94002AC24F /* AppDelegate.m */; };
+		4B2B2FFC25E23E94002AC24F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FFB25E23E94002AC24F /* Shaders.metal */; };
+		4B2B300025E23E94002AC24F /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FFF25E23E94002AC24F /* Renderer.m */; };
+		4B2B300325E23E94002AC24F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B300225E23E94002AC24F /* ViewController.m */; };
+		4B2B300625E23E94002AC24F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B2B300425E23E94002AC24F /* Main.storyboard */; };
+		4B2B300825E23E95002AC24F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2B300725E23E95002AC24F /* Assets.xcassets */; };
+		4B2B300B25E23E95002AC24F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B2B300925E23E95002AC24F /* LaunchScreen.storyboard */; };
+		4B2B300E25E23E95002AC24F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B300D25E23E95002AC24F /* main.m */; };
+		4B2B302525E23F5B002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
+		4B2B302625E23F5B002AC24F /* HandTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4B38241925E749AC00B39EEB /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B38241825E749AC00B39EEB /* Input.cpp */; };
+		4B38245D25E77F6900B39EEB /* MathHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B38242C25E74B1200B39EEB /* MathHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4B38248225E77F8500B39EEB /* MathHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6AD99B25E34404008F9911 /* MathHelper.h */; };
+		4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6AD99125E343EB008F9911 /* MathHelper.m */; };
+		4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C84E825E3F19B00B04F03 /* MathHelper.m */; };
+		4B6CC26A25D42C2C0068CB66 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26925D42C2C0068CB66 /* AppDelegate.m */; };
+		4B6CC26C25D42C2C0068CB66 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26B25D42C2C0068CB66 /* Shaders.metal */; };
+		4B6CC27025D42C2C0068CB66 /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26F25D42C2C0068CB66 /* Renderer.m */; };
+		4B6CC27325D42C2C0068CB66 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC27225D42C2C0068CB66 /* ViewController.m */; };
+		4B6CC27625D42C2C0068CB66 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27425D42C2C0068CB66 /* Main.storyboard */; };
+		4B6CC27825D42C2D0068CB66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27725D42C2D0068CB66 /* Assets.xcassets */; };
+		4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27925D42C2D0068CB66 /* LaunchScreen.storyboard */; };
+		4B6CC27E25D42C2D0068CB66 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC27D25D42C2D0068CB66 /* main.m */; };
 		961B8AEF253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8AF0253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8B00253BBABF0025BA7D /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 961B8AFF253BBABF0025BA7D /* Metal.framework */; };
@@ -84,8 +109,6 @@
 		9666E9EF257260D900A7F127 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9666E9ED257260D900A7F127 /* Main.storyboard */; };
 		9666E9F1257260DA00A7F127 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9666E9F0257260DA00A7F127 /* Assets.xcassets */; };
 		9666E9F4257260DA00A7F127 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9666E9F2257260DA00A7F127 /* LaunchScreen.storyboard */; };
-		9666EA052572610200A7F127 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
-		9666EA122572616A00A7F127 /* test_ceres.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9666EA102572616A00A7F127 /* test_ceres.cpp */; };
 		9666EAB42572692700A7F127 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EAB32572692700A7F127 /* Accelerate.framework */; };
 		968D697C253AC0FC00CFBBB3 /* holokit.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D697B253AC0FC00CFBBB3 /* holokit.cc */; };
 		968D69CC253AC4C900CFBBB3 /* distortion_renderer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D69CB253AC4C900CFBBB3 /* distortion_renderer.cc */; };
@@ -125,6 +148,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		4B2B2FE925E23588002AC24F /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4B2B2FE825E23588002AC24F /* HandTracker.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B2B302725E23F5B002AC24F /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4B2B302625E23F5B002AC24F /* HandTracker.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		965105752575FCBC00F076B5 /* Embed App Clips */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -190,6 +235,44 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-monocular-handtracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B2B2FF825E23E94002AC24F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		4B2B2FF925E23E94002AC24F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		4B2B2FFB25E23E94002AC24F /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		4B2B2FFD25E23E94002AC24F /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		4B2B2FFE25E23E94002AC24F /* Renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
+		4B2B2FFF25E23E94002AC24F /* Renderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Renderer.m; sourceTree = "<group>"; };
+		4B2B300125E23E94002AC24F /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		4B2B300225E23E94002AC24F /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		4B2B300525E23E94002AC24F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		4B2B300725E23E95002AC24F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4B2B300A25E23E95002AC24F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		4B2B300C25E23E95002AC24F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4B2B300D25E23E95002AC24F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4B38240625E7491B00B39EEB /* libtest-unity-plugin-input.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libtest-unity-plugin-input.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B38240825E7491B00B39EEB /* test_unity_plugin_input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test_unity_plugin_input.h; sourceTree = "<group>"; };
+		4B38240A25E7491B00B39EEB /* test_unity_plugin_input.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test_unity_plugin_input.m; sourceTree = "<group>"; };
+		4B38241825E749AC00B39EEB /* Input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
+		4B38242C25E74B1200B39EEB /* MathHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelpers.h; sourceTree = "<group>"; };
+		4B38244025E757D100B39EEB /* test_input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_input.cpp; sourceTree = "<group>"; };
+		4B6AD99125E343EB008F9911 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
+		4B6AD99B25E34404008F9911 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
+		4B6C84E825E3F19B00B04F03 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
+		4B6C84F225E3F1A700B04F03 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
+		4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-stereoscopic-rendering.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B6CC26825D42C2C0068CB66 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		4B6CC26925D42C2C0068CB66 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		4B6CC26B25D42C2C0068CB66 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		4B6CC26D25D42C2C0068CB66 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		4B6CC26E25D42C2C0068CB66 /* Renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
+		4B6CC26F25D42C2C0068CB66 /* Renderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Renderer.m; sourceTree = "<group>"; };
+		4B6CC27125D42C2C0068CB66 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		4B6CC27225D42C2C0068CB66 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		4B6CC27525D42C2C0068CB66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		4B6CC27725D42C2D0068CB66 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4B6CC27A25D42C2D0068CB66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		4B6CC27C25D42C2D0068CB66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4B6CC27D25D42C2D0068CB66 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		961B8AD8253B40110025BA7D /* UnityXRNativePtrs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnityXRNativePtrs.h; sourceTree = "<group>"; };
 		961B8AEE253BB99F0025BA7D /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
 		961B8AFF253BBABF0025BA7D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
@@ -367,6 +450,29 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4B2B2FF325E23E94002AC24F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B2B302525E23F5B002AC24F /* HandTracker.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B38240425E7491B00B39EEB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B6CC26325D42C2C0068CB66 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		965105372575FC9800F076B5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -417,7 +523,6 @@
 			files = (
 				9699F6692575D0010011D823 /* HandTracker.framework in Frameworks */,
 				9666EAB42572692700A7F127 /* Accelerate.framework in Frameworks */,
-				9666EA052572610200A7F127 /* libceres.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -449,6 +554,62 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4B2B2FF725E23E94002AC24F /* test-monocular-handtracking */ = {
+			isa = PBXGroup;
+			children = (
+				4B2B2FF825E23E94002AC24F /* AppDelegate.h */,
+				4B2B2FF925E23E94002AC24F /* AppDelegate.m */,
+				4B2B2FFB25E23E94002AC24F /* Shaders.metal */,
+				4B2B2FFD25E23E94002AC24F /* ShaderTypes.h */,
+				4B2B2FFE25E23E94002AC24F /* Renderer.h */,
+				4B2B2FFF25E23E94002AC24F /* Renderer.m */,
+				4B2B300125E23E94002AC24F /* ViewController.h */,
+				4B2B300225E23E94002AC24F /* ViewController.m */,
+				4B2B300425E23E94002AC24F /* Main.storyboard */,
+				4B2B300725E23E95002AC24F /* Assets.xcassets */,
+				4B2B300925E23E95002AC24F /* LaunchScreen.storyboard */,
+				4B2B300C25E23E95002AC24F /* Info.plist */,
+				4B2B300D25E23E95002AC24F /* main.m */,
+				4B6AD99125E343EB008F9911 /* MathHelper.m */,
+				4B6AD99B25E34404008F9911 /* MathHelper.h */,
+			);
+			path = "test-monocular-handtracking";
+			sourceTree = "<group>";
+		};
+		4B38240725E7491B00B39EEB /* test-unity-plugin-input */ = {
+			isa = PBXGroup;
+			children = (
+				4B38240825E7491B00B39EEB /* test_unity_plugin_input.h */,
+				4B38240A25E7491B00B39EEB /* test_unity_plugin_input.m */,
+				4B38241825E749AC00B39EEB /* Input.cpp */,
+				4B38242C25E74B1200B39EEB /* MathHelpers.h */,
+				4B38244025E757D100B39EEB /* test_input.cpp */,
+			);
+			path = "test-unity-plugin-input";
+			sourceTree = "<group>";
+		};
+		4B6CC26725D42C2C0068CB66 /* test-stereoscopic-rendering */ = {
+			isa = PBXGroup;
+			children = (
+				4B6CC26825D42C2C0068CB66 /* AppDelegate.h */,
+				4B6CC26925D42C2C0068CB66 /* AppDelegate.m */,
+				4B6CC26B25D42C2C0068CB66 /* Shaders.metal */,
+				4B6CC26D25D42C2C0068CB66 /* ShaderTypes.h */,
+				4B6CC26E25D42C2C0068CB66 /* Renderer.h */,
+				4B6CC26F25D42C2C0068CB66 /* Renderer.m */,
+				4B6CC27125D42C2C0068CB66 /* ViewController.h */,
+				4B6CC27225D42C2C0068CB66 /* ViewController.m */,
+				4B6CC27425D42C2C0068CB66 /* Main.storyboard */,
+				4B6CC27725D42C2D0068CB66 /* Assets.xcassets */,
+				4B6CC27925D42C2D0068CB66 /* LaunchScreen.storyboard */,
+				4B6CC27C25D42C2D0068CB66 /* Info.plist */,
+				4B6CC27D25D42C2D0068CB66 /* main.m */,
+				4B6C84E825E3F19B00B04F03 /* MathHelper.m */,
+				4B6C84F225E3F1A700B04F03 /* MathHelper.h */,
+			);
+			path = "test-stereoscopic-rendering";
+			sourceTree = "<group>";
+		};
 		9651053B2575FC9800F076B5 /* official-app */ = {
 			isa = PBXGroup;
 			children = (
@@ -504,6 +665,9 @@
 				9651053B2575FC9800F076B5 /* official-app */,
 				965106A92576659000F076B5 /* holokit-app-clip */,
 				965106DB25766AB100F076B5 /* test-external-holokit-game */,
+				4B6CC26725D42C2C0068CB66 /* test-stereoscopic-rendering */,
+				4B2B2FF725E23E94002AC24F /* test-monocular-handtracking */,
+				4B38240725E7491B00B39EEB /* test-unity-plugin-input */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -522,6 +686,9 @@
 				9651053A2575FC9800F076B5 /* official-app.app */,
 				965106A82576659000F076B5 /* holokit-app-clip.app */,
 				965106DA25766AB100F076B5 /* test-external-holokit-game.app */,
+				4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */,
+				4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */,
+				4B38240625E7491B00B39EEB /* libtest-unity-plugin-input.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -824,6 +991,15 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		4B38240225E7491B00B39EEB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B38248225E77F8500B39EEB /* MathHelper.h in Headers */,
+				4B38245D25E77F6900B39EEB /* MathHelpers.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		968D692E253ABEB300CFBBB3 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -834,6 +1010,60 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		4B2B2FF525E23E94002AC24F /* test-monocular-handtracking */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B2B300F25E23E95002AC24F /* Build configuration list for PBXNativeTarget "test-monocular-handtracking" */;
+			buildPhases = (
+				4B2B2FF225E23E94002AC24F /* Sources */,
+				4B2B2FF325E23E94002AC24F /* Frameworks */,
+				4B2B2FF425E23E94002AC24F /* Resources */,
+				4B2B302725E23F5B002AC24F /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "test-monocular-handtracking";
+			productName = "test-monocular-handtracking";
+			productReference = 4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4B38240525E7491B00B39EEB /* test-unity-plugin-input */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B38240E25E7491B00B39EEB /* Build configuration list for PBXNativeTarget "test-unity-plugin-input" */;
+			buildPhases = (
+				4B38240225E7491B00B39EEB /* Headers */,
+				4B38240325E7491B00B39EEB /* Sources */,
+				4B38240425E7491B00B39EEB /* Frameworks */,
+				4B38243625E74CCE00B39EEB /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "test-unity-plugin-input";
+			productName = "test-unity-plugin-input";
+			productReference = 4B38240625E7491B00B39EEB /* libtest-unity-plugin-input.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		4B6CC26525D42C2C0068CB66 /* test-stereoscopic-rendering */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B6CC28125D42C2D0068CB66 /* Build configuration list for PBXNativeTarget "test-stereoscopic-rendering" */;
+			buildPhases = (
+				4B6CC26225D42C2C0068CB66 /* Sources */,
+				4B6CC26325D42C2C0068CB66 /* Frameworks */,
+				4B6CC26425D42C2C0068CB66 /* Resources */,
+				4B2B2FE925E23588002AC24F /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "test-stereoscopic-rendering";
+			productName = "test-stereoscopic-rendering";
+			productReference = 4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */;
+			productType = "com.apple.product-type.application";
+		};
 		965105392575FC9800F076B5 /* official-app */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9651054D2575FC9900F076B5 /* Build configuration list for PBXNativeTarget "official-app" */;
@@ -1021,6 +1251,15 @@
 				LastSwiftUpdateCheck = 1220;
 				LastUpgradeCheck = 1220;
 				TargetAttributes = {
+					4B2B2FF525E23E94002AC24F = {
+						CreatedOnToolsVersion = 12.4;
+					};
+					4B38240525E7491B00B39EEB = {
+						CreatedOnToolsVersion = 12.4;
+					};
+					4B6CC26525D42C2C0068CB66 = {
+						CreatedOnToolsVersion = 12.3;
+					};
 					965105392575FC9800F076B5 = {
 						CreatedOnToolsVersion = 12.2;
 					};
@@ -1073,11 +1312,34 @@
 				965105392575FC9800F076B5 /* official-app */,
 				965106A72576659000F076B5 /* holokit-app-clip */,
 				965106D925766AB100F076B5 /* test-external-holokit-game */,
+				4B6CC26525D42C2C0068CB66 /* test-stereoscopic-rendering */,
+				4B2B2FF525E23E94002AC24F /* test-monocular-handtracking */,
+				4B38240525E7491B00B39EEB /* test-unity-plugin-input */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		4B2B2FF425E23E94002AC24F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B2B300B25E23E95002AC24F /* LaunchScreen.storyboard in Resources */,
+				4B2B300825E23E95002AC24F /* Assets.xcassets in Resources */,
+				4B2B300625E23E94002AC24F /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B6CC26425D42C2C0068CB66 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */,
+				4B6CC27825D42C2D0068CB66 /* Assets.xcassets in Resources */,
+				4B6CC27625D42C2C0068CB66 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		965105382575FC9800F076B5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1139,6 +1401,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		4B38243625E74CCE00B39EEB /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"osx/x64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.sdk.inputsample/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/InputProviderSample.dylib\"\n\n";
+		};
 		968D6948253ABF2000CFBBB3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1177,6 +1456,40 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4B2B2FF225E23E94002AC24F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B2B300E25E23E95002AC24F /* main.m in Sources */,
+				4B2B2FFC25E23E94002AC24F /* Shaders.metal in Sources */,
+				4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */,
+				4B2B300325E23E94002AC24F /* ViewController.m in Sources */,
+				4B2B300025E23E94002AC24F /* Renderer.m in Sources */,
+				4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B38240325E7491B00B39EEB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B38241925E749AC00B39EEB /* Input.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B6CC26225D42C2C0068CB66 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B6CC27E25D42C2D0068CB66 /* main.m in Sources */,
+				4B6CC26C25D42C2C0068CB66 /* Shaders.metal in Sources */,
+				4B6CC26A25D42C2C0068CB66 /* AppDelegate.m in Sources */,
+				4B6CC27325D42C2C0068CB66 /* ViewController.m in Sources */,
+				4B6CC27025D42C2C0068CB66 /* Renderer.m in Sources */,
+				4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		965105362575FC9800F076B5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1266,7 +1579,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9666E9E7257260D900A7F127 /* Shaders.metal in Sources */,
-				9666EA122572616A00A7F127 /* test_ceres.cpp in Sources */,
 				9666E9EA257260D900A7F127 /* Renderer.swift in Sources */,
 				9666E9EC257260D900A7F127 /* ViewController.swift in Sources */,
 				9666E9E5257260D800A7F127 /* AppDelegate.swift in Sources */,
@@ -1330,6 +1642,38 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		4B2B300425E23E94002AC24F /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4B2B300525E23E94002AC24F /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		4B2B300925E23E95002AC24F /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4B2B300A25E23E95002AC24F /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		4B6CC27425D42C2C0068CB66 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4B6CC27525D42C2C0068CB66 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		4B6CC27925D42C2D0068CB66 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4B6CC27A25D42C2D0068CB66 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 		965105422575FC9800F076B5 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1405,6 +1749,134 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		4B2B301025E23E95002AC24F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				INFOPLIST_FILE = "test-monocular-handtracking/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-monocular-handtracking";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4B2B301125E23E95002AC24F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				INFOPLIST_FILE = "test-monocular-handtracking/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-monocular-handtracking";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4B38240C25E7491B00B39EEB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		4B38240D25E7491B00B39EEB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		4B6CC27F25D42C2D0068CB66 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				INFOPLIST_FILE = "test-stereoscopic-rendering/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-stereoscopic-rendering";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4B6CC28025D42C2D0068CB66 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				INFOPLIST_FILE = "test-stereoscopic-rendering/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-stereoscopic-rendering";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		9651054B2575FC9900F076B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1782,14 +2254,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = /Users/amber/Projects/HoloKit/HoloKit2/handtracking/HandTracker/Example/Carthage/Build/iOS/;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/sdk/third_party/";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 					"CERES_NO_THREADS=1",
 				);
 				HEADER_SEARCH_PATHS = (
-					"/Users/amber/Projects/HoloKit/HoloKit2/handtracking/ceres-solver/include",
+					"/usr/local/Cellar/ceres-solver/2.0.0/include/ceres/",
 					/usr/local/include/eigen3/,
 					"/Users/amber/Projects/HoloKit/HoloKit2/handtracking/ceres-solver/internal/ceres/miniglog",
 					"/Users/amber/Projects/HoloKit/HoloKit2/handtracking/ceres-solver/config",
@@ -1819,10 +2291,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = /Users/amber/Projects/HoloKit/HoloKit2/handtracking/HandTracker/Example/Carthage/Build/iOS/;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/sdk/third_party/";
 				GCC_PREPROCESSOR_DEFINITIONS = "CERES_NO_THREADS=1";
 				HEADER_SEARCH_PATHS = (
-					"/Users/amber/Projects/HoloKit/HoloKit2/handtracking/ceres-solver/include",
+					"/usr/local/Cellar/ceres-solver/2.0.0/include/ceres/",
 					/usr/local/include/eigen3/,
 					"/Users/amber/Projects/HoloKit/HoloKit2/handtracking/ceres-solver/internal/ceres/miniglog",
 					"/Users/amber/Projects/HoloKit/HoloKit2/handtracking/ceres-solver/config",
@@ -1970,6 +2442,33 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4B2B300F25E23E95002AC24F /* Build configuration list for PBXNativeTarget "test-monocular-handtracking" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B2B301025E23E95002AC24F /* Debug */,
+				4B2B301125E23E95002AC24F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B38240E25E7491B00B39EEB /* Build configuration list for PBXNativeTarget "test-unity-plugin-input" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B38240C25E7491B00B39EEB /* Debug */,
+				4B38240D25E7491B00B39EEB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B6CC28125D42C2D0068CB66 /* Build configuration list for PBXNativeTarget "test-stereoscopic-rendering" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B6CC27F25D42C2D0068CB66 /* Debug */,
+				4B6CC28025D42C2D0068CB66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9651054D2575FC9900F076B5 /* Build configuration list for PBXNativeTarget "official-app" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
