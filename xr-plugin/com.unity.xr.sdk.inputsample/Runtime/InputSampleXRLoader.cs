@@ -12,26 +12,29 @@ namespace Unity.XR.SDK
 
         public override bool Initialize()
         {
-            //Debug.Log("dddddddddddd");
             CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "input0");
+            Debug.Log("XRLoader::Initialize(): Subsystem input0 is created.");
             return true;
         }
 
         public override bool Start()
         {
             StartSubsystem<XRInputSubsystem>();
+            Debug.Log("XRLoader::Start()");
             return true;
         }
 
         public override bool Stop()
         {
             StopSubsystem<XRInputSubsystem>();
+            Debug.Log("XRLoader::Stop()");
             return true;
         }
 
         public override bool Deinitialize()
         {
             DestroySubsystem<XRInputSubsystem>();
+            Debug.Log("XRLoader::Deinitialize()");
             return true;
         }
     }

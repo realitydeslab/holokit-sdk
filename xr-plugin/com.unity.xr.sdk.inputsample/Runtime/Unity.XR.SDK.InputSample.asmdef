@@ -1,14 +1,24 @@
 {
     "name": "Unity.XR.SDK.InputSample",
+    "rootNamespace": "",
     "references": [
-        "Unity.XR.Management"
+        "Unity.XR.Management",
+        "Unity.InputSystem",
+        "Unity.XR.ARSubsystems"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "",
+            "define": "UNITY_INPUT_SYSTEM"
+        }
+    ],
+    "noEngineReferences": false
 }

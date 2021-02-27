@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
 		4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
 		4B2B2FE825E23588002AC24F /* HandTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FF925E23E94002AC24F /* AppDelegate.m */; };
@@ -19,9 +20,12 @@
 		4B2B300E25E23E95002AC24F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B300D25E23E95002AC24F /* main.m */; };
 		4B2B302525E23F5B002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
 		4B2B302625E23F5B002AC24F /* HandTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		4B38241925E749AC00B39EEB /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B38241825E749AC00B39EEB /* Input.cpp */; };
 		4B38245D25E77F6900B39EEB /* MathHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B38242C25E74B1200B39EEB /* MathHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4B38248225E77F8500B39EEB /* MathHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6AD99B25E34404008F9911 /* MathHelper.h */; };
+		4B4CDC3125F06D36000C2AC7 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
+		4B66159525F39F9000CC4E81 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
+		4B6615A225F39FE000CC4E81 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
+		4B6615A425F39FED00CC4E81 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6AD99125E343EB008F9911 /* MathHelper.m */; };
 		4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C84E825E3F19B00B04F03 /* MathHelper.m */; };
 		4B6CC26A25D42C2C0068CB66 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26925D42C2C0068CB66 /* AppDelegate.m */; };
@@ -32,6 +36,10 @@
 		4B6CC27825D42C2D0068CB66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27725D42C2D0068CB66 /* Assets.xcassets */; };
 		4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27925D42C2D0068CB66 /* LaunchScreen.storyboard */; };
 		4B6CC27E25D42C2D0068CB66 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC27D25D42C2D0068CB66 /* main.m */; };
+		4B9E03E425E890DA00AA0FAA /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
+		4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		4BBDD2B825F36C0300070CB4 /* hand_tracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */; };
+		4BBDD2F025F397D200070CB4 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
 		961B8AEF253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8AF0253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8B00253BBABF0025BA7D /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 961B8AFF253BBABF0025BA7D /* Metal.framework */; };
@@ -170,6 +178,15 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B2D6E3F25E7CFD500DAAD13 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		965105752575FCBC00F076B5 /* Embed App Clips */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -235,6 +252,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4B06977225ECADA3009D51BD /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = System/Library/Frameworks/Vision.framework; sourceTree = SDKROOT; };
 		4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-monocular-handtracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2B2FF825E23E94002AC24F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B2B2FF925E23E94002AC24F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -249,12 +267,16 @@
 		4B2B300A25E23E95002AC24F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4B2B300C25E23E95002AC24F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B2B300D25E23E95002AC24F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4B2D6E3125E7CF1200DAAD13 /* test_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_main.cpp; sourceTree = "<group>"; };
+		4B2D6E3C25E7CF2000DAAD13 /* test_load.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test_load.h; sourceTree = "<group>"; };
+		4B2D6E4125E7CFD500DAAD13 /* libtest-unity-input-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtest-unity-input-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B38240625E7491B00B39EEB /* libtest-unity-plugin-input.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libtest-unity-plugin-input.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B38240825E7491B00B39EEB /* test_unity_plugin_input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test_unity_plugin_input.h; sourceTree = "<group>"; };
-		4B38240A25E7491B00B39EEB /* test_unity_plugin_input.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test_unity_plugin_input.m; sourceTree = "<group>"; };
 		4B38241825E749AC00B39EEB /* Input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
 		4B38242C25E74B1200B39EEB /* MathHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelpers.h; sourceTree = "<group>"; };
-		4B38244025E757D100B39EEB /* test_input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_input.cpp; sourceTree = "<group>"; };
+		4B38244025E757D100B39EEB /* test_input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = test_input.mm; sourceTree = "<group>"; };
+		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
+		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
+		4B6615B025F3A0C700CC4E81 /* hand_tracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hand_tracking.h; sourceTree = "<group>"; };
 		4B6AD99125E343EB008F9911 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
 		4B6AD99B25E34404008F9911 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
 		4B6C84E825E3F19B00B04F03 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
@@ -273,6 +295,10 @@
 		4B6CC27A25D42C2D0068CB66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4B6CC27C25D42C2D0068CB66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B6CC27D25D42C2D0068CB66 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4B9E039725E88F3300AA0FAA /* libtest-holokit-sdk-prototype.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libtest-holokit-sdk-prototype.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B9E039925E88F3300AA0FAA /* test_holokit_sdk_prototype.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test_holokit_sdk_prototype.h; sourceTree = "<group>"; };
+		4B9E039B25E88F3300AA0FAA /* test_holokit_sdk_prototype.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test_holokit_sdk_prototype.m; sourceTree = "<group>"; };
+		4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hand_tracking.mm; sourceTree = "<group>"; };
 		961B8AD8253B40110025BA7D /* UnityXRNativePtrs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnityXRNativePtrs.h; sourceTree = "<group>"; };
 		961B8AEE253BB99F0025BA7D /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
 		961B8AFF253BBABF0025BA7D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
@@ -458,6 +484,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B2D6E3E25E7CFD500DAAD13 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B6615A425F39FED00CC4E81 /* Metal.framework in Frameworks */,
+				4B6615A225F39FE000CC4E81 /* ARKit.framework in Frameworks */,
+				4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4B38240425E7491B00B39EEB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -469,7 +505,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */,
 				4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B9E039525E88F3300AA0FAA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,14 +620,23 @@
 			path = "test-monocular-handtracking";
 			sourceTree = "<group>";
 		};
+		4B2D6E4225E7CFD500DAAD13 /* test-unity-input-ios */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "test-unity-input-ios";
+			sourceTree = "<group>";
+		};
 		4B38240725E7491B00B39EEB /* test-unity-plugin-input */ = {
 			isa = PBXGroup;
 			children = (
-				4B38240825E7491B00B39EEB /* test_unity_plugin_input.h */,
-				4B38240A25E7491B00B39EEB /* test_unity_plugin_input.m */,
+				4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */,
 				4B38241825E749AC00B39EEB /* Input.cpp */,
 				4B38242C25E74B1200B39EEB /* MathHelpers.h */,
-				4B38244025E757D100B39EEB /* test_input.cpp */,
+				4B38244025E757D100B39EEB /* test_input.mm */,
+				4B2D6E3125E7CF1200DAAD13 /* test_main.cpp */,
+				4B2D6E3C25E7CF2000DAAD13 /* test_load.h */,
+				4B6615B025F3A0C700CC4E81 /* hand_tracking.h */,
 			);
 			path = "test-unity-plugin-input";
 			sourceTree = "<group>";
@@ -608,6 +661,15 @@
 				4B6C84F225E3F1A700B04F03 /* MathHelper.h */,
 			);
 			path = "test-stereoscopic-rendering";
+			sourceTree = "<group>";
+		};
+		4B9E039825E88F3300AA0FAA /* test-holokit-sdk-prototype */ = {
+			isa = PBXGroup;
+			children = (
+				4B9E039925E88F3300AA0FAA /* test_holokit_sdk_prototype.h */,
+				4B9E039B25E88F3300AA0FAA /* test_holokit_sdk_prototype.m */,
+			);
+			path = "test-holokit-sdk-prototype";
 			sourceTree = "<group>";
 		};
 		9651053B2575FC9800F076B5 /* official-app */ = {
@@ -668,6 +730,8 @@
 				4B6CC26725D42C2C0068CB66 /* test-stereoscopic-rendering */,
 				4B2B2FF725E23E94002AC24F /* test-monocular-handtracking */,
 				4B38240725E7491B00B39EEB /* test-unity-plugin-input */,
+				4B2D6E4225E7CFD500DAAD13 /* test-unity-input-ios */,
+				4B9E039825E88F3300AA0FAA /* test-holokit-sdk-prototype */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -689,6 +753,8 @@
 				4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */,
 				4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */,
 				4B38240625E7491B00B39EEB /* libtest-unity-plugin-input.dylib */,
+				4B2D6E4125E7CFD500DAAD13 /* libtest-unity-input-ios.a */,
+				4B9E039725E88F3300AA0FAA /* libtest-holokit-sdk-prototype.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -696,6 +762,9 @@
 		96602188253935D7004019A5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4B6615A325F39FED00CC4E81 /* Metal.framework */,
+				4B6615A125F39FE000CC4E81 /* ARKit.framework */,
+				4B06977225ECADA3009D51BD /* Vision.framework */,
 				9666EAB32572692700A7F127 /* Accelerate.framework */,
 				9666EA042572610200A7F127 /* libceres.a */,
 				9666E9902572395C00A7F127 /* HandTracker.framework */,
@@ -1000,6 +1069,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B9E039325E88F3300AA0FAA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		968D692E253ABEB300CFBBB3 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1027,6 +1103,24 @@
 			productName = "test-monocular-handtracking";
 			productReference = 4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */;
 			productType = "com.apple.product-type.application";
+		};
+		4B2D6E4025E7CFD500DAAD13 /* test-unity-input-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B2D6E4725E7CFD500DAAD13 /* Build configuration list for PBXNativeTarget "test-unity-input-ios" */;
+			buildPhases = (
+				4B2D6E3D25E7CFD500DAAD13 /* Sources */,
+				4B2D6E3E25E7CFD500DAAD13 /* Frameworks */,
+				4B2D6E3F25E7CFD500DAAD13 /* CopyFiles */,
+				4B2D6E5425E7CFDD00DAAD13 /* Run Script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "test-unity-input-ios";
+			productName = "test-unity-input-ios";
+			productReference = 4B2D6E4125E7CFD500DAAD13 /* libtest-unity-input-ios.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 		4B38240525E7491B00B39EEB /* test-unity-plugin-input */ = {
 			isa = PBXNativeTarget;
@@ -1063,6 +1157,24 @@
 			productName = "test-stereoscopic-rendering";
 			productReference = 4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */;
 			productType = "com.apple.product-type.application";
+		};
+		4B9E039625E88F3300AA0FAA /* test-holokit-sdk-prototype */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B9E039F25E88F3300AA0FAA /* Build configuration list for PBXNativeTarget "test-holokit-sdk-prototype" */;
+			buildPhases = (
+				4B9E039325E88F3300AA0FAA /* Headers */,
+				4B9E039425E88F3300AA0FAA /* Sources */,
+				4B9E039525E88F3300AA0FAA /* Frameworks */,
+				4B9E03AB25E88F6E00AA0FAA /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "test-holokit-sdk-prototype";
+			productName = "test-holokit-sdk-prototype";
+			productReference = 4B9E039725E88F3300AA0FAA /* libtest-holokit-sdk-prototype.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 		965105392575FC9800F076B5 /* official-app */ = {
 			isa = PBXNativeTarget;
@@ -1254,11 +1366,17 @@
 					4B2B2FF525E23E94002AC24F = {
 						CreatedOnToolsVersion = 12.4;
 					};
+					4B2D6E4025E7CFD500DAAD13 = {
+						CreatedOnToolsVersion = 12.4;
+					};
 					4B38240525E7491B00B39EEB = {
 						CreatedOnToolsVersion = 12.4;
 					};
 					4B6CC26525D42C2C0068CB66 = {
 						CreatedOnToolsVersion = 12.3;
+					};
+					4B9E039625E88F3300AA0FAA = {
+						CreatedOnToolsVersion = 12.4;
 					};
 					965105392575FC9800F076B5 = {
 						CreatedOnToolsVersion = 12.2;
@@ -1315,6 +1433,8 @@
 				4B6CC26525D42C2C0068CB66 /* test-stereoscopic-rendering */,
 				4B2B2FF525E23E94002AC24F /* test-monocular-handtracking */,
 				4B38240525E7491B00B39EEB /* test-unity-plugin-input */,
+				4B2D6E4025E7CFD500DAAD13 /* test-unity-input-ios */,
+				4B9E039625E88F3300AA0FAA /* test-holokit-sdk-prototype */,
 			);
 		};
 /* End PBXProject section */
@@ -1401,7 +1521,42 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		4B2D6E5425E7CFDD00DAAD13 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios/arm64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.sdk.inputsample/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/InputProviderSample.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/TestUnityInput/Build/Libraries/com.unity.xr.sdk.inputsample/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/InputProviderSample.a\"\n\n";
+		};
 		4B38243625E74CCE00B39EEB /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"osx/x64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.sdk.inputsample/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/InputProviderSample.dylib\"\n\n";
+		};
+		4B9E03AB25E88F6E00AA0FAA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1469,11 +1624,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B2D6E3D25E7CFD500DAAD13 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BBDD2F025F397D200070CB4 /* test_input.mm in Sources */,
+				4BBDD2B825F36C0300070CB4 /* hand_tracking.mm in Sources */,
+				4B66159525F39F9000CC4E81 /* printc.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4B38240325E7491B00B39EEB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B38241925E749AC00B39EEB /* Input.cpp in Sources */,
+				4B4CDC3125F06D36000C2AC7 /* test_input.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1487,6 +1652,14 @@
 				4B6CC27325D42C2C0068CB66 /* ViewController.m in Sources */,
 				4B6CC27025D42C2C0068CB66 /* Renderer.m in Sources */,
 				4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B9E039425E88F3300AA0FAA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B9E03E425E890DA00AA0FAA /* test_input.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1797,6 +1970,48 @@
 			};
 			name = Release;
 		};
+		4B2D6E4825E7CFD500DAAD13 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4B2D6E4925E7CFD500DAAD13 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		4B38240C25E7491B00B39EEB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1805,6 +2020,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
 				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1821,6 +2040,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
 				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1874,6 +2097,38 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-stereoscopic-rendering";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4B9E039D25E88F3300AA0FAA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		4B9E039E25E88F3300AA0FAA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -2451,6 +2706,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		4B2D6E4725E7CFD500DAAD13 /* Build configuration list for PBXNativeTarget "test-unity-input-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B2D6E4825E7CFD500DAAD13 /* Debug */,
+				4B2D6E4925E7CFD500DAAD13 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		4B38240E25E7491B00B39EEB /* Build configuration list for PBXNativeTarget "test-unity-plugin-input" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2465,6 +2729,15 @@
 			buildConfigurations = (
 				4B6CC27F25D42C2D0068CB66 /* Debug */,
 				4B6CC28025D42C2D0068CB66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B9E039F25E88F3300AA0FAA /* Build configuration list for PBXNativeTarget "test-holokit-sdk-prototype" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B9E039D25E88F3300AA0FAA /* Debug */,
+				4B9E039E25E88F3300AA0FAA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

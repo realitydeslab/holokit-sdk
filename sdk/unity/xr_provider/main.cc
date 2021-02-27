@@ -22,6 +22,8 @@ extern "C" {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
   auto* xr_trace = unity_interfaces->Get<IUnityXRTrace>();
+    CARDBOARD_MAIN_XR_TRACE_LOG(xr_trace,
+                                "XXssdasdsadsssd");
 
   if (LoadDisplay(unity_interfaces) != kUnitySubsystemErrorCodeSuccess) {
     CARDBOARD_MAIN_XR_TRACE_LOG(xr_trace, "Error loading display subsystem.");

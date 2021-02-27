@@ -40,8 +40,8 @@ namespace UnityEditor.XR.HoloKit
                         loaderName = "HoloKit",
                         loaderType = typeof(HoloKitLoader).FullName,
                         supportedBuildTargets = new List<BuildTargetGroup>() {
-                            //BuildTargetGroup.iOS, 
-                            //BuildTargetGroup.Standalone //TODO(for dummy test)
+                            BuildTargetGroup.iOS, 
+                            BuildTargetGroup.Standalone //TODO(for dummy test)
                         }
                     },
                 }

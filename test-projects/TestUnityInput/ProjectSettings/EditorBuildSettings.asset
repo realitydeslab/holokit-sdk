@@ -36,6 +36,8 @@ EditorBuildSettings:
     path: Assets/Tests/XRNodePhysicalTryGets/XRNodePhysicalTryGets.unity
     guid: 779b8af5c4da96c4494250f188f61ce4
   m_configObjects:
+    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 31b16367c50be45f8a4b52960e0e93de,
+      type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 1455b28ba8c6b471fba8bdaba122724c,
       type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 699d170f84e608d44a4cd3d303d6df9d,

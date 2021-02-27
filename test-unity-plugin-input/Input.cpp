@@ -40,6 +40,12 @@ static UnityXRInputDeviceCharacteristics rightControllerCharacteristics = (Unity
                                | kUnityXRInputDeviceCharacteristicsTrackedDevice
                                | kUnityXRInputDeviceCharacteristicsController
                                | kUnityXRInputDeviceCharacteristicsHeldInHand);
+
+static UnityXRInputDeviceCharacteristics handCharacteristics = (UnityXRInputDeviceCharacteristics)
+                                (kUnityXRInputDeviceCharacteristicsController
+                                 | kUnityXRInputDeviceCharacteristicsHeldInHand);
+
+
 // clang-format on
 
 static IUnityInterfaces* s_UnityInterfaces;
@@ -67,6 +73,8 @@ typedef struct MockHMD
         updateCount++;
 
         rotation.y = sin(((float)updateCount) * kHMDRotationSpeed) * kMaxHMDRotationAngle * 0.1;
+        
+        //position.x += 0.1;
     }
 
     void Recenter()
@@ -181,6 +189,7 @@ static UnitySubsystemErrorCode Tick(UnitySubsystemHandle handle, void* userData,
     if (updateType == kUnityXRInputUpdateTypeDynamic)
         s_ProviderData.frameCount++;
 
+    
     // You can connect a controller anytime you want
     if (s_ProviderData.frameCount == kControllerConnectedFrameCount)
         s_XrInput->InputSubsystem_DeviceConnected(handle, kDeviceId_Controller);
@@ -191,6 +200,7 @@ static UnitySubsystemErrorCode Tick(UnitySubsystemHandle handle, void* userData,
         s_XrInput->InputSubsystem_DeviceConnected(handle, kDeviceId_Controller);
         s_ProviderData.controllerCharacteristics = (s_ProviderData.controllerCharacteristics == leftControllerCharacteristics) ? rightControllerCharacteristics : leftControllerCharacteristics;
     }
+     
 
     s_ProviderData.hmd.Update();
     s_ProviderData.controller.Update();
@@ -218,11 +228,14 @@ static UnitySubsystemErrorCode FillDeviceDefinition(UnitySubsystemHandle handle,
         s_XrInput->DeviceDefinition_AddFeatureWithUsage(definition, "Center Eye Rotation", kUnityXRInputFeatureTypeRotation, kUnityXRInputFeatureUsageCenterEyeRotation);
     }
     break;
+            
     case kDeviceId_Controller:
     {
-        s_XrInput->DeviceDefinition_SetName(definition, "Sample Controller");
+        s_XrInput->DeviceDefinition_SetName(definition, "Sample Controller Aris");
         s_XrInput->DeviceDefinition_SetCharacteristics(definition, s_ProviderData.controllerCharacteristics);
+        //s_XrInput->DeviceDefinition_SetCharacteristics(definition, handCharacteristics);
 
+        
         s_XrInput->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
         s_XrInput->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageTrackingState);
 
@@ -233,13 +246,16 @@ static UnitySubsystemErrorCode FillDeviceDefinition(UnitySubsystemHandle handle,
         s_XrInput->DeviceDefinition_AddFeatureWithUsage(definition, "Sample Axis", kUnityXRInputFeatureTypeAxis1D, kUnityXRInputFeatureUsageLegacyAxis3);
         s_XrInput->DeviceDefinition_AddFeatureWithUsage(definition, "Sample 2D Axis", kUnityXRInputFeatureTypeAxis2D, kUnityXRInputFeatureUsagePrimary2DAxis);
 
+        
         s_XrInput->DeviceDefinition_AddFeature(definition, "Unmapped Button", kUnityXRInputFeatureTypeBinary);
 
         UnityXRInputFeatureIndex featureIndex = s_XrInput->DeviceDefinition_AddFeature(definition, "Multi-Usage Button", kUnityXRInputFeatureTypeBinary);
         s_XrInput->DeviceDefinition_AddUsageAtIndex(definition, featureIndex, kUnityXRInputFeatureUsageSecondaryButton);
         s_XrInput->DeviceDefinition_AddUsageAtIndex(definition, featureIndex, kUnityXRInputFeatureUsageLegacyButton11);
         s_XrInput->DeviceDefinition_AddUsageAtIndex(definition, featureIndex, kUnityXRInputFeatureUsageLegacyButton12);
+         
     }
+             
     break;
     default:
         return kUnitySubsystemErrorCodeFailure;
@@ -247,8 +263,12 @@ static UnitySubsystemErrorCode FillDeviceDefinition(UnitySubsystemHandle handle,
     return kUnitySubsystemErrorCodeSuccess;
 }
 
+static void SetVector3(UnityXRVector3& vector, float x, float y, float z);
+
 static UnitySubsystemErrorCode UpdateDeviceState(UnitySubsystemHandle handle, void* userData, UnityXRInternalInputDeviceId deviceId, UnityXRInputUpdateType updateType, UnityXRInputDeviceState* state)
 {
+    XR_TRACE_LOG(s_XrTrace, "device state updated>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    
     UnityXRInputFeatureIndex featureIndex = 0;
 
     // Feature values should either be stored as indices when creating the device definitions, or you can also follow this incrementing pattern
@@ -261,16 +281,20 @@ static UnitySubsystemErrorCode UpdateDeviceState(UnitySubsystemHandle handle, vo
         s_XrInput->DeviceState_SetBinaryValue(state, featureIndex++, hmd->isTracked);
         s_XrInput->DeviceState_SetDiscreteStateValue(state, featureIndex++, hmd->trackingState);
         s_XrInput->DeviceState_SetAxis3DValue(state, featureIndex++, hmd->position);
-
+        //s_XrInput->DeviceState_SetAxis3DValue(state, featureIndex++, translate);
+        
         UnityXRVector4 rotationQuaternion = MathHelpers::EulerToQuaternion(hmd->rotation);
+        //UnityXRVector4 rotationQuaternion = MathHelpers::EulerToQuaternion(rotate);
         s_XrInput->DeviceState_SetRotationValue(state, featureIndex++, rotationQuaternion);
 
         s_XrInput->DeviceState_SetAxis3DValue(state, featureIndex++, hmd->centerEyePosition);
+        //s_XrInput->DeviceState_SetAxis3DValue(state, featureIndex++, translate);
         s_XrInput->DeviceState_SetRotationValue(state, featureIndex++, rotationQuaternion);
     }
     break;
     case kDeviceId_Controller:
     {
+        
         MockController* controller = &s_ProviderData.controller;
         s_XrInput->DeviceState_SetBinaryValue(state, featureIndex++, controller->isTracked);
         s_XrInput->DeviceState_SetDiscreteStateValue(state, featureIndex++, controller->trackingState);
@@ -284,6 +308,7 @@ static UnitySubsystemErrorCode UpdateDeviceState(UnitySubsystemHandle handle, vo
         s_XrInput->DeviceState_SetAxis2DValue(state, featureIndex++, controller->axis2D);
         s_XrInput->DeviceState_SetBinaryValue(state, featureIndex++, controller->unmappedButton);
         s_XrInput->DeviceState_SetBinaryValue(state, featureIndex++, controller->multiMappedButton);
+         
     }
     break;
     default:
@@ -383,6 +408,8 @@ static UnitySubsystemErrorCode HandleSetTrackingOriginMode(UnitySubsystemHandle 
 /// Callback executed when a subsystem should initialize in preparation for becoming active.
 static UnitySubsystemErrorCode UNITY_INTERFACE_API Lifecycle_Initialize(UnitySubsystemHandle handle, void* data)
 {
+    XR_TRACE_LOG(s_XrTrace, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    
     s_ProviderData.Reset();
 
     UnityXRInputProvider inputProvider;
@@ -418,6 +445,7 @@ static UnitySubsystemErrorCode UNITY_INTERFACE_API Lifecycle_Start(UnitySubsyste
 {
     s_ProviderData.Reset();
     s_XrInput->InputSubsystem_DeviceConnected(handle, kDeviceId_HMD);
+    s_XrInput->InputSubsystem_DeviceConnected(handle, kDeviceId_Controller);
 
     UnityXRVector3 boundary[4];
     SetVector3(boundary[0], -1.f, 0.f, 1.f);
@@ -445,6 +473,8 @@ static void UNITY_INTERFACE_API Lifecycle_Shutdown(UnitySubsystemHandle handle, 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityPluginLoad(IUnityInterfaces* unityInterfaces)
 {
+    XR_TRACE_LOG(s_XrTrace, "!!!!!!!!!!!UnityPluginLoad!!!!!!!!!!!!!!!!!!!!");
+    
     s_UnityInterfaces = unityInterfaces;
     s_XrInput = unityInterfaces->Get<IUnityXRInputInterface>();
     UnityLifecycleProvider inputLifecycleHandler = {
@@ -458,3 +488,8 @@ UnityPluginLoad(IUnityInterfaces* unityInterfaces)
     s_XrTrace = unityInterfaces->Get<IUnityXRTrace>();
 }
 
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityPluginUnload()
+{
+    
+}

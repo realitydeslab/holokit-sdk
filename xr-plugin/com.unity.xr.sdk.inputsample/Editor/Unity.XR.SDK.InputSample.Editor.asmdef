@@ -2,11 +2,13 @@
     "name": "Unity.XR.SDK.InputSample.Editor",
     "rootNamespace": "",
     "references": [
-        "Unity.XR.Management",
-        "Unity.XR.Management.Editor",
-        "Unity.XR.SDK.InputSample"
+        "GUID:e40ba710768534012815d3193fa296cb",
+        "GUID:f9fe0089ec81f4079af78eb2287a6163",
+        "GUID:86d2e0d128305fc4ca00f7e4c0484200"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
