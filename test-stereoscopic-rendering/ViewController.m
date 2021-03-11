@@ -141,10 +141,14 @@
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
     // process capturedImage for handtracking
     
+    //ARWorldTrackingConfiguration *newConfiguration = [ARWorldTrackingConfiguration new];
+    //newConfiguration.frameSemantics = ARFrameSemanticSmoothedSceneDepth;
+    //[session runWithConfiguration:newConfiguration options:ARSessionRunOptionResetTracking];
+    //NSLog(@"new configuration set.");
+    
     //NSLog(@"handTracker.processVideoFrame is called");
     [self.handTracker processVideoFrame: frame.capturedImage];
     return;
-    
     
     // for apple hand detection
     NSLog(@"Apple Vision Hand Detection is running");
@@ -244,7 +248,7 @@
 
 - (void)handTracker:(HandTracker *)handTracker didOutputLandmarks:(NSArray<NSArray<Landmark *> *> *)multiLandmarks {
     
-    NSLog(@"MediaPipe hand tracking is running");
+    //NSLog(@"MediaPipe hand tracking is running");
     self.landmarks = multiLandmarks;
     
     if(self.session.currentFrame == nil){
@@ -275,7 +279,10 @@
     
     Float32* baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
     
+    int handIndex = 0;
     for(NSArray<Landmark *> *landmarks in multiLandmarks){
+        NSLog(@"hand %d has landmarks: %d", handIndex, [landmarks count]);
+        handIndex++;
         for(Landmark *landmark in landmarks){
             
             //NSLog(@"idx: %d", landmarkIndex);
@@ -298,7 +305,7 @@
 }
 
 - (void)handTracker: (HandTracker*)handTracker didOutputHandednesses: (NSArray<Handedness *> *)handednesses {
-    
+    NSLog(@"%d", [handednesses count]);
 }
 
 - (void)handTracker: (HandTracker*)handTracker didOutputPixelBuffer: (CVPixelBufferRef)pixelBuffer {

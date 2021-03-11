@@ -13,7 +13,7 @@ public class AcessInputDeviceData : MonoBehaviour
     void Start()
     {
         // 1. get all input devices
-        Debug.Log("<<<<<<<<<< trying to get all input devices:");
+        //Debug.Log("<<<<<<<<<< trying to get all input devices:");
         var inputDevices = new List<InputDevice>();
         InputDevices.GetDevices(inputDevices);
         foreach (var device in inputDevices)
@@ -22,7 +22,7 @@ public class AcessInputDeviceData : MonoBehaviour
         }
 
         // 2. get devices by characteristics
-        Debug.Log("<<<<<<<<<< trying to get devices by characteristics");
+        //Debug.Log("<<<<<<<<<< trying to get devices by characteristics");
         // get HoloKitHMD
         var HoloKitHMDs = new List<InputDevice>();
         var desiredCharacteristics = InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice;
@@ -30,7 +30,7 @@ public class AcessInputDeviceData : MonoBehaviour
         foreach (var device in HoloKitHMDs)
         {
             HoloKitHMD = device;
-            Debug.Log(string.Format("Device name '{0}' has characteristics '{1}'", device.name, device.characteristics.ToString()));
+            //Debug.Log(string.Format("Device name '{0}' has characteristics '{1}'", device.name, device.characteristics.ToString()));
         }
         // get right hand
         var HoloKitHands = new List<InputDevice>();
@@ -41,7 +41,7 @@ public class AcessInputDeviceData : MonoBehaviour
         foreach (var device in HoloKitHands)
         {
             HoloKitHand = device;
-            Debug.Log(string.Format("Device name '{0}' has characteristics '{1}'", device.name, device.characteristics.ToString()));
+            //Debug.Log(string.Format("Device name '{0}' has characteristics '{1}'", device.name, device.characteristics.ToString()));
         }
     }
 
@@ -60,23 +60,23 @@ public class AcessInputDeviceData : MonoBehaviour
         }
 
         // get values from HoloKitHMD:
-        Debug.Log("<<<<<<<<<< HoloKitHMD device values:");
+        //Debug.Log("<<<<<<<<<< HoloKitHMD device values:");
         if (HoloKitHMD.isValid)
         {
             Vector3 centerEyePosition;
             if (HoloKitHMD.TryGetFeatureValue(CommonUsages.centerEyePosition, out centerEyePosition))
             {
-                Debug.Log(string.Format(" centerEyePosition is: [{0}, {1}, {2}]", centerEyePosition.x, centerEyePosition.y, centerEyePosition.z));
+                //Debug.Log(string.Format(" centerEyePosition is: [{0}, {1}, {2}]", centerEyePosition.x, centerEyePosition.y, centerEyePosition.z));
             }
             Quaternion centerEyeRotation;
             if (HoloKitHMD.TryGetFeatureValue(CommonUsages.centerEyeRotation, out centerEyeRotation))
             {
-                Debug.Log(string.Format(" centerEyeRotation is: [{0}, {1}, {2}]", centerEyeRotation.x, centerEyeRotation.y, centerEyeRotation.z));
+                //Debug.Log(string.Format(" centerEyeRotation is: [{0}, {1}, {2}]", centerEyeRotation.x, centerEyeRotation.y, centerEyeRotation.z));
             }
         }
 
         // get bone values from HoloKitHand
-        Debug.Log("<<<<<<<<<< HoloKitHand device values:");
+        //Debug.Log("<<<<<<<<<< HoloKitHand device values:");
         if (HoloKitHand.isValid)
         {
 
@@ -89,32 +89,32 @@ public class AcessInputDeviceData : MonoBehaviour
          
                     if (inputFeatureUsage.type == typeof(Hand))
                     {
-                        Debug.Log("Got hand");
+                        //Debug.Log("Got hand");
              
                         Hand hand;
                         if(HoloKitHand.TryGetFeatureValue(inputFeatureUsage.As<Hand>(), out hand))
                         {
-                            Debug.Log("Got value");
+                            //Debug.Log("Got value");
                             Bone bone;
                             if(hand.TryGetRootBone(out bone))
                             {
-                                Debug.Log("Got root bone !!!");
+                                //Debug.Log("Got root bone !!!");
                                 Vector3 position;
                                 if(bone.TryGetPosition(out position))
                                 {
-                                    Debug.Log(position);
+                                    //Debug.Log(position);
                                 }
                             }
                             List<Bone> fingerBones = new List<Bone>();
                             if(hand.TryGetFingerBones(HandFinger.Thumb, fingerBones))
                             {
-                                Debug.Log("Got thumb finger bones !!!");
+                                //Debug.Log("Got thumb finger bones !!!");
                                 Vector3 position;
                                 foreach(var fingerBone in fingerBones)
                                 {
                                     if(fingerBone.TryGetPosition(out position))
                                     {
-                                        Debug.Log(position);
+                                        //Debug.Log(position);
                                     }
                                 }
                             }

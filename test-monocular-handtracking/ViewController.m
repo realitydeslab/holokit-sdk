@@ -53,13 +53,13 @@
     // Set hand tracker
     _landmarkZMin = 1000;
     _landmarkZMax = -1000;
-    //self.handTracker = [[HandTracker alloc] init];
-    //self.handTracker.delegate = self;
-    //[self.handTracker startGraph];
+    self.handTracker = [[HandTracker alloc] init];
+    self.handTracker.delegate = self;
+    [self.handTracker startGraph];
     
     // apple hand detection
-    self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
-    self.handPoseRequest.maximumHandCount = 1;
+    //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
+    //self.handPoseRequest.maximumHandCount = 1;
     
     // Set the view to use the default device
     MTKView *view = (MTKView *)self.view;
@@ -135,7 +135,8 @@
     // process capturedImage for handtracking
     
     //NSLog(@"handTracker.processVideoFrame is called");
-    //[self.handTracker processVideoFrame: frame.capturedImage];
+    [self.handTracker processVideoFrame: frame.capturedImage];
+    return;
     
     
     // for apple hand detection
@@ -228,13 +229,13 @@
     transform.columns[3].x = unprojectedPoint.x;
     transform.columns[3].y = unprojectedPoint.y;
     transform.columns[3].z = unprojectedPoint.z;
-    
+    NSLog(@"point in world coordinate [%f, %f, %f]", unprojectedPoint.x, unprojectedPoint.y, unprojectedPoint.z);
     return transform;
 }
 
 - (void)handTracker:(HandTracker *)handTracker didOutputLandmarks:(NSArray<NSArray<Landmark *> *> *)multiLandmarks {
     
-    NSLog(@"handTracker function is called");
+    //NSLog(@"handTracker function is called");
     self.landmarks = multiLandmarks;
     
     if(self.session.currentFrame == nil){
@@ -273,12 +274,18 @@
         float wristDepth = 0.5;
         float zValueOffset = 0.0;
         for(Landmark *landmark in landmarks){
+            if(landmarkIndex > 0){
+                landmarkIndex++;
+                break;
+            }
+            landmarkIndex++;
             
             //NSLog(@"idx: %d", landmarkIndex);
             int x = (CGFloat)landmark.x * currentFrame.camera.imageResolution.width;
             int y = (CGFloat)landmark.y * currentFrame.camera.imageResolution.height;
             CGPoint screenPoint = CGPointMake(x, y);
             
+            //NSLog(@"landmark coordinate: [%f, %f]", landmark.x, landmark.y);
             /*
             float offsetLandmarkZ = 0.0;
             // get the depth value of the landmark from the depthMap

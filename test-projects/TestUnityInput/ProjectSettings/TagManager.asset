@@ -6,6 +6,9 @@ TagManager:
   tags:
   - CameraAnchor
   - TestInstructions
+  - Landmark
+  - LandmarkLeft
+  - LandmarkRight
   layers:
   - Default
   - TransparentFX
