@@ -146,7 +146,7 @@ public class HandTracking : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Left hand is not tracked.");
+                    //Debug.Log("Left hand is not tracked.");
                     for(int i = 0; i < 21; i++)
                     {
                         leftHandLandmarks[i].SetActive(false);
@@ -206,7 +206,7 @@ public class HandTracking : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Right hand is not tracked");
+                    //Debug.Log("Right hand is not tracked");
                     for (int i = 0; i < 21; i++)
                     {
                         rightHandLandmarks[i].SetActive(false);

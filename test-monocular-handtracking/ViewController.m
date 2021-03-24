@@ -229,7 +229,7 @@
     transform.columns[3].x = unprojectedPoint.x;
     transform.columns[3].y = unprojectedPoint.y;
     transform.columns[3].z = unprojectedPoint.z;
-    NSLog(@"point in world coordinate [%f, %f, %f]", unprojectedPoint.x, unprojectedPoint.y, unprojectedPoint.z);
+    //NSLog(@"point in world coordinate [%f, %f, %f]", unprojectedPoint.x, unprojectedPoint.y, unprojectedPoint.z);
     return transform;
 }
 
@@ -268,6 +268,7 @@
     
     Float32* baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
     
+    int handIndex = 0;
     for(NSArray<Landmark *> *landmarks in multiLandmarks){
         int landmarkIndex = 0;
         // for each hand, we only need to get the depth of the wrist
@@ -275,15 +276,15 @@
         float zValueOffset = 0.0;
         for(Landmark *landmark in landmarks){
             if(landmarkIndex > 0){
-                landmarkIndex++;
                 break;
             }
-            landmarkIndex++;
             
             //NSLog(@"idx: %d", landmarkIndex);
             int x = (CGFloat)landmark.x * currentFrame.camera.imageResolution.width;
             int y = (CGFloat)landmark.y * currentFrame.camera.imageResolution.height;
             CGPoint screenPoint = CGPointMake(x, y);
+            
+            NSLog(@"index: %d, coordinate: [%f, %f ,%f]", landmarkIndex++, landmark.x, landmark.y, landmark.z);
             
             //NSLog(@"landmark coordinate: [%f, %f]", landmark.x, landmark.y);
             /*
@@ -375,7 +376,9 @@
             
             [self.session addAnchor:anchor];
         }
+        handIndex++;
     }
+    NSLog(@"total number of hands %d", handIndex);
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
 }
  

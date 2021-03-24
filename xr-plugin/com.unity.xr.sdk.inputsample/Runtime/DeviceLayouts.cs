@@ -56,6 +56,9 @@ namespace UnityEngine.XR.HoloKit.Input
         public ButtonControl airTap { get; private set; }
         [Preserve]
         [InputControl]
+        public ButtonControl bloom { get; private set; }
+        [Preserve]
+        [InputControl]
         public Bone​Control wrist { get; private set; }
         [Preserve]
         [InputControl]
@@ -118,6 +121,8 @@ namespace UnityEngine.XR.HoloKit.Input
         [InputControl]
         public Bone​Control pinkyEnd { get; private set; }
 
+       
+
         protected override void FinishSetup()
         {
             base.FinishSetup();
@@ -126,6 +131,7 @@ namespace UnityEngine.XR.HoloKit.Input
             isTracked = GetChildControl<ButtonControl>("isTracked");
             handedness = GetChildControl<IntegerControl>("handedness");
             airTap = GetChildControl<ButtonControl>("airTap");
+            bloom = GetChildControl<ButtonControl>("bloom");
 
             wrist = GetChildControl<Bone​Control>("wrist");
 

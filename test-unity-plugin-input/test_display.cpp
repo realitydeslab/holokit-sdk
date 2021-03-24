@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <iostream>
 
 #include "IUnityInterface.h"
 #include "IUnityXRDisplay.h"
@@ -229,6 +230,14 @@ UnityXRProjection HoloKitDisplayProvider::GetProjection(int pass) {
     return ret;
 }
 
+
+UnitySubsystemErrorCode HoloKitDisplayProvider::UpdateDisplayState(UnityXRDisplayState * state, ProviderContext &ctx) {
+    state->displayIsTransparent = true;
+    state->reprojectionMode = kUnityXRReprojectionModeOrientationOnly;
+    state->focusLost = false;
+    return kUnitySubsystemErrorCodeSuccess;
+}
+    
 UnitySubsystemErrorCode HoloKitDisplayProvider::QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo *mirrorBlitInfo, UnityXRMirrorViewBlitDesc *blitDescriptor, ProviderContext &ctx) {
     if (ctx.displayProvider->m_UnityTextures.size() == 0) {
         // Eye texture is not available yet, return failure
@@ -307,6 +316,11 @@ static UnitySubsystemErrorCode UNITY_INTERFACE_API Display_Initialize(UnitySubsy
     ctx.display->RegisterProviderForGraphicsThread(handle, &gfxThreadProvider);
     
     UnityXRDisplayProvider provider{&ctx, NULL, NULL};
+
+    provider.UpdateDisplayState = [](UnitySubsystemHandle handle, void* userData, UnityXRDisplayState * state) ->UnitySubsystemErrorCode {
+        auto& ctx = GetProviderContext(userData);
+        return ctx.displayProvider->UpdateDisplayState(state, ctx);
+    };
     provider.QueryMirrorViewBlitDesc = [](UnitySubsystemHandle handle, void* userData, const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc* blitDescriptor) -> UnitySubsystemErrorCode {
         auto& ctx = GetProviderContext(userData);
         return ctx.displayProvider->QueryMirrorViewBlitDesc(&mirrorBlitInfo, blitDescriptor, ctx);
@@ -344,14 +358,16 @@ UnitySubsystemErrorCode Load_Display(ProviderContext& ctx) {
         delete ctx.displayProvider;
     };
     
-    // id of the subsystem is "HoloKit Display"
-    return ctx.display->RegisterLifecycleProvider("HoloKit SDK Display Subsystem", "HoloKit Display", &displayLifecycleHandler);
+    // id of the subsystem is "HoloKit SDK Display"
+    return ctx.display->RegisterLifecycleProvider("HoloKit SDK Display", "display0", &displayLifecycleHandler);
 }
 
 extern "C" {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityPluginLoad(IUnityInterfaces* unityInterfaces) {
+    std::cout << "<<<<<<<<<< display UnityPluginLoad()" << std::endl;
+    
     auto* ctx = new ProviderContext;
     
     ctx->interfaces = unityInterfaces;

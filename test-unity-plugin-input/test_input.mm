@@ -137,10 +137,17 @@ public:
                 
                 break;
             }
-            case kDeviceIdHoloKitHandLeft: {
+            case kDeviceIdHoloKitHandLeft:
+            case kDeviceIdHoloKitHandRight:
+            {
                 HOLOKIT_INPUT_XR_TRACE_LOG(holokit_input_provider_->GetTrace(), "<<<<<<<<<< connecting device HoloKitHandLeft...");
-                input_->DeviceDefinition_SetName(definition, "HoloKit Left Hand");
-                input_->DeviceDefinition_SetCharacteristics(definition, kLeftHandCharacteristics);
+                if (device_id == kDeviceIdHoloKitHandLeft) {
+                    input_->DeviceDefinition_SetName(definition, "HoloKit Left Hand");
+                    input_->DeviceDefinition_SetCharacteristics(definition, kLeftHandCharacteristics);
+                } else {
+                    input_->DeviceDefinition_SetName(definition, "HoloKit Right Hand");
+                    input_->DeviceDefinition_SetCharacteristics(definition, kRightHandCharacteristics);
+                }
                 input_->DeviceDefinition_SetManufacturer(definition, "Holo Interactive");
                 // features defining 21 landmarks
                 input_->DeviceDefinition_AddFeature(definition, "Wrist", kUnityXRInputFeatureTypeBone);
@@ -165,45 +172,16 @@ public:
                 input_->DeviceDefinition_AddFeature(definition, "Pinky2", kUnityXRInputFeatureTypeBone);
                 input_->DeviceDefinition_AddFeature(definition, "PinkyEnd", kUnityXRInputFeatureTypeBone);
                 // for XR hand
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Hand", kUnityXRInputFeatureTypeHand, kUnityXRInputFeatureUsageHandData);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "hand", kUnityXRInputFeatureTypeHand, kUnityXRInputFeatureUsageHandData);
                 // is tracked?
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "isTracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
+                
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "airTap", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "bloom", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+
                 break;
             }
             
-            case kDeviceIdHoloKitHandRight: {
-                HOLOKIT_INPUT_XR_TRACE_LOG(holokit_input_provider_->GetTrace(), "<<<<<<<<<< connecting device HoloKitHandRight...");
-                input_->DeviceDefinition_SetName(definition, "HoloKit Right Hand");
-                input_->DeviceDefinition_SetCharacteristics(definition, kRightHandCharacteristics);
-                input_->DeviceDefinition_SetManufacturer(definition, "Holo Interactive");
-                // features defining 21 landmarks
-                input_->DeviceDefinition_AddFeature(definition, "Wrist", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "ThumbStart", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Thumb1", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Thumb2", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "ThumbEnd", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "IndexStart", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Index1", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Index2", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "IndexEnd", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "MidStart", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Mid1", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Mid2", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "MidEnd", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "RingStart", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Ring1", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Ring2", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "RingEnd", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "PinkyStart", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Pinky1", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "Pinky2", kUnityXRInputFeatureTypeBone);
-                input_->DeviceDefinition_AddFeature(definition, "PinkyEnd", kUnityXRInputFeatureTypeBone);
-                // for XR hand
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Hand", kUnityXRInputFeatureTypeHand, kUnityXRInputFeatureUsageHandData);
-                // is tracked?
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
-                break;
-            }
             default:
                 return kUnitySubsystemErrorCodeFailure;
         }
@@ -351,6 +329,10 @@ public:
                 input_->DeviceState_SetHandValue(state, feature_index++, hand);
                 
                 input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.isLeftHandTracked);
+                
+                input_->DeviceState_SetBinaryValue(state, feature_index++, true);
+                input_->DeviceState_SetBinaryValue(state, feature_index++, true);
+
                 break;
             }
             case kDeviceIdHoloKitHandRight: {
