@@ -30,9 +30,11 @@ fragment FShaderOutput fshader_tex(VProgOutput input [[stage_in]], texture2d<hal
 {
     // merge two textures into one for ATW
     FShaderOutput out;
-    if(input.out_pos.x < 0.5) {
+    if(input.out_pos.x < tex.get_width() / 2) {
+        input.texcoord.x *= 2;
         out = { tex.sample(blit_tex_sampler, input.texcoord) };
     } else {
+        input.texcoord.x = (input.texcoord.x - tex.get_width() / 2) * 2;
         out = { tex2.sample(blit_tex_sampler, input.texcoord) };
     }
     return out;
