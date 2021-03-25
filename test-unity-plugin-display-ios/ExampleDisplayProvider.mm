@@ -93,6 +93,7 @@ private:
     IUnityGraphicsMetal* metalInterface;
     
     bool gotTexture = false;
+    bool textureCreated = false;
     
     id<MTLDevice> mtlDevice;
     
@@ -113,7 +114,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::Initialize()
     metalInterface = m_Ctx.interfaces->Get<IUnityGraphicsMetal>();
     
     mtlDevice = metalInterface->MetalDevice();
-    NSURL* url = [NSURL fileURLWithPath:@"/Users/yuchen/Projects/Holoi Initial/HoloKitSDK/test-unity-plugin-display-ios/space.jpeg"];
+    NSURL* url = [NSURL URLWithString:@"https://i.stack.imgur.com/9z6nS.png"];
     spaceTexture = loadTextureUsingMetalKit(url, mtlDevice);
     
     return kUnitySubsystemErrorCodeSuccess;
@@ -211,14 +212,25 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_SubmitCurrentFrame()\n", getCurrentTime());
     
     id<MTLTexture> texture = metalInterface->CurrentRenderPassDescriptor().colorAttachments[0].texture;
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f current render pass texture width:%d, height:%d, pixelFormat:%d \n", getCurrentTime(), texture.width, texture.height, texture.pixelFormat);
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f current render pass texture width:%d, height:%d, pixelFormat:%d, texture type:%d, depth:%d, mipmapLevelCount:%d, sampleCount:%d, arrayLength:%d, resourceOptions:%d, cpuCacheMode:%d, storageMode:%d, hazardTrackingMode:%d, usage:%d, allowGPU:%d, swizzle:%d\n", getCurrentTime(), texture.width, texture.height, texture.pixelFormat, texture.textureType, texture.depth, texture.mipmapLevelCount, texture.sampleCount, texture.arrayLength, texture.resourceOptions, texture.cpuCacheMode, texture.storageMode, texture.hazardTrackingMode, texture.usage, texture.allowGPUOptimizedContents, texture.swizzle);
     
-    if(gotTexture) {
-        //spaceTexture = (__bridge id<MTLTexture>)m_NativeTextures[0];
-        XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< got the space texture\n", getCurrentTime());
+    if(textureCreated == NO) {
+        return kUnitySubsystemErrorCodeSuccess;
     }
+    // query the texture
+    UnityXRRenderTextureDesc unityTextureDesc;
+    memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
+    UnitySubsystemErrorCode res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[0], &unityTextureDesc);
+    if(res == kUnitySubsystemErrorCodeSuccess) {
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f query texture succeeded\n", getCurrentTime());
+    } else {
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f query texture failed\n", getCurrentTime());
+    }
+    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f queried texture width %d and height %d\n", getCurrentTime(), unityTextureDesc.width, unityTextureDesc.height);
+    m_NativeTextures[0] = unityTextureDesc.color.nativePtr;
+    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f unity texture id %d\n", getCurrentTime(), m_NativeTextures[0]);
+    id<MTLTexture> screenTexture = (__bridge id<MTLTexture>)m_NativeTextures[0];
     
-    /*
     // do an extral draw call
     MTLPixelFormat extraDrawCallPixelFormat = texture.pixelFormat;
     NSUInteger extraDrawCallSampleCount = texture.sampleCount;
@@ -244,7 +256,8 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     colorDesc.pixelFormat = extraDrawCallPixelFormat;
     pipeDesc.colorAttachments[0] = colorDesc;
 
-    pipeDesc.fragmentFunction = g_FShaderColor;
+    //pipeDesc.fragmentFunction = g_FShaderColor;
+    pipeDesc.fragmentFunction = g_FShaderTexture;
     pipeDesc.vertexFunction = g_VProg;
     pipeDesc.vertexDescriptor = g_VertexDesc;
     pipeDesc.sampleCount = extraDrawCallSampleCount;
@@ -257,10 +270,10 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     g_VB = [mtlDevice newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
     g_IB = [mtlDevice newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
     [cmd setVertexBuffer:g_VB offset:0 atIndex:0];
+    [cmd setFragmentTexture:screenTexture atIndex:0];
     [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
-     */
     
-    
+    /*
     // draw the texture onto the screen
     MTLRenderPipelineDescriptor* pipelineDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
     pipelineDescriptor.sampleCount = 1;
@@ -283,7 +296,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     [commandEncoder setRenderPipelineState:pipelineState];
     [commandEncoder setFragmentTexture:spaceTexture atIndex:0];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4 instanceCount:1];
-    
+    */
     
     //UnityXRRenderTextureDesc unityTextureDesc;
     //memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
@@ -494,10 +507,10 @@ void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLen
 {
     //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f CreateTextures()\n", getCurrentTime());
     
-   // const int texWidth = 2688; //(int)(1920.0f * requestedTextureScale * (SIDE_BY_SIDE ? 2.0f : 1.0f));
-    //const int texHeight = 1242; //(int)(1200.0f * requestedTextureScale);
-    const int texWidth = (int)(1920.0f * requestedTextureScale * (SIDE_BY_SIDE ? 2.0f : 1.0f));
-    const int texHeight = (int)(1200.0f * requestedTextureScale);
+    const int texWidth = 2778; //(int)(1920.0f * requestedTextureScale * (SIDE_BY_SIDE ? 2.0f : 1.0f));
+    const int texHeight = 1284; //(int)(1200.0f * requestedTextureScale);
+    //const int texWidth = (int)(1920.0f * requestedTextureScale * (SIDE_BY_SIDE ? 2.0f : 1.0f));
+    //const int texHeight = (int)(1200.0f * requestedTextureScale);
     
     m_NativeTextures.resize(numTextures);
     m_UnityTextures.resize(numTextures);
@@ -505,7 +518,8 @@ void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLen
     // Tell unity about the native textures, getting back UnityXRRenderTextureIds.
     for (int i = 0; i < numTextures; ++i)
     {
-        UnityXRRenderTextureDesc uDesc{};
+        UnityXRRenderTextureDesc uDesc;
+        memset(&uDesc, 0 , sizeof(UnityXRRenderTextureDesc));
 #if XR_METAL
         //IUnityGraphicsMetal* metalInterface = m_Ctx.interfaces->Get<IUnityGraphicsMetal>();
         //id<MTLDevice> mtlDevice = metalInterface->MetalDevice();
@@ -517,19 +531,24 @@ void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLen
         //MTLTextureDescriptor* textureDescriptor = [[MTLTextureDescriptor alloc] init];
         MTLTextureDescriptor* textureDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm width:texWidth height:texHeight mipmapped:NO];
         textureDesc.textureType = MTLTextureType2D;
-        //textureDesc.sampleCount = 4;
-        //textureDescriptor.pixelFormat = MTLPixelFormatRGBA8Unorm;
-        //textureDescriptor.arrayLength = (textureArrayLength == 0 ? 1 : textureArrayLength);
-        //textureDescriptor.width = texWidth;
-        //textureDescriptor.height = texHeight;
-        //textureDescriptor.arrayLength = (textureArrayLength == 0 ? 1 : textureArrayLength);
+        textureDesc.depth = 1;
+        textureDesc.mipmapLevelCount = 1;
+        textureDesc.sampleCount = 1;
+        textureDesc.arrayLength = 1;
+        textureDesc.resourceOptions = 512;
+        textureDesc.cpuCacheMode = (MTLCPUCacheMode)0;
+        textureDesc.storageMode = (MTLStorageMode)0;
+        textureDesc.hazardTrackingMode = (MTLHazardTrackingMode)2;
+        textureDesc.usage = 23;
+        textureDesc.allowGPUOptimizedContents = 1;
+        //textureDesc.swizzle = MTLTextureSwizzleRed;
         id<MTLTexture> nativeTex = [mtlDevice newTextureWithDescriptor:textureDesc];
         
         //reinterpret_cast<void*>(static_cast<intptr_t>(i))
         
         //m_NativeTextures[i] = nativeTex;
         //uDesc.color.nativePtr = nativeTex;
-        //uDesc.color.nativePtr = (__bridge void*)nativeTex;
+        uDesc.color.nativePtr = (__bridge void*)nativeTex;
         
         uDesc.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
         //NSLog(@"@", uDesc.color.nativePtr);
@@ -560,24 +579,9 @@ void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLen
         UnityXRRenderTextureId uTexId;
         m_Ctx.display->CreateTexture(m_Handle, &uDesc, &uTexId);
         m_UnityTextures[i] = uTexId;
-        //XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f number of textures!!!!!!! %d\n", getCurrentTime(), i);
-        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f the idididididididi %d\n", getCurrentTime(), uTexId);
     }
     XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f CreateTextures()\n", getCurrentTime());
-    
-    // query the texture
-    UnityXRRenderTextureDesc unityTextureDesc;
-    memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
-    UnitySubsystemErrorCode res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[0], &unityTextureDesc);
-    if(res != kUnitySubsystemErrorCodeSuccess) {
-        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f query texture succeeded\n", getCurrentTime());
-    } else {
-        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f query texture failed\n", getCurrentTime());
-    }
-    m_NativeTextures[0] = unityTextureDesc.color.nativePtr;
-    gotTexture = true;
-    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f set the bool\n", getCurrentTime());
-    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f unity texture id %d\n", getCurrentTime(), m_NativeTextures[0]);
+    textureCreated = true;
 }
 
 void ExampleDisplayProvider::DestroyTextures()
