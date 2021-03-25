@@ -92,6 +92,8 @@ private:
 
     IUnityGraphicsMetal* metalInterface;
     
+    bool gotTexture = false;
+    
     id<MTLDevice> mtlDevice;
     
     id<MTLTexture> spaceTexture;
@@ -111,9 +113,9 @@ UnitySubsystemErrorCode ExampleDisplayProvider::Initialize()
     metalInterface = m_Ctx.interfaces->Get<IUnityGraphicsMetal>();
     
     mtlDevice = metalInterface->MetalDevice();
-    NSURL* baseURL = [NSURL fileURLWithPath:@"/Users/yuchen/Projects/Holoi Initial/HoloKitSDK/test-unity-plugin-display-ios/"];
-    NSURL* url = [NSURL fileURLWithPath:@"/Users/yuchen/Projects/Holoi Initial/HoloKitSDK/test-unity-plugin-display-ios/"];
+    NSURL* url = [NSURL fileURLWithPath:@"/Users/yuchen/Projects/Holoi Initial/HoloKitSDK/test-unity-plugin-display-ios/space.jpeg"];
     spaceTexture = loadTextureUsingMetalKit(url, mtlDevice);
+    
     return kUnitySubsystemErrorCodeSuccess;
 }
 
@@ -211,6 +213,11 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     id<MTLTexture> texture = metalInterface->CurrentRenderPassDescriptor().colorAttachments[0].texture;
     XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f current render pass texture width:%d, height:%d, pixelFormat:%d \n", getCurrentTime(), texture.width, texture.height, texture.pixelFormat);
     
+    if(gotTexture) {
+        //spaceTexture = (__bridge id<MTLTexture>)m_NativeTextures[0];
+        XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< got the space texture\n", getCurrentTime());
+    }
+    
     /*
     // do an extral draw call
     MTLPixelFormat extraDrawCallPixelFormat = texture.pixelFormat;
@@ -253,7 +260,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
      */
     
-    /*
+    
     // draw the texture onto the screen
     MTLRenderPipelineDescriptor* pipelineDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
     pipelineDescriptor.sampleCount = 1;
@@ -276,13 +283,10 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     [commandEncoder setRenderPipelineState:pipelineState];
     [commandEncoder setFragmentTexture:spaceTexture atIndex:0];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4 instanceCount:1];
-    */
     
-    UnityXRRenderTextureDesc unityTextureDesc;
-    memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
-    if(!m_UnityTextures[0]){
-        XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f Unity texture is not created yet\n", getCurrentTime());
-    };
+    
+    //UnityXRRenderTextureDesc unityTextureDesc;
+    //memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
     
     //UnitySubsystemErrorCode res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[0], &unityTextureDesc);
     //if(res != kUnitySubsystemErrorCodeSuccess) {
@@ -488,7 +492,7 @@ void ExampleDisplayProvider::Shutdown()
 
 void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLength, float requestedTextureScale)
 {
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f CreateTextures()\n", getCurrentTime());
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f CreateTextures()\n", getCurrentTime());
     
    // const int texWidth = 2688; //(int)(1920.0f * requestedTextureScale * (SIDE_BY_SIDE ? 2.0f : 1.0f));
     //const int texHeight = 1242; //(int)(1200.0f * requestedTextureScale);
@@ -502,9 +506,6 @@ void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLen
     for (int i = 0; i < numTextures; ++i)
     {
         UnityXRRenderTextureDesc uDesc{};
-        
-      
-        
 #if XR_METAL
         //IUnityGraphicsMetal* metalInterface = m_Ctx.interfaces->Get<IUnityGraphicsMetal>();
         //id<MTLDevice> mtlDevice = metalInterface->MetalDevice();
@@ -559,9 +560,24 @@ void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLen
         UnityXRRenderTextureId uTexId;
         m_Ctx.display->CreateTexture(m_Handle, &uDesc, &uTexId);
         m_UnityTextures[i] = uTexId;
+        //XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f number of textures!!!!!!! %d\n", getCurrentTime(), i);
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f the idididididididi %d\n", getCurrentTime(), uTexId);
     }
     XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f CreateTextures()\n", getCurrentTime());
-
+    
+    // query the texture
+    UnityXRRenderTextureDesc unityTextureDesc;
+    memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
+    UnitySubsystemErrorCode res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[0], &unityTextureDesc);
+    if(res != kUnitySubsystemErrorCodeSuccess) {
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f query texture succeeded\n", getCurrentTime());
+    } else {
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f query texture failed\n", getCurrentTime());
+    }
+    m_NativeTextures[0] = unityTextureDesc.color.nativePtr;
+    gotTexture = true;
+    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f set the bool\n", getCurrentTime());
+    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f unity texture id %d\n", getCurrentTime(), m_NativeTextures[0]);
 }
 
 void ExampleDisplayProvider::DestroyTextures()
