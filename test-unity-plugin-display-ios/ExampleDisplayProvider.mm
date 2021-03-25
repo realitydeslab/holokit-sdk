@@ -43,19 +43,6 @@ static bool s_SkipFrame = true;
 #define WORKAROUND_RESET_SKIP_FIRST_FRAME() s_SkipFrame = true;
 // END WORKAROUND
 
-id<MTLTexture> loadTextureUsingMetalKit(NSURL * url, id<MTLDevice> device) {
-    MTKTextureLoader *loader = [[MTKTextureLoader alloc] initWithDevice: device];
-    
-    id<MTLTexture> texture = [loader newTextureWithContentsOfURL:url options:nil error:nil];
-    
-    if(!texture)
-    {
-        NSLog(@"Failed to create the texture from %@", url.absoluteString);
-        return nil;
-    }
-    return texture;
-}
-
 class ExampleDisplayProvider : ProviderImpl
 {
 public:
@@ -117,8 +104,6 @@ UnitySubsystemErrorCode ExampleDisplayProvider::Initialize()
     metalInterface = m_Ctx.interfaces->Get<IUnityGraphicsMetal>();
     
     mtlDevice = metalInterface->MetalDevice();
-    NSURL* url = [NSURL URLWithString:@"https://i.stack.imgur.com/9z6nS.png"];
-    spaceTexture = loadTextureUsingMetalKit(url, mtlDevice);
     
     return kUnitySubsystemErrorCodeSuccess;
 }
@@ -192,7 +177,7 @@ NSString* shaderStr = @
         "fragment FShaderOutput fshader_tex(VProgOutput input [[stage_in]], texture2d<half> tex [[texture(0)]], texture2d<half> tex2 [[texture(1)]])"
         "{\n"
         "    FShaderOutput out = { half4(1,0,0,1) };\n"
-        "    if(input.out_pos.x < 0) {\n"
+        "    if(input.out_pos.x < 1300) {\n"
         "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
         "    } else {\n"
         "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
@@ -220,14 +205,26 @@ void ExampleDisplayProvider::GetNativeTextures() {
     memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
     UnitySubsystemErrorCode res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[0], &unityTextureDesc);
     if(res == kUnitySubsystemErrorCodeSuccess) {
-        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f query texture succeeded\n", getCurrentTime());
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f Query left eye texture succeeded\n", getCurrentTime());
     } else {
-        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f query texture failed\n", getCurrentTime());
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f Query left eye texture failed\n", getCurrentTime());
     }
-    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f queried texture width %d and height %d\n", getCurrentTime(), unityTextureDesc.width, unityTextureDesc.height);
+    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f left eye texture width %d and height %d\n", getCurrentTime(), unityTextureDesc.width, unityTextureDesc.height);
     m_NativeTextures[0] = unityTextureDesc.color.nativePtr;
-    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f unity texture id %d\n", getCurrentTime(), m_NativeTextures[0]);
+    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f left eye texture native pointer %d\n", getCurrentTime(), m_NativeTextures[0]);
     m_MetalTextures[0] = (__bridge id<MTLTexture>)m_NativeTextures[0];
+    
+    // get right eye texture
+    res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[1], &unityTextureDesc);
+    if(res == kUnitySubsystemErrorCodeSuccess) {
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f Query right eye texture succeeded\n", getCurrentTime());
+    } else {
+        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f Query right eye texture failed\n", getCurrentTime());
+    }
+    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f right eye texture width %d and height %d\n", getCurrentTime(), unityTextureDesc.width, unityTextureDesc.height);
+    m_NativeTextures[1] = unityTextureDesc.color.nativePtr;
+    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f right eye texture native pointer %d\n", getCurrentTime(), m_NativeTextures[1]);
+    m_MetalTextures[1] = (__bridge id<MTLTexture>)m_NativeTextures[1];
 }
 
 UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
@@ -284,7 +281,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     g_IB = [mtlDevice newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
     [cmd setVertexBuffer:g_VB offset:0 atIndex:0];
     [cmd setFragmentTexture:m_MetalTextures[0] atIndex:0];
-    [cmd setFragmentTexture:m_MetalTextures[0] atIndex:1];
+    [cmd setFragmentTexture:m_MetalTextures[1] atIndex:1];
     [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
     
     /*
