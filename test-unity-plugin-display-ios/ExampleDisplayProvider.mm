@@ -28,7 +28,7 @@
 #endif
 
 
-#define SIDE_BY_SIDE 1
+#define SIDE_BY_SIDE 0
 #define NUM_RENDER_PASSES 2
 static const float s_PoseXPositionPerPass[] = {-1.0f, 1.0f};
 
@@ -80,6 +80,8 @@ public:
 
     void Stop() override;
     void Shutdown() override;
+    
+    void GetNativeTextures();
 
 private:
     void CreateTextures(int numTextures, int textureArrayLength, float requestedTextureScale);
@@ -97,6 +99,7 @@ private:
     
     id<MTLDevice> mtlDevice;
     
+    std::vector<id<MTLTexture>> m_MetalTextures;
     id<MTLTexture> spaceTexture;
 #if XR_METAL
     std::vector<void*> m_NativeTextures;
@@ -189,10 +192,10 @@ NSString* shaderStr = @
         "fragment FShaderOutput fshader_tex(VProgOutput input [[stage_in]], texture2d<half> tex [[texture(0)]], texture2d<half> tex2 [[texture(1)]])"
         "{\n"
         "    FShaderOutput out = { half4(1,0,0,1) };\n"
-        "    if(input.out_pos.x < 1000) {\n"
+        "    if(input.out_pos.x < 0) {\n"
         "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
         "    } else {\n"
-        "       out = { half4(1,0,1,1) };\n"
+        "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
         "    }\n"
         "    return out;\n"
         "}\n"
@@ -211,17 +214,7 @@ const float vdata[] = {
 
 const uint16_t idata[] = {0, 1, 2, 2, 3, 0};
 
-UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
-{
-    // SubmitFrame();
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_SubmitCurrentFrame()\n", getCurrentTime());
-    
-    id<MTLTexture> texture = metalInterface->CurrentRenderPassDescriptor().colorAttachments[0].texture;
-    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f current render pass texture width:%d, height:%d, pixelFormat:%d, texture type:%d, depth:%d, mipmapLevelCount:%d, sampleCount:%d, arrayLength:%d, resourceOptions:%d, cpuCacheMode:%d, storageMode:%d, hazardTrackingMode:%d, usage:%d, allowGPU:%d, swizzle:%d\n", getCurrentTime(), texture.width, texture.height, texture.pixelFormat, texture.textureType, texture.depth, texture.mipmapLevelCount, texture.sampleCount, texture.arrayLength, texture.resourceOptions, texture.cpuCacheMode, texture.storageMode, texture.hazardTrackingMode, texture.usage, texture.allowGPUOptimizedContents, texture.swizzle);
-    
-    if(textureCreated == NO) {
-        return kUnitySubsystemErrorCodeSuccess;
-    }
+void ExampleDisplayProvider::GetNativeTextures() {
     // query the texture
     UnityXRRenderTextureDesc unityTextureDesc;
     memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
@@ -234,7 +227,21 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f queried texture width %d and height %d\n", getCurrentTime(), unityTextureDesc.width, unityTextureDesc.height);
     m_NativeTextures[0] = unityTextureDesc.color.nativePtr;
     XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f unity texture id %d\n", getCurrentTime(), m_NativeTextures[0]);
-    id<MTLTexture> screenTexture = (__bridge id<MTLTexture>)m_NativeTextures[0];
+    m_MetalTextures[0] = (__bridge id<MTLTexture>)m_NativeTextures[0];
+}
+
+UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
+{
+    // SubmitFrame();
+    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_SubmitCurrentFrame()\n", getCurrentTime());
+    
+    id<MTLTexture> texture = metalInterface->CurrentRenderPassDescriptor().colorAttachments[0].texture;
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f current render pass texture width:%d, height:%d, pixelFormat:%d, texture type:%d, depth:%d, mipmapLevelCount:%d, sampleCount:%d, arrayLength:%d, resourceOptions:%d, cpuCacheMode:%d, storageMode:%d, hazardTrackingMode:%d, usage:%d, allowGPU:%d, swizzle:%d\n", getCurrentTime(), texture.width, texture.height, texture.pixelFormat, texture.textureType, texture.depth, texture.mipmapLevelCount, texture.sampleCount, texture.arrayLength, texture.resourceOptions, texture.cpuCacheMode, texture.storageMode, texture.hazardTrackingMode, texture.usage, texture.allowGPUOptimizedContents, texture.swizzle);
+    
+    if(textureCreated == NO) {
+        return kUnitySubsystemErrorCodeSuccess;
+    }
+    GetNativeTextures();
     
     // do an extral draw call
     MTLPixelFormat extraDrawCallPixelFormat = texture.pixelFormat;
@@ -276,8 +283,8 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     g_VB = [mtlDevice newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
     g_IB = [mtlDevice newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
     [cmd setVertexBuffer:g_VB offset:0 atIndex:0];
-    [cmd setFragmentTexture:screenTexture atIndex:0];
-    [cmd setFragmentTexture:screenTexture atIndex:1];
+    [cmd setFragmentTexture:m_MetalTextures[0] atIndex:0];
+    [cmd setFragmentTexture:m_MetalTextures[0] atIndex:1];
     [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
     
     /*
@@ -521,6 +528,7 @@ void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLen
     
     m_NativeTextures.resize(numTextures);
     m_UnityTextures.resize(numTextures);
+    m_MetalTextures.resize(numTextures);
 
     // Tell unity about the native textures, getting back UnityXRRenderTextureIds.
     for (int i = 0; i < numTextures; ++i)
