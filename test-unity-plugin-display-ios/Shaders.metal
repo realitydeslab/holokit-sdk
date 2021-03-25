@@ -7,33 +7,39 @@
 
 #include <metal_stdlib>
 using namespace metal;
-
-typedef struct {
-    float4 renderedCoordinate [[position]];
-    float2 textureCoordinate;
-} TextureMappingVertex;
-
-vertex TextureMappingVertex mapTexture(unsigned int vertex_id [[ vertex_id ]]) {
-    float4x4 renderedCoordinates = float4x4(float4( -1.0, -1.0, 0.0, 1.0 ),
-                                            float4(  0.0, -1.0, 0.0, 1.0 ),
-                                            float4( -1.0,  1.0, 0.0, 1.0 ),
-                                            float4(  0.0,  1.0, 0.0, 1.0 ));
-
-    float4x2 textureCoordinates = float4x2(float2( 0.0, 1.0 ),
-                                           float2( 1.0, 1.0 ),
-                                           float2( 0.0, 0.0 ),
-                                           float2( 1.0, 0.0 ));
-    TextureMappingVertex outVertex;
-    outVertex.renderedCoordinate = renderedCoordinates[vertex_id];
-    outVertex.textureCoordinate = textureCoordinates[vertex_id];
-    
-    return outVertex;
+struct AppData
+{
+    float4 in_pos [[attribute(0)]];
+};
+struct VProgOutput
+{
+    float4 out_pos [[position]];
+    float2 texcoord;
+};
+struct FShaderOutput
+{
+    half4 frag_data [[color(0)]];
+};
+vertex VProgOutput vprog(AppData input [[stage_in]])
+{
+    VProgOutput out = { float4(input.in_pos.xy, 0, 1), input.in_pos.zw };
+    return out;
 }
-
-fragment half4 displayTexture(TextureMappingVertex mappingVertex [[ stage_in ]],
-                              texture2d<float, access::sample> texture [[ texture(0) ]]) {
-    constexpr sampler s(address::clamp_to_edge, filter::linear);
-
-    return half4(texture.sample(s, mappingVertex.textureCoordinate));
+constexpr sampler blit_tex_sampler(address::clamp_to_edge, filter::linear);
+fragment FShaderOutput fshader_tex(VProgOutput input [[stage_in]], texture2d<half> tex [[texture(0)]], texture2d<half> tex2 [[texture(1)]])
+{
+    // merge two textures into one for ATW
+    FShaderOutput out;
+    if(input.out_pos.x < 0.5) {
+        out = { tex.sample(blit_tex_sampler, input.texcoord) };
+    } else {
+        out = { tex2.sample(blit_tex_sampler, input.texcoord) };
+    }
+    return out;
+}
+fragment FShaderOutput fshader_color(VProgOutput input [[stage_in]])
+{
+    FShaderOutput out = { half4(1,0,0,1) };
+    return out;
 }
 

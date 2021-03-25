@@ -1,12 +1,12 @@
 #include "XR/IUnityXRDisplay.h"
 #include "XR/IUnityXRTrace.h"
 
-
 #include "ProviderContext.h"
 #include <cmath>
 #include <vector>
 #include <iostream>
 #include "GetCurrentTime.h"
+//#include "Shaders.metal"
 
 // We'll use DX11 to allocate textures if we're on windows.
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(WINAPI_FAMILY)
@@ -186,9 +186,14 @@ NSString* shaderStr = @
         "    return out;\n"
         "}\n"
         "constexpr sampler blit_tex_sampler(address::clamp_to_edge, filter::linear);\n"
-        "fragment FShaderOutput fshader_tex(VProgOutput input [[stage_in]], texture2d<half> tex [[texture(0)]])\n"
+        "fragment FShaderOutput fshader_tex(VProgOutput input [[stage_in]], texture2d<half> tex [[texture(0)]], texture2d<half> tex2 [[texture(1)]])"
         "{\n"
-        "    FShaderOutput out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
+        "    FShaderOutput out = { half4(1,0,0,1) };\n"
+        "    if(input.out_pos.x < 1000) {\n"
+        "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
+        "    } else {\n"
+        "       out = { half4(1,0,1,1) };\n"
+        "    }\n"
         "    return out;\n"
         "}\n"
         "fragment FShaderOutput fshader_color(VProgOutput input [[stage_in]])\n"
@@ -200,8 +205,8 @@ NSString* shaderStr = @
 const float vdata[] = {
         -1.0f,  1.0f, 0.0f, 0.0f,
         -1.0f, -1.0f, 0.0f, 1.0f,
-        0.0f, -1.0f, 1.0f, 1.0f,
-        0.0f,  1.0f, 1.0f, 0.0f,
+        1.0f, -1.0f, 1.0f, 1.0f,
+        1.0f,  1.0f, 1.0f, 0.0f,
     };
 
 const uint16_t idata[] = {0, 1, 2, 2, 3, 0};
@@ -235,6 +240,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     MTLPixelFormat extraDrawCallPixelFormat = texture.pixelFormat;
     NSUInteger extraDrawCallSampleCount = texture.sampleCount;
     id<MTLLibrary> lib = [mtlDevice newLibraryWithSource:shaderStr options:nil error:nil];
+    //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
     id<MTLFunction> g_VProg = [lib newFunctionWithName:@"vprog"];
     id<MTLFunction> g_FShaderColor = [lib newFunctionWithName:@"fshader_color"];
     id<MTLFunction> g_FShaderTexture = [lib newFunctionWithName:@"fshader_tex"];
@@ -271,6 +277,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     g_IB = [mtlDevice newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
     [cmd setVertexBuffer:g_VB offset:0 atIndex:0];
     [cmd setFragmentTexture:screenTexture atIndex:0];
+    [cmd setFragmentTexture:screenTexture atIndex:1];
     [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
     
     /*
@@ -412,10 +419,10 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_PopulateNextFrameDesc(
 #else
             // TODO: frameHints.appSetup.renderViewport
             renderParams.viewportRect = {
-                pass == 0 ? 0.1f : 0.6f, // x
-                0.2f,                    // y
-                0.3f,                    // width
-                0.5f                     // height
+                pass == 0 ? 0.0f : 0.5f, // x
+                0.0f,                    // y
+                0.5f,                    // width
+                1.0f                     // height
             };
 #endif
         }

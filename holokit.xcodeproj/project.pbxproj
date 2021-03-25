@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B04D8A8260CCC9C0055020F /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
+		4B04D8AA260CCCA20055020F /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B04D8A9260CCCA20055020F /* MetalKit.framework */; };
+		4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B4FFDF42604AA93002FC8D7 /* Shaders.metal */; };
 		4B06069D25F5C963006DF0B0 /* test_display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B06069C25F5C963006DF0B0 /* test_display.cpp */; };
 		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
 		4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
@@ -24,7 +27,6 @@
 		4B38245D25E77F6900B39EEB /* MathHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B38242C25E74B1200B39EEB /* MathHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4B38248225E77F8500B39EEB /* MathHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6AD99B25E34404008F9911 /* MathHelper.h */; };
 		4B4CDC3125F06D36000C2AC7 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
-		4B4FFDF52604AA93002FC8D7 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B4FFDF42604AA93002FC8D7 /* Shaders.metal */; };
 		4B66159525F39F9000CC4E81 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
 		4B6615A225F39FE000CC4E81 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		4B6615A425F39FED00CC4E81 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
@@ -271,6 +273,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4B04D8A9260CCCA20055020F /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B06069C25F5C963006DF0B0 /* test_display.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_display.cpp; sourceTree = "<group>"; };
 		4B0606CB25F5CA08006DF0B0 /* libtest-unity-plugin-display-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtest-unity-plugin-display-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B06070C25F5F8F4006DF0B0 /* ProviderContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProviderContext.h; sourceTree = "<group>"; };
@@ -297,7 +300,6 @@
 		4B38242C25E74B1200B39EEB /* MathHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelpers.h; sourceTree = "<group>"; };
 		4B38244025E757D100B39EEB /* test_input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = test_input.mm; sourceTree = "<group>"; };
 		4B4FFDF42604AA93002FC8D7 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
-		4B4FFE0426060A1B002FC8D7 /* space.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = space.jpeg; sourceTree = "<group>"; };
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615B025F3A0C700CC4E81 /* hand_tracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hand_tracking.h; sourceTree = "<group>"; };
@@ -510,6 +512,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B04D8AA260CCCA20055020F /* MetalKit.framework in Frameworks */,
+				4B04D8A8260CCC9C0055020F /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -638,7 +642,6 @@
 		4B0606CC25F5CA08006DF0B0 /* test-unity-plugin-display-ios */ = {
 			isa = PBXGroup;
 			children = (
-				4B4FFE0426060A1B002FC8D7 /* space.jpeg */,
 				4BDFC4E62600A54C0087F728 /* Main.cpp */,
 				4BDFC4F32600A56E0087F728 /* ProviderContext.h */,
 				4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */,
@@ -810,6 +813,7 @@
 		96602188253935D7004019A5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4B04D8A9260CCCA20055020F /* MetalKit.framework */,
 				4B6615A325F39FED00CC4E81 /* Metal.framework */,
 				4B6615A125F39FE000CC4E81 /* ARKit.framework */,
 				4B06977225ECADA3009D51BD /* Vision.framework */,
@@ -1702,11 +1706,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */,
 				4BDFC4F52600A5830087F728 /* ExampleDisplayProvider.mm in Sources */,
 				4BDFC5902600EC940087F728 /* GetCurrentTime.mm in Sources */,
 				4BDFC4E72600A54C0087F728 /* Main.cpp in Sources */,
 				4BDFC5022600A59B0087F728 /* ExampleTrackingProvider.cpp in Sources */,
-				4B4FFDF52604AA93002FC8D7 /* Shaders.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
