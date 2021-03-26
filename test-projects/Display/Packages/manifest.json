@@ -16,6 +16,7 @@
     "com.unity.ugui": "1.0.0",
     "com.unity.visualeffectgraph": "11.0.0",
     "com.unity.xr.arfoundation": "4.1.5",
+    "com.unity.xr.arkit": "4.1.5",
     "com.unity.xr.sdk.displaysample": "file:../../../xr-plugin/com.unity.xr.sdk.displaysample",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",

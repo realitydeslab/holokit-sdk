@@ -72,7 +72,7 @@ fragment float4 capturedImageFragmentShader(ImageColorInOut in [[stage_in]],
     //return float4(depth, depth, depth, 1.0);
     
     // Return converted RGB color
-    //return ycbcrToRGBTransform * ycbcr;
+    return ycbcrToRGBTransform * ycbcr;
     
     // render black background
     return float4(0.0, 0.0, 0.0, 1.0);

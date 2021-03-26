@@ -28,7 +28,7 @@
 #endif
 
 
-#define SIDE_BY_SIDE 0
+#define SIDE_BY_SIDE 1
 #define NUM_RENDER_PASSES 2
 static const float s_PoseXPositionPerPass[] = {-1.0f, 1.0f};
 
@@ -42,6 +42,75 @@ static bool s_SkipFrame = true;
     }
 #define WORKAROUND_RESET_SKIP_FIRST_FRAME() s_SkipFrame = true;
 // END WORKAROUND
+
+typedef struct PhoneModel {
+    float screenWidth;
+    float screenHeight;
+    float screenBottom;
+    float centerLineOffset;
+    simd_float3 cameraOffset;
+} PhoneModel;
+
+typedef struct HoloKitModel {
+    // Q
+    float opticalAxisDistance;
+    // 3D offset from the center of the bottomline of the HoloKit phone display to the center of two eyes
+    // x is right
+    // y is up
+    // z is backward
+    // right-handed
+    simd_float3 mrOffset;
+    // Q
+    float distortion;
+    // Q
+    float viewportInner;
+    float viewportOuter;
+    float viewportTop;
+    float viewportBottom;
+    float focalLength;
+    float screenToLens;
+    float lensToEye;
+    float axisToBottom;
+    float viewportCushion;
+    float horizontalAlignmentMarkerOffset;
+} HoloKitModel;
+
+static HoloKitModel InitializeHoloKitModel() {
+    HoloKitModel holoKitModel;
+    holoKitModel.opticalAxisDistance = 0.064;
+    holoKitModel.mrOffset = simd_make_float3(0, -0.02894, 0.07055);
+    holoKitModel.distortion = 0.0;
+    holoKitModel.viewportInner = 0.0292;
+    holoKitModel.viewportOuter = 0.0292;
+    holoKitModel.viewportTop = 0.02386;
+    holoKitModel.viewportBottom = 0.02386;
+    holoKitModel.focalLength = 0.065;
+    holoKitModel.screenToLens = 0.02715 + 0.03136 + 0.002;
+    holoKitModel.lensToEye = 0.02497 + 0.03898;
+    holoKitModel.axisToBottom = 0.02990;
+    holoKitModel.viewportCushion = 0.0000;
+    holoKitModel.horizontalAlignmentMarkerOffset = 0.05075;
+    
+    return holoKitModel;
+}
+
+static PhoneModel InitializePhoneModel() {
+    PhoneModel phoneModel;
+    //phoneModel.screenWidth = 0.13977;
+    //phoneModel.screenHeight = 0.06458;
+    //phoneModel.screenBottom = 0.00347;
+    //phoneModel.centerLineOffset = 0.0;
+    //phoneModel.cameraOffset = simd_make_float3(0.05996, -0.02364 - 0.03494, 0.00591);
+    
+    // iPhone12ProMax phone model
+    phoneModel.screenWidth = 0.15390;
+    phoneModel.screenHeight = 0.07113;
+    phoneModel.screenBottom = 0.00347;
+    phoneModel.centerLineOffset = 0.0;
+    phoneModel.cameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
+    
+    return phoneModel;
+}
 
 class ExampleDisplayProvider : ProviderImpl
 {
@@ -178,10 +247,10 @@ NSString* shaderStr = @
         "{\n"
         "    FShaderOutput out = { half4(1,0,0,1) };\n"
         "    if(input.out_pos.x < tex.get_width() / 2) {\n"
-        "       input.texcoord.x *= 2;\n"
+        "       //input.texcoord.x *= 2;\n"
         "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
         "    } else {\n"
-        "       input.texcoord.x = (input.texcoord.x - 0.5) * 2;"
+        "       //input.texcoord.x = (input.texcoord.x - 0.5) * 2;\n"
         "       out = { tex2.sample(blit_tex_sampler, input.texcoord) };\n"
         "    }\n"
         "    return out;\n"
@@ -215,7 +284,7 @@ void ExampleDisplayProvider::GetNativeTextures() {
     m_NativeTextures[0] = unityTextureDesc.color.nativePtr;
     XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f left eye texture native pointer %d\n", getCurrentTime(), m_NativeTextures[0]);
     m_MetalTextures[0] = (__bridge id<MTLTexture>)m_NativeTextures[0];
-    
+    /*
     // get right eye texture
     res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[1], &unityTextureDesc);
     if(res == kUnitySubsystemErrorCodeSuccess) {
@@ -227,6 +296,7 @@ void ExampleDisplayProvider::GetNativeTextures() {
     m_NativeTextures[1] = unityTextureDesc.color.nativePtr;
     XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f right eye texture native pointer %d\n", getCurrentTime(), m_NativeTextures[1]);
     m_MetalTextures[1] = (__bridge id<MTLTexture>)m_NativeTextures[1];
+     */
 }
 
 UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
@@ -283,7 +353,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     g_IB = [mtlDevice newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
     [cmd setVertexBuffer:g_VB offset:0 atIndex:0];
     [cmd setFragmentTexture:m_MetalTextures[0] atIndex:0];
-    [cmd setFragmentTexture:m_MetalTextures[1] atIndex:1];
+    [cmd setFragmentTexture:m_MetalTextures[0] atIndex:1];
     [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
     
     /*
@@ -322,6 +392,72 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f Got native texture pointer %x\n", getCurrentTime(), unityTextureDesc.color.nativePtr);
     
     return kUnitySubsystemErrorCodeSuccess;
+}
+
+void UpdateRenderParams(UnityXRNextFrameDesc& frameDesc) {
+    PhoneModel phone = InitializePhoneModel();
+    HoloKitModel hme = InitializeHoloKitModel();
+    
+    float centerX = 0.5 * phone.screenWidth + phone.centerLineOffset;
+    float centerY = phone.screenHeight - (hme.axisToBottom - phone.screenBottom);
+    float fullWidth = hme.viewportOuter * 2 + hme.opticalAxisDistance + hme.viewportCushion * 2;
+    float width = hme.viewportOuter + hme.viewportInner + hme.viewportCushion * 2;
+    float height = hme.viewportTop + hme.viewportBottom + hme.viewportCushion * 2;
+    float ipd = 0.064;
+    float near = hme.lensToEye;
+    float far = 1000.0;
+    
+    matrix_float4x4 leftEyeProjectionMatrix = matrix_identity_float4x4;
+    leftEyeProjectionMatrix.columns[0].x = 2 * near / width;
+    leftEyeProjectionMatrix.columns[1].y = 2 * near / height;
+    leftEyeProjectionMatrix.columns[2].x = (fullWidth - ipd - width) / width;
+    leftEyeProjectionMatrix.columns[2].y = (hme.viewportTop - hme.viewportBottom) / height;
+    leftEyeProjectionMatrix.columns[2].z = -(far + near) / (far - near);
+    leftEyeProjectionMatrix.columns[3].z = -(2.0 * far * near) / (far - near);
+    leftEyeProjectionMatrix.columns[2].w = -1.0;
+    leftEyeProjectionMatrix.columns[3].w = 0.0;
+    
+    matrix_float4x4 rightEyeProjectionMatrix = leftEyeProjectionMatrix;
+    rightEyeProjectionMatrix.columns[2].x = -rightEyeProjectionMatrix.columns[2].x;
+    
+    int drawWidth = 2778;
+    int drawHeight = 1284;
+    // viewport
+    double yMinInPixel = (double)((centerY - (hme.viewportTop + hme.viewportCushion)) / phone.screenHeight * (float)drawHeight);
+    double xMinRightInPixel = (double)((centerX + fullWidth / 2 - width) / phone.screenWidth * (float)drawWidth);
+    double xMinLeftInPixel = (double)((centerX - fullWidth / 2) / phone.screenWidth * (float)drawWidth);
+    double widthInPixel = (double)(width / phone.screenWidth * (float)drawWidth);
+    double heightInPixel = (double)(height / phone.screenHeight * (float)drawHeight);
+    MTLViewport rightViewport;
+    rightViewport.originX = xMinRightInPixel;
+    rightViewport.originY = yMinInPixel;
+    rightViewport.width = widthInPixel;
+    rightViewport.height = heightInPixel;
+    rightViewport.znear = 0;
+    rightViewport.zfar = 1;
+    MTLViewport leftViewport;
+    leftViewport.originX = xMinLeftInPixel;
+    leftViewport.originY = yMinInPixel;
+    leftViewport.width = widthInPixel;
+    leftViewport.height = heightInPixel;
+    leftViewport.znear = 0;
+    leftViewport.zfar = 1;
+    
+    UnityXRRectf leftRect;
+    leftRect.x = leftViewport.originX;
+    leftRect.y = leftViewport.originY;
+    leftRect.width = leftViewport.width;
+    leftRect.height = leftViewport.height;
+    UnityXRRectf rightRect;
+    rightRect.x = rightViewport.originX;
+    rightRect.y = rightViewport.originY;
+    rightRect.width = rightViewport.width;
+    rightRect.height = rightViewport.height;
+    NSLog(@"left rect: %f, %f, %f, %f", leftRect.x, leftRect.y, leftRect.width, leftRect.height);
+    NSLog(@"right rect: %f, %f, %f, %f", rightRect.x, rightRect.y, rightRect.width, rightRect.height);
+    
+    //frameDesc.renderPasses[0].renderParams[0].viewportRect = leftRect;
+    //frameDesc.renderPasses[1].renderParams[0].viewportRect = rightRect;
 }
 
 UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints& frameHints, UnityXRNextFrameDesc& nextFrame)
@@ -432,6 +568,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_PopulateNextFrameDesc(
             };
 #endif
         }
+        UpdateRenderParams(nextFrame);
     }
     else
     {

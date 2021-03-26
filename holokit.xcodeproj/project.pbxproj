@@ -52,6 +52,7 @@
 		4BDFC55B2600AB820087F728 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4E62600A54C0087F728 /* Main.cpp */; };
 		4BDFC5682600AB830087F728 /* ExampleTrackingProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */; };
 		4BDFC5902600EC940087F728 /* GetCurrentTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */; };
+		4BFE562A260E98470074B70D /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		961B8AEF253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8AF0253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8B00253BBABF0025BA7D /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 961B8AFF253BBABF0025BA7D /* Metal.framework */; };
@@ -512,6 +513,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BFE562A260E98470074B70D /* ARKit.framework in Frameworks */,
 				4B04D8AA260CCCA20055020F /* MetalKit.framework in Frameworks */,
 				4B04D8A8260CCC9C0055020F /* Metal.framework in Frameworks */,
 			);

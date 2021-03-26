@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
-//using UnityEngine.XR.ARSubsystems;
+using UnityEngine.XR.ARSubsystems;
 
 #if UNITY_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -53,7 +53,7 @@ namespace UnityEngine.XR.HoloKit
     
 #endif
 
-    public class XRManager
+    public class DisplaySampleXRManager
     {
         public const string kHoloKitDisplayProviderId = "Display Sample";
         public const string kHoloKitInputProviderId = "Head Tracking Sample";
@@ -67,6 +67,7 @@ namespace UnityEngine.XR.HoloKit
             {
                 if (d.id.Equals(kHoloKitDisplayProviderId))
                 {
+                    Debug.Log("++++++++++ found display provider");
                     return d;
                 }
             }
@@ -82,6 +83,7 @@ namespace UnityEngine.XR.HoloKit
             {
                 if (d.id.Equals(kHoloKitInputProviderId))
                 {
+                    Debug.Log("++++++++++ found head tracking input provider");
                     return d;
                 }
             }
@@ -142,6 +144,7 @@ namespace UnityEngine.XR.HoloKit
                     }
                     else
                     {
+                        Debug.Log("++++++++++ holokit display subsystem has started automatically");
                         holokitDisplayStarted = true;
                     }
                 }
@@ -155,6 +158,7 @@ namespace UnityEngine.XR.HoloKit
                     var holokitDisplaySubsystem = holokitDisplaySubsystemDescriptor.Create();
                     if (holokitDisplaySubsystem != null)
                     {
+                       Debug.Log("++++++++++ try manually start holokit display subsystem");
                        holokitDisplaySubsystem.Start();
                     }
                 }
@@ -169,6 +173,7 @@ namespace UnityEngine.XR.HoloKit
                 {
                     if (d.subsystemDescriptor.id.Equals(kHoloKitInputProviderId))
                     {
+                        Debug.Log("++++++++++ holokit input subsystem has started automatically");
                         holokitInputStarted = true;
                     }
                 }
@@ -182,6 +187,7 @@ namespace UnityEngine.XR.HoloKit
                     var holokitInputSubsystem = holokitInputSubsystemDescriptor.Create();
                     if (holokitInputSubsystem != null)
                     {
+                        Debug.Log("+++++++++++ try manually start holokit input subsystem");
                         holokitInputSubsystem.Start();
                     }
                 }
@@ -214,19 +220,19 @@ namespace UnityEngine.XR.HoloKit
             var xrSettings = XRGeneralSettings.Instance;
             if (xrSettings == null)
             {
-                //Debug.Log($"XRGeneralSettings is null.");
+                Debug.Log($"XRGeneralSettings is null.");
                 return;
             }
 
             var xrManager = xrSettings.Manager;
             if (xrManager == null)
             {
-                //Debug.Log($"XRManagerSettings is null.");
+                Debug.Log($"XRManagerSettings is null.");
                 return;
             }
 
-            //Debug.Log($"[OnSubsystemRegistration] Set automaticloading = false.");
-             xrManager.automaticLoading = false;
+            Debug.Log($"[OnSubsystemRegistration] Set automaticloading = false.");
+            xrManager.automaticLoading = false;
         }
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
@@ -240,7 +246,6 @@ namespace UnityEngine.XR.HoloKit
            //Debug.Log("[OnBeforeSplashScreen] Start");
 
             //Debug.Log("xrManager loaders");
-
 
             LoadHoloKitXRSubsystem();
         }

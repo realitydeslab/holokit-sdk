@@ -14,6 +14,7 @@ namespace Unity.XR.SDK
 
         public override bool Initialize()
         {
+            UnityEngine.Debug.Log("++++++++++ XRLoader Initialize()");
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(s_DisplaySubsystemDescriptors, "Display Sample");
             CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "Head Tracking Sample");
             return true;
