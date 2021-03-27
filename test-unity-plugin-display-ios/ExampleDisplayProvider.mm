@@ -407,6 +407,7 @@ void UpdateRenderParams(UnityXRNextFrameDesc& frameDesc) {
     float near = hme.lensToEye;
     float far = 1000.0;
     
+    // projection matrices
     matrix_float4x4 leftEyeProjectionMatrix = matrix_identity_float4x4;
     leftEyeProjectionMatrix.columns[0].x = 2 * near / width;
     leftEyeProjectionMatrix.columns[1].y = 2 * near / height;
@@ -420,9 +421,9 @@ void UpdateRenderParams(UnityXRNextFrameDesc& frameDesc) {
     matrix_float4x4 rightEyeProjectionMatrix = leftEyeProjectionMatrix;
     rightEyeProjectionMatrix.columns[2].x = -rightEyeProjectionMatrix.columns[2].x;
     
+    // viewport
     int drawWidth = 2778;
     int drawHeight = 1284;
-    // viewport
     double yMinInPixel = (double)((centerY - (hme.viewportTop + hme.viewportCushion)) / phone.screenHeight * (float)drawHeight);
     double xMinRightInPixel = (double)((centerX + fullWidth / 2 - width) / phone.screenWidth * (float)drawWidth);
     double xMinLeftInPixel = (double)((centerX - fullWidth / 2) / phone.screenWidth * (float)drawWidth);
