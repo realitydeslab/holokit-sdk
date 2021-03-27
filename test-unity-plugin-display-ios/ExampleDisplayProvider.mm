@@ -444,20 +444,20 @@ void UpdateRenderParams(UnityXRNextFrameDesc& frameDesc) {
     leftViewport.zfar = 1;
     
     UnityXRRectf leftRect;
-    leftRect.x = leftViewport.originX;
-    leftRect.y = leftViewport.originY;
-    leftRect.width = leftViewport.width;
-    leftRect.height = leftViewport.height;
+    leftRect.x = leftViewport.originX / drawWidth;
+    leftRect.width = leftViewport.width / drawWidth;
+    leftRect.height = leftViewport.height / drawHeight;
+    leftRect.y = 1 - leftViewport.originY / drawHeight - leftRect.height;
     UnityXRRectf rightRect;
-    rightRect.x = rightViewport.originX;
-    rightRect.y = rightViewport.originY;
-    rightRect.width = rightViewport.width;
-    rightRect.height = rightViewport.height;
+    rightRect.x = rightViewport.originX / drawWidth;
+    rightRect.width = rightViewport.width / drawWidth;
+    rightRect.height = rightViewport.height / drawHeight;
+    rightRect.y = 1 - rightViewport.originY / drawHeight - rightRect.height;
     NSLog(@"left rect: %f, %f, %f, %f", leftRect.x, leftRect.y, leftRect.width, leftRect.height);
     NSLog(@"right rect: %f, %f, %f, %f", rightRect.x, rightRect.y, rightRect.width, rightRect.height);
     
-    //frameDesc.renderPasses[0].renderParams[0].viewportRect = leftRect;
-    //frameDesc.renderPasses[1].renderParams[0].viewportRect = rightRect;
+    frameDesc.renderPasses[0].renderParams[0].viewportRect = leftRect;
+    frameDesc.renderPasses[1].renderParams[0].viewportRect = rightRect;
 }
 
 UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints& frameHints, UnityXRNextFrameDesc& nextFrame)
@@ -561,10 +561,10 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_PopulateNextFrameDesc(
 #else
             // TODO: frameHints.appSetup.renderViewport
             renderParams.viewportRect = {
-                pass == 0 ? 0.0f : 0.5f, // x
+                pass == 0 ? 0.2f : 0.7f, // x
                 0.0f,                    // y
-                0.5f,                    // width
-                1.0f                     // height
+                0.2f,                    // width
+                0.6f                     // height
             };
 #endif
         }

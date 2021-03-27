@@ -472,6 +472,8 @@ const float kUserInterpupillaryDistance = 0.064;
     const double widthInPixel = (double)(width / phone.screenWidth * (float)_drawableSize.width);
     const double heightInPixel = (double)(height / phone.screenHeight * (float)_drawableSize.height);
     
+    NSLog(@"drawable width %f and height %f", _drawableSize.width, _drawableSize.height);
+    
     MTLViewport rightViewport;
     rightViewport.originX = xMinRightInPixel;
     rightViewport.originY = yMinInPixel;
@@ -486,8 +488,8 @@ const float kUserInterpupillaryDistance = 0.064;
     leftViewport.height = heightInPixel;
     leftViewport.znear = 0;
     leftViewport.zfar = 1;
-    //NSLog(@"leftViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", leftViewport.originX, leftViewport.originY, leftViewport.width, leftViewport.height, leftViewport.znear, leftViewport.zfar);
-    //NSLog(@"rightViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", rightViewport.originX, rightViewport.originY, rightViewport.width, rightViewport.height, rightViewport.znear, rightViewport.zfar);
+    NSLog(@"leftViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", leftViewport.originX, leftViewport.originY, leftViewport.width, leftViewport.height, leftViewport.znear, leftViewport.zfar);
+    NSLog(@"rightViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", rightViewport.originX, rightViewport.originY, rightViewport.width, rightViewport.height, rightViewport.znear, rightViewport.zfar);
     
     _viewportPerEye[0] = leftViewport;
     _viewportPerEye[1] = rightViewport;
