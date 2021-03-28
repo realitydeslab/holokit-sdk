@@ -53,6 +53,10 @@
 		4BDFC5682600AB830087F728 /* ExampleTrackingProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */; };
 		4BDFC5902600EC940087F728 /* GetCurrentTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */; };
 		4BE7B4C026105532001F39F2 /* ArSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B4BF26105532001F39F2 /* ArSession.mm */; };
+		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
+		4BE7B63E2611051A001F39F2 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
+		4BE7B64F26110544001F39F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* main.cpp */; };
+		4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B66A2611055A001F39F2 /* math_helpers.mm */; };
 		4BFE562A260E98470074B70D /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		961B8AEF253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8AF0253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
@@ -210,6 +214,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BE7B609261104ED001F39F2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		965105752575FCBC00F076B5 /* Embed App Clips */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -334,6 +347,13 @@
 		4BDFC58E2600EC470087F728 /* GetCurrentTime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GetCurrentTime.h; sourceTree = "<group>"; };
 		4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GetCurrentTime.mm; sourceTree = "<group>"; };
 		4BE7B4BF26105532001F39F2 /* ArSession.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ArSession.mm; sourceTree = "<group>"; };
+		4BE7B60B261104ED001F39F2 /* libholokit-sdk-skeleton.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk-skeleton.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BE7B62126110504001F39F2 /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
+		4BE7B63D2611051A001F39F2 /* input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = input.mm; sourceTree = "<group>"; };
+		4BE7B64C26110537001F39F2 /* load.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = load.h; sourceTree = "<group>"; };
+		4BE7B64D26110544001F39F2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4BE7B66A2611055A001F39F2 /* math_helpers.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = math_helpers.mm; sourceTree = "<group>"; };
+		4BE7B6862611056A001F39F2 /* math_helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = math_helpers.h; sourceTree = "<group>"; };
 		961B8AD8253B40110025BA7D /* UnityXRNativePtrs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnityXRNativePtrs.h; sourceTree = "<group>"; };
 		961B8AEE253BB99F0025BA7D /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
 		961B8AFF253BBABF0025BA7D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
@@ -562,6 +582,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BE7B608261104ED001F39F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		965105372575FC9800F076B5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -727,6 +754,19 @@
 			path = "test-stereoscopic-rendering";
 			sourceTree = "<group>";
 		};
+		4BE7B60C261104ED001F39F2 /* holokit-sdk-skeleton */ = {
+			isa = PBXGroup;
+			children = (
+				4BE7B62126110504001F39F2 /* display.mm */,
+				4BE7B63D2611051A001F39F2 /* input.mm */,
+				4BE7B64C26110537001F39F2 /* load.h */,
+				4BE7B64D26110544001F39F2 /* main.cpp */,
+				4BE7B6862611056A001F39F2 /* math_helpers.h */,
+				4BE7B66A2611055A001F39F2 /* math_helpers.mm */,
+			);
+			path = "holokit-sdk-skeleton";
+			sourceTree = "<group>";
+		};
 		9651053B2575FC9800F076B5 /* official-app */ = {
 			isa = PBXGroup;
 			children = (
@@ -787,6 +827,7 @@
 				4B38240725E7491B00B39EEB /* test-unity-plugin-input */,
 				4B2D6E4225E7CFD500DAAD13 /* test-unity-input-ios */,
 				4B0606CC25F5CA08006DF0B0 /* test-unity-plugin-display-ios */,
+				4BE7B60C261104ED001F39F2 /* holokit-sdk-skeleton */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -811,6 +852,7 @@
 				4B2D6E4125E7CFD500DAAD13 /* libtest-unity-plugin-input-ios.a */,
 				4B0606CB25F5CA08006DF0B0 /* libtest-unity-plugin-display-ios.a */,
 				4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */,
+				4BE7B60B261104ED001F39F2 /* libholokit-sdk-skeleton.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1251,6 +1293,23 @@
 			productReference = 4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		4BE7B60A261104ED001F39F2 /* holokit-sdk-skeleton */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BE7B613261104ED001F39F2 /* Build configuration list for PBXNativeTarget "holokit-sdk-skeleton" */;
+			buildPhases = (
+				4BE7B607261104ED001F39F2 /* Sources */,
+				4BE7B608261104ED001F39F2 /* Frameworks */,
+				4BE7B609261104ED001F39F2 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "holokit-sdk-skeleton";
+			productName = "holokit-sdk-skeleton";
+			productReference = 4BE7B60B261104ED001F39F2 /* libholokit-sdk-skeleton.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		965105392575FC9800F076B5 /* official-app */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9651054D2575FC9900F076B5 /* Build configuration list for PBXNativeTarget "official-app" */;
@@ -1456,6 +1515,9 @@
 					4BDFC53D2600AB210087F728 = {
 						CreatedOnToolsVersion = 12.4;
 					};
+					4BE7B60A261104ED001F39F2 = {
+						CreatedOnToolsVersion = 12.4;
+					};
 					965105392575FC9800F076B5 = {
 						CreatedOnToolsVersion = 12.2;
 					};
@@ -1514,6 +1576,7 @@
 				4B2D6E4025E7CFD500DAAD13 /* test-unity-plugin-input-ios */,
 				4B0606CA25F5CA08006DF0B0 /* test-unity-plugin-display-ios */,
 				4BDFC53D2600AB210087F728 /* test-unity-plugin-display-mac */,
+				4BE7B60A261104ED001F39F2 /* holokit-sdk-skeleton */,
 			);
 		};
 /* End PBXProject section */
@@ -1774,6 +1837,17 @@
 				4BDFC54E2600AB800087F728 /* ExampleDisplayProvider.mm in Sources */,
 				4BDFC55B2600AB820087F728 /* Main.cpp in Sources */,
 				4BDFC5682600AB830087F728 /* ExampleTrackingProvider.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BE7B607261104ED001F39F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
+				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
+				4BE7B62226110504001F39F2 /* display.mm in Sources */,
+				4BE7B64F26110544001F39F2 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2287,6 +2361,36 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		4BE7B611261104ED001F39F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4BE7B612261104ED001F39F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -2905,6 +3009,15 @@
 			buildConfigurations = (
 				4BDFC5402600AB210087F728 /* Debug */,
 				4BDFC5412600AB210087F728 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4BE7B613261104ED001F39F2 /* Build configuration list for PBXNativeTarget "holokit-sdk-skeleton" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BE7B611261104ED001F39F2 /* Debug */,
+				4BE7B612261104ED001F39F2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
