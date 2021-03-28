@@ -64,7 +64,7 @@ UnitySubsystemErrorCode ExampleTrackingProvider::FillDeviceDefinition(UnityXRInt
 {
     // Fill in your connected device information here when requested.  Used to create customized device states.
     auto& input = *m_Ctx.input;
-    input.DeviceDefinition_SetName(definition, "head tracking");
+    input.DeviceDefinition_SetName(definition, "head tracking fuck");
     input.DeviceDefinition_SetCharacteristics(definition, (UnityXRInputDeviceCharacteristics)(kUnityXRInputDeviceCharacteristicsHeadMounted | kUnityXRInputDeviceCharacteristicsTrackedDevice));
     input.DeviceDefinition_SetManufacturer(definition, "sample");
     input.DeviceDefinition_SetSerialNumber(definition, "1234");
@@ -77,7 +77,7 @@ UnitySubsystemErrorCode ExampleTrackingProvider::FillDeviceDefinition(UnityXRInt
 
 UnitySubsystemErrorCode ExampleTrackingProvider::UpdateDeviceState(UnityXRInternalInputDeviceId deviceId, UnityXRInputUpdateType updateType, UnityXRInputDeviceState* state)
 {
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f Input UpdateDeviceState()\n", getCurrentTime());
+    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f Input UpdateDeviceState() ohohoh\n", getCurrentTime());
 
     
     /// Called by Unity when it needs a current device snapshot

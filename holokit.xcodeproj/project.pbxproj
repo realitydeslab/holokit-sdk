@@ -52,6 +52,7 @@
 		4BDFC55B2600AB820087F728 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4E62600A54C0087F728 /* Main.cpp */; };
 		4BDFC5682600AB830087F728 /* ExampleTrackingProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */; };
 		4BDFC5902600EC940087F728 /* GetCurrentTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */; };
+		4BE7B4C026105532001F39F2 /* ArSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B4BF26105532001F39F2 /* ArSession.mm */; };
 		4BFE562A260E98470074B70D /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		961B8AEF253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8AF0253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
@@ -332,6 +333,7 @@
 		4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libtest-unity-plugin-display-mac.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BDFC58E2600EC470087F728 /* GetCurrentTime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GetCurrentTime.h; sourceTree = "<group>"; };
 		4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GetCurrentTime.mm; sourceTree = "<group>"; };
+		4BE7B4BF26105532001F39F2 /* ArSession.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ArSession.mm; sourceTree = "<group>"; };
 		961B8AD8253B40110025BA7D /* UnityXRNativePtrs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnityXRNativePtrs.h; sourceTree = "<group>"; };
 		961B8AEE253BB99F0025BA7D /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
 		961B8AFF253BBABF0025BA7D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
@@ -651,6 +653,7 @@
 				4BDFC58E2600EC470087F728 /* GetCurrentTime.h */,
 				4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */,
 				4B4FFDF42604AA93002FC8D7 /* Shaders.metal */,
+				4BE7B4BF26105532001F39F2 /* ArSession.mm */,
 			);
 			path = "test-unity-plugin-display-ios";
 			sourceTree = "<group>";
@@ -1711,6 +1714,7 @@
 				4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */,
 				4BDFC4F52600A5830087F728 /* ExampleDisplayProvider.mm in Sources */,
 				4BDFC5902600EC940087F728 /* GetCurrentTime.mm in Sources */,
+				4BE7B4C026105532001F39F2 /* ArSession.mm in Sources */,
 				4BDFC4E72600A54C0087F728 /* Main.cpp in Sources */,
 				4BDFC5022600A59B0087F728 /* ExampleTrackingProvider.cpp in Sources */,
 			);

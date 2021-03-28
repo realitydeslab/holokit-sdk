@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 #include "GetCurrentTime.h"
-//#include "Shaders.metal"
+#include "ArSession.mm"
 
 // We'll use DX11 to allocate textures if we're on windows.
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(WINAPI_FAMILY)
@@ -138,6 +138,7 @@ public:
     void Shutdown() override;
     
     void GetNativeTextures();
+    void UpdateRenderParams(UnityXRNextFrameDesc& frameDesc);
 
 private:
     void CreateTextures(int numTextures, int textureArrayLength, float requestedTextureScale);
@@ -165,6 +166,12 @@ private:
     std::vector<void*> m_NativeTextures;
 #endif
     std::vector<UnityXRRenderTextureId> m_UnityTextures;
+    
+    ARSessionDelegateController *arSessionDelegateController;
+    
+    ARSession* session;
+    ARFrame* frame;
+    ARCamera* camera;
 };
 
 UnitySubsystemErrorCode ExampleDisplayProvider::Initialize()
@@ -277,13 +284,13 @@ void ExampleDisplayProvider::GetNativeTextures() {
     memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
     UnitySubsystemErrorCode res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[0], &unityTextureDesc);
     if(res == kUnitySubsystemErrorCodeSuccess) {
-        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f Query left eye texture succeeded\n", getCurrentTime());
+        //XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f Query left eye texture succeeded\n", getCurrentTime());
     } else {
-        XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f Query left eye texture failed\n", getCurrentTime());
+        //XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f Query left eye texture failed\n", getCurrentTime());
     }
-    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f left eye texture width %d and height %d\n", getCurrentTime(), unityTextureDesc.width, unityTextureDesc.height);
+    //XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f left eye texture width %d and height %d\n", getCurrentTime(), unityTextureDesc.width, unityTextureDesc.height);
     m_NativeTextures[0] = unityTextureDesc.color.nativePtr;
-    XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f left eye texture native pointer %d\n", getCurrentTime(), m_NativeTextures[0]);
+    //XR_TRACE_LOG(m_Ctx.trace, ">>>>>>>>>> %f left eye texture native pointer %d\n", getCurrentTime(), m_NativeTextures[0]);
     m_MetalTextures[0] = (__bridge id<MTLTexture>)m_NativeTextures[0];
     /*
     // get right eye texture
@@ -303,10 +310,15 @@ void ExampleDisplayProvider::GetNativeTextures() {
 UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
 {
     // SubmitFrame();
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_SubmitCurrentFrame()\n", getCurrentTime());
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_SubmitCurrentFrame()\n", getCurrentTime());
     
     id<MTLTexture> texture = metalInterface->CurrentRenderPassDescriptor().colorAttachments[0].texture;
     //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f current render pass texture width:%d, height:%d, pixelFormat:%d, texture type:%d, depth:%d, mipmapLevelCount:%d, sampleCount:%d, arrayLength:%d, resourceOptions:%d, cpuCacheMode:%d, storageMode:%d, hazardTrackingMode:%d, usage:%d, allowGPU:%d, swizzle:%d\n", getCurrentTime(), texture.width, texture.height, texture.pixelFormat, texture.textureType, texture.depth, texture.mipmapLevelCount, texture.sampleCount, texture.arrayLength, texture.resourceOptions, texture.cpuCacheMode, texture.storageMode, texture.hazardTrackingMode, texture.usage, texture.allowGPUOptimizedContents, texture.swizzle);
+    if(arSessionDelegateController == nullptr) {
+        arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+        XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f got ARSessionDelegateController()\n", getCurrentTime());
+    }
+    
     
     if(textureCreated == NO) {
         return kUnitySubsystemErrorCodeSuccess;
@@ -395,7 +407,37 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     return kUnitySubsystemErrorCodeSuccess;
 }
 
-void UpdateRenderParams(UnityXRNextFrameDesc& frameDesc) {
+simd_float4 MatrixVectorMultiplication(simd_float4x4 mat, simd_float4 vec) {
+    simd_float4 ret;
+    ret.x = mat.columns[0].x * vec.x + mat.columns[1].x * vec.y + mat.columns[2].x * vec.z + mat.columns[3].x * vec.w;
+    ret.y = mat.columns[0].y * vec.x + mat.columns[1].y * vec.y + mat.columns[2].y * vec.z + mat.columns[3].y * vec.w;
+    ret.z = mat.columns[0].z * vec.x + mat.columns[1].z * vec.y + mat.columns[2].z * vec.z + mat.columns[3].z * vec.w;
+    ret.w = mat.columns[0].w * vec.x + mat.columns[1].w * vec.y + mat.columns[2].w * vec.z + mat.columns[3].w * vec.w;
+    return ret;
+}
+
+UnityXRMatrix4x4 simd_float4x4ToUnityXRMatrix4x4(simd_float4x4 in, UnityXRMatrix4x4 out) {
+    UnityXRMatrix4x4 res;
+    res.columns[0].x = in.columns[0].x;
+    res.columns[0].y = in.columns[0].y;
+    res.columns[0].z = in.columns[0].z;
+    res.columns[0].w = in.columns[0].w;
+    res.columns[1].x = in.columns[1].x;
+    res.columns[1].y = in.columns[1].y;
+    res.columns[1].z = in.columns[1].z;
+    res.columns[1].w = in.columns[1].w;
+    res.columns[2].x = in.columns[2].x;
+    res.columns[2].y = in.columns[2].y;
+    res.columns[2].z = in.columns[2].z;
+    res.columns[2].w = in.columns[2].w;
+    res.columns[3].x = in.columns[3].x;
+    res.columns[3].y = in.columns[3].y;
+    res.columns[3].z = in.columns[3].z;
+    res.columns[3].w = in.columns[3].w;
+    return res;
+}
+
+void ExampleDisplayProvider::UpdateRenderParams(UnityXRNextFrameDesc& frameDesc) {
     PhoneModel phone = InitializePhoneModel();
     HoloKitModel hme = InitializeHoloKitModel();
     
@@ -421,6 +463,30 @@ void UpdateRenderParams(UnityXRNextFrameDesc& frameDesc) {
     
     matrix_float4x4 rightEyeProjectionMatrix = leftEyeProjectionMatrix;
     rightEyeProjectionMatrix.columns[2].x = -rightEyeProjectionMatrix.columns[2].x;
+    
+    // construct Unity matrices
+    UnityXRMatrix4x4 leftProjMatrix;
+    leftProjMatrix.columns[0].x = 2 * near / width;
+    leftProjMatrix.columns[1].y = 2 * near / height;
+    leftProjMatrix.columns[2].x = (fullWidth - ipd - width) / width;
+    leftProjMatrix.columns[2].y = (hme.viewportTop - hme.viewportBottom) / height;
+    leftProjMatrix.columns[2].z = -(far + near) / (far - near);
+    leftProjMatrix.columns[3].z = -(2.0 * far * near) / (far - near);
+    leftProjMatrix.columns[2].w = -1.0;
+    leftProjMatrix.columns[3].w = 0.0;
+    
+    UnityXRMatrix4x4 rightProjMatrix = leftProjMatrix;
+    rightProjMatrix.columns[2].x = -rightProjMatrix.columns[2].x;
+    
+    frameDesc.renderPasses[0].renderParams[0].projection.type = kUnityXRProjectionTypeMatrix;
+    frameDesc.renderPasses[0].renderParams[0].projection.data.matrix = leftProjMatrix;
+    frameDesc.renderPasses[1].renderParams[0].projection.type = kUnityXRProjectionTypeMatrix;
+    frameDesc.renderPasses[1].renderParams[0].projection.data.matrix = rightProjMatrix;
+    
+    frameDesc.cullingPasses[0].projection.type = kUnityXRProjectionTypeMatrix;
+    frameDesc.cullingPasses[0].projection.data.matrix = leftProjMatrix;
+    frameDesc.cullingPasses[1].projection.type = kUnityXRProjectionTypeMatrix;
+    frameDesc.cullingPasses[1].projection.data.matrix = rightProjMatrix;
     
     // viewport
     int drawWidth = 2778;
@@ -455,18 +521,37 @@ void UpdateRenderParams(UnityXRNextFrameDesc& frameDesc) {
     rightRect.width = rightViewport.width / drawWidth;
     rightRect.height = rightViewport.height / drawHeight;
     rightRect.y = 1 - rightViewport.originY / drawHeight - rightRect.height;
-    NSLog(@"left rect: %f, %f, %f, %f", leftRect.x, leftRect.y, leftRect.width, leftRect.height);
-    NSLog(@"right rect: %f, %f, %f, %f", rightRect.x, rightRect.y, rightRect.width, rightRect.height);
+    //NSLog(@"left rect: %f, %f, %f, %f", leftRect.x, leftRect.y, leftRect.width, leftRect.height);
+    //NSLog(@"right rect: %f, %f, %f, %f", rightRect.x, rightRect.y, rightRect.width, rightRect.height);
     
     frameDesc.renderPasses[0].renderParams[0].viewportRect = leftRect;
     frameDesc.renderPasses[1].renderParams[0].viewportRect = rightRect;
+    
+    // view matrices
+    simd_float3 offset = hme.mrOffset + phone.cameraOffset;
+    simd_float4x4 cameraTransform = camera.transform;
+    simd_float4 translation_left = MatrixVectorMultiplication(cameraTransform, simd_make_float4(offset.x - ipd / 2, offset.y, offset.z, 1));
+    simd_float4 translation_right = MatrixVectorMultiplication(cameraTransform, simd_make_float4(offset.x + ipd / 2, offset.y, offset.z, 1));
+    simd_float4x4 cameraTransform_left = cameraTransform;
+    cameraTransform_left.columns[3] = translation_left;
+    simd_float4x4 cameraTransform_right = cameraTransform;
+    cameraTransform_right.columns[3] = translation_right;
+    simd_float4x4 leftViewMatrix = simd_inverse(cameraTransform_left);
+    simd_float4x4 rightViewMatrix = simd_inverse(cameraTransform_right);
+    
+    //frameDesc.renderPasses[0].renderParams[0].deviceAnchorToEyePose.position = UnityXRVector3 { offset.x - ipd / 2, offset.y, offset.z };
+    //simd_quatf leftQuaternion = simd_quaternion(cameraTransform);
+    //frameDesc.renderPasses[0].renderParams[0].deviceAnchorToEyePose.rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
+    //frameDesc.renderPasses[1].renderParams[0].deviceAnchorToEyePose.position = UnityXRVector3 { offset.x + ipd / 2, offset.y, offset.z };
+    //frameDesc.renderPasses[1].renderParams[0].deviceAnchorToEyePose.rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
+    
 }
 
 UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints& frameHints, UnityXRNextFrameDesc& nextFrame)
 {
     
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_PopulateNextFrameDesc()\n", getCurrentTime());
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f ReprojectionMode %d\n", getCurrentTime(), frameHints.appSetup.reprojectionMode);
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_PopulateNextFrameDesc()\n", getCurrentTime());
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f ReprojectionMode %d\n", getCurrentTime(), frameHints.appSetup.reprojectionMode);
     WORKAROUND_SKIP_FIRST_FRAME();
 
     // BlockUntilUnityShouldStartSubmittingRenderingCommands();
@@ -521,7 +606,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_PopulateNextFrameDesc(
     // Frame hints tells us if we should setup our renderpasses with a single pass
     if (!frameHints.appSetup.singlePassRendering)
     {
-        XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_PopulateNextFrameDesc Use multi-pass rendering to render %d ()\n", getCurrentTime(), NUM_RENDER_PASSES);
+        //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_PopulateNextFrameDesc Use multi-pass rendering to render %d ()\n", getCurrentTime(), NUM_RENDER_PASSES);
 
         // Use multi-pass rendering to render
 
@@ -563,10 +648,10 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_PopulateNextFrameDesc(
 #else
             // TODO: frameHints.appSetup.renderViewport
             renderParams.viewportRect = {
-                pass == 0 ? 0.2f : 0.7f, // x
+                pass == 0 ? 0.0f : 0.5f, // x
                 0.0f,                    // y
-                0.2f,                    // width
-                0.6f                     // height
+                0.5f,                    // width
+                1.0f                     // height
             };
 #endif
         }
@@ -704,6 +789,8 @@ void ExampleDisplayProvider::CreateTextures(int numTextures, int textureArrayLen
         uDesc.color.nativePtr = (__bridge void*)nativeTex;
         
         uDesc.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
+        uDesc.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
+        uDesc.depthFormat = kUnityXRDepthTextureFormat24bitOrGreater;
         //NSLog(@"@", uDesc.color.nativePtr);
         //NSLog(@"--------------------------------------");
 #elif XR_DX11
@@ -785,18 +872,18 @@ UnityXRProjection ExampleDisplayProvider::GetProjection(int pass)
 
 UnitySubsystemErrorCode ExampleDisplayProvider::UpdateDisplayState(UnityXRDisplayState * state, ProviderContext &ctx) {
     
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f UpdateDisplayState()\n", getCurrentTime());
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f UpdateDisplayState()\n", getCurrentTime());
     
     state->displayIsTransparent = true;
     state->reprojectionMode = kUnityXRReprojectionModeUnspecified;
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f reprojectionMode %d\n", getCurrentTime(), state->reprojectionMode);
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f reprojectionMode %d\n", getCurrentTime(), state->reprojectionMode);
     state->focusLost = false;
     return kUnitySubsystemErrorCodeSuccess;
 }
 
 UnitySubsystemErrorCode ExampleDisplayProvider::QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo* mirrorBlitInfo, UnityXRMirrorViewBlitDesc* blitDescriptor, ProviderContext& ctx)
 {
-    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f QueryMirrorViewBlitDesc()\n", getCurrentTime());
+    //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f QueryMirrorViewBlitDesc()\n", getCurrentTime());
     
     if (ctx.displayProvider->m_UnityTextures.size() == 0)
     {
@@ -844,7 +931,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::QueryMirrorViewBlitDesc(const Un
     (*blitDescriptor).blitParams[0].srcRect = {sourceUV0.x, sourceUV0.y, sourceUV1.x - sourceUV0.x, sourceUV1.y - sourceUV0.y};
     (*blitDescriptor).blitParams[0].destRect = {destUV0.x, destUV0.y, destUV1.x - destUV0.x, destUV1.y - destUV0.y};
     
-    return kUnitySubsystemErrorCodex`x`
+    return kUnitySubsystemErrorCodeFailure;
     return kUnitySubsystemErrorCodeSuccess;
 }
 

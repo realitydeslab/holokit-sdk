@@ -108,7 +108,7 @@ namespace UnityEngine.XR.HoloKit
             return null;
         }
 
-        /*
+        
         static XRSessionSubsystem GetLoadedXRSessionSubsystem()
         {
             List<XRSessionSubsystem> xrSessionSubsystems = new List<XRSessionSubsystem>();
@@ -124,7 +124,7 @@ namespace UnityEngine.XR.HoloKit
             }
             return null;
         }
-        */
+        
 
         static void LoadHoloKitXRSubsystem() 
         {
@@ -148,7 +148,7 @@ namespace UnityEngine.XR.HoloKit
             */
             
             // arkit stuff
-            
+            /*
             bool arkitInputStarted = false;
             List<XRInputSubsystem> arkitInputSubsystems = new List<XRInputSubsystem>();
             SubsystemManager.GetSubsystems(arkitInputSubsystems);
@@ -177,7 +177,7 @@ namespace UnityEngine.XR.HoloKit
                     }
                 }
             }
-            
+            */
             
             bool holokitDisplayStarted = false;
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
@@ -189,9 +189,10 @@ namespace UnityEngine.XR.HoloKit
 
                 if (d.running)
                 {
-                    /*
+                    
                     if (!d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
-                    {                        
+                    {
+                        Debug.Log("sorry got another display provider...");
                         d.Stop();
                     }
                     else
@@ -199,12 +200,12 @@ namespace UnityEngine.XR.HoloKit
                         Debug.Log("++++++++++ holokit display subsystem has started automatically");
                         holokitDisplayStarted = true;
                     }
-                    */
-                    if (d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
-                    {
-                        Debug.Log("++++++++++ holokit display subsystem has started automatically");
-                        holokitDisplayStarted = true;
-                    }
+                    
+                    //if (d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
+                    //{
+                    //    Debug.Log("++++++++++ holokit display subsystem has started automatically");
+                    //    holokitDisplayStarted = true;
+                    //}
                 }
             }
 
@@ -222,7 +223,7 @@ namespace UnityEngine.XR.HoloKit
                 }
             }
             
-            
+            /*
             bool holokitInputStarted = false;
             List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
             SubsystemManager.GetSubsystems(inputSubsystems);
@@ -251,8 +252,8 @@ namespace UnityEngine.XR.HoloKit
                     }
                 }
             }
+            */
             
-            /*
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
             if (xrSessionSubsystem != null)
             {
@@ -267,7 +268,7 @@ namespace UnityEngine.XR.HoloKit
             InputLayoutLoader.RegisterInputLayouts();
             //Debug.Log("<<<<<<<<<<RegisterInputLayours()");
 #endif
-            */
+            
         }
 
         //Before AfterAssembliesLoaded
@@ -299,7 +300,7 @@ namespace UnityEngine.XR.HoloKit
             Debug.Log($"number of loaders: {xrManager.loaders.Count}");
             //Debug.Log($"number of registered loaders: {xrManager.}")
             foreach(var loader in xrManager.loaders)
-            {
+            {   
                 Debug.Log($"trying to initialize loader number");
                 loader.Initialize();
             }
@@ -334,8 +335,8 @@ namespace UnityEngine.XR.HoloKit
             
         }
 
-        //[DllImport("__Internal")]
-        //public static extern void UnityHoloKit_SetARSession(IntPtr ptr);
+        [DllImport("__Internal")]
+        public static extern void UnityHoloKit_SetARSession(IntPtr ptr);
 
     }
 }

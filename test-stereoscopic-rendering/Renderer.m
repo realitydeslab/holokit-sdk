@@ -505,7 +505,8 @@ const float kUserInterpupillaryDistance = 0.064;
     const simd_float3 offset = hme.mrOffset + phone.cameraOffset;
     // the world coordinate of the camera
     const simd_float4x4 cameraTransform = frame.camera.transform;
-    //[Renderer logMatrix4x4:cameraTransform];
+    NSLog(@"come on lalalalalalla");
+    [Renderer logMatrix4x4:cameraTransform];
     const simd_float4 translation_left = [Renderer matrixVectorMultiplication:cameraTransform vector:simd_make_float4(offset.x - ipd / 2, offset.y, offset.z, 1)];
     // test the accuracy of the matrix vector multiplication function
     //[Renderer logVector4:translation_left];
