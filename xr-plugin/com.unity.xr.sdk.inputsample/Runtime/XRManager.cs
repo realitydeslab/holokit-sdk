@@ -52,7 +52,7 @@ namespace UnityEngine.XR.HoloKit
     }
 #endif
 
-    public class XRManager
+    public class InputSampleXRManager
     {
         public const string kHoloKitDisplayProviderId = "display0";
         public const string kHoloKitInputProviderId = "input0";

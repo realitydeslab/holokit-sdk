@@ -57,7 +57,8 @@ namespace UnityEngine.XR.HoloKit
     {
         public const string kHoloKitDisplayProviderId = "Display Sample";
         public const string kHoloKitInputProviderId = "Head Tracking Sample";
-
+        public const string kArKitInputProviderId = "ARKit-Input";
+        
         static XRDisplaySubsystemDescriptor GetHoloKitDisplaySubsystemDescriptor()
         {
             List<XRDisplaySubsystemDescriptor> displayProviders = new List<XRDisplaySubsystemDescriptor>();
@@ -73,7 +74,7 @@ namespace UnityEngine.XR.HoloKit
             }
             return null;
         }
-
+        
         static XRInputSubsystemDescriptor GetHoloKitInputSubsystemDescriptor()
         {
             List<XRInputSubsystemDescriptor> inputProviders = new List<XRInputSubsystemDescriptor>();
@@ -84,6 +85,23 @@ namespace UnityEngine.XR.HoloKit
                 if (d.id.Equals(kHoloKitInputProviderId))
                 {
                     Debug.Log("++++++++++ found head tracking input provider");
+                    return d;
+                }
+            }
+            return null;
+        }
+
+        // arkit
+        static XRInputSubsystemDescriptor GetArKitInputSubsystemDescriptor()
+        {
+            List<XRInputSubsystemDescriptor> inputProviders = new List<XRInputSubsystemDescriptor>();
+            SubsystemManager.GetSubsystemDescriptors(inputProviders);
+
+            foreach (var d in inputProviders)
+            {
+                if (d.id.Equals(kArKitInputProviderId))
+                {
+                    Debug.Log("++++++++++ found arkit input provider");
                     return d;
                 }
             }
@@ -128,21 +146,61 @@ namespace UnityEngine.XR.HoloKit
                 //Debug.Log("Input Subsystem: " + d.subsystemDescriptor.id);
             }
             */
+            
+            // arkit stuff
+            
+            bool arkitInputStarted = false;
+            List<XRInputSubsystem> arkitInputSubsystems = new List<XRInputSubsystem>();
+            SubsystemManager.GetSubsystems(arkitInputSubsystems);
+            foreach (var d in arkitInputSubsystems)
+            {
+                if (d.running)
+                {
+                    if (d.subsystemDescriptor.id.Equals(kArKitInputProviderId))
+                    {
+                        Debug.Log("++++++++++ arkit input subsystem has started automatically");
+                        arkitInputStarted = true;
+                    }
+                }
+            }
 
+            if (!arkitInputStarted)
+            {
+                var arkitInputSubsystemDescriptor = GetArKitInputSubsystemDescriptor();
+                if (arkitInputSubsystemDescriptor != null)
+                {
+                    var arkitInputSubsystem = arkitInputSubsystemDescriptor.Create();
+                    if (arkitInputSubsystem != null)
+                    {
+                        Debug.Log("+++++++++++ try manually start arkit input subsystem");
+                        arkitInputSubsystem.Start();
+                    }
+                }
+            }
+            
+            
             bool holokitDisplayStarted = false;
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
             foreach (var d in displaySubsystems)
-            {
+            {   
+                Debug.Log("++++++++++ lalala");
                 Debug.Log("LoadHoloKitXRSubsystem " + d.subsystemDescriptor.id);
 
                 if (d.running)
                 {
+                    /*
                     if (!d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
                     {                        
                         d.Stop();
                     }
                     else
+                    {
+                        Debug.Log("++++++++++ holokit display subsystem has started automatically");
+                        holokitDisplayStarted = true;
+                    }
+                    */
+                    if (d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
                     {
                         Debug.Log("++++++++++ holokit display subsystem has started automatically");
                         holokitDisplayStarted = true;
@@ -159,11 +217,12 @@ namespace UnityEngine.XR.HoloKit
                     if (holokitDisplaySubsystem != null)
                     {
                        Debug.Log("++++++++++ try manually start holokit display subsystem");
-                       holokitDisplaySubsystem.Start();
+                        holokitDisplaySubsystem.Start();
                     }
                 }
             }
-
+            
+            
             bool holokitInputStarted = false;
             List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
             SubsystemManager.GetSubsystems(inputSubsystems);
@@ -192,7 +251,7 @@ namespace UnityEngine.XR.HoloKit
                     }
                 }
             }
-
+            
             /*
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
             if (xrSessionSubsystem != null)
@@ -237,17 +296,18 @@ namespace UnityEngine.XR.HoloKit
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void OnAfterAssembliesLoaded() {
-           //Debug.Log("[OnAfterAssembliesLoaded] Start");
+           Debug.Log("[OnAfterAssembliesLoaded] Start");
            
         }   
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         static void OnBeforeSplashScreen() {
-           //Debug.Log("[OnBeforeSplashScreen] Start");
+            Debug.Log("[OnBeforeSplashScreen] Start");
 
             //Debug.Log("xrManager loaders");
-
+            Debug.Log("++++++++++ before LoadHoloKitXRSubsystem()");
             LoadHoloKitXRSubsystem();
+            Debug.Log("++++++++++ after LoadHoloKitXRSubsystem()");
         }
  
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

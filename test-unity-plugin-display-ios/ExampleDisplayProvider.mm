@@ -191,6 +191,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_Start(UnityXRRendering
     renderingCaps.noSinglePassRenderingSupport = true; //GetHardwareSupportsLayerIndexInVertexShader();
     
     renderingCaps.skipPresentToMainScreen = false;
+    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_Start() end\n", getCurrentTime());
     return kUnitySubsystemErrorCodeSuccess;
 }
 
