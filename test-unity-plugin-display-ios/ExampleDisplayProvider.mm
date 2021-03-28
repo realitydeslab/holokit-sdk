@@ -844,7 +844,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::QueryMirrorViewBlitDesc(const Un
     (*blitDescriptor).blitParams[0].srcRect = {sourceUV0.x, sourceUV0.y, sourceUV1.x - sourceUV0.x, sourceUV1.y - sourceUV0.y};
     (*blitDescriptor).blitParams[0].destRect = {destUV0.x, destUV0.y, destUV1.x - destUV0.x, destUV1.y - destUV0.y};
     
-    return kUnitySubsystemErrorCodeFailure;
+    return kUnitySubsystemErrorCodex`x`
     return kUnitySubsystemErrorCodeSuccess;
 }
 

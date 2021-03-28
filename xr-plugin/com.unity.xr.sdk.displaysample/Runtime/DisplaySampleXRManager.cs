@@ -292,6 +292,18 @@ namespace UnityEngine.XR.HoloKit
 
             Debug.Log($"[OnSubsystemRegistration] Set automaticloading = false.");
             xrManager.automaticLoading = false;
+            
+            // do something here
+            // manually force to initialize all loaders
+            Debug.Log("sorry this is the lab oooooooo");
+            Debug.Log($"number of loaders: {xrManager.loaders.Count}");
+            //Debug.Log($"number of registered loaders: {xrManager.}")
+            foreach(var loader in xrManager.loaders)
+            {
+                Debug.Log($"trying to initialize loader number");
+                loader.Initialize();
+            }
+            
         }
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]

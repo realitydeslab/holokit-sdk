@@ -17,8 +17,8 @@ namespace Unity.XR.SDK
             UnityEngine.Debug.Log("++++++++++ XRLoader Initialize()");
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(s_DisplaySubsystemDescriptors, "Display Sample");
             UnityEngine.Debug.Log("++++++++++ create subsystem display sample ha");
-            //CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "Head Tracking Sample");
-            //UnityEngine.Debug.Log("++++++++++ create subsystem head tracking sample ha");
+            CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "Head Tracking Sample");
+            UnityEngine.Debug.Log("++++++++++ create subsystem head tracking sample ha");
             return true;
         }
 
