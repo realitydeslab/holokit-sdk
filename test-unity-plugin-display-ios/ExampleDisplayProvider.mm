@@ -539,11 +539,11 @@ void ExampleDisplayProvider::UpdateRenderParams(UnityXRNextFrameDesc& frameDesc)
     simd_float4x4 leftViewMatrix = simd_inverse(cameraTransform_left);
     simd_float4x4 rightViewMatrix = simd_inverse(cameraTransform_right);
     
-    //frameDesc.renderPasses[0].renderParams[0].deviceAnchorToEyePose.position = UnityXRVector3 { offset.x - ipd / 2, offset.y, offset.z };
-    //simd_quatf leftQuaternion = simd_quaternion(cameraTransform);
-    //frameDesc.renderPasses[0].renderParams[0].deviceAnchorToEyePose.rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
-    //frameDesc.renderPasses[1].renderParams[0].deviceAnchorToEyePose.position = UnityXRVector3 { offset.x + ipd / 2, offset.y, offset.z };
-    //frameDesc.renderPasses[1].renderParams[0].deviceAnchorToEyePose.rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
+    frameDesc.renderPasses[0].renderParams[0].deviceAnchorToEyePose.position = UnityXRVector3 { offset.x - ipd / 2, offset.y, offset.z };
+    simd_quatf leftQuaternion = simd_quaternion(cameraTransform);
+    frameDesc.renderPasses[0].renderParams[0].deviceAnchorToEyePose.rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
+    frameDesc.renderPasses[1].renderParams[0].deviceAnchorToEyePose.position = UnityXRVector3 { offset.x + ipd / 2, offset.y, offset.z };
+    frameDesc.renderPasses[1].renderParams[0].deviceAnchorToEyePose.rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
     
 }
 
