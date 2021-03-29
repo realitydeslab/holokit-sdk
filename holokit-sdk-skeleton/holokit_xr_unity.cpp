@@ -1,8 +1,8 @@
 //
-//  input.mm
+//  holokit_xr_unity.cpp
 //  holokit-sdk-skeleton
 //
 //  Created by Yuchen on 2021/3/29.
 //
 
-#import <Foundation/Foundation.h>
+#include "holokit_xr_unity.h"
