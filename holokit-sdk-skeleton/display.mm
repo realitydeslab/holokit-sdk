@@ -34,6 +34,7 @@
   XR_TRACE_LOG(trace, "[HoloKitXrDisplayProvider]: " message "\n", \
                ##__VA_ARGS__)
 
+namespace {
 class HoloKitDisplayProvider {
 public:
     HoloKitDisplayProvider(IUnityXRTrace* trace,
@@ -48,7 +49,8 @@ public:
     
     ///@return A reference to the static instance of this singleton class.
     static std::unique_ptr<HoloKitDisplayProvider>& GetInstance();
-    
+
+#pragma mark - Display Provider Methods
     /// @brief Initializes the display subsystem.
     ///
     /// @details Loads and configures a UnityXRDisplayGraphicsThreadProvider and
@@ -62,6 +64,35 @@ public:
         
         SetHandle(handle);
         
+        // Register for callbacks on the graphics thread.
+        UnityXRDisplayGraphicsThreadProvider gfx_thread_provider{};
+        gfx_thread_provider.userData = NULL;
+        gfx_thread_provider.Start = [](UnitySubsystemHandle, void*, UnityXRRenderingCapabilities* rendering_caps) -> UnitySubsystemErrorCode {
+            return GetInstance()->GfxThread_Start(rendering_caps);
+        };
+        gfx_thread_provider.SubmitCurrentFrame = [](UnitySubsystemHandle, void*) -> UnitySubsystemErrorCode {
+            return GetInstance()->GfxThread_SubmitCurrentFrame();
+        };
+        gfx_thread_provider.PopulateNextFrameDesc = []
+        (UnitySubsystemHandle, void*, const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) -> UnitySubsystemErrorCode {
+            return GetInstance()->GfxThread_PopulateNextFrameDesc(frame_hints, next_frame);
+        };
+        gfx_thread_provider.Stop = [](UnitySubsystemHandle, void*) -> UnitySubsystemErrorCode {
+            return GetInstance()->GfxThread_Stop();
+        };
+        GetInstance()->GetDisplay()->RegisterProviderForGraphicsThread
+        (handle, &gfx_thread_provider);
+        
+        // Register for callbacks on display provider.
+        UnityXRDisplayProvider provider{NULL, NULL, NULL};
+        provider.UpdateDisplayState = [](UnitySubsystemHandle, void*, UnityXRDisplayState* state) -> UnitySubsystemErrorCode {
+            return GetInstance()->UpdateDisplayState(state);
+        };
+        provider.QueryMirrorViewBlitDesc = [](UnitySubsystemHandle, void*, const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) -> UnitySubsystemErrorCode {
+            return GetInstance()->QueryMirrorViewBlitDesc(mirrorBlitInfo, blitDescriptor);
+        };
+        GetInstance()->GetDisplay()->RegisterProvider(handle, &provider);
+        
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -74,6 +105,18 @@ public:
     
     void Shutdown() const {}
     
+    UnitySubsystemErrorCode UpdateDisplayState(UnityXRDisplayState* state) {
+        return kUnitySubsystemErrorCodeSuccess;
+    }
+    
+    UnitySubsystemErrorCode QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) {
+        // TODO: fill this
+        
+        // currently we do not need blit
+        return kUnitySubsystemErrorCodeFailure;
+    }
+    
+#pragma mark - Gfx Thread Provider Methods
     UnitySubsystemErrorCode GfxThread_Start(
             UnityXRRenderingCapabilities* rendering_caps) const {
         XR_TRACE_LOG(trace_, "%f GfxThread_Start()\n", GetCurrentTime());
@@ -166,6 +209,15 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
     
+    UnitySubsystemErrorCode GfxThread_Stop() {
+        XR_TRACE_LOG(trace_, "%f GfxThread_Stop()\n", GetCurrentTime());
+        // TODO: reset holokit api
+        
+        is_initialized_ = false;
+        return kUnitySubsystemErrorCodeSuccess;
+    }
+
+#pragma mark - Private Methods
 private:
     
     /// @brief Allocate unity textures.
@@ -225,6 +277,7 @@ private:
 #endif
     }
     
+#pragma mark - Private Properties
 private:
     ///@brief Points to Unity XR Trace interface.
     IUnityXRTrace* trace_ = nullptr;
@@ -271,3 +324,37 @@ std::unique_ptr<HoloKitDisplayProvider> HoloKitDisplayProvider::display_provider
 std::unique_ptr<HoloKitDisplayProvider>& HoloKitDisplayProvider::GetInstance() {
     return display_provider_;
 }
+
+} // namespace
+
+UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
+    auto* display = xr_interfaces->Get<IUnityXRDisplayInterface>();
+    if(display == NULL) {
+        return kUnitySubsystemErrorCodeFailure;
+    }
+    auto* trace = xr_interfaces->Get<IUnityXRTrace>();
+    if(trace == NULL) {
+        return kUnitySubsystemErrorCodeFailure;
+    }
+    HoloKitDisplayProvider::GetInstance().reset(new HoloKitDisplayProvider(trace, display));
+    
+    UnityLifecycleProvider display_lifecycle_handler;
+    display_lifecycle_handler.userData = NULL;
+    display_lifecycle_handler.Initialize = [](UnitySubsystemHandle handle, void*) -> UnitySubsystemErrorCode {
+        return HoloKitDisplayProvider::GetInstance()->Initialize(handle);
+    };
+    display_lifecycle_handler.Start = [](UnitySubsystemHandle, void*) -> UnitySubsystemErrorCode {
+        return HoloKitDisplayProvider::GetInstance()->Start();
+    };
+    display_lifecycle_handler.Stop = [](UnitySubsystemHandle, void*) -> void {
+        return HoloKitDisplayProvider::GetInstance()->Stop();
+    };
+    display_lifecycle_handler.Shutdown = [](UnitySubsystemHandle, void*) -> void {
+        return HoloKitDisplayProvider::GetInstance()->Shutdown();
+    };
+    
+    // the names do matter
+    return HoloKitDisplayProvider::GetInstance()->GetDisplay()->RegisterLifecycleProvider("HoloKit", "Display", &display_lifecycle_handler);
+}
+
+void UnloadDisplay() { HoloKitDisplayProvider::GetInstance().reset(); }
