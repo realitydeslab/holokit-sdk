@@ -60,7 +60,7 @@ public:
     ///         successful. Otherwise, a value in UnitySubsystemErrorCode flagging
     ///         the error.
     UnitySubsystemErrorCode Initialize(UnitySubsystemHandle handle) {
-        XR_TRACE_LOG(trace_, "%f Initialize()\n", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Initialize()", GetCurrentTime());
         
         SetHandle(handle);
         
@@ -97,7 +97,7 @@ public:
     }
     
     UnitySubsystemErrorCode Start() const {
-        XR_TRACE_LOG(trace_, "%f Start()\n", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -119,7 +119,7 @@ public:
 #pragma mark - Gfx Thread Provider Methods
     UnitySubsystemErrorCode GfxThread_Start(
             UnityXRRenderingCapabilities* rendering_caps) const {
-        XR_TRACE_LOG(trace_, "%f GfxThread_Start()\n", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Start()", GetCurrentTime());
         // Does the system use multi-pass rendering?
         rendering_caps->noSinglePassRenderingSupport = true;
         rendering_caps->invalidateRenderStateAfterEachCallback = true;
@@ -131,7 +131,7 @@ public:
     }
     
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
-        XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()\n", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
         // TODO: should we get native textures here?
         
@@ -141,7 +141,7 @@ public:
     }
     
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
-        XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()\n", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
         
         // Allocate new textures if needed
         if((frame_hints->changedFlags & kUnityXRFrameSetupHintsChangedTextureResolutionScale) != 0 || !is_initialized_) {
@@ -210,7 +210,7 @@ public:
     }
     
     UnitySubsystemErrorCode GfxThread_Stop() {
-        XR_TRACE_LOG(trace_, "%f GfxThread_Stop()\n", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
         // TODO: reset holokit api
         
         is_initialized_ = false;
@@ -222,7 +222,7 @@ private:
     
     /// @brief Allocate unity textures.
     void CreateTextures(int num_textures, int texture_array_length, float requested_texture_scale) {
-        XR_TRACE_LOG(trace_, "%f CreateTextures()\n", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f CreateTextures()", GetCurrentTime());
         
         // TODO: improve this
         const int tex_width = (int)(2778.0f * requested_texture_scale);
@@ -256,7 +256,7 @@ private:
     
     /// @brief Deallocate textures.
     void DestroyTextures() {
-        XR_TRACE_LOG(trace_, "%f DestroyTextures()\n", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f DestroyTextures()", GetCurrentTime());
         
         assert(native_textures_.size() == unity_textures_.size());
         
@@ -337,7 +337,7 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
         return kUnitySubsystemErrorCodeFailure;
     }
     HoloKitDisplayProvider::GetInstance().reset(new HoloKitDisplayProvider(trace, display));
-    XR_TRACE_LOG(trace, "%f LoadDisplay()\n", GetCurrentTime());
+    HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, "%f LoadDisplay()", GetCurrentTime());
     
     UnityLifecycleProvider display_lifecycle_handler;
     display_lifecycle_handler.userData = NULL;
