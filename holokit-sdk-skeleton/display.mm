@@ -19,13 +19,13 @@
 #define XR_METAL 1
 #define XR_ANDROID 0
 #include "IUnityGraphicsMetal.h"
-#import <Metal/Metal.h>
+#include <Metal/Metal.h>
 #else
 #define XR_METAL 0
 #define XR_ANDROID 1
 #endif
 
-/// if this is 1, both render passes will render to a single texture.
+/// If this is 1, both render passes will render to a single texture.
 /// Otherwise, they will render to two separate textures.
 #define SIDE_BY_SIDE 1
 
@@ -105,7 +105,62 @@ public:
             // TODO: reset HoloKitApi
             
             // Deallocate old textures
+            DestroyTextures();
             
+            // Create new textures
+#if SIDE_BY_SIDE
+            int num_textures = 1;
+            int texture_array_length = 0;
+#else
+            int num_textures = 2;
+            // TODO: for single pass rendering, it seems that this should be 2
+            int texture_array_length = 0;
+#endif
+            CreateTextures(num_textures, texture_array_length, frame_hints->appSetup.textureResolutionScale);
+        }
+        
+        // use multi-pass rendering or single-pass rendering?
+        if (!frame_hints->appSetup.singlePassRendering) {
+            // multi-pass rendering
+            next_frame->renderPassesCount = 2;
+            
+            for (int pass = 0; pass < 2; pass++){
+                // get a reference of the current render pass
+                auto& render_pass = next_frame->renderPasses[pass];
+                
+#if SIDE_BY_SIDE
+                // for both passes, we render the content to a single texture
+                // through two different viewports
+                render_pass.textureId = unity_textures_[0];
+#else
+                // each pass renders to a separate texture
+                render_pass.textureId = unity_textures_[pass];
+#endif
+                
+                render_pass.renderParamsCount = 1;
+                
+                // we can also share the culling pass between two render passes
+                render_pass.cullingPassIndex = pass;
+                
+                auto& culling_pass = next_frame->cullingPasses[pass];
+                // TODO: culling pass seperation
+                
+                // set view and projection matrices
+                auto& render_params = render_pass.renderParams[0];
+                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = holokit_api_->GetViewMatrix(pass);
+                render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
+                render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
+                
+#if SIDE_BY_SIDE
+                render_params.viewportRect = holokit_api_->GetViewportRect(pass);
+#else
+                // TODO: fill this
+#endif
+
+            }
+        } else {
+            // single-pass rendering
+            // TODO: fill this
         }
         
         return kUnitySubsystemErrorCodeSuccess;
