@@ -1,0 +1,10 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes: []
+  m_configObjects:
+    UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: 95490e6840b9445f188f951254bbb73a, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: b93f085033a6a418cb58295c920fc9f4, type: 2}

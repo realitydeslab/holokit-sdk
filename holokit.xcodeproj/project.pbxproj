@@ -1305,6 +1305,7 @@
 				4BE7B607261104ED001F39F2 /* Sources */,
 				4BE7B608261104ED001F39F2 /* Frameworks */,
 				4BE7B609261104ED001F39F2 /* CopyFiles */,
+				4BE7B6F22611CE4B001F39F2 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1736,6 +1737,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"osx/x64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.sdk.displaysample/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/DisplayProviderSample.dylib\"\n\n";
+		};
+		4BE7B6F22611CE4B001F39F2 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios/arm64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.holokit.skeleton/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/HoloKitSDKSample/Build/Libraries/com.unity.xr.holokit.skeleton/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\n";
 		};
 		968D6948253ABF2000CFBBB3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
