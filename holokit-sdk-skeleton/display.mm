@@ -355,7 +355,9 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
     };
     
     // the names do matter
-    return HoloKitDisplayProvider::GetInstance()->GetDisplay()->RegisterLifecycleProvider("HoloKit", "Display", &display_lifecycle_handler);
+    // The parameters passed to RegisterLifecycleProvider must match the name and id fields in your manifest file.
+    // see https://docs.unity3d.com/Manual/xrsdk-provider-setup.html
+    return HoloKitDisplayProvider::GetInstance()->GetDisplay()->RegisterLifecycleProvider("HoloKit XR Plugin", "HoloKit-Display", &display_lifecycle_handler);
 }
 
 void UnloadDisplay() { HoloKitDisplayProvider::GetInstance().reset(); }
