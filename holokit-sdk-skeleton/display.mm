@@ -25,6 +25,10 @@
 #define XR_ANDROID 1
 #endif
 
+/// if this is 1, both render passes will render to a single texture.
+/// Otherwise, they will render to two separate textures.
+#define SIDE_BY_SIDE 1
+
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, message, ...)                \
   XR_TRACE_LOG(trace, "[HoloKitXrDisplayProvider]: " message "\n", \
@@ -105,6 +109,65 @@ public:
         }
         
         return kUnitySubsystemErrorCodeSuccess;
+    }
+    
+private:
+    
+    /// @brief Allocate unity textures.
+    void CreateTextures(int num_textures, int texture_array_length, float requested_texture_scale) {
+        XR_TRACE_LOG(trace_, "%f CreateTextures()\n", GetCurrentTime());
+        
+        // TODO: improve this
+        const int tex_width = (int)(2778.0f * requested_texture_scale);
+        const int tex_height = (int)(1284.0f * requested_texture_scale);
+        
+        native_textures_.resize(num_textures);
+        unity_textures_.resize(num_textures);
+#if XR_METAL
+        metal_textures_.resize(num_textures);
+#endif
+        
+        for (int i = 0; i < num_textures; i++) {
+            UnityXRRenderTextureDesc texture_desc;
+            memset(&texture_desc, 0, sizeof(UnityXRRenderTextureDesc));
+            
+            texture_desc.colorFormat = kUnityXRRenderTextureFormatRGBA32;
+            // we will query the pointer of unity created texture later
+            texture_desc.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
+            // TODO: do we need depth?
+            texture_desc.depthFormat = kUnityXRDepthTextureFormat24bitOrGreater;
+            texture_desc.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
+            texture_desc.width = tex_width;
+            texture_desc.height = tex_height;
+            texture_desc.textureArrayLength = texture_array_length;
+            
+            UnityXRRenderTextureId unity_texture_id;
+            display_->CreateTexture(handle_, &texture_desc, &unity_texture_id);
+            unity_textures_[i] = unity_texture_id;
+        }
+    }
+    
+    /// @brief Deallocate textures.
+    void DestroyTextures() {
+        XR_TRACE_LOG(trace_, "%f DestroyTextures()\n", GetCurrentTime());
+        
+        assert(native_textures_.size() == unity_textures_.size());
+        
+        for (int i = 0; i < unity_textures_.size(); i++) {
+            if(unity_textures_[i] != 0) {
+                display_->DestroyTexture(handle_, unity_textures_[i]);
+                native_textures_[i] = nullptr;
+#if XR_METAL
+                // TODO: release metal texture
+#endif
+            }
+        }
+        
+        unity_textures_.clear();
+        native_textures_.clear();
+#if XR_METAL
+        metal_textures_.clear();
+#endif
     }
     
 private:
