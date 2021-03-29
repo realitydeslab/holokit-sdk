@@ -55,9 +55,9 @@
 		4BE7B4C026105532001F39F2 /* ArSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B4BF26105532001F39F2 /* ArSession.mm */; };
 		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
 		4BE7B63E2611051A001F39F2 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
-		4BE7B64F26110544001F39F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* main.cpp */; };
+		4BE7B64F26110544001F39F2 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* main.cc */; };
 		4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B66A2611055A001F39F2 /* math_helpers.mm */; };
-		4BE7B6CA26117AE1001F39F2 /* holokit_xr_unity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.cpp */; };
+		4BE7B6CA26117AE1001F39F2 /* holokit_xr_unity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.mm */; };
 		4BFE562A260E98470074B70D /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		961B8AEF253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8AF0253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
@@ -352,10 +352,10 @@
 		4BE7B62126110504001F39F2 /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 		4BE7B63D2611051A001F39F2 /* input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = input.mm; sourceTree = "<group>"; };
 		4BE7B64C26110537001F39F2 /* load.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = load.h; sourceTree = "<group>"; };
-		4BE7B64D26110544001F39F2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4BE7B64D26110544001F39F2 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		4BE7B66A2611055A001F39F2 /* math_helpers.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = math_helpers.mm; sourceTree = "<group>"; };
 		4BE7B6862611056A001F39F2 /* math_helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = math_helpers.h; sourceTree = "<group>"; };
-		4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = holokit_xr_unity.cpp; sourceTree = "<group>"; };
+		4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = holokit_xr_unity.mm; sourceTree = "<group>"; };
 		4BE7B6C926117AE1001F39F2 /* holokit_xr_unity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = holokit_xr_unity.h; sourceTree = "<group>"; };
 		961B8AD8253B40110025BA7D /* UnityXRNativePtrs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnityXRNativePtrs.h; sourceTree = "<group>"; };
 		961B8AEE253BB99F0025BA7D /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
@@ -763,10 +763,10 @@
 				4BE7B62126110504001F39F2 /* display.mm */,
 				4BE7B63D2611051A001F39F2 /* input.mm */,
 				4BE7B64C26110537001F39F2 /* load.h */,
-				4BE7B64D26110544001F39F2 /* main.cpp */,
+				4BE7B64D26110544001F39F2 /* main.cc */,
 				4BE7B6862611056A001F39F2 /* math_helpers.h */,
 				4BE7B66A2611055A001F39F2 /* math_helpers.mm */,
-				4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.cpp */,
+				4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.mm */,
 				4BE7B6C926117AE1001F39F2 /* holokit_xr_unity.h */,
 			);
 			path = "holokit-sdk-skeleton";
@@ -1867,11 +1867,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BE7B6CA26117AE1001F39F2 /* holokit_xr_unity.cpp in Sources */,
+				4BE7B6CA26117AE1001F39F2 /* holokit_xr_unity.mm in Sources */,
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
-				4BE7B64F26110544001F39F2 /* main.cpp in Sources */,
+				4BE7B64F26110544001F39F2 /* main.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
