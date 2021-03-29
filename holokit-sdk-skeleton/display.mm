@@ -337,6 +337,7 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
         return kUnitySubsystemErrorCodeFailure;
     }
     HoloKitDisplayProvider::GetInstance().reset(new HoloKitDisplayProvider(trace, display));
+    XR_TRACE_LOG(trace, "%f LoadDisplay()\n", GetCurrentTime());
     
     UnityLifecycleProvider display_lifecycle_handler;
     display_lifecycle_handler.userData = NULL;
