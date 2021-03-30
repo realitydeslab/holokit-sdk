@@ -17,7 +17,7 @@
     "com.unity.visualeffectgraph": "11.0.0",
     "com.unity.xr.arfoundation": "4.1.5",
     "com.unity.xr.arkit": "4.1.5",
-    "com.unity.xr.sdk.displaysample": "file:../../../xr-plugin/com.unity.xr.sdk.displaysample",
+    "com.unity.xr.holokit.skeleton": "file:../../../xr-plugin/com.unity.xr.holokit.skeleton",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

@@ -31,7 +31,7 @@
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, message, ...)                \
-  XR_TRACE_LOG(trace, "[HoloKitXrDisplayProvider]: " message "\n", \
+  XR_TRACE_LOG(trace, "[HoloKitDisplayProvider]: " message "\n", \
                ##__VA_ARGS__)
 
 namespace {
@@ -113,6 +113,7 @@ public:
         // TODO: fill this
         
         // currently we do not need blit
+        return kUnitySubsystemErrorCodeSuccess;
         return kUnitySubsystemErrorCodeFailure;
     }
     
@@ -187,19 +188,34 @@ public:
                 
                 auto& culling_pass = next_frame->cullingPasses[pass];
                 // TODO: culling pass seperation
-                
+    
                 // set view and projection matrices
                 auto& render_params = render_pass.renderParams[0];
                 render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = holokit_api_->GetViewMatrix(pass);
-                render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-                render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
+                //render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
+                //render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
+                
+                // test
+                UnityXRProjection ret;
+                ret.type = kUnityXRProjectionTypeHalfAngles;
+                ret.data.halfAngles.left = -1.0;
+                ret.data.halfAngles.right = 1.0;
+                ret.data.halfAngles.top = 0.625;
+                ret.data.halfAngles.bottom = -0.625;
+                render_params.projection = culling_pass.projection = ret;
                 
 #if SIDE_BY_SIDE
-                render_params.viewportRect = holokit_api_->GetViewportRect(pass);
+                render_params.viewportRect = {
+                    pass == 0 ? 0.0f : 0.5f, // x
+                    0.0f,                    // y
+                    0.5f,                    // width
+                    1.0f                     // height
+                };
+                //render_params.viewportRect = holokit_api_->GetViewportRect(pass);
+                
 #else
                 // TODO: fill this
 #endif
-
             }
         } else {
             // single-pass rendering
@@ -223,6 +239,12 @@ private:
     /// @brief Allocate unity textures.
     void CreateTextures(int num_textures, int texture_array_length, float requested_texture_scale) {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f CreateTextures()", GetCurrentTime());
+        
+        // initialize or reset holokit_api_
+        holokit_api_.reset(new holokit::HoloKitApi);
+        holokit_api_->Initialize();
+        NSLog(@"holokit_api_ initialization succeeded!!@!!!!");
+        is_initialized_ = true;
         
         // TODO: improve this
         const int tex_width = (int)(2778.0f * requested_texture_scale);
@@ -357,7 +379,7 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
     // the names do matter
     // The parameters passed to RegisterLifecycleProvider must match the name and id fields in your manifest file.
     // see https://docs.unity3d.com/Manual/xrsdk-provider-setup.html
-    return HoloKitDisplayProvider::GetInstance()->GetDisplay()->RegisterLifecycleProvider("HoloKit XR Plugin", "HoloKit-Display", &display_lifecycle_handler);
+    return HoloKitDisplayProvider::GetInstance()->GetDisplay()->RegisterLifecycleProvider("HoloKit XR Plugin", "HoloKit Display", &display_lifecycle_handler);
 }
 
 void UnloadDisplay() { HoloKitDisplayProvider::GetInstance().reset(); }

@@ -34,7 +34,8 @@ namespace UnityEditor.XR.HoloKit
          private static IXRPackageMetadata s_Metadata = new PackageMetadata(){
                 packageName = "HoloKit XR Plugin",
                 packageId = "com.unity.xr.holokit.skeleton",
-                settingsType = typeof(HoloKitPackageSettings).FullName,
+                // should be "HoloKitPackageSettings"
+                settingsType = typeof(HoloKitXRLoader).FullName,
                 loaderMetadata = new List<IXRLoaderMetadata>() {
                     new LoaderMetadata() {
                         loaderName = "HoloKit",

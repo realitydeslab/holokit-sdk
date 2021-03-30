@@ -23,7 +23,6 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityPluginLoad(IUnityInterfaces* unityInterfaces)
 {
     
-    
     auto* ctx = s_Context = new ProviderContext;
 
     ctx->interfaces = unityInterfaces;

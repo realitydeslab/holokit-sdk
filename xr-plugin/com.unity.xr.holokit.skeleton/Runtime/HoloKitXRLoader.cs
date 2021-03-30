@@ -21,8 +21,8 @@ namespace UnityEngine.XR.HoloKit
         public override bool Initialize() 
         {
         	Debug.Log("[HoloKitXRLoader]: Initialize()");
-            CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(s_DisplaySubsystemDescriptors, "HoloKit-Display");
-            Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit-Display)");
+            CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(s_DisplaySubsystemDescriptors, "HoloKit Display");
+            Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit Display)");
             //CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "HoloKit-Input");
             //Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit-Input)");
             

@@ -12,9 +12,12 @@ const float kUserInterpupillaryDistance = 0.064;
 namespace holokit {
 
 void HoloKitApi::Initialize() {
+    NSLog(@"[HoloKitApi]: Initialize()");
     // Initializes phone model and holokit model
-    InitPhoneModel();
-    InitHoloKitModel();
+    auto phone_model = InitPhoneModel();
+    auto holokit_model = InitHoloKitModel();
+    mrOffset_ = holokit_model.mrOffset;
+    cameraOffset_ = phone_model.cameraOffset;
     
     // TODO: do this more elegantly
     width_ = 2778;
@@ -24,34 +27,40 @@ void HoloKitApi::Initialize() {
     ComputeViewportRects();
 }
 
-void HoloKitApi::InitPhoneModel() {
+PhoneModel HoloKitApi::InitPhoneModel() {
     // iPhone12ProMax phone model
-    phone_model_.screenWidth = 0.15390;
-    phone_model_.screenHeight = 0.07113;
-    phone_model_.screenBottom = 0.00347;
-    phone_model_.centerLineOffset = 0.0;
-    phone_model_.cameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
+    PhoneModel phone_model;
+    phone_model.screenWidth = 0.15390;
+    phone_model.screenHeight = 0.07113;
+    phone_model.screenBottom = 0.00347;
+    phone_model.centerLineOffset = 0.0;
+    phone_model.cameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
+    
+    return phone_model;
 }
 
-void HoloKitApi::InitHoloKitModel() {
-    holokit_model_.opticalAxisDistance = 0.064;
-    holokit_model_.mrOffset = simd_make_float3(0, -0.02894, 0.07055);
-    holokit_model_.distortion = 0.0;
-    holokit_model_.viewportInner = 0.0292;
-    holokit_model_.viewportOuter = 0.0292;
-    holokit_model_.viewportTop = 0.02386;
-    holokit_model_.viewportBottom = 0.02386;
-    holokit_model_.focalLength = 0.065;
-    holokit_model_.screenToLens = 0.02715 + 0.03136 + 0.002;
-    holokit_model_.lensToEye = 0.02497 + 0.03898;
-    holokit_model_.axisToBottom = 0.02990;
-    holokit_model_.viewportCushion = 0.0000;
-    holokit_model_.horizontalAlignmentMarkerOffset = 0.05075;
+HoloKitModel HoloKitApi::InitHoloKitModel() {
+    HoloKitModel holokit_model;
+    holokit_model.opticalAxisDistance = 0.064;
+    holokit_model.mrOffset = simd_make_float3(0, -0.02894, 0.07055);
+    holokit_model.distortion = 0.0;
+    holokit_model.viewportInner = 0.0292;
+    holokit_model.viewportOuter = 0.0292;
+    holokit_model.viewportTop = 0.02386;
+    holokit_model.viewportBottom = 0.02386;
+    holokit_model.focalLength = 0.065;
+    holokit_model.screenToLens = 0.02715 + 0.03136 + 0.002;
+    holokit_model.lensToEye = 0.02497 + 0.03898;
+    holokit_model.axisToBottom = 0.02990;
+    holokit_model.viewportCushion = 0.0000;
+    holokit_model.horizontalAlignmentMarkerOffset = 0.05075;
+    
+    return holokit_model;
 }
 
 void HoloKitApi::ComputeProjectionMatrices() {
     //auto& phone = phone_model_;
-    auto& hme = holokit_model_;
+    auto hme = InitHoloKitModel();
     
     //float center_x = 0.5 * phone.screenWidth + phone.centerLineOffset;
     //float center_y = phone.screenHeight - (hme.axisToBottom - phone.screenBottom);
@@ -77,12 +86,12 @@ void HoloKitApi::ComputeProjectionMatrices() {
     
     projection_matrices_.resize(2);
     projection_matrices_[0] = leftProjMatrix;
-    projection_matrices_[1] = rightProjMatrix;
+    projection_matrices_[0] = rightProjMatrix;
 }
 
 void HoloKitApi::ComputeViewportRects() {
-    auto& phone = phone_model_;
-    auto& hme = holokit_model_;
+    auto phone = InitPhoneModel();
+    auto hme = InitHoloKitModel();
     
     float center_x = 0.5 * phone.screenWidth + phone.centerLineOffset;
     float center_y = phone.screenHeight - (hme.axisToBottom - phone.screenBottom);
@@ -121,6 +130,7 @@ UnityXRMatrix4x4 HoloKitApi::GetProjectionMatrix(int eye_index) {
         NSLog(@"[HoloKitApi]: projection matrices are not initialized.");
         return UnityXRMatrix4x4{};
     }
+    return UnityXRMatrix4x4{};
 }
 
 UnityXRRectf HoloKitApi::GetViewportRect(int eye_index) {
@@ -132,6 +142,7 @@ UnityXRRectf HoloKitApi::GetViewportRect(int eye_index) {
         NSLog(@"[HoloKitApi]: viewport rects are not initialized.");
         return UnityXRRectf{};
     }
+    return UnityXRRectf{};
 }
 
 UnityXRPose HoloKitApi::GetViewMatrix(int eye_index) {

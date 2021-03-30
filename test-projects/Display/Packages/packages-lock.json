@@ -224,6 +224,14 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.xr.holokit.skeleton": {
+      "version": "file:../../../xr-plugin/com.unity.xr.holokit.skeleton",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.xr.management": "3.2.15"
+      }
+    },
     "com.unity.xr.legacyinputhelpers": {
       "version": "2.1.7",
       "depth": 2,
@@ -246,14 +254,6 @@
         "com.unity.subsystemregistration": "1.0.6"
       },
       "url": "https://packages.unity.com"
-    },
-    "com.unity.xr.sdk.displaysample": {
-      "version": "file:../../../xr-plugin/com.unity.xr.sdk.displaysample",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.unity.xr.management": "3.0.4"
-      }
     },
     "nuget.mono-cecil": {
       "version": "0.1.5-preview",

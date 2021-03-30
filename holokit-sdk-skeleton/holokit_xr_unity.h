@@ -4,14 +4,14 @@
 //
 //  Created by Yuchen on 2021/3/29.
 //
+#pragma once
 
 #include <vector>
+#include <memory>
 
 #include "UnityXRTypes.h"
 #include <Metal/Metal.h>
 #include <MetalKit/MetalKit.h>
-
-
 
 namespace holokit {
     
@@ -47,11 +47,6 @@ typedef struct HoloKitModel {
 /// Wrapper of HoloKit SDK
 class HoloKitApi {
 public:
-    /// @brief Constructs a HoloKitApi.
-    HoloKitApi() = default;
-    
-    /// @brief Destructor.
-    ~HoloKitApi() = default;
     
     void Initialize();
     
@@ -61,10 +56,12 @@ public:
     
     UnityXRRectf GetViewportRect(int eye_index);
     
-private:
-    void InitPhoneModel();
+    //static std::unique_ptr<HoloKitApi>& GetInstance();
     
-    void InitHoloKitModel();
+private:
+    PhoneModel InitPhoneModel();
+    
+    HoloKitModel InitHoloKitModel();
     
     /// @brief Projection matrices only need to be computed once.
     void ComputeProjectionMatrices();
@@ -73,12 +70,9 @@ private:
     void ComputeViewportRects();
     
 private:
-    
-    /// @brief Stores the optical data of the phone.
-    PhoneModel phone_model_;
-    
-    /// @brief Stores the optical data of the holokit.
-    HoloKitModel holokit_model_;
+    // the only two optical parameters necessary for computing view matrices
+    simd_float3 mrOffset_;
+    simd_float3 cameraOffset_;
     
     /// @brief Stores left and right eye projection matrices.
     std::vector<UnityXRMatrix4x4> projection_matrices_;
@@ -92,6 +86,14 @@ private:
     /// @brief Screen height in pixels. 
     int height_;
     
+    //static std::unique_ptr<HoloKitApi> holokit_api_;
+    
 }; // class HoloKitApi
+
+//std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;
+
+//std::unique_ptr<HoloKitApi>& HoloKitApi::GetInstance() {
+//    return holokit_api_;
+//}
 
 } // namespace holokit

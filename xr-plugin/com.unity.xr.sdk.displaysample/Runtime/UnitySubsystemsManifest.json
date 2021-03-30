@@ -8,7 +8,7 @@
 			"id": "Display Sample"
 		}
 	],
-	"inputs": [
+    "inputs": [
 		{
 			"id": "Head Tracking Sample"
 		}
