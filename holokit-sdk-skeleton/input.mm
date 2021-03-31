@@ -188,7 +188,14 @@ public:
         
         switch (device_id) {
             case kDeviceIdHoloKitHme: {
+                simd_float4x4 camera_transform = ar_session_handler_.session.currentFrame.camera.transform;
+                //LogMatrix4x4(camera_transform);
+                UnityXRVector3 position = UnityXRVector3 { camera_transform.columns[3].x, camera_transform.columns[3].y, -camera_transform.columns[3].z };
+                position = UnityXRVector3 { 0, 0, -10 };
                 // update head pose position and rotation
+                input_->DeviceState_SetAxis3DValue(state, feature_index++, position);
+                input_->DeviceState_SetRotationValue(state, feature_index++, UnityXRVector4 { 0, 0, 0, 1 });
+                
                 break;
             }
             case kDeviceIdHoloKitHandLeft: {

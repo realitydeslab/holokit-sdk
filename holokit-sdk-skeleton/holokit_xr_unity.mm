@@ -148,11 +148,13 @@ UnityXRRectf HoloKitApi::GetViewportRect(int eye_index) {
 }
 
 UnityXRPose HoloKitApi::GetViewMatrix(int eye_index) {
+    //ARCamera* camera = ar_session_handler_.session.currentFrame.camera;
     ARCamera* camera = ar_session_handler_.camera;
     float ipd = kUserInterpupillaryDistance;
     
     simd_float3 offset = mrOffset_ + cameraOffset_;
-    simd_float4x4 cameraTransform = camera.transform;
+    simd_float4x4 cameraTransform = matrix_identity_float4x4;
+    LogMatrix4x4(cameraTransform);
     simd_float4 translation_left = MatrixVectorMultiplication(cameraTransform, simd_make_float4(offset.x - ipd / 2, offset.y, offset.z, 1));
     simd_float4 translation_right = MatrixVectorMultiplication(cameraTransform, simd_make_float4(offset.x + ipd / 2, offset.y, offset.z, 1));
     simd_float4x4 cameraTransform_left = cameraTransform;
@@ -166,10 +168,12 @@ UnityXRPose HoloKitApi::GetViewMatrix(int eye_index) {
     UnityXRVector3 left_position = UnityXRVector3 { offset.x - ipd / 2, offset.y, offset.z };
     simd_quatf leftQuaternion = simd_quaternion(cameraTransform);
     UnityXRVector4 left_rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
+    left_rotation = UnityXRVector4 { 0, 0, 0, 1 };
     
     // right eye
     UnityXRVector3 right_position = UnityXRVector3 { offset.x + ipd / 2, offset.y, offset.z };
     UnityXRVector4 right_rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
+    right_rotation = UnityXRVector4 { 0, 0, 0, 1 };
     
     UnityXRPose res;
     if (eye_index == 0){
@@ -180,15 +184,6 @@ UnityXRPose HoloKitApi::GetViewMatrix(int eye_index) {
         res.rotation = right_rotation;
     }
     return res;
-}
-
-simd_float4 HoloKitApi::MatrixVectorMultiplication(simd_float4x4 mat, simd_float4 vec) {
-    simd_float4 ret;
-    ret.x = mat.columns[0].x * vec.x + mat.columns[1].x * vec.y + mat.columns[2].x * vec.z + mat.columns[3].x * vec.w;
-    ret.y = mat.columns[0].y * vec.x + mat.columns[1].y * vec.y + mat.columns[2].y * vec.z + mat.columns[3].y * vec.w;
-    ret.z = mat.columns[0].z * vec.x + mat.columns[1].z * vec.y + mat.columns[2].z * vec.z + mat.columns[3].z * vec.w;
-    ret.w = mat.columns[0].w * vec.x + mat.columns[1].w * vec.y + mat.columns[2].w * vec.z + mat.columns[3].w * vec.w;
-    return ret;
 }
 
 } // namespace

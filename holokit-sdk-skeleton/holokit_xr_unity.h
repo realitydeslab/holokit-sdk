@@ -13,6 +13,7 @@
 #include <Metal/Metal.h>
 #include <MetalKit/MetalKit.h>
 #include "ar_session.mm"
+#include "math_helpers.h"
 
 namespace holokit {
     
@@ -69,8 +70,6 @@ private:
     
     /// @brief Viewport rects only need to be computed once.
     void ComputeViewportRects();
-    
-    simd_float4 MatrixVectorMultiplication(simd_float4x4 mat, simd_float4 vec);
     
 private:
     // the only two optical parameters necessary for computing view matrices

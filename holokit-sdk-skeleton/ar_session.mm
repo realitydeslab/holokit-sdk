@@ -300,12 +300,12 @@ static const float kMaxLandmarkDistance = 0.8f;
     
 
 - (void)handTracker: (HandTracker*)handTracker didOutputHandednesses: (NSArray<Handedness *> *)handednesses {
-    NSLog(@"handedness function is called");
-    NSLog(@"current number of hands is: %d", [handednesses count]);
-    for(int i = 0; i < [handednesses count] ; i++){
-        NSLog(@"hand index: %d and score: %f", handednesses[i].index, handednesses[i].score);
-    }
-    NSLog(@"---------------------------------------------");
+    //NSLog(@"handedness function is called");
+    //NSLog(@"current number of hands is: %d", [handednesses count]);
+    //for(int i = 0; i < [handednesses count] ; i++){
+    //    NSLog(@"hand index: %d and score: %f", handednesses[i].index, handednesses[i].score);
+    //}
+    //NSLog(@"---------------------------------------------");
 }
 
 - (void)handTracker: (HandTracker*)handTracker didOutputPixelBuffer: (CVPixelBufferRef)pixelBuffer { }

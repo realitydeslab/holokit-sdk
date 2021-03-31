@@ -421,7 +421,7 @@ public:
         UnityXRPose pose{};
         if (pass < (sizeof(s_PoseXPositionPerPass) / sizeof(s_PoseXPositionPerPass[0])))
             pose.position.x = s_PoseXPositionPerPass[pass];
-        pose.position.z = -10.0f;
+        //pose.position.z = -10.0f;
         pose.rotation.w = 1.0f;
         
         //pose.rotation.x = 10.0f;
@@ -525,7 +525,7 @@ public:
                 auto& render_params = renderPass.renderParams[0];
                 render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = holokit_api_->GetViewMatrix(pass);
                 //render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = GetPose(pass);
-                //renderParams.projection = cullingPass.projection = GetProjection(pass);
+                //render_params.projection = culling_pass.projection = GetProjection(pass);
                 render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
                 render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
 
