@@ -130,38 +130,6 @@ namespace UnityEngine.XR.HoloKit
             }
             */
             
-            // arkit stuff
-            /*
-            bool arkitInputStarted = false;
-            List<XRInputSubsystem> arkitInputSubsystems = new List<XRInputSubsystem>();
-            SubsystemManager.GetSubsystems(arkitInputSubsystems);
-            foreach (var d in arkitInputSubsystems)
-            {
-                if (d.running)
-                {
-                    if (d.subsystemDescriptor.id.Equals(kArKitInputProviderId))
-                    {
-                        Debug.Log("++++++++++ arkit input subsystem has started automatically");
-                        arkitInputStarted = true;
-                    }
-                }
-            }
-
-            if (!arkitInputStarted)
-            {
-                var arkitInputSubsystemDescriptor = GetArKitInputSubsystemDescriptor();
-                if (arkitInputSubsystemDescriptor != null)
-                {
-                    var arkitInputSubsystem = arkitInputSubsystemDescriptor.Create();
-                    if (arkitInputSubsystem != null)
-                    {
-                        Debug.Log("+++++++++++ try manually start arkit input subsystem");
-                        arkitInputSubsystem.Start();
-                    }
-                }
-            }
-            */
-            
             bool holokitDisplayStarted = false;
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
@@ -204,7 +172,6 @@ namespace UnityEngine.XR.HoloKit
                 }
             }
             
-            /*
             bool holokitInputStarted = false;
             List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
             SubsystemManager.GetSubsystems(inputSubsystems);
@@ -233,8 +200,6 @@ namespace UnityEngine.XR.HoloKit
                     }
                 }
             }
-            */
-            
             
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
             if (xrSessionSubsystem != null)

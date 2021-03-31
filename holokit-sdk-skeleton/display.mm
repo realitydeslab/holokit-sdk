@@ -119,7 +119,7 @@ public:
     ///@return A reference to the static instance of this singleton class.
     static std::unique_ptr<HoloKitDisplayProvider>& GetInstance();
 
-#pragma mark - Display Provider Methods
+#pragma mark - Display Lifecycle Methods
     /// @brief Initializes the display subsystem.
     ///
     /// @details Loads and configures a UnityXRDisplayGraphicsThreadProvider and
@@ -173,65 +173,6 @@ public:
     void Stop() const {}
     
     void Shutdown() const {}
-    
-    UnitySubsystemErrorCode UpdateDisplayState(UnityXRDisplayState* state) {
-        return kUnitySubsystemErrorCodeSuccess;
-    }
-    
-    UnitySubsystemErrorCode QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f QueryMirrorViewBlitDesc()", GetCurrentTime());
-        
-        // TODO: fill this
-        if (unity_textures_.size() == 0)
-        {
-            // Eye texture is not available yet, return failure
-            return UnitySubsystemErrorCode::kUnitySubsystemErrorCodeFailure;
-        }
-        // atw
-        int srcTexId = unity_textures_[0];
-        const UnityXRVector2 sourceTextureSize = {static_cast<float>(1920), static_cast<float>(1200)};
-        const UnityXRRectf sourceUVRect = {0.0f, 0.0f, 1.0f, 1.0f};
-        const UnityXRVector2 destTextureSize = {static_cast<float>(mirrorBlitInfo.mirrorRtDesc->rtScaledWidth), static_cast<float>(mirrorBlitInfo.mirrorRtDesc->rtScaledHeight)};
-        const UnityXRRectf destUVRect = {0.0f, 0.0f, 1.0f, 1.0f};
-
-        // By default, The source rect will be adjust so that it matches the dest rect aspect ratio.
-        // This has the visual effect of expanding the source image, resulting in cropping
-        // along the non-fitting axis. In this mode, the destination rect will be completely
-        // filled, but not all the source image may be visible.
-        UnityXRVector2 sourceUV0, sourceUV1, destUV0, destUV1;
-
-        float sourceAspect = (sourceTextureSize.x * sourceUVRect.width) / (sourceTextureSize.y * sourceUVRect.height);
-        float destAspect = (destTextureSize.x * destUVRect.width) / (destTextureSize.y * destUVRect.height);
-        float ratio = sourceAspect / destAspect;
-        UnityXRVector2 sourceUVCenter = {sourceUVRect.x + sourceUVRect.width * 0.5f, sourceUVRect.y + sourceUVRect.height * 0.5f};
-        UnityXRVector2 sourceUVSize = {sourceUVRect.width, sourceUVRect.height};
-        UnityXRVector2 destUVCenter = {destUVRect.x + destUVRect.width * 0.5f, destUVRect.y + destUVRect.height * 0.5f};
-        UnityXRVector2 destUVSize = {destUVRect.width, destUVRect.height};
-
-        if (ratio > 1.0f)
-        {
-            sourceUVSize.x /= ratio;
-        }
-        else
-        {
-            sourceUVSize.y *= ratio;
-        }
-
-        sourceUV0 = {sourceUVCenter.x - (sourceUVSize.x * 0.5f), sourceUVCenter.y - (sourceUVSize.y * 0.5f)};
-        sourceUV1 = {sourceUV0.x + sourceUVSize.x, sourceUV0.y + sourceUVSize.y};
-        destUV0 = {destUVCenter.x - destUVSize.x * 0.5f, destUVCenter.y - destUVSize.y * 0.5f};
-        destUV1 = {destUV0.x + destUVSize.x, destUV0.y + destUVSize.y};
-
-        (*blitDescriptor).blitParamsCount = 1;
-        (*blitDescriptor).blitParams[0].srcTexId = srcTexId;
-        (*blitDescriptor).blitParams[0].srcTexArraySlice = 0;
-        (*blitDescriptor).blitParams[0].srcRect = {sourceUV0.x, sourceUV0.y, sourceUV1.x - sourceUV0.x, sourceUV1.y - sourceUV0.y};
-        (*blitDescriptor).blitParams[0].destRect = {destUV0.x, destUV0.y, destUV1.x - destUV0.x, destUV1.y - destUV0.y};
-        
-        // currently we do not need blit
-        //return kUnitySubsystemErrorCodeSuccess;
-        return kUnitySubsystemErrorCodeFailure;
-    }
     
 #pragma mark - Gfx Thread Provider Methods
     UnitySubsystemErrorCode GfxThread_Start(
@@ -661,6 +602,65 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
 
+    UnitySubsystemErrorCode UpdateDisplayState(UnityXRDisplayState* state) {
+        return kUnitySubsystemErrorCodeSuccess;
+    }
+    
+    UnitySubsystemErrorCode QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) {
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f QueryMirrorViewBlitDesc()", GetCurrentTime());
+        
+        // TODO: fill this
+        if (unity_textures_.size() == 0)
+        {
+            // Eye texture is not available yet, return failure
+            return UnitySubsystemErrorCode::kUnitySubsystemErrorCodeFailure;
+        }
+        // atw
+        int srcTexId = unity_textures_[0];
+        const UnityXRVector2 sourceTextureSize = {static_cast<float>(1920), static_cast<float>(1200)};
+        const UnityXRRectf sourceUVRect = {0.0f, 0.0f, 1.0f, 1.0f};
+        const UnityXRVector2 destTextureSize = {static_cast<float>(mirrorBlitInfo.mirrorRtDesc->rtScaledWidth), static_cast<float>(mirrorBlitInfo.mirrorRtDesc->rtScaledHeight)};
+        const UnityXRRectf destUVRect = {0.0f, 0.0f, 1.0f, 1.0f};
+
+        // By default, The source rect will be adjust so that it matches the dest rect aspect ratio.
+        // This has the visual effect of expanding the source image, resulting in cropping
+        // along the non-fitting axis. In this mode, the destination rect will be completely
+        // filled, but not all the source image may be visible.
+        UnityXRVector2 sourceUV0, sourceUV1, destUV0, destUV1;
+
+        float sourceAspect = (sourceTextureSize.x * sourceUVRect.width) / (sourceTextureSize.y * sourceUVRect.height);
+        float destAspect = (destTextureSize.x * destUVRect.width) / (destTextureSize.y * destUVRect.height);
+        float ratio = sourceAspect / destAspect;
+        UnityXRVector2 sourceUVCenter = {sourceUVRect.x + sourceUVRect.width * 0.5f, sourceUVRect.y + sourceUVRect.height * 0.5f};
+        UnityXRVector2 sourceUVSize = {sourceUVRect.width, sourceUVRect.height};
+        UnityXRVector2 destUVCenter = {destUVRect.x + destUVRect.width * 0.5f, destUVRect.y + destUVRect.height * 0.5f};
+        UnityXRVector2 destUVSize = {destUVRect.width, destUVRect.height};
+
+        if (ratio > 1.0f)
+        {
+            sourceUVSize.x /= ratio;
+        }
+        else
+        {
+            sourceUVSize.y *= ratio;
+        }
+
+        sourceUV0 = {sourceUVCenter.x - (sourceUVSize.x * 0.5f), sourceUVCenter.y - (sourceUVSize.y * 0.5f)};
+        sourceUV1 = {sourceUV0.x + sourceUVSize.x, sourceUV0.y + sourceUVSize.y};
+        destUV0 = {destUVCenter.x - destUVSize.x * 0.5f, destUVCenter.y - destUVSize.y * 0.5f};
+        destUV1 = {destUV0.x + destUVSize.x, destUV0.y + destUVSize.y};
+
+        (*blitDescriptor).blitParamsCount = 1;
+        (*blitDescriptor).blitParams[0].srcTexId = srcTexId;
+        (*blitDescriptor).blitParams[0].srcTexArraySlice = 0;
+        (*blitDescriptor).blitParams[0].srcRect = {sourceUV0.x, sourceUV0.y, sourceUV1.x - sourceUV0.x, sourceUV1.y - sourceUV0.y};
+        (*blitDescriptor).blitParams[0].destRect = {destUV0.x, destUV0.y, destUV1.x - destUV0.x, destUV1.y - destUV0.y};
+        
+        // currently we do not need blit
+        //return kUnitySubsystemErrorCodeSuccess;
+        return kUnitySubsystemErrorCodeFailure;
+    }
+    
 #pragma mark - Private Methods
 private:
     

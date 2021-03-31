@@ -50,6 +50,7 @@ static const float kMaxLandmarkDistance = 0.8f;
 @property (nonatomic, strong) ARFrame* frame;
 @property (assign) simd_float4x4 cameraTransform;
 @property (nonatomic, strong) ARSession* session;
+@property (nonatomic, strong) ARCamera* camera;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
@@ -135,11 +136,13 @@ static const float kMaxLandmarkDistance = 0.8f;
     //NSLog(@"type depth %d", type2);
 
     
-    self.frame = session.currentFrame;
-    self.cameraTransform = session.currentFrame.camera.transform;
+    
     if(self.session == NULL) {
         NSLog(@"initialize ARSession reference.");
         self.session = session;
+        self.frame = session.currentFrame;
+        self.cameraTransform = session.currentFrame.camera.transform;
+        self.camera = session.currentFrame.camera;
     }
     
     float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];

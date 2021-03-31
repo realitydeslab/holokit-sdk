@@ -23,8 +23,8 @@ namespace UnityEngine.XR.HoloKit
         	Debug.Log("[HoloKitXRLoader]: Initialize()");
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(s_DisplaySubsystemDescriptors, "HoloKit Display");
             Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit Display)");
-            //CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "HoloKit-Input");
-            //Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit-Input)");
+            CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "HoloKit Input");
+            Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit-Input)");
             
             return true;
             return displaySubsystem != null && inputSubsystem != null;
@@ -33,21 +33,21 @@ namespace UnityEngine.XR.HoloKit
         public override bool Start()
         {
             StartSubsystem<XRDisplaySubsystem>();
-            //StartSubsystem<XRInputSubsystem>();
+            StartSubsystem<XRInputSubsystem>();
             return true;
         }
 
         public override bool Stop()
         {
             StopSubsystem<XRDisplaySubsystem>();
-            //StopSubsystem<XRInputSubsystem>();
+            StopSubsystem<XRInputSubsystem>();
             return true;
         }
 
         public override bool Deinitialize()
         {
             DestroySubsystem<XRDisplaySubsystem>();
-            //DestroySubsystem<XRInputSubsystem>();
+            DestroySubsystem<XRInputSubsystem>();
             return true;
         }
     }

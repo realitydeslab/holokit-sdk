@@ -33,6 +33,20 @@
 		4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6AD99125E343EB008F9911 /* MathHelper.m */; };
 		4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C84E825E3F19B00B04F03 /* MathHelper.m */; };
 		4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ar_session.mm */; };
+		4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C742625F5B948001935A8 /* LandmarkPosition.m */; };
+		4B6C94492614B70200CBDFB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
+		4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
+		4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
+		4B6C94822614C2E300CBDFB4 /* LandmarkPosition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C742625F5B948001935A8 /* LandmarkPosition.m */; };
+		4B6C94872614C2E300CBDFB4 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
+		4B6C94882614C2E300CBDFB4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
+		4B6C94892614C2E300CBDFB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		4B6C94BA2614C32300CBDFB4 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
+		4B6C94C92614C32500CBDFB4 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
+		4B6C94D82614C32700CBDFB4 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* main.mm */; };
+		4B6C94E72614C32A00CBDFB4 /* math_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B66A2611055A001F39F2 /* math_helpers.mm */; };
+		4B6C95132614C33300CBDFB4 /* holokit_xr_unity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.mm */; };
+		4B6C95222614C33500CBDFB4 /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ar_session.mm */; };
 		4B6CC26A25D42C2C0068CB66 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26925D42C2C0068CB66 /* AppDelegate.m */; };
 		4B6CC26C25D42C2C0068CB66 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26B25D42C2C0068CB66 /* Shaders.metal */; };
 		4B6CC27025D42C2C0068CB66 /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26F25D42C2C0068CB66 /* Renderer.m */; };
@@ -216,6 +230,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B6C948A2614C2E300CBDFB4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4BE7B609261104ED001F39F2 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -325,6 +348,7 @@
 		4B6C84E825E3F19B00B04F03 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
 		4B6C84F225E3F1A700B04F03 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
 		4B6C941F261493E300CBDFB4 /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
+		4B6C948F2614C2E300CBDFB4 /* libholokit-sdk-skeleton-2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk-skeleton-2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-stereoscopic-rendering.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B6CC26825D42C2C0068CB66 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B6CC26925D42C2C0068CB66 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -571,6 +595,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B6C94862614C2E300CBDFB4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B6C94872614C2E300CBDFB4 /* Metal.framework in Frameworks */,
+				4B6C94882614C2E300CBDFB4 /* ARKit.framework in Frameworks */,
+				4B6C94892614C2E300CBDFB4 /* HandTracker.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4B6CC26325D42C2C0068CB66 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -591,6 +625,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B6C94492614B70200CBDFB4 /* HandTracker.framework in Frameworks */,
+				4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */,
+				4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -861,6 +898,7 @@
 				4B0606CB25F5CA08006DF0B0 /* libtest-unity-plugin-display-ios.a */,
 				4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */,
 				4BE7B60B261104ED001F39F2 /* libholokit-sdk-skeleton.a */,
+				4B6C948F2614C2E300CBDFB4 /* libholokit-sdk-skeleton-2.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1265,6 +1303,24 @@
 			productReference = 4B38240625E7491B00B39EEB /* libtest-unity-plugin-input-mac.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		4B6C94802614C2E300CBDFB4 /* holokit-sdk-skeleton-2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B6C948C2614C2E300CBDFB4 /* Build configuration list for PBXNativeTarget "holokit-sdk-skeleton-2" */;
+			buildPhases = (
+				4B6C94812614C2E300CBDFB4 /* Sources */,
+				4B6C94862614C2E300CBDFB4 /* Frameworks */,
+				4B6C948A2614C2E300CBDFB4 /* CopyFiles */,
+				4B6C948B2614C2E300CBDFB4 /* Run Script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "holokit-sdk-skeleton-2";
+			productName = "test-unity-input-ios";
+			productReference = 4B6C948F2614C2E300CBDFB4 /* libholokit-sdk-skeleton-2.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		4B6CC26525D42C2C0068CB66 /* test-stereoscopic-rendering */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4B6CC28125D42C2D0068CB66 /* Build configuration list for PBXNativeTarget "test-stereoscopic-rendering" */;
@@ -1586,6 +1642,7 @@
 				4B0606CA25F5CA08006DF0B0 /* test-unity-plugin-display-ios */,
 				4BDFC53D2600AB210087F728 /* test-unity-plugin-display-mac */,
 				4BE7B60A261104ED001F39F2 /* holokit-sdk-skeleton */,
+				4B6C94802614C2E300CBDFB4 /* holokit-sdk-skeleton-2 */,
 			);
 		};
 /* End PBXProject section */
@@ -1706,6 +1763,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"osx/x64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.sdk.inputsample/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/InputProviderSample.dylib\"\n\n";
+		};
+		4B6C948B2614C2E300CBDFB4 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios/arm64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.holokit.skeleton/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/Display/Build/Libraries/com.unity.xr.holokit.skeleton/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\n";
 		};
 		4BC2B98D26005A0B002D398A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1843,6 +1918,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B6C94812614C2E300CBDFB4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B6C94822614C2E300CBDFB4 /* LandmarkPosition.m in Sources */,
+				4B6C94BA2614C32300CBDFB4 /* display.mm in Sources */,
+				4B6C94C92614C32500CBDFB4 /* input.mm in Sources */,
+				4B6C94D82614C32700CBDFB4 /* main.mm in Sources */,
+				4B6C94E72614C32A00CBDFB4 /* math_helpers.mm in Sources */,
+				4B6C95222614C33500CBDFB4 /* ar_session.mm in Sources */,
+				4B6C95132614C33300CBDFB4 /* holokit_xr_unity.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4B6CC26225D42C2C0068CB66 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1874,6 +1963,7 @@
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
+				4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* main.mm in Sources */,
 			);
@@ -2304,6 +2394,48 @@
 			};
 			name = Release;
 		};
+		4B6C948D2614C2E300CBDFB4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4B6C948E2614C2E300CBDFB4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		4B6CC27F25D42C2D0068CB66 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2398,7 +2530,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2413,7 +2548,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party/unity_plugin_api";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3019,6 +3157,15 @@
 			buildConfigurations = (
 				4B38240C25E7491B00B39EEB /* Debug */,
 				4B38240D25E7491B00B39EEB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B6C948C2614C2E300CBDFB4 /* Build configuration list for PBXNativeTarget "holokit-sdk-skeleton-2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B6C948D2614C2E300CBDFB4 /* Debug */,
+				4B6C948E2614C2E300CBDFB4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
