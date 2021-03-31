@@ -311,7 +311,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
 {
     // SubmitFrame();
     //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_SubmitCurrentFrame()\n", getCurrentTime());
-    
+    //return kUnitySubsystemErrorCodeSuccess;
     id<MTLTexture> texture = metalInterface->CurrentRenderPassDescriptor().colorAttachments[0].texture;
     //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f current render pass texture width:%d, height:%d, pixelFormat:%d, texture type:%d, depth:%d, mipmapLevelCount:%d, sampleCount:%d, arrayLength:%d, resourceOptions:%d, cpuCacheMode:%d, storageMode:%d, hazardTrackingMode:%d, usage:%d, allowGPU:%d, swizzle:%d\n", getCurrentTime(), texture.width, texture.height, texture.pixelFormat, texture.textureType, texture.depth, texture.mipmapLevelCount, texture.sampleCount, texture.arrayLength, texture.resourceOptions, texture.cpuCacheMode, texture.storageMode, texture.hazardTrackingMode, texture.usage, texture.allowGPUOptimizedContents, texture.swizzle);
     if(arSessionDelegateController == nullptr) {
@@ -883,6 +883,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::UpdateDisplayState(UnityXRDispla
 
 UnitySubsystemErrorCode ExampleDisplayProvider::QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo* mirrorBlitInfo, UnityXRMirrorViewBlitDesc* blitDescriptor, ProviderContext& ctx)
 {
+    //return kUnitySubsystemErrorCodeSuccess;
     //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f QueryMirrorViewBlitDesc()\n", getCurrentTime());
     
     if (ctx.displayProvider->m_UnityTextures.size() == 0)
@@ -931,7 +932,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::QueryMirrorViewBlitDesc(const Un
     (*blitDescriptor).blitParams[0].srcRect = {sourceUV0.x, sourceUV0.y, sourceUV1.x - sourceUV0.x, sourceUV1.y - sourceUV0.y};
     (*blitDescriptor).blitParams[0].destRect = {destUV0.x, destUV0.y, destUV1.x - destUV0.x, destUV1.y - destUV0.y};
     
-    return kUnitySubsystemErrorCodeFailure;
+    //return kUnitySubsystemErrorCodeFailure;
     return kUnitySubsystemErrorCodeSuccess;
 }
 
