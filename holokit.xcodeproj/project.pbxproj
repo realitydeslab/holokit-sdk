@@ -32,6 +32,7 @@
 		4B6615A425F39FED00CC4E81 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6AD99125E343EB008F9911 /* MathHelper.m */; };
 		4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C84E825E3F19B00B04F03 /* MathHelper.m */; };
+		4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ar_session.mm */; };
 		4B6CC26A25D42C2C0068CB66 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26925D42C2C0068CB66 /* AppDelegate.m */; };
 		4B6CC26C25D42C2C0068CB66 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26B25D42C2C0068CB66 /* Shaders.metal */; };
 		4B6CC27025D42C2C0068CB66 /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26F25D42C2C0068CB66 /* Renderer.m */; };
@@ -323,6 +324,7 @@
 		4B6AD99B25E34404008F9911 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
 		4B6C84E825E3F19B00B04F03 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
 		4B6C84F225E3F1A700B04F03 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
+		4B6C941F261493E300CBDFB4 /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
 		4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-stereoscopic-rendering.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B6CC26825D42C2C0068CB66 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B6CC26925D42C2C0068CB66 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -768,6 +770,7 @@
 				4BE7B66A2611055A001F39F2 /* math_helpers.mm */,
 				4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.mm */,
 				4BE7B6C926117AE1001F39F2 /* holokit_xr_unity.h */,
+				4B6C941F261493E300CBDFB4 /* ar_session.mm */,
 			);
 			path = "holokit-sdk-skeleton";
 			sourceTree = "<group>";
@@ -1870,6 +1873,7 @@
 				4BE7B6CA26117AE1001F39F2 /* holokit_xr_unity.mm in Sources */,
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
+				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* main.mm in Sources */,
 			);

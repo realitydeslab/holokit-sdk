@@ -521,6 +521,10 @@ public:
             pose.position.x = s_PoseXPositionPerPass[pass];
         pose.position.z = -10.0f;
         pose.rotation.w = 1.0f;
+        
+        pose.rotation.x = 0.0f;
+        pose.rotation.y = 0.0f;
+        pose.rotation.z = 0.0f;
         return pose;
     }
     
