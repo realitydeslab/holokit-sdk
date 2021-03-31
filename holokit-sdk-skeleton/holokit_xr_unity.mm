@@ -148,13 +148,14 @@ UnityXRRectf HoloKitApi::GetViewportRect(int eye_index) {
 }
 
 UnityXRPose HoloKitApi::GetViewMatrix(int eye_index) {
-    //ARCamera* camera = ar_session_handler_.session.currentFrame.camera;
-    ARCamera* camera = ar_session_handler_.camera;
+    ARCamera* camera = ar_session_handler_.session.currentFrame.camera;
+    //ARCamera* camera = ar_session_handler_.camera;
     float ipd = kUserInterpupillaryDistance;
     
     simd_float3 offset = mrOffset_ + cameraOffset_;
+    //simd_float4x4 cameraTransform = camera.transform;
     simd_float4x4 cameraTransform = matrix_identity_float4x4;
-    LogMatrix4x4(cameraTransform);
+    //LogMatrix4x4(cameraTransform);
     simd_float4 translation_left = MatrixVectorMultiplication(cameraTransform, simd_make_float4(offset.x - ipd / 2, offset.y, offset.z, 1));
     simd_float4 translation_right = MatrixVectorMultiplication(cameraTransform, simd_make_float4(offset.x + ipd / 2, offset.y, offset.z, 1));
     simd_float4x4 cameraTransform_left = cameraTransform;

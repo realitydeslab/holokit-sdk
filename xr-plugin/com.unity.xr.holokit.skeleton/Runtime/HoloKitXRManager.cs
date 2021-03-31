@@ -206,7 +206,6 @@ namespace UnityEngine.XR.HoloKit
             {
                 Debug.Log("[LoadHoloKitXRSubsystem] xrSessionSubsystem sessionId=" + xrSessionSubsystem.sessionId + " xrSessionSubsystem.trackingState=" + xrSessionSubsystem.trackingState + " xrSessionSubsystem.nativePtr=" + xrSessionSubsystem.nativePtr);
                 Debug.Log("[LoadHoloKitXRSubsystem] Setup xrSessionSubsystem");
-                Debug.Log("fuck");
 #if UNITY_IOS
                 UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
                 Debug.Log("[HoloKitXRManager]: UnityHoloKit_SetARSession()");
@@ -266,9 +265,7 @@ namespace UnityEngine.XR.HoloKit
             Debug.Log("[OnBeforeSplashScreen] Start");
 
             //Debug.Log("xrManager loaders");
-            Debug.Log("++++++++++ before LoadHoloKitXRSubsystem()");
             LoadHoloKitXRSubsystem();
-            Debug.Log("++++++++++ after LoadHoloKitXRSubsystem()");
         }
  
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

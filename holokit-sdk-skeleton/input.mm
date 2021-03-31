@@ -21,6 +21,9 @@
                ##__VA_ARGS__)
 
 namespace{
+
+static int s_FrameCount = 0;
+
 class HoloKitInputProvider {
 public:
     HoloKitInputProvider(IUnityXRTrace* trace, IUnityXRInputInterface* input)
@@ -110,7 +113,7 @@ public:
         
         switch (device_id) {
             case kDeviceIdHoloKitHme: {
-                /*
+                
                 HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(), "<<<<<<<<<< connecting device HoloKitHme...");
                 input_->DeviceDefinition_SetName(definition, "HoloKit HMD");
                 input_->DeviceDefinition_SetCharacteristics(definition, kHmeCharacteristics);
@@ -122,7 +125,7 @@ public:
                     "Center Eye Rotation", kUnityXRInputFeatureTypeRotation,
                     kUnityXRInputFeatureUsageCenterEyeRotation);
                 // TODO: add more stuff
-                */
+                
                 break;
             }
             case kDeviceIdHoloKitHandLeft:
@@ -191,10 +194,18 @@ public:
                 simd_float4x4 camera_transform = ar_session_handler_.session.currentFrame.camera.transform;
                 //LogMatrix4x4(camera_transform);
                 UnityXRVector3 position = UnityXRVector3 { camera_transform.columns[3].x, camera_transform.columns[3].y, -camera_transform.columns[3].z };
-                position = UnityXRVector3 { 0, 0, -10 };
+                //position = UnityXRVector3 { 0, 0, -5 };
+                
+                s_FrameCount++;
+                UnityXRVector4 rotation = {0.0f, sin((float)s_FrameCount), 0.0f, 1.0f};
+                
+                simd_quatf quaternion = simd_quaternion(camera_transform);
                 // update head pose position and rotation
+                quaternion = simd_inverse(quaternion);
+                rotation = UnityXRVector4 {quaternion.vector.x, quaternion.vector.y, quaternion.vector.z, quaternion.vector.w};
+                //NSLog(@"position: %f, %f, %f", position.x, position.y, position.z);
                 input_->DeviceState_SetAxis3DValue(state, feature_index++, position);
-                input_->DeviceState_SetRotationValue(state, feature_index++, UnityXRVector4 { 0, 0, 0, 1 });
+                input_->DeviceState_SetRotationValue(state, feature_index++, rotation);
                 
                 break;
             }
