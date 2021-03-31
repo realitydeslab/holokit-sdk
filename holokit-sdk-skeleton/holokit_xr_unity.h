@@ -12,6 +12,7 @@
 #include "UnityXRTypes.h"
 #include <Metal/Metal.h>
 #include <MetalKit/MetalKit.h>
+#include "ar_session.mm"
 
 namespace holokit {
     
@@ -69,6 +70,8 @@ private:
     /// @brief Viewport rects only need to be computed once.
     void ComputeViewportRects();
     
+    simd_float4 MatrixVectorMultiplication(simd_float4x4 mat, simd_float4 vec);
+    
 private:
     // the only two optical parameters necessary for computing view matrices
     simd_float3 mrOffset_;
@@ -85,6 +88,8 @@ private:
     
     /// @brief Screen height in pixels. 
     int height_;
+    
+    ARSessionDelegateController* ar_session_handler_;
     
     //static std::unique_ptr<HoloKitApi> holokit_api_;
     

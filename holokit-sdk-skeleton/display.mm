@@ -476,10 +476,11 @@ public:
                 
                 auto& culling_pass = next_frame->cullingPasses[pass];
                 // TODO: culling pass seperation
-    
+                culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
+                
                 // set view and projection matrices
                 auto& render_params = render_pass.renderParams[0];
-                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = holokit_api_->GetViewMatrix(pass);
+                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = GetPose(pass);// holokit_api_->GetViewMatrix(pass);
                 //render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
                 //render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
                 
@@ -522,9 +523,9 @@ public:
         pose.position.z = -10.0f;
         pose.rotation.w = 1.0f;
         
-        pose.rotation.x = 0.0f;
-        pose.rotation.y = 0.0f;
-        pose.rotation.z = 0.0f;
+        //pose.rotation.x = 10.0f;
+        //pose.rotation.y = 0.0f;
+        //pose.rotation.z = 0.0f;
         return pose;
     }
     
@@ -617,12 +618,14 @@ public:
                 renderPass.cullingPassIndex = pass;
 
                 // Fill out render params. View, projection, viewport for pass.
-                auto& cullingPass = next_frame->cullingPasses[pass];
-                cullingPass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
+                auto& culling_pass = next_frame->cullingPasses[pass];
+                culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
 
-                auto& renderParams = renderPass.renderParams[0];
-                renderParams.deviceAnchorToEyePose = cullingPass.deviceAnchorToCullingPose = GetPose(pass);
-                renderParams.projection = cullingPass.projection = GetProjection(pass);
+                auto& render_params = renderPass.renderParams[0];
+                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = holokit_api_->GetViewMatrix(pass);
+                //renderParams.projection = cullingPass.projection = GetProjection(pass);
+                render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
+                render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
 
     #if !SIDE_BY_SIDE
                 // App has hinted that it would like to render to a smaller viewport.  Tell unity to render to that viewport.
@@ -632,12 +635,13 @@ public:
                 // Compositor_SetRenderSubRect(pass, renderParams.viewportRect);
     #else
                 // TODO: frameHints.appSetup.renderViewport
-                renderParams.viewportRect = {
-                    pass == 0 ? 0.0f : 0.5f, // x
-                    0.0f,                    // y
-                    0.5f,                    // width
-                    1.0f                     // height
-                };
+                render_params.viewportRect = holokit_api_->GetViewportRect(pass);
+                //renderParams.viewportRect = {
+                //    pass == 0 ? 0.0f : 0.5f, // x
+                //    0.0f,                    // y
+                //    0.5f,                    // width
+                //    1.0f                     // height
+                //};
     #endif
             }
         }

@@ -59,36 +59,6 @@
         self.frame = session.currentFrame;
         self.camera = session.currentFrame.camera;
     }
-    
-    
-//
-//    switch (format) {
-//        case kCVPixelFormatType_32BGRA:
-//          return GpuBufferFormat::kBGRA32;
-//        case kCVPixelFormatType_DepthFloat32:
-//          return GpuBufferFormat::kGrayFloat32;
-//        case kCVPixelFormatType_OneComponent16Half:
-//          return GpuBufferFormat::kGrayHalf16;
-//        case kCVPixelFormatType_OneComponent32Float:
-//          return GpuBufferFormat::kGrayFloat32;
-//        case kCVPixelFormatType_OneComponent8:
-//          return GpuBufferFormat::kOneComponent8;
-//        case kCVPixelFormatType_TwoComponent16Half:
-//          return GpuBufferFormat::kTwoComponentHalf16;
-//        case kCVPixelFormatType_TwoComponent32Float:
-//          return GpuBufferFormat::kTwoComponentFloat32;
-//        case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
-//          return GpuBufferFormat::kBiPlanar420YpCbCr8VideoRange;
-//        case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
-//          return GpuBufferFormat::kBiPlanar420YpCbCr8FullRange;
-//        case kCVPixelFormatType_24RGB:
-//          return GpuBufferFormat::kRGB24;
-//        case kCVPixelFormatType_64RGBAHalf:
-//          return GpuBufferFormat::kRGBAHalf64;
-//        case kCVPixelFormatType_128RGBAFloat:
-//          return GpuBufferFormat::kRGBAFloat128;
-//      }
-    
 }
 @end
 
