@@ -202,7 +202,8 @@ static const float kMaxLandmarkDistance = 0.8f;
             size_t depthBufferWidth;
             size_t depthBufferHeight;
             Float32* depthBufferBaseAddress;
-            ARDepthData* sceneDepth = self.frame.sceneDepth;
+            //ARDepthData* sceneDepth = self.frame.sceneDepth;
+            ARDepthData* sceneDepth = self.session.currentFrame.sceneDepth;
             if(!sceneDepth) {
                 NSLog(@"ViewController");
                 NSLog(@"Failed to acquire scene depth.");

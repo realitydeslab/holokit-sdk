@@ -258,12 +258,7 @@ public:
     // TODO: delete this
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame()
     {
-        // SubmitFrame();
-        //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f GfxThread_SubmitCurrentFrame()\n", getCurrentTime());
-        //return kUnitySubsystemErrorCodeSuccess;
-        //id<MTLTexture> texture = metal_interface_->CurrentRenderPassDescriptor().colorAttachments[0].texture;
-        //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f current render pass texture width:%d, height:%d, pixelFormat:%d, texture type:%d, depth:%d, mipmapLevelCount:%d, sampleCount:%d, arrayLength:%d, resourceOptions:%d, cpuCacheMode:%d, storageMode:%d, hazardTrackingMode:%d, usage:%d, allowGPU:%d, swizzle:%d\n", getCurrentTime(), texture.width, texture.height, texture.pixelFormat, texture.textureType, texture.depth, texture.mipmapLevelCount, texture.sampleCount, texture.arrayLength, texture.resourceOptions, texture.cpuCacheMode, texture.storageMode, texture.hazardTrackingMode, texture.usage, texture.allowGPUOptimizedContents, texture.swizzle);
-        
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
         if(textures_initialized_ == NO) {
             return kUnitySubsystemErrorCodeSuccess;
@@ -329,41 +324,6 @@ public:
         [cmd setFragmentTexture:metal_textures_[0] atIndex:0];
         [cmd setFragmentTexture:metal_textures_[0] atIndex:1];
         [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
-        
-        /*
-        // draw the texture onto the screen
-        MTLRenderPipelineDescriptor* pipelineDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
-        pipelineDescriptor.sampleCount = 1;
-        pipelineDescriptor.colorAttachments[0].pixelFormat = texture.pixelFormat;
-        pipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatInvalid;
-        //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
-        id<MTLLibrary> lib = [mtlDevice newLibraryWithSource:texShader options:nil error:nil];
-        pipelineDescriptor.vertexFunction = [lib newFunctionWithName:@"mapTexture"];
-        pipelineDescriptor.fragmentFunction = [lib newFunctionWithName:@"displayTexture"];
-        id<MTLRenderPipelineState> pipelineState = [mtlDevice newRenderPipelineStateWithDescriptor:pipelineDescriptor error:nil];
-        
-        //id<MTLCommandBuffer> commandBuffer = metalInterface->CurrentCommandBuffer();
-        //MTLRenderPassDescriptor* rd = metalInterface->CurrentRenderPassDescriptor();
-        //id<MTLRenderCommandEncoder> commandEncoder = [commandBuffer renderCommandEncoderWithDescriptor:rd];
-        //[commandEncoder setRenderPipelineState:pipelineState];
-        //[commandEncoder setFragmentTexture:texture atIndex:0];
-        //[commandEncoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4 instanceCount:1];
-        
-        id<MTLRenderCommandEncoder> commandEncoder = (id<MTLRenderCommandEncoder>)metalInterface->CurrentCommandEncoder();
-        [commandEncoder setRenderPipelineState:pipelineState];
-        [commandEncoder setFragmentTexture:spaceTexture atIndex:0];
-        [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4 instanceCount:1];
-        */
-        
-        //UnityXRRenderTextureDesc unityTextureDesc;
-        //memset(&unityTextureDesc, 0, sizeof(UnityXRRenderTextureDesc));
-        
-        //UnitySubsystemErrorCode res = m_Ctx.display->QueryTextureDesc(m_Handle, m_UnityTextures[0], &unityTextureDesc);
-        //if(res != kUnitySubsystemErrorCodeSuccess) {
-        //    XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f Failed to query unity texture\n", getCurrentTime());
-        //}
-        //m_NativeTextures[0] = unityTextureDesc.color.nativePtr;
-        //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f Got native texture pointer %x\n", getCurrentTime(), unityTextureDesc.color.nativePtr);
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -485,7 +445,7 @@ public:
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame)
     {
         
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
         WORKAROUND_SKIP_FIRST_FRAME();
 
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
@@ -564,6 +524,7 @@ public:
 
                 auto& render_params = renderPass.renderParams[0];
                 render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = holokit_api_->GetViewMatrix(pass);
+                //render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = GetPose(pass);
                 //renderParams.projection = cullingPass.projection = GetProjection(pass);
                 render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
                 render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
@@ -607,8 +568,8 @@ public:
     }
     
     UnitySubsystemErrorCode QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f QueryMirrorViewBlitDesc()", GetCurrentTime());
-        
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f QueryMirrorViewBlitDesc()", GetCurrentTime());
+        return kUnitySubsystemErrorCodeFailure;
         // TODO: fill this
         if (unity_textures_.size() == 0)
         {

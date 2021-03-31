@@ -110,6 +110,7 @@ public:
         
         switch (device_id) {
             case kDeviceIdHoloKitHme: {
+                /*
                 HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(), "<<<<<<<<<< connecting device HoloKitHme...");
                 input_->DeviceDefinition_SetName(definition, "HoloKit HMD");
                 input_->DeviceDefinition_SetCharacteristics(definition, kHmeCharacteristics);
@@ -121,7 +122,7 @@ public:
                     "Center Eye Rotation", kUnityXRInputFeatureTypeRotation,
                     kUnityXRInputFeatureUsageCenterEyeRotation);
                 // TODO: add more stuff
-                
+                */
                 break;
             }
             case kDeviceIdHoloKitHandLeft:

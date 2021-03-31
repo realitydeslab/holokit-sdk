@@ -30,7 +30,6 @@ UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
     }
     HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "HoloKit display subsystem successfully loaded.");
     
-    
     if (LoadInput(unity_interfaces) != kUnitySubsystemErrorCodeSuccess) {
         HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "Error loading HoloKit input subsystem.");
             return;

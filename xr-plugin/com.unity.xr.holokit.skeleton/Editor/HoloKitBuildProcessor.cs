@@ -1,5 +1,5 @@
 #if UNITY_IOS
-/*
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -100,12 +100,12 @@ namespace UnityEditor.XR.HoloKit
                 proj.SetBuildProperty(mainTargetGuid, "ENABLE_BITCODE", "NO");
                 proj.SetBuildProperty(unityFrameworkTargetGuid, "ENABLE_BITCODE", "NO");
 
-               // string framework = "com.unity.xr.holokit/Runtime/ios/arm64/HandTracker.framework";
-               // string fileGuid = proj.AddFile(framework, "Frameworks/" + framework, PBXSourceTree.Source);
+                string framework = "com.unity.xr.holokit.skeleton/Runtime/ios/arm64/HandTracker.framework";
+                string fileGuid = proj.AddFile(framework, "Frameworks/" + framework, PBXSourceTree.Source);
            
-           //     PBXProjectExtensions.AddFileToEmbedFrameworks(proj, mainTargetGuid, fileGuid);
-                // proj.SetBuildProperty(unityFrameworkTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
-                // proj.SetBuildProperty(mainTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
+                PBXProjectExtensions.AddFileToEmbedFrameworks(proj, mainTargetGuid, fileGuid);
+                proj.SetBuildProperty(unityFrameworkTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
+                proj.SetBuildProperty(mainTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
 
                 proj.WriteToFile(projPath);
             }
@@ -114,5 +114,5 @@ namespace UnityEditor.XR.HoloKit
 
     }
 }
-*/
+
 #endif
