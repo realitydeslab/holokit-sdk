@@ -166,13 +166,13 @@ UnityXRPose HoloKitApi::GetViewMatrix(int eye_index) {
     simd_float4x4 rightViewMatrix = simd_inverse(cameraTransform_right);
     
     // left eye
-    UnityXRVector3 left_position = UnityXRVector3 { offset.x - ipd / 2, offset.y, offset.z };
+    UnityXRVector3 left_position = UnityXRVector3 { offset.x - ipd / 2, offset.y, -offset.z };
     simd_quatf leftQuaternion = simd_quaternion(cameraTransform);
     UnityXRVector4 left_rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
     left_rotation = UnityXRVector4 { 0, 0, 0, 1 };
     
     // right eye
-    UnityXRVector3 right_position = UnityXRVector3 { offset.x + ipd / 2, offset.y, offset.z };
+    UnityXRVector3 right_position = UnityXRVector3 { offset.x + ipd / 2, offset.y, -offset.z };
     UnityXRVector4 right_rotation = UnityXRVector4 { leftQuaternion.vector.x, leftQuaternion.vector.y, leftQuaternion.vector.z, leftQuaternion.vector.w };
     right_rotation = UnityXRVector4 { 0, 0, 0, 1 };
     
