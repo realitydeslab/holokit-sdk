@@ -100,8 +100,8 @@ const uint16_t idata[] = {0, 1, 2, 2, 3, 0};
 
 // widgets data
 const float vertex_data[] = {
-            0.0, 0.0, 0.0, 1.0,
-            0.0, 0.2, 0.0, 1.0
+    0.829760, 1, 0.0, 1.0,
+    0.829760, 0.2, 0.0, 1.0
 };
 
 NSString* myShader = @

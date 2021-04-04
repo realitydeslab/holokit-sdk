@@ -6,6 +6,7 @@
 //
 
 #include "holokit_xr_unity.h"
+#include <sys/utsname.h>
 
 const float kUserInterpupillaryDistance = 0.064;
 
@@ -17,6 +18,13 @@ void HoloKitApi::Initialize() {
     // TODO: do this more elegantly
     width_ = 2778;
     height_ = 1284;
+    
+    // Retrive device model
+    // see: https://stackoverflow.com/questions/9617301/how-to-print-out-string-constant-with-nslog-on-ios
+    struct utsname system_info;
+    uname(&system_info);
+    NSString* device_name = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
+    NSLog(@"device name %@", device_name);
     
     InitOpticalParameters();
     
