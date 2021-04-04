@@ -99,100 +99,9 @@ const float vdata[] = {
 const uint16_t idata[] = {0, 1, 2, 2, 3, 0};
 
 // widgets data
-/*
-const float vertex_data[] = {
-            // Internal Triangles
-            0.0, 0.0, 0.0, 1.0,
-            -0.2, 0.2, 0.0, 1.0,
-            0.2, 0.2, 0.0, 1.0,
-            
-            0.0, 0.0, 0.0, 1.0,
-            0.2, 0.2, 0.0, 1.0,
-            0.3, 0.0, 0.0, 1.0,
-            
-            0.0, 0.0, 0.0, 1.0,
-            0.3, 0.0, 0.0, 1.0,
-            0.0, -0.2, 0.0, 1.0,
-            
-            0.0, 0.0, 0.0, 1.0,
-            0.0, -0.2, 0.0, 1.0,
-            -0.3, 0.0, 0.0, 1.0,
-            
-            0.0, 0.0, 0.0, 1.0,
-            -0.3, 0.0, 0.0, 1.0,
-            -0.2, 0.2, 0.0, 1.0,
-            
-            // External Triangles
-            0.0, 0.6, 0.0, 1.0,
-            -0.2, 0.2, 0.0, 1.0,
-            0.2, 0.2, 0.0, 1.0,
-            
-            0.6, 0.2, 0.0, 1.0,
-            0.2, 0.2, 0.0, 1.0,
-            0.3, 0.0, 0.0, 1.0,
-            
-            0.6, -0.4, 0.0, 1.0,
-            0.0, -0.2, 0.0, 1.0,
-            0.3, 0.0, 0.0, 1.0,
-            
-            -0.6, -0.4, 0.0, 1.0,
-            0.0, -0.2, 0.0, 1.0,
-            -0.3, 0.0, 0.0, 1.0,
-            
-            -0.6, 0.2, 0.0, 1.0,
-            -0.2, 0.2, 0.0, 1.0,
-            -0.3, 0.0, 0.0, 1.0
-};
-*/
-
 const float vertex_data[] = {
             0.0, 0.0, 0.0, 1.0,
             0.0, 0.2, 0.0, 1.0
-};
-
-
-const float vertex_color_data[] = {
-            // Internal Triangles
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            // External Triangles
-            1.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            1.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            1.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            1.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            
-            1.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0
 };
 
 NSString* myShader = @
@@ -204,12 +113,10 @@ NSString* myShader = @
 "    float4  color;\n"
 "};\n"
 "vertex VertexInOut passThroughVertex(uint vid [[ vertex_id ]],\n"
-"                                     constant packed_float4* position  [[ buffer(0) ]],\n"
-"                                     constant packed_float4* color    [[ buffer(1) ]])\n"
+"                                     constant packed_float4* position  [[ buffer(0) ]])\n"
 "{\n"
 "    VertexInOut outVertex;\n"
 "    outVertex.position = position[vid];\n"
-"    outVertex.color    = color[vid];\n"
 "    return outVertex;\n"
 "};\n"
 "fragment half4 passThroughFragment(VertexInOut inFrag [[stage_in]])\n"
@@ -288,6 +195,7 @@ public:
     
     UnitySubsystemErrorCode Start() const {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
+        
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -309,73 +217,6 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
     
-    /*
-    UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
-        // TODO: should we get native textures here?
-        if(!textures_initialized_) {
-            return kUnitySubsystemErrorCodeSuccess;
-        }
-        
-        if (!native_textures_got_) {
-            // Query left eye texture
-            UnityXRRenderTextureDesc unity_texture_desc;
-            memset(&unity_texture_desc, 0, sizeof(UnityXRRenderTextureDesc));
-            UnitySubsystemErrorCode query_result = display_->QueryTextureDesc(handle_, unity_textures_[0], &unity_texture_desc);
-            if (query_result == kUnitySubsystemErrorCodeSuccess) {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
-                NSLog(@"native texture pointer id: %d", unity_texture_desc.color.nativePtr);
-            } else {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
-            }
-            native_textures_[0] = unity_texture_desc.color.nativePtr;
-            metal_textures_[0] = (__bridge id<MTLTexture>)native_textures_[0];
-            
-            // TODO: query the right eye texture when SIDE_BY_SIDE = 0
-            native_textures_got_ = true;
-        }
-        
-        id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:shaderStr options:nil error:nil];
-        id<MTLFunction> vertex_function = [lib newFunctionWithName:@"vprog"];
-        id<MTLFunction> fragment_function = [lib newFunctionWithName:@"fshader_tex"];
-        MTLVertexDescriptor* g_VertexDesc;
-        MTLVertexBufferLayoutDescriptor* streamDesc = [[mtl_bundle_ classNamed:@"MTLVertexBufferLayoutDescriptor"] new];
-        streamDesc.stride = 4 * sizeof(float);
-        streamDesc.stepFunction = MTLVertexStepFunctionPerVertex;
-        streamDesc.stepRate = 1;
-        MTLVertexAttributeDescriptor* attrDesc = [[mtl_bundle_ classNamed:@"MTLVertexAttributeDescriptor"] new];
-        attrDesc.format = MTLVertexFormatFloat4;
-        g_VertexDesc = [[mtl_bundle_ classNamed:@"MTLVertexDescriptor"] vertexDescriptor];
-        g_VertexDesc.attributes[0] = attrDesc;
-        g_VertexDesc.layouts[0] = streamDesc;
-        
-        MTLRenderPipelineDescriptor* pipeDesc = [[mtl_bundle_ classNamed:@"MTLRenderPipelineDescriptor"] new];
-
-        MTLRenderPipelineColorAttachmentDescriptor* colorDesc = [[mtl_bundle_ classNamed:@"MTLRenderPipelineColorAttachmentDescriptor"] new];
-        colorDesc.pixelFormat = MTLPixelFormatBGRA8Unorm;
-        pipeDesc.colorAttachments[0] = colorDesc;
-
-        //pipeDesc.fragmentFunction = g_FShaderColor;
-        pipeDesc.fragmentFunction = fragment_function;
-        pipeDesc.vertexFunction = vertex_function;
-        pipeDesc.vertexDescriptor = g_VertexDesc;
-        pipeDesc.sampleCount = 1;
-        id<MTLRenderPipelineState> g_ExtraDrawCallPipe = [mtl_device_ newRenderPipelineStateWithDescriptor:pipeDesc error:nil];
-        
-        id<MTLRenderCommandEncoder> cmd = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [cmd setRenderPipelineState:g_ExtraDrawCallPipe];
-        [cmd setCullMode:MTLCullModeNone];
-        static id<MTLBuffer> g_VB, g_IB;
-        g_VB = [mtl_device_ newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
-        g_IB = [mtl_device_ newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
-        [cmd setVertexBuffer:g_VB offset:0 atIndex:0];
-        [cmd setFragmentTexture:metal_textures_[0] atIndex:0];
-        [cmd setFragmentTexture:metal_textures_[0] atIndex:1];
-        [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
-        
-        return kUnitySubsystemErrorCodeSuccess;
-    }
-    */
     // TODO: delete this
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame()
     {
@@ -448,15 +289,15 @@ public:
         [render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:index_buffer indexBufferOffset:0];
         
         RenderWidgets();
-        
+        NSLog(@"horizontal alignment offset: %f", holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset());
         return kUnitySubsystemErrorCodeSuccess;
     }
     
     void RenderWidgets() {
         id<MTLBuffer> vertex_buffer = [mtl_device_ newBufferWithBytes:vertex_data length:sizeof(vertex_data) options:MTLResourceOptionCPUCacheModeDefault];
         vertex_buffer.label = @"vertices";
-        id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
-        vertex_color_buffer.label = @"colors";
+        //id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
+        //vertex_color_buffer.label = @"colors";
         
         id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:myShader options:nil error:nil];
         id<MTLFunction> vertex_function = [lib newFunctionWithName:@"passThroughVertex"];
@@ -472,125 +313,11 @@ public:
         id<MTLRenderCommandEncoder> command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
         [command_encoder setRenderPipelineState:pipeline_state];
         [command_encoder setVertexBuffer:vertex_buffer offset:0 atIndex:0];
-        [command_encoder setVertexBuffer:vertex_color_buffer offset:0 atIndex:1];
+        //[command_encoder setVertexBuffer:vertex_color_buffer offset:0 atIndex:1];
         [command_encoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:(sizeof(vertex_data) / sizeof(float))];
         //NSLog(@"draw call");
     }
     
-    /*
-    UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
-        WORKAROUND_SKIP_FIRST_FRAME();
-        
-        // Allocate new textures if needed
-        if((frame_hints->changedFlags & kUnityXRFrameSetupHintsChangedTextureResolutionScale) != 0 || (frame_hints->changedFlags & kUnityXRFrameSetupHintsChangedSinglePassRendering) != 0 || !is_initialized_) {
-            // TODO: reset HoloKitApi
-            
-            // Deallocate old textures
-            DestroyTextures();
-            
-            // Create new textures
-#if SIDE_BY_SIDE
-            int num_textures = 1;
-            int texture_array_length = 0;
-#else
-            int num_textures = 2;
-            // TODO: for single pass rendering, it seems that this should be 2
-            int texture_array_length = 0;
-#endif
-            CreateTextures(num_textures, texture_array_length, frame_hints->appSetup.textureResolutionScale);
-        }
-        
-        // use multi-pass rendering or single-pass rendering?
-        if (!frame_hints->appSetup.singlePassRendering) {
-            // multi-pass rendering
-            next_frame->renderPassesCount = 2;
-            
-            for (int pass = 0; pass < next_frame->renderPassesCount; pass++){
-                // get a reference of the current render pass
-                auto& render_pass = next_frame->renderPasses[pass];
-                
-#if SIDE_BY_SIDE
-                // for both passes, we render the content to a single texture
-                // through two different viewports
-                render_pass.textureId = unity_textures_[0];
-#else
-                // each pass renders to a separate texture
-                render_pass.textureId = unity_textures_[pass];
-#endif
-                
-                render_pass.renderParamsCount = 1;
-                
-                // we can also share the culling pass between two render passes
-                render_pass.cullingPassIndex = pass;
-                
-                auto& culling_pass = next_frame->cullingPasses[pass];
-                // TODO: culling pass seperation
-                culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
-                
-                // set view and projection matrices
-                auto& render_params = render_pass.renderParams[0];
-                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = GetPose(pass);// holokit_api_->GetViewMatrix(pass);
-                //render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-                //render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
-                
-                // test
-                UnityXRProjection ret;
-                ret.type = kUnityXRProjectionTypeHalfAngles;
-                ret.data.halfAngles.left = -1.0;
-                ret.data.halfAngles.right = 1.0;
-                ret.data.halfAngles.top = 0.625;
-                ret.data.halfAngles.bottom = -0.625;
-                render_params.projection = culling_pass.projection = ret;
-                
-#if SIDE_BY_SIDE
-                render_params.viewportRect = {
-                    pass == 0 ? 0.0f : 0.5f, // x
-                    0.0f,                    // y
-                    0.5f,                    // width
-                    1.0f                     // height
-                };
-                //render_params.viewportRect = holokit_api_->GetViewportRect(pass);
-                
-#else
-                // TODO: fill this
-#endif
-            }
-        } else {
-            // single-pass rendering
-            // TODO: fill this
-        }
-        
-        return kUnitySubsystemErrorCodeSuccess;
-    }
-    */
-    
-    UnityXRPose GetPose(int pass)
-    {
-        UnityXRPose pose{};
-        if (pass < (sizeof(s_PoseXPositionPerPass) / sizeof(s_PoseXPositionPerPass[0])))
-            pose.position.x = s_PoseXPositionPerPass[pass];
-        //pose.position.z = -10.0f;
-        pose.rotation.w = 1.0f;
-        
-        //pose.rotation.x = 10.0f;
-        //pose.rotation.y = 0.0f;
-        //pose.rotation.z = 0.0f;
-        return pose;
-    }
-    
-    UnityXRProjection GetProjection(int pass)
-    {
-        UnityXRProjection ret;
-        ret.type = kUnityXRProjectionTypeHalfAngles;
-        ret.data.halfAngles.left = -1.0;
-        ret.data.halfAngles.right = 1.0;
-        ret.data.halfAngles.top = 0.625;
-        ret.data.halfAngles.bottom = -0.625;
-        return ret;
-    }
-    
-    // TODO: delete this
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame)
     {
         
@@ -672,9 +399,9 @@ public:
                 culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
 
                 auto& render_params = renderPass.renderParams[0];
-                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = EyePositionToUnityXRPose(holokit_api_->GetEyePosition(pass));
+                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
                 render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit_api_->GetProjectionMatrix(pass));
+                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
 
     #if !SIDE_BY_SIDE
                 // App has hinted that it would like to render to a smaller viewport.  Tell unity to render to that viewport.
@@ -684,7 +411,7 @@ public:
                 // Compositor_SetRenderSubRect(pass, renderParams.viewportRect);
     #else
                 // TODO: frameHints.appSetup.renderViewport
-                render_params.viewportRect = Float4ToUnityXRRect(holokit_api_->GetViewportRect(pass));
+                render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
                 //renderParams.viewportRect = {
                 //    pass == 0 ? 0.0f : 0.5f, // x
                 //    0.0f,                    // y
@@ -777,10 +504,10 @@ private:
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f CreateTextures()", GetCurrentTime());
         
         // initialize or reset holokit_api_
-        holokit_api_.reset(new holokit::HoloKitApi);
-        holokit_api_->Initialize();
-        NSLog(@"holokit_api_ initialization succeeded!!@!!!!");
-        is_initialized_ = true;
+        //holokit_api_.reset(new holokit::HoloKitApi);
+        //holokit_api_->Initialize();
+        //NSLog(@"holokit_api_ initialization succeeded!!@!!!!");
+        //is_initialized_ = true;
         
         // TODO: improve this
         const int tex_width = 2778;//(int)(2778.0f * requested_texture_scale);
@@ -812,46 +539,6 @@ private:
         }
         textures_initialized_ = true;
     }
-    
-    /*
-    void CreateTextures(int numTextures, int textureArrayLength, float requestedTextureScale)
-    {
-        //XR_TRACE_LOG(m_Ctx.trace, "<<<<<<<<<< %f CreateTextures()\n", getCurrentTime());
-        
-        const int texWidth = 2778; //(int)(1920.0f * requestedTextureScale * (SIDE_BY_SIDE ? 2.0f : 1.0f));
-        const int texHeight = 1284; //(int)(1200.0f * requestedTextureScale);
-        //const int texWidth = (int)(1920.0f * requestedTextureScale * (SIDE_BY_SIDE ? 2.0f : 1.0f));
-        //const int texHeight = (int)(1200.0f * requestedTextureScale);
-        
-        native_textures_.resize(numTextures);
-        unity_textures_.resize(numTextures);
-        metal_textures_.resize(numTextures);
-
-        // Tell unity about the native textures, getting back UnityXRRenderTextureIds.
-        for (int i = 0; i < numTextures; ++i)
-        {
-            UnityXRRenderTextureDesc uDesc;
-            memset(&uDesc, 0 , sizeof(UnityXRRenderTextureDesc));
-            
-            uDesc.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
-            uDesc.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
-            uDesc.depthFormat = kUnityXRDepthTextureFormat24bitOrGreater;
-            //NSLog(@"@", uDesc.color.nativePtr);
-            //NSLog(@"--------------------------------------");
-                
-            uDesc.width = texWidth;
-            uDesc.height = texHeight;
-            uDesc.textureArrayLength = textureArrayLength;
-
-            // Create an UnityXRRenderTextureId for the native texture so we can tell unity to render to it later.
-            UnityXRRenderTextureId uTexId;
-            display_->CreateTexture(handle_, &uDesc, &uTexId);
-            unity_textures_[i] = uTexId;
-        }
-        textures_initialized_ = true;
-    }
-    */
-    //TODO: delete this
     
     /// @brief Deallocate textures.
     void DestroyTextures() {

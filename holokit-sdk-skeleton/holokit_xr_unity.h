@@ -51,6 +51,8 @@ typedef struct HoloKitModel {
 class HoloKitApi {
 public:
     
+    HoloKitApi() {};
+    
     void Initialize();
     
     simd_float3 GetEyePosition(int eye_index);
@@ -59,7 +61,9 @@ public:
     
     simd_float4 GetViewportRect(int eye_index);
     
-    //static std::unique_ptr<HoloKitApi>& GetInstance();
+    float GetHorizontalAlignmentMarkerOffset() { return horizontal_alignment_marker_offset_; }
+    
+    static std::unique_ptr<HoloKitApi>& GetInstance();
     
 private:
     PhoneModel InitPhoneModel();
@@ -87,16 +91,18 @@ private:
     /// @brief Screen height in pixels. 
     int height_;
     
+    float horizontal_alignment_marker_offset_;
+    
     ARSessionDelegateController* ar_session_handler_;
     
-    //static std::unique_ptr<HoloKitApi> holokit_api_;
+    static std::unique_ptr<HoloKitApi> holokit_api_;
     
 }; // class HoloKitApi
 
-//std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;
+std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;
 
-//std::unique_ptr<HoloKitApi>& HoloKitApi::GetInstance() {
-//    return holokit_api_;
-//}
+std::unique_ptr<HoloKitApi>& HoloKitApi::GetInstance() {
+    return holokit_api_;
+}
 
 } // namespace holokit
