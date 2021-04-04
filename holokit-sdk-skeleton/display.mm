@@ -88,6 +88,7 @@ NSString* shaderStr = @
         "    return out;\n"
         "}\n";
 
+// position + texture coordinate
 const float vdata[] = {
         -1.0f,  1.0f, 0.0f, 0.0f,
         -1.0f, -1.0f, 0.0f, 1.0f,
@@ -96,6 +97,126 @@ const float vdata[] = {
     };
 
 const uint16_t idata[] = {0, 1, 2, 2, 3, 0};
+
+// widgets data
+/*
+const float vertex_data[] = {
+            // Internal Triangles
+            0.0, 0.0, 0.0, 1.0,
+            -0.2, 0.2, 0.0, 1.0,
+            0.2, 0.2, 0.0, 1.0,
+            
+            0.0, 0.0, 0.0, 1.0,
+            0.2, 0.2, 0.0, 1.0,
+            0.3, 0.0, 0.0, 1.0,
+            
+            0.0, 0.0, 0.0, 1.0,
+            0.3, 0.0, 0.0, 1.0,
+            0.0, -0.2, 0.0, 1.0,
+            
+            0.0, 0.0, 0.0, 1.0,
+            0.0, -0.2, 0.0, 1.0,
+            -0.3, 0.0, 0.0, 1.0,
+            
+            0.0, 0.0, 0.0, 1.0,
+            -0.3, 0.0, 0.0, 1.0,
+            -0.2, 0.2, 0.0, 1.0,
+            
+            // External Triangles
+            0.0, 0.6, 0.0, 1.0,
+            -0.2, 0.2, 0.0, 1.0,
+            0.2, 0.2, 0.0, 1.0,
+            
+            0.6, 0.2, 0.0, 1.0,
+            0.2, 0.2, 0.0, 1.0,
+            0.3, 0.0, 0.0, 1.0,
+            
+            0.6, -0.4, 0.0, 1.0,
+            0.0, -0.2, 0.0, 1.0,
+            0.3, 0.0, 0.0, 1.0,
+            
+            -0.6, -0.4, 0.0, 1.0,
+            0.0, -0.2, 0.0, 1.0,
+            -0.3, 0.0, 0.0, 1.0,
+            
+            -0.6, 0.2, 0.0, 1.0,
+            -0.2, 0.2, 0.0, 1.0,
+            -0.3, 0.0, 0.0, 1.0
+};
+*/
+
+const float vertex_data[] = {
+            0.0, 0.0, 0.0, 1.0,
+            0.0, 0.2, 0.0, 1.0
+};
+
+
+const float vertex_color_data[] = {
+            // Internal Triangles
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            // External Triangles
+            1.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            1.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            1.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            1.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            
+            1.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0
+};
+
+NSString* myShader = @
+"#include <metal_stdlib>\n"
+"using namespace metal;\n"
+"struct VertexInOut\n"
+"{\n"
+"    float4  position [[position]];\n"
+"    float4  color;\n"
+"};\n"
+"vertex VertexInOut passThroughVertex(uint vid [[ vertex_id ]],\n"
+"                                     constant packed_float4* position  [[ buffer(0) ]],\n"
+"                                     constant packed_float4* color    [[ buffer(1) ]])\n"
+"{\n"
+"    VertexInOut outVertex;\n"
+"    outVertex.position = position[vid];\n"
+"    outVertex.color    = color[vid];\n"
+"    return outVertex;\n"
+"};\n"
+"fragment half4 passThroughFragment(VertexInOut inFrag [[stage_in]])\n"
+"{\n"
+"//  return half4(1, 0, 0, 1);\n"
+"    return half4(1, 1, 1, 1);\n"
+"};\n";
 
 namespace {
 class HoloKitDisplayProvider {
@@ -282,50 +403,78 @@ public:
         }
         
         // do an extral draw call
-        //MTLPixelFormat extraDrawCallPixelFormat = texture.pixelFormat;
-        //NSUInteger extraDrawCallSampleCount = texture.sampleCount;
+        id<MTLBuffer> vertex_buffer = [mtl_device_ newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
+        id<MTLBuffer> index_buffer = [mtl_device_ newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
+        
         id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:shaderStr options:nil error:nil];
         //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
-        id<MTLFunction> g_VProg = [lib newFunctionWithName:@"vprog"];
-        id<MTLFunction> g_FShaderColor = [lib newFunctionWithName:@"fshader_color"];
-        id<MTLFunction> g_FShaderTexture = [lib newFunctionWithName:@"fshader_tex"];
-        NSBundle* mtlBundle = metal_interface_->MetalBundle();
-        MTLVertexDescriptor* g_VertexDesc;
-        MTLVertexBufferLayoutDescriptor* streamDesc = [[mtlBundle classNamed:@"MTLVertexBufferLayoutDescriptor"] new];
-        streamDesc.stride = 4 * sizeof(float);
-        streamDesc.stepFunction = MTLVertexStepFunctionPerVertex;
-        streamDesc.stepRate = 1;
-        MTLVertexAttributeDescriptor* attrDesc = [[mtlBundle classNamed:@"MTLVertexAttributeDescriptor"] new];
-        attrDesc.format = MTLVertexFormatFloat4;
-        g_VertexDesc = [[mtlBundle classNamed:@"MTLVertexDescriptor"] vertexDescriptor];
-        g_VertexDesc.attributes[0] = attrDesc;
-        g_VertexDesc.layouts[0] = streamDesc;
+        id<MTLFunction> vertex_function = [lib newFunctionWithName:@"vprog"];
+        id<MTLFunction> fragment_function = [lib newFunctionWithName:@"fshader_tex"];
         
-        MTLRenderPipelineDescriptor* pipeDesc = [[mtlBundle classNamed:@"MTLRenderPipelineDescriptor"] new];
+        NSBundle* mtl_bundle = metal_interface_->MetalBundle();
+        
+        MTLVertexBufferLayoutDescriptor* buffer_layout_descriptor = [[mtl_bundle classNamed:@"MTLVertexBufferLayoutDescriptor"] new];
+        buffer_layout_descriptor.stride = 4 * sizeof(float);
+        buffer_layout_descriptor.stepFunction = MTLVertexStepFunctionPerVertex;
+        buffer_layout_descriptor.stepRate = 1;
+        
+        MTLVertexAttributeDescriptor* attribute_descriptor = [[mtl_bundle classNamed:@"MTLVertexAttributeDescriptor"] new];
+        attribute_descriptor.format = MTLVertexFormatFloat4;
+        
+        MTLVertexDescriptor* vertex_descriptor = [[mtl_bundle classNamed:@"MTLVertexDescriptor"] vertexDescriptor];
+        vertex_descriptor.attributes[0] = attribute_descriptor;
+        vertex_descriptor.layouts[0] = buffer_layout_descriptor;
+        
+        MTLRenderPipelineDescriptor* render_pipeline_descriptor = [[mtl_bundle classNamed:@"MTLRenderPipelineDescriptor"] new];
 
-        MTLRenderPipelineColorAttachmentDescriptor* colorDesc = [[mtlBundle classNamed:@"MTLRenderPipelineColorAttachmentDescriptor"] new];
-        colorDesc.pixelFormat = MTLPixelFormatBGRA8Unorm;
-        pipeDesc.colorAttachments[0] = colorDesc;
+        MTLRenderPipelineColorAttachmentDescriptor* color_attachment_descriptor = [[mtl_bundle classNamed:@"MTLRenderPipelineColorAttachmentDescriptor"] new];
+        color_attachment_descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
+        render_pipeline_descriptor.colorAttachments[0] = color_attachment_descriptor;
 
         //pipeDesc.fragmentFunction = g_FShaderColor;
-        pipeDesc.fragmentFunction = g_FShaderTexture;
-        pipeDesc.vertexFunction = g_VProg;
-        pipeDesc.vertexDescriptor = g_VertexDesc;
-        pipeDesc.sampleCount = 1;
-        id<MTLRenderPipelineState> g_ExtraDrawCallPipe = [mtl_device_ newRenderPipelineStateWithDescriptor:pipeDesc error:nil];
+        render_pipeline_descriptor.fragmentFunction = fragment_function;
+        render_pipeline_descriptor.vertexFunction = vertex_function;
+        render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
+        render_pipeline_descriptor.sampleCount = 1;
+        id<MTLRenderPipelineState> render_pipeline_state = [mtl_device_ newRenderPipelineStateWithDescriptor:render_pipeline_descriptor error:nil];
         
-        id<MTLRenderCommandEncoder> cmd = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [cmd setRenderPipelineState:g_ExtraDrawCallPipe];
-        [cmd setCullMode:MTLCullModeNone];
-        static id<MTLBuffer> g_VB, g_IB;
-        g_VB = [mtl_device_ newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
-        g_IB = [mtl_device_ newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
-        [cmd setVertexBuffer:g_VB offset:0 atIndex:0];
-        [cmd setFragmentTexture:metal_textures_[0] atIndex:0];
-        [cmd setFragmentTexture:metal_textures_[0] atIndex:1];
-        [cmd drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:g_IB indexBufferOffset:0];
+        
+        id<MTLRenderCommandEncoder> render_command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
+        [render_command_encoder setRenderPipelineState:render_pipeline_state];
+        [render_command_encoder setCullMode:MTLCullModeNone];
+        [render_command_encoder setVertexBuffer:vertex_buffer offset:0 atIndex:0];
+        [render_command_encoder setFragmentTexture:metal_textures_[0] atIndex:0];
+        [render_command_encoder setFragmentTexture:metal_textures_[0] atIndex:1];
+        [render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:index_buffer indexBufferOffset:0];
+        
+        RenderWidgets();
         
         return kUnitySubsystemErrorCodeSuccess;
+    }
+    
+    void RenderWidgets() {
+        id<MTLBuffer> vertex_buffer = [mtl_device_ newBufferWithBytes:vertex_data length:sizeof(vertex_data) options:MTLResourceOptionCPUCacheModeDefault];
+        vertex_buffer.label = @"vertices";
+        id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
+        vertex_color_buffer.label = @"colors";
+        
+        id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:myShader options:nil error:nil];
+        id<MTLFunction> vertex_function = [lib newFunctionWithName:@"passThroughVertex"];
+        id<MTLFunction> fragment_function = [lib newFunctionWithName:@"passThroughFragment"];
+        
+        MTLRenderPipelineDescriptor* pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
+        pipeline_descriptor.vertexFunction = vertex_function;
+        pipeline_descriptor.fragmentFunction = fragment_function;
+        pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+        pipeline_descriptor.sampleCount = 1;
+        
+        id<MTLRenderPipelineState> pipeline_state = [mtl_device_ newRenderPipelineStateWithDescriptor:pipeline_descriptor error:nil];
+        id<MTLRenderCommandEncoder> command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
+        [command_encoder setRenderPipelineState:pipeline_state];
+        [command_encoder setVertexBuffer:vertex_buffer offset:0 atIndex:0];
+        [command_encoder setVertexBuffer:vertex_color_buffer offset:0 atIndex:1];
+        [command_encoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:(sizeof(vertex_data) / sizeof(float))];
+        //NSLog(@"draw call");
     }
     
     /*
@@ -523,11 +672,9 @@ public:
                 culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
 
                 auto& render_params = renderPass.renderParams[0];
-                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = holokit_api_->GetViewMatrix(pass);
-                //render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = GetPose(pass);
-                //render_params.projection = culling_pass.projection = GetProjection(pass);
+                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = EyePositionToUnityXRPose(holokit_api_->GetEyePosition(pass));
                 render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-                render_params.projection.data.matrix = culling_pass.projection.data.matrix = holokit_api_->GetProjectionMatrix(pass);
+                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit_api_->GetProjectionMatrix(pass));
 
     #if !SIDE_BY_SIDE
                 // App has hinted that it would like to render to a smaller viewport.  Tell unity to render to that viewport.
@@ -537,7 +684,7 @@ public:
                 // Compositor_SetRenderSubRect(pass, renderParams.viewportRect);
     #else
                 // TODO: frameHints.appSetup.renderViewport
-                render_params.viewportRect = holokit_api_->GetViewportRect(pass);
+                render_params.viewportRect = Float4ToUnityXRRect(holokit_api_->GetViewportRect(pass));
                 //renderParams.viewportRect = {
                 //    pass == 0 ? 0.0f : 0.5f, // x
                 //    0.0f,                    // y

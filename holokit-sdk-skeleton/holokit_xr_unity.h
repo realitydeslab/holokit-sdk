@@ -14,6 +14,7 @@
 #include <MetalKit/MetalKit.h>
 #include "ar_session.mm"
 #include "math_helpers.h"
+#include <simd/simd.h>
 
 namespace holokit {
     
@@ -52,11 +53,11 @@ public:
     
     void Initialize();
     
-    UnityXRPose GetViewMatrix(int eye_index);
+    simd_float3 GetEyePosition(int eye_index);
     
-    UnityXRMatrix4x4 GetProjectionMatrix(int eye_index);
+    simd_float4x4 GetProjectionMatrix(int eye_index);
     
-    UnityXRRectf GetViewportRect(int eye_index);
+    simd_float4 GetViewportRect(int eye_index);
     
     //static std::unique_ptr<HoloKitApi>& GetInstance();
     
@@ -65,22 +66,20 @@ private:
     
     HoloKitModel InitHoloKitModel();
     
-    /// @brief Projection matrices only need to be computed once.
-    void ComputeProjectionMatrices();
-    
-    /// @brief Viewport rects only need to be computed once.
-    void ComputeViewportRects();
+    /// @brief Initializes view matrix, projection matrix and viewport rectangles.
+    void InitOpticalParameters();
     
 private:
-    // the only two optical parameters necessary for computing view matrices
-    simd_float3 mrOffset_;
-    simd_float3 cameraOffset_;
     
     /// @brief Stores left and right eye projection matrices.
-    std::vector<UnityXRMatrix4x4> projection_matrices_;
+    std::vector<simd_float4x4> projection_matrices_;
     
     /// @brief Stores left and right eye viewport rects.
-    std::vector<UnityXRRectf> viewport_rects_;
+    /// @details x is original x, y is original y, z is width and w is height.
+    std::vector<simd_float4> viewport_rects_;
+    
+    /// @brief Relative eye position from the camera to both eyes.
+    std::vector<simd_float3> eye_positions_;
     
     /// @brief Screen width in pixels.
     int width_;
