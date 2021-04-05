@@ -135,8 +135,6 @@ static const float kMaxLandmarkDistance = 0.8f;
     //NSLog(@"type %d", type);
     //NSLog(@"type depth %d", type2);
 
-    
-    
     if(self.session == NULL) {
         NSLog(@"initialize ARSession reference.");
         self.session = session;

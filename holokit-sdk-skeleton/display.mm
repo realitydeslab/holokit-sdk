@@ -203,7 +203,6 @@ public:
     
     void Shutdown() const {}
     
-#pragma mark - Gfx Thread Provider Methods
     UnitySubsystemErrorCode GfxThread_Start(
             UnityXRRenderingCapabilities* rendering_caps) const {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Start()", GetCurrentTime());
@@ -217,7 +216,8 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
     
-    // TODO: delete this
+
+#pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame()
     {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
@@ -232,14 +232,22 @@ public:
             UnitySubsystemErrorCode query_result = display_->QueryTextureDesc(handle_, unity_textures_[0], &unity_texture_desc);
             if (query_result == kUnitySubsystemErrorCodeSuccess) {
                 HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
-                NSLog(@"native texture pointer id: %d", unity_texture_desc.color.nativePtr);
             } else {
                 HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
             }
             native_textures_[0] = unity_texture_desc.color.nativePtr;
             metal_textures_[0] = (__bridge id<MTLTexture>)native_textures_[0];
             // TODO: query the right eye texture when SIDE_BY_SIDE = 0
-            
+    #if !SIDE_BY_SIDE
+            query_result = display_->QueryTextureDesc(handle_, unity_textures_[1], &unity_texture_desc);
+            if (query_result == kUnitySubsystemErrorCodeSuccess) {
+                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
+            } else {
+                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
+            }
+            native_textures_[1] = unity_texture_desc.color.nativePtr;
+            metal_textures_[1] = (__bridge id<MTLTexture>)native_textures_[1];
+    #endif
             native_textures_got_ = true;
         }
         
@@ -279,17 +287,20 @@ public:
         render_pipeline_descriptor.sampleCount = 1;
         id<MTLRenderPipelineState> render_pipeline_state = [mtl_device_ newRenderPipelineStateWithDescriptor:render_pipeline_descriptor error:nil];
         
-        
         id<MTLRenderCommandEncoder> render_command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
         [render_command_encoder setRenderPipelineState:render_pipeline_state];
         [render_command_encoder setCullMode:MTLCullModeNone];
         [render_command_encoder setVertexBuffer:vertex_buffer offset:0 atIndex:0];
         [render_command_encoder setFragmentTexture:metal_textures_[0] atIndex:0];
+#if SIDE_BY_SIDE
         [render_command_encoder setFragmentTexture:metal_textures_[0] atIndex:1];
+#else
+        [render_command_encoder setFragmentTexture:metal_textures_[1] atIndex:1];
+#endif
         [render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:index_buffer indexBufferOffset:0];
         
         RenderWidgets();
-        NSLog(@"horizontal alignment offset: %f", holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset());
+        //NSLog(@"horizontal alignment offset: %f", holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset());
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -317,7 +328,8 @@ public:
         [command_encoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:(sizeof(vertex_data) / sizeof(float))];
         //NSLog(@"draw call");
     }
-    
+
+#pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame)
     {
         
@@ -363,8 +375,8 @@ public:
             int numTextures = 1;
             int textureArrayLength = 0;
     #else
-            int numTextures = frameHints.appSetup.singlePassRendering ? NUM_RENDER_PASSES - 1 : NUM_RENDER_PASSES;
-            int textureArrayLength = frameHints.appSetup.singlePassRendering ? 2 : 0;
+            int numTextures = 2;
+            int textureArrayLength = frame_hints->appSetup.singlePassRendering ? 2 : 0;
     #endif
             CreateTextures(numTextures, textureArrayLength, frame_hints->appSetup.textureResolutionScale);
         }
@@ -378,34 +390,38 @@ public:
 
             for (int pass = 0; pass < next_frame->renderPassesCount; ++pass)
             {
-                auto& renderPass = next_frame->renderPasses[pass];
+                auto& render_pass = next_frame->renderPasses[pass];
 
                 // Texture that unity will render to next frame.  We created it above.
                 // You might want to change this dynamically to double / triple buffer.
     #if !SIDE_BY_SIDE
-                renderPass.textureId = unity_textures_[pass];
+                render_pass.textureId = unity_textures_[pass];
     #else
-                renderPass.textureId = unity_textures_[0];
+                render_pass.textureId = unity_textures_[0];
     #endif
 
                 // One set of render params per pass.
-                renderPass.renderParamsCount = 1;
+                render_pass.renderParamsCount = 1;
 
                 // Note that you can share culling between multiple passes by setting this to the same index.
-                renderPass.cullingPassIndex = pass;
+                render_pass.cullingPassIndex = pass;
 
                 // Fill out render params. View, projection, viewport for pass.
                 auto& culling_pass = next_frame->cullingPasses[pass];
                 culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
 
-                auto& render_params = renderPass.renderParams[0];
+                auto& render_params = render_pass.renderParams[0];
                 render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
                 render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
                 render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
 
     #if !SIDE_BY_SIDE
                 // App has hinted that it would like to render to a smaller viewport.  Tell unity to render to that viewport.
-                renderParams.viewportRect = frameHints.appSetup.renderViewport;
+                render_params.viewportRect = frame_hints->appSetup.renderViewport;
+                // x = 0, y = 0, width = 1, height = 1.
+                // Render to the full screen basically.
+                //NSLog(@"render pass #%f", pass);
+                //NSLog(@"render viewport x: %f, y: %f, width: %f, height: %f", render_params.viewportRect.x, render_params.viewportRect.y, render_params.viewportRect.width, render_params.viewportRect.height);
 
                 // Tell the compositor what pixels were rendered to for display.
                 // Compositor_SetRenderSubRect(pass, renderParams.viewportRect);
@@ -423,7 +439,7 @@ public:
         }
         else
         {
-            
+            // TODO: single-pass rendering
         }
         
         return kUnitySubsystemErrorCodeSuccess;
@@ -602,15 +618,11 @@ private:
     
     NSBundle* mtl_bundle_;
     
-#if XR_METAL
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
     
     /// @brief An array of metal textures.
     std::vector<id<MTLTexture>> metal_textures_;
-#elif XR_ANDROID
-    // TODO: fill in
-#endif
     
     static std::unique_ptr<HoloKitDisplayProvider> display_provider_;
 };

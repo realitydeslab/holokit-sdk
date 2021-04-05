@@ -64,37 +64,37 @@ HoloKitModel HoloKitApi::InitHoloKitModel() {
 
 void HoloKitApi::InitOpticalParameters() {
     auto phone = InitPhoneModel();
-    auto hme = InitHoloKitModel();
+    auto model = InitHoloKitModel();
     
     // projection matrices
     float center_x = 0.5 * phone.screenWidth + phone.centerLineOffset;
-    float center_y = phone.screenHeight - (hme.axisToBottom - phone.screenBottom);
-    float full_width = hme.viewportOuter * 2 + hme.opticalAxisDistance + hme.viewportCushion * 2;
-    float width = hme.viewportOuter + hme.viewportInner + hme.viewportCushion * 2;
-    float height = hme.viewportTop + hme.viewportBottom + hme.viewportCushion * 2;
+    float center_y = phone.screenHeight - (model.axisToBottom - phone.screenBottom);
+    float full_width = model.viewportOuter * 2 + model.opticalAxisDistance + model.viewportCushion * 2;
+    float width = model.viewportOuter + model.viewportInner + model.viewportCushion * 2;
+    float height = model.viewportTop + model.viewportBottom + model.viewportCushion * 2;
     float ipd = kUserInterpupillaryDistance;
-    float near = hme.lensToEye;
+    float near = model.lensToEye;
     float far = 1000.0f;
     
-    simd_float4x4 leftProjMatrix;
-    leftProjMatrix.columns[0].x = 2 * near / width;
-    leftProjMatrix.columns[1].y = 2 * near / height;
-    leftProjMatrix.columns[2].x = (full_width - ipd - width) / width;
-    leftProjMatrix.columns[2].y = (hme.viewportTop - hme.viewportBottom) / height;
-    leftProjMatrix.columns[2].z = -(far + near) / (far - near);
-    leftProjMatrix.columns[3].z = -(2.0 * far * near) / (far - near);
-    leftProjMatrix.columns[2].w = -1.0;
-    leftProjMatrix.columns[3].w = 0.0;
+    simd_float4x4 left_projection_matrix;
+    left_projection_matrix.columns[0].x = 2 * near / width;
+    left_projection_matrix.columns[1].y = 2 * near / height;
+    left_projection_matrix.columns[2].x = (full_width - ipd - width) / width;
+    left_projection_matrix.columns[2].y = (model.viewportTop - model.viewportBottom) / height;
+    left_projection_matrix.columns[2].z = -(far + near) / (far - near);
+    left_projection_matrix.columns[3].z = -(2.0 * far * near) / (far - near);
+    left_projection_matrix.columns[2].w = -1.0;
+    left_projection_matrix.columns[3].w = 0.0;
     
-    simd_float4x4 rightProjMatrix = leftProjMatrix;
-    rightProjMatrix.columns[2].x = -rightProjMatrix.columns[2].x;
+    simd_float4x4 right_projection_matrix = left_projection_matrix;
+    right_projection_matrix.columns[2].x = -right_projection_matrix.columns[2].x;
     
     projection_matrices_.resize(2);
-    projection_matrices_[0] = leftProjMatrix;
-    projection_matrices_[1] = rightProjMatrix;
+    projection_matrices_[0] = left_projection_matrix;
+    projection_matrices_[1] = right_projection_matrix;
     
     // viewport rects
-    double y_min_in_pixel = (double)((center_y - (hme.viewportTop + hme.viewportCushion)) / phone.screenHeight * (float)height_);
+    double y_min_in_pixel = (double)((center_y - (model.viewportTop + model.viewportCushion)) / phone.screenHeight * (float)height_);
     double x_min_right_in_pixel = (double)((center_x + full_width / 2 - width) / phone.screenWidth * (float)width_);
     double x_min_left_in_pixel = (double)((center_x - full_width / 2) / phone.screenWidth * (float)width_);
     double width_in_pixel = (double)(width / phone.screenWidth * (float)width_);
@@ -116,13 +116,13 @@ void HoloKitApi::InitOpticalParameters() {
     viewport_rects_[1] = rightRect;
     
     // view matrix
-    simd_float3 offset = phone.cameraOffset + hme.mrOffset;
+    simd_float3 offset = phone.cameraOffset + model.mrOffset;
     eye_positions_.resize(2);
     eye_positions_[0] = simd_make_float3(offset.x - ipd / 2, offset.y, -offset.z);
     eye_positions_[1] = simd_make_float3(offset.x + ipd / 2, offset.y, -offset.z);
     
     // horizontal alignment marker offset
-    horizontal_alignment_marker_offset_ = 0.5 + (phone.centerLineOffset + hme.horizontalAlignmentMarkerOffset) / phone.screenWidth;
+    horizontal_alignment_marker_offset_ = 0.5 + (phone.centerLineOffset + model.horizontalAlignmentMarkerOffset) / phone.screenWidth;
 }
 
 simd_float4x4 HoloKitApi::GetProjectionMatrix(int eye_index) {
