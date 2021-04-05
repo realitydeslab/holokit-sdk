@@ -27,7 +27,7 @@
 
 /// If this is 1, both render passes will render to a single texture.
 /// Otherwise, they will render to two separate textures.
-#define SIDE_BY_SIDE 1
+#define SIDE_BY_SIDE 0
 #define NUM_RENDER_PASSES 2
 static const float s_PoseXPositionPerPass[] = {-1.0f, 1.0f};
 
@@ -74,10 +74,10 @@ NSString* shaderStr = @
         "{\n"
         "    FShaderOutput out = { half4(1,0,0,1) };\n"
         "    if(input.out_pos.x < tex.get_width() / 2) {\n"
-        "       //input.texcoord.x *= 2;\n"
+        "       input.texcoord.x *= 2;\n"
         "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
         "    } else {\n"
-        "       //input.texcoord.x = (input.texcoord.x - 0.5) * 2;\n"
+        "       input.texcoord.x = (input.texcoord.x - 0.5) * 2;\n"
         "       out = { tex2.sample(blit_tex_sampler, input.texcoord) };\n"
         "    }\n"
         "    return out;\n"
@@ -235,8 +235,10 @@ public:
             } else {
                 HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
             }
-            native_textures_[0] = unity_texture_desc.color.nativePtr;
-            metal_textures_[0] = (__bridge id<MTLTexture>)native_textures_[0];
+            native_color_textures_[0] = unity_texture_desc.color.nativePtr;
+            native_depth_textures_[0] = unity_texture_desc.depth.nativePtr;
+            metal_color_textures_[0] = (__bridge id<MTLTexture>)native_color_textures_[0];
+            metal_depth_textures_[0] = (__bridge id<MTLTexture>)native_depth_textures_[0];
             // TODO: query the right eye texture when SIDE_BY_SIDE = 0
     #if !SIDE_BY_SIDE
             query_result = display_->QueryTextureDesc(handle_, unity_textures_[1], &unity_texture_desc);
@@ -245,8 +247,10 @@ public:
             } else {
                 HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
             }
-            native_textures_[1] = unity_texture_desc.color.nativePtr;
-            metal_textures_[1] = (__bridge id<MTLTexture>)native_textures_[1];
+            native_color_textures_[1] = unity_texture_desc.color.nativePtr;
+            native_depth_textures_[1] = unity_texture_desc.depth.nativePtr;
+            metal_color_textures_[1] = (__bridge id<MTLTexture>)native_color_textures_[1];
+            metal_depth_textures_[1] = (__bridge id<MTLTexture>)native_depth_textures_[1];
     #endif
             native_textures_got_ = true;
         }
@@ -291,11 +295,11 @@ public:
         [render_command_encoder setRenderPipelineState:render_pipeline_state];
         [render_command_encoder setCullMode:MTLCullModeNone];
         [render_command_encoder setVertexBuffer:vertex_buffer offset:0 atIndex:0];
-        [render_command_encoder setFragmentTexture:metal_textures_[0] atIndex:0];
+        [render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:0];
 #if SIDE_BY_SIDE
         [render_command_encoder setFragmentTexture:metal_textures_[0] atIndex:1];
 #else
-        [render_command_encoder setFragmentTexture:metal_textures_[1] atIndex:1];
+        [render_command_encoder setFragmentTexture:metal_color_textures_[1] atIndex:1];
 #endif
         [render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:index_buffer indexBufferOffset:0];
         
@@ -512,7 +516,7 @@ public:
         return kUnitySubsystemErrorCodeFailure;
     }
     
-#pragma mark - Private Methods
+#pragma mark - CreateTextures()
 private:
     
     /// @brief Allocate unity textures.
@@ -529,22 +533,24 @@ private:
         const int tex_width = 2778;//(int)(2778.0f * requested_texture_scale);
         const int tex_height = 1284;//(int)(1284.0f * requested_texture_scale);
         
-        native_textures_.resize(num_textures);
         unity_textures_.resize(num_textures);
+        native_color_textures_.resize(num_textures);
+        native_depth_textures_.resize(num_textures);
 #if XR_METAL
-        metal_textures_.resize(num_textures);
+        metal_color_textures_.resize(num_textures);
+        metal_depth_textures_.resize(num_textures);
 #endif
         
         for (int i = 0; i < num_textures; i++) {
             UnityXRRenderTextureDesc texture_desc;
             memset(&texture_desc, 0, sizeof(UnityXRRenderTextureDesc));
             
-            //texture_desc.colorFormat = kUnityXRRenderTextureFormatRGBA32;
+            texture_desc.colorFormat = kUnityXRRenderTextureFormatRGBA32;
             // we will query the pointer of unity created texture later
             texture_desc.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
             // TODO: do we need depth?
-            //texture_desc.depthFormat = kUnityXRDepthTextureFormat24bitOrGreater;
-            //texture_desc.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
+            texture_desc.depthFormat = kUnityXRDepthTextureFormat24bitOrGreater;
+            texture_desc.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
             texture_desc.width = tex_width;
             texture_desc.height = tex_height;
             texture_desc.textureArrayLength = texture_array_length;
@@ -560,12 +566,12 @@ private:
     void DestroyTextures() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f DestroyTextures()", GetCurrentTime());
         
-        assert(native_textures_.size() == unity_textures_.size());
+        assert(native_color_textures_.size() == unity_textures_.size());
         
         for (int i = 0; i < unity_textures_.size(); i++) {
             if(unity_textures_[i] != 0) {
                 display_->DestroyTexture(handle_, unity_textures_[i]);
-                native_textures_[i] = nullptr;
+                native_color_textures_[i] = nullptr;
 #if XR_METAL
                 // TODO: release metal texture
 #endif
@@ -573,9 +579,9 @@ private:
         }
         
         unity_textures_.clear();
-        native_textures_.clear();
+        native_color_textures_.clear();
 #if XR_METAL
-        metal_textures_.clear();
+        metal_color_textures_.clear();
 #endif
     }
     
@@ -603,10 +609,17 @@ private:
     std::unique_ptr<holokit::HoloKitApi> holokit_api_;
     
     /// @brief An array of native texture pointers.
-    std::vector<void*> native_textures_;
+    std::vector<void*> native_color_textures_;
     
     /// @brief An array of UnityXRRenderTextureId.
     std::vector<UnityXRRenderTextureId> unity_textures_;
+    
+    /// @brief An array of metal textures.
+    std::vector<id<MTLTexture>> metal_color_textures_;
+    
+    std::vector<void*> native_depth_textures_;
+    
+    std::vector<id<MTLTexture>> metal_depth_textures_;
     
     bool textures_initialized_ = false;
     
@@ -620,9 +633,6 @@ private:
     
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
-    
-    /// @brief An array of metal textures.
-    std::vector<id<MTLTexture>> metal_textures_;
     
     static std::unique_ptr<HoloKitDisplayProvider> display_provider_;
 };

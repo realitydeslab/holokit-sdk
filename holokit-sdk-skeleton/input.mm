@@ -195,8 +195,9 @@ public:
                 //LogMatrix4x4(camera_transform);
                 UnityXRVector3 position = UnityXRVector3 { camera_transform.columns[3].x, camera_transform.columns[3].y, -camera_transform.columns[3].z };
                 simd_quatf quaternion = simd_quaternion(camera_transform);
-                quaternion = simd_inverse(quaternion);
-                UnityXRVector4 rotation = UnityXRVector4 {quaternion.vector.x, quaternion.vector.y, quaternion.vector.z, quaternion.vector.w};
+                //quaternion = simd_inverse(quaternion);
+                // I got these negation by experimentation... don't know why
+                UnityXRVector4 rotation = UnityXRVector4 {-quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w};
                 input_->DeviceState_SetAxis3DValue(state, feature_index++, position);
                 input_->DeviceState_SetRotationValue(state, feature_index++, rotation);
                 
