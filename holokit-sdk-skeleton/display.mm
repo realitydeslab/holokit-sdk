@@ -27,7 +27,7 @@
 
 /// If this is 1, both render passes will render to a single texture.
 /// Otherwise, they will render to two separate textures.
-#define SIDE_BY_SIDE 0
+#define SIDE_BY_SIDE 1
 #define NUM_RENDER_PASSES 2
 static const float s_PoseXPositionPerPass[] = {-1.0f, 1.0f};
 
@@ -74,10 +74,10 @@ NSString* shaderStr = @
         "{\n"
         "    FShaderOutput out = { half4(1,0,0,1) };\n"
         "    if(input.out_pos.x < tex.get_width() / 2) {\n"
-        "       input.texcoord.x *= 2;\n"
+        "       //input.texcoord.x *= 2;\n"
         "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
         "    } else {\n"
-        "       input.texcoord.x = (input.texcoord.x - 0.5) * 2;\n"
+        "       //input.texcoord.x = (input.texcoord.x - 0.5) * 2;\n"
         "       out = { tex2.sample(blit_tex_sampler, input.texcoord) };\n"
         "    }\n"
         "    return out;\n"
@@ -297,7 +297,7 @@ public:
         [render_command_encoder setVertexBuffer:vertex_buffer offset:0 atIndex:0];
         [render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:0];
 #if SIDE_BY_SIDE
-        [render_command_encoder setFragmentTexture:metal_textures_[0] atIndex:1];
+        [render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:1];
 #else
         [render_command_encoder setFragmentTexture:metal_color_textures_[1] atIndex:1];
 #endif
