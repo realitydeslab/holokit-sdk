@@ -6,6 +6,7 @@
 //
 #pragma once
 
+#include "ar_session.h"
 #include "UnityXRNativePtrs.h"
 #include <TargetConditionals.h>
 #include "UnityXRTypes.h"
@@ -16,7 +17,7 @@
 #import <vector>
 #import "LandmarkPosition.h"
 
-#if TARGET_OS_IPHONE
+//#if TARGET_OS_IPHONE
 #import <Foundation/Foundation.h>
 #import <HandTracker/HandTracker.h>
 #import <ARKit/ARKit.h>
@@ -35,6 +36,7 @@
 
 static const float kMaxLandmarkDistance = 0.8f;
 
+/*
 @interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
@@ -46,15 +48,15 @@ static const float kMaxLandmarkDistance = 0.8f;
 @property (assign) double lastHandTrackingTimestamp;
 @property (assign) bool isLeftHandTracked;
 @property (assign) bool isRightHandTracked;
+// open or close hand tracking
+@property (assign) bool isHandTrackingEnabled;
 
-@property (nonatomic, strong) ARFrame* frame;
-@property (assign) simd_float4x4 cameraTransform;
 @property (nonatomic, strong) ARSession* session;
-@property (nonatomic, strong) ARCamera* camera;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
 @end
+*/
 
 @implementation ARSessionDelegateController
 
@@ -85,14 +87,13 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.isRightHandTracked = true;
         self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
         
+        self.isHandTrackingEnabled = YES;
         
         //[self startAccelerometer];
         //[self startGyroscope];
     }
     return self;
 }
-
-
 
 - (void)startAccelerometer {
     if ([self.motionManager isAccelerometerAvailable] == YES) {
@@ -138,9 +139,6 @@ static const float kMaxLandmarkDistance = 0.8f;
     if(self.session == NULL) {
         NSLog(@"initialize ARSession reference.");
         self.session = session;
-        self.frame = session.currentFrame;
-        self.cameraTransform = session.currentFrame.camera.transform;
-        self.camera = session.currentFrame.camera;
     }
     
     float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];
@@ -151,9 +149,11 @@ static const float kMaxLandmarkDistance = 0.8f;
     }
     
     //NSLog(@"trying to run mediapipe...");
-    [self.handTrackingQueue addOperationWithBlock:^{
-        [self.handTracker processVideoFrame: frame.capturedImage];
-    }];
+    if (self.isHandTrackingEnabled) {
+        [self.handTrackingQueue addOperationWithBlock:^{
+            [self.handTracker processVideoFrame: frame.capturedImage];
+        }];
+    }
 }
 
 #pragma mark - HandTracking
@@ -192,8 +192,8 @@ static const float kMaxLandmarkDistance = 0.8f;
         int landmarkIndex = 0;
         for(Landmark *landmark in landmarks) {
         
-            int x = (CGFloat)landmark.x * self.frame.camera.imageResolution.width;
-            int y = (CGFloat)landmark.y * self.frame.camera.imageResolution.height;
+            int x = (CGFloat)landmark.x * self.session.currentFrame.camera.imageResolution.width;
+            int y = (CGFloat)landmark.y * self.session.currentFrame.camera.imageResolution.height;
             CGPoint screenPoint = CGPointMake(x, y);
             
             //NSLog(@"landmark [%f, %f]", landmark.x, landmark.y);
@@ -234,7 +234,7 @@ static const float kMaxLandmarkDistance = 0.8f;
                 }
             }
             
-            simd_float3 unprojectedPoint = [self unprojectScreenPoint:screenPoint depth:landmarkDepth currentFrame:self.frame];
+            simd_float3 unprojectedPoint = [self unprojectScreenPoint:screenPoint depth:landmarkDepth currentFrame:self.session.currentFrame];
             
             //NSLog(@"raw landmark coordinate: [%f, %f]", landmark.x, landmark.y);
             //NSLog(@"point in world: [%f, %f, %f]", unprojectedPoint.x, unprojectedPoint.y, unprojectedPoint.z);
@@ -366,13 +366,19 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
 
 
 
-#else
-void SetARSession(UnityXRNativeSession* ar_native_session) {
-    printout("SetARSession on mac");
-}
-#endif
+//#else
+//void SetARSession(UnityXRNativeSession* ar_native_session) {
+//    printout("SetARSession on mac");
+//}
+//#endif
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
     SetARSession(ar_native_session);
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_EnableHandTracking(bool enabled) {
+    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+    ar_session_handler.isHandTrackingEnabled = enabled;
 }

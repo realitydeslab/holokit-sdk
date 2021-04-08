@@ -12,7 +12,7 @@
 #include "IUnityXRTrace.h"
 #include "IUnityXRInput.h"
 #include "math_helpers.h"
-#include "ar_session.mm"
+#include "ar_session.h"
 #include "load.h"
 
 // @def Logs to Unity XR Trace interface @p message.

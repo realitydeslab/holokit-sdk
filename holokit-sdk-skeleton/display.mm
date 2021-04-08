@@ -375,6 +375,10 @@ public:
 
         if (reallocateTextures)
         {
+            // initialize HoloKitApi at the first frame
+            holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
+            holokit::HoloKitApi::GetInstance()->Initialize();
+            
             textures_initialized_ = false;
             native_textures_got_ = false;
             DestroyTextures();

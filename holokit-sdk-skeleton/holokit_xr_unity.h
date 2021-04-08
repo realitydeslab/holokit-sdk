@@ -12,7 +12,7 @@
 #include "UnityXRTypes.h"
 #include <Metal/Metal.h>
 #include <MetalKit/MetalKit.h>
-#include "ar_session.mm"
+#include "ar_session.h"
 #include "math_helpers.h"
 #include <simd/simd.h>
 #include "holokit_profile.h"
