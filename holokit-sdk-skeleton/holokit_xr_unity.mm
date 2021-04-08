@@ -23,48 +23,17 @@ void HoloKitApi::Initialize() {
     // see: https://stackoverflow.com/questions/9617301/how-to-print-out-string-constant-with-nslog-on-ios
     struct utsname system_info;
     uname(&system_info);
-    NSString* device_name = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
-    NSLog(@"device name %@", device_name);
+    device_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
+    NSLog(@"device name %@", device_name_);
     
     InitOpticalParameters();
     
     ar_session_handler_ = [ARSessionDelegateController sharedARSessionDelegateController];
 }
 
-PhoneModel HoloKitApi::InitPhoneModel() {
-    // iPhone12ProMax phone model
-    PhoneModel phone_model;
-    phone_model.screenWidth = 0.15390;
-    phone_model.screenHeight = 0.07113;
-    phone_model.screenBottom = 0.00347;
-    phone_model.centerLineOffset = 0.0;
-    phone_model.cameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
-    
-    return phone_model;
-}
-
-HoloKitModel HoloKitApi::InitHoloKitModel() {
-    HoloKitModel holokit_model;
-    holokit_model.opticalAxisDistance = 0.064;
-    holokit_model.mrOffset = simd_make_float3(0, -0.02894, 0.07055);
-    holokit_model.distortion = 0.0;
-    holokit_model.viewportInner = 0.0292;
-    holokit_model.viewportOuter = 0.0292;
-    holokit_model.viewportTop = 0.02386;
-    holokit_model.viewportBottom = 0.02386;
-    holokit_model.focalLength = 0.065;
-    holokit_model.screenToLens = 0.02715 + 0.03136 + 0.002;
-    holokit_model.lensToEye = 0.02497 + 0.03898;
-    holokit_model.axisToBottom = 0.02990;
-    holokit_model.viewportCushion = 0.0000;
-    holokit_model.horizontalAlignmentMarkerOffset = 0.05075;
-    
-    return holokit_model;
-}
-
 void HoloKitApi::InitOpticalParameters() {
-    auto phone = InitPhoneModel();
-    auto model = InitHoloKitModel();
+    auto phone = Profile::GetPhoneModel(Profile::DeviceNameToPhoneType(device_name_));
+    auto model = Profile::GetHoloKitModel(Profile::HoloKitX);
     
     // projection matrices
     float center_x = 0.5 * phone.screenWidth + phone.centerLineOffset;

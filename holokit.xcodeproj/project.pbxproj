@@ -56,6 +56,7 @@
 		4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27925D42C2D0068CB66 /* LaunchScreen.storyboard */; };
 		4B6CC27E25D42C2D0068CB66 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC27D25D42C2D0068CB66 /* main.m */; };
 		4B99658F25F715E3006AF9A5 /* hand_tracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */; };
+		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
 		4B9C742725F5B948001935A8 /* LandmarkPosition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C742625F5B948001935A8 /* LandmarkPosition.m */; };
 		4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		4BBDD2F025F397D200070CB4 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
@@ -363,6 +364,8 @@
 		4B6CC27A25D42C2D0068CB66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4B6CC27C25D42C2D0068CB66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B6CC27D25D42C2D0068CB66 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = holokit_profile.mm; sourceTree = "<group>"; };
+		4B9C52AF261EF13A0020E4C8 /* holokit_profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = holokit_profile.h; sourceTree = "<group>"; };
 		4B9C742525F5B909001935A8 /* LandmarkPosition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LandmarkPosition.h; sourceTree = "<group>"; };
 		4B9C742625F5B948001935A8 /* LandmarkPosition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LandmarkPosition.m; sourceTree = "<group>"; };
 		4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hand_tracking.mm; sourceTree = "<group>"; };
@@ -805,9 +808,11 @@
 				4BE7B64D26110544001F39F2 /* main.mm */,
 				4BE7B6862611056A001F39F2 /* math_helpers.h */,
 				4BE7B66A2611055A001F39F2 /* math_helpers.mm */,
-				4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.mm */,
 				4BE7B6C926117AE1001F39F2 /* holokit_xr_unity.h */,
+				4BE7B6C826117AE1001F39F2 /* holokit_xr_unity.mm */,
 				4B6C941F261493E300CBDFB4 /* ar_session.mm */,
+				4B9C52AF261EF13A0020E4C8 /* holokit_profile.h */,
+				4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */,
 			);
 			path = "holokit-sdk-skeleton";
 			sourceTree = "<group>";
@@ -1965,6 +1970,7 @@
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
 				4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
+				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* main.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

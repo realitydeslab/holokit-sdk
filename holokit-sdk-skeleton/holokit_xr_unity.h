@@ -15,37 +15,9 @@
 #include "ar_session.mm"
 #include "math_helpers.h"
 #include <simd/simd.h>
+#include "holokit_profile.h"
 
 namespace holokit {
-    
-typedef struct PhoneModel {
-    float screenWidth;
-    float screenHeight;
-    float screenBottom;
-    float centerLineOffset;
-    simd_float3 cameraOffset;
-} PhoneModel;
-
-typedef struct HoloKitModel {
-    float opticalAxisDistance;
-    // 3D offset from the center of the bottomline of the HoloKit phone display to the center of two eyes
-    // x is right
-    // y is up
-    // z is backward
-    // right-handed
-    simd_float3 mrOffset;
-    float distortion;
-    float viewportInner;
-    float viewportOuter;
-    float viewportTop;
-    float viewportBottom;
-    float focalLength;
-    float screenToLens;
-    float lensToEye;
-    float axisToBottom;
-    float viewportCushion;
-    float horizontalAlignmentMarkerOffset;
-} HoloKitModel;
 
 /// Wrapper of HoloKit SDK
 class HoloKitApi {
@@ -66,14 +38,14 @@ public:
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
 private:
-    PhoneModel InitPhoneModel();
-    
-    HoloKitModel InitHoloKitModel();
     
     /// @brief Initializes view matrix, projection matrix and viewport rectangles.
     void InitOpticalParameters();
     
 private:
+    
+    /// @brief The device name of the phone.
+    NSString* device_name_;
     
     /// @brief Stores left and right eye projection matrices.
     std::vector<simd_float4x4> projection_matrices_;
