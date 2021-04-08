@@ -29,6 +29,13 @@ void HoloKitApi::Initialize() {
     InitOpticalParameters();
     
     ar_session_handler_ = [ARSessionDelegateController sharedARSessionDelegateController];
+    if ([device_name_ isEqualToString:@"iPhone13,3"] == NO &&
+        [device_name_ isEqualToString:@"iPhone13,4"] == NO) {
+        NSLog(@"[HoloKitApi]: the phone type does not support hand tracking.");
+        ar_session_handler_.isHandTrackingEnabled = NO;
+    } else {
+        NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
+    }
 }
 
 void HoloKitApi::InitOpticalParameters() {
