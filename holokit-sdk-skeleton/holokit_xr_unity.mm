@@ -122,7 +122,7 @@ void HoloKitApi::InitOpticalParameters() {
     eye_positions_[1] = simd_make_float3(offset.x + ipd / 2, offset.y, -offset.z);
     
     // horizontal alignment marker offset
-    horizontal_alignment_marker_offset_ = 0.5 + (phone.centerLineOffset + model.horizontalAlignmentMarkerOffset) / phone.screenWidth;
+    horizontal_alignment_marker_offset_ = model.horizontalAlignmentMarkerOffset / (phone.screenWidth / 2);
 }
 
 simd_float4x4 HoloKitApi::GetProjectionMatrix(int eye_index) {

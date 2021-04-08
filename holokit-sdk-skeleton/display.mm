@@ -99,9 +99,9 @@ const float vdata[] = {
 const uint16_t idata[] = {0, 1, 2, 2, 3, 0};
 
 // widgets data
-const float vertex_data[] = {
+float vertex_data[] = {
     0.829760, 1, 0.0, 1.0,
-    0.829760, 0.2, 0.0, 1.0
+    0.829760, 0.7, 0.0, 1.0
 };
 
 NSString* myShader = @
@@ -195,6 +195,8 @@ public:
     
     UnitySubsystemErrorCode Start() const {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
+        
+        //holokit_api_.reset(holokit::HoloKitApi::GetInstance());
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -309,6 +311,8 @@ public:
     }
     
     void RenderWidgets() {
+        vertex_data[0] = vertex_data[4] = holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset();
+        
         id<MTLBuffer> vertex_buffer = [mtl_device_ newBufferWithBytes:vertex_data length:sizeof(vertex_data) options:MTLResourceOptionCPUCacheModeDefault];
         vertex_buffer.label = @"vertices";
         //id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
