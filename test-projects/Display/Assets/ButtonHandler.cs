@@ -12,17 +12,23 @@ public class ButtonHandler : MonoBehaviour
         Text txt = transform.Find("Text").GetComponent<Text>();
         if(xrMode)
         {
-            xrMode = false;
-            txt.text = "AR Mode";
-            RenderingSettings.EnableARBackground(false);
-            Debug.Log("Display mode changed to AR mode.");
-            
-        } else
+            // XR mode
+            if (RenderingSettings.EnableARBackground(true))
+            {
+                xrMode = false;
+                txt.text = "AR Mode";
+                Debug.Log("Display mode changed to AR mode.");
+            }
+        }
+        else
         {
-            xrMode = true;
-            txt.text = "XR Mode";
-            RenderingSettings.EnableARBackground(true);
-            Debug.Log("Display mode changed to XR mode.");
+            // AR mode
+            if (RenderingSettings.EnableARBackground(false))
+            {
+                xrMode = true;
+                txt.text = "XR Mode";
+                Debug.Log("Display mode changed to XR mode.");
+            }
         }
     }
 }

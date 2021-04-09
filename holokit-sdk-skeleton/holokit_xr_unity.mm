@@ -13,6 +13,7 @@ const float kUserInterpupillaryDistance = 0.064;
 
 namespace holokit {
 
+#pragma mark - Initialize()
 void HoloKitApi::Initialize() {
     NSLog(@"[HoloKitApi]: Initialize()");
     
@@ -39,6 +40,11 @@ void HoloKitApi::Initialize() {
     }
     
     is_xr_mode_enabled_ = false;
+    
+    // MODIFY HERE
+    is_nfc_enabled_ = true;
+    
+    is_nfc_validated_ = false;
 }
 
 void HoloKitApi::InitOpticalParameters() {
@@ -134,9 +140,26 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     return simd_make_float3(0);
 }
 
+bool HoloKitApi::SetIsXrModeEnabled(bool val) {
+    if(!is_nfc_enabled_) {
+        is_xr_mode_enabled_ = val;
+        return true;;
+    }
+    if (is_nfc_enabled_ && !is_nfc_validated_) {
+        [[NFCSession sharedNFCSession] startReaderSession];
+        is_nfc_validated_ = true;
+        return false;
+    }
+    if (is_nfc_enabled_ && is_nfc_validated_) {
+        is_xr_mode_enabled_ = val;
+        return true;
+    }
+    return false;
+}
+
 } // namespace
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+extern "C" bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetIsXrModeEnabled(bool val) {
-    holokit::HoloKitApi::GetInstance()->SetIsXrModeEnabled(val);
+    return holokit::HoloKitApi::GetInstance()->SetIsXrModeEnabled(val);
 }

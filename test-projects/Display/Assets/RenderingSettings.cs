@@ -10,7 +10,7 @@ public class RenderingSettings : MonoBehaviour
     static ARCameraBackground camBackground;
 
     [DllImport("__Internal")]
-    public static extern void UnityHoloKit_SetIsXrModeEnabled(bool val);
+    public static extern bool UnityHoloKit_SetIsXrModeEnabled(bool val);
 
     // Start is called before the first frame update
     void Start()
@@ -29,9 +29,17 @@ public class RenderingSettings : MonoBehaviour
 
     }
 
-    public static void EnableARBackground(bool val)
+    public static bool EnableARBackground(bool val)
     {
-        camBackground.enabled = val;
-        UnityHoloKit_SetIsXrModeEnabled(!val);
+       
+        if (UnityHoloKit_SetIsXrModeEnabled(!val))
+        {
+            camBackground.enabled = val;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

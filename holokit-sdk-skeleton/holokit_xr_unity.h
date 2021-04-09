@@ -16,6 +16,7 @@
 #include "math_helpers.h"
 #include <simd/simd.h>
 #include "holokit_profile.h"
+#include "nfc_session.h"
 
 namespace holokit {
 
@@ -39,7 +40,8 @@ public:
     
     bool GetIsXrModeEnabled() { return is_xr_mode_enabled_; }
     
-    void SetIsXrModeEnabled(bool val) { is_xr_mode_enabled_ = val; }
+    /// @brief This method might fail due to NFC check, in which case it returns false.
+    bool SetIsXrModeEnabled(bool val);
     
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
@@ -75,6 +77,11 @@ private:
     
     /// @brief True for XR mode and false for AR mode.
     bool is_xr_mode_enabled_;
+    
+    /// @brief If this value is true, the app will do NFC check when the user switches to XR mode.
+    bool is_nfc_enabled_;
+    
+    bool is_nfc_validated_;
     
     static std::unique_ptr<HoloKitApi> holokit_api_;
     

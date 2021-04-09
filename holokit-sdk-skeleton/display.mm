@@ -356,7 +356,8 @@ public:
         // Skip the splash screen phase, since holokit api is not initialized.
         if (is_holokit_api_initialized_) {
             if (is_xr_mode_enabled_ != holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled()) {
-                NSLog(@"Display mode switched.");
+                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Display mode switched.", GetCurrentTime());
+                NSLog(@"%d", holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled());
                 is_xr_mode_enabled_ = holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled();
                 display_mode_changed_ = true;
             }
@@ -518,7 +519,6 @@ public:
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
         // TODO: reset holokit api
         
-        is_holokit_api_initialized_ = false;
         return kUnitySubsystemErrorCodeSuccess;
     }
 
