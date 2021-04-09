@@ -48,7 +48,7 @@ static bool s_SkipFrame = true;
                ##__VA_ARGS__)
 
 // TODO: put the following data in a proper place
-NSString* shaderStr = @
+NSString* side_by_side_shader = @
         "#include <metal_stdlib>\n"
         "using namespace metal;\n"
         "struct AppData\n"
@@ -193,10 +193,11 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
     
-    UnitySubsystemErrorCode Start() const {
+    UnitySubsystemErrorCode Start() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
         //holokit_api_.reset(holokit::HoloKitApi::GetInstance());
+        is_xr_mode_enabled_ = true;
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -224,10 +225,15 @@ public:
     {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
+        // delete this
+        //id<MTLTexture> texture = metal_interface_->CurrentRenderPassDescriptor().depthAttachment.texture;
+        //NSLog(@"depth format %d", texture.pixelFormat);
+        //  MTLPixelFormatDepth32Float_Stencil8
+        
         if(textures_initialized_ == NO) {
             return kUnitySubsystemErrorCodeSuccess;
         }
-        if(native_textures_got_ == NO) {
+        if(native_textures_queried_ == NO) {
             // Query left eye texture
             UnityXRRenderTextureDesc unity_texture_desc;
             memset(&unity_texture_desc, 0, sizeof(UnityXRRenderTextureDesc));
@@ -254,14 +260,14 @@ public:
             metal_color_textures_[1] = (__bridge id<MTLTexture>)native_color_textures_[1];
             metal_depth_textures_[1] = (__bridge id<MTLTexture>)native_depth_textures_[1];
     #endif
-            native_textures_got_ = true;
+            native_textures_queried_ = true;
         }
         
         // do an extral draw call
         id<MTLBuffer> vertex_buffer = [mtl_device_ newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
         id<MTLBuffer> index_buffer = [mtl_device_ newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
         
-        id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:shaderStr options:nil error:nil];
+        id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:side_by_side_shader options:nil error:nil];
         //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
         id<MTLFunction> vertex_function = [lib newFunctionWithName:@"vprog"];
         id<MTLFunction> fragment_function = [lib newFunctionWithName:@"fshader_tex"];
@@ -345,12 +351,11 @@ public:
         WORKAROUND_SKIP_FIRST_FRAME();
 
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
-
         
-        bool reallocateTextures = (unity_textures_.size() == 0);
+        bool reallocate_textures = (unity_textures_.size() == 0);
         if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0)
         {
-            reallocateTextures = true;
+            reallocate_textures = true;
         }
         if ((kUnityXRFrameSetupHintsChangedRenderViewport & frame_hints->changedFlags) != 0)
         {
@@ -358,7 +363,7 @@ public:
         }
         if ((kUnityXRFrameSetupHintsChangedTextureResolutionScale & frame_hints->changedFlags) != 0)
         {
-            reallocateTextures = true;
+            reallocate_textures = true;
         }
         if ((kUnityXRFrameSetuphintsChangedContentProtectionState & frame_hints->changedFlags) != 0)
         {
@@ -372,25 +377,60 @@ public:
         {
             // App changed focus plane, configure compositor if possible.
         }
+        if (render_mode_changed_) {
+            reallocate_textures = true;
+        }
 
-        if (reallocateTextures)
+        if (reallocate_textures)
         {
             // initialize HoloKitApi at the first frame
             holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
             holokit::HoloKitApi::GetInstance()->Initialize();
             
             textures_initialized_ = false;
-            native_textures_got_ = false;
+            native_textures_queried_ = false;
             DestroyTextures();
 
     #if SIDE_BY_SIDE
-            int numTextures = 1;
-            int textureArrayLength = 0;
+            int num_textures = 1;
+            int texture_array_length = 0;
     #else
-            int numTextures = 2;
-            int textureArrayLength = frame_hints->appSetup.singlePassRendering ? 2 : 0;
+            int num_textures = 2;
+            int texture_array_length = frame_hints->appSetup.singlePassRendering ? 2 : 0;
     #endif
-            CreateTextures(numTextures, textureArrayLength, frame_hints->appSetup.textureResolutionScale);
+            if (!is_xr_mode_enabled_) {
+                num_textures = 1;
+                texture_array_length = 0;
+            }
+            
+            CreateTextures(num_textures, texture_array_length, frame_hints->appSetup.textureResolutionScale);
+        }
+        
+        // AR mode rendering
+        if (!is_xr_mode_enabled_) {
+            next_frame->renderPassesCount = 1;
+            
+            auto& render_pass = next_frame->renderPasses[0];
+            render_pass.textureId = unity_textures_[0];
+            render_pass.renderParamsCount = 1;
+            render_pass.cullingPassIndex = 1;
+            auto& culling_pass = next_frame->cullingPasses[0];
+            // TODO: culling pass separation
+            
+            auto& render_params = render_pass.renderParams[0];
+            // view matrix
+            UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
+            UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
+            UnityXRPose pose = { position, rotation };
+            render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = pose;
+            // projection matrix
+            // get ARKit projection matrix
+            simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
+            render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
+            render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
+            // viewport
+            render_params.viewportRect = frame_hints->appSetup.renderViewport;
+            return kUnitySubsystemErrorCodeSuccess;
         }
 
         // Frame hints tells us if we should setup our renderpasses with a single pass
@@ -425,7 +465,7 @@ public:
                 auto& render_params = render_pass.renderParams[0];
                 render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
                 render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
+                render_params.projection.data.matrix = culling_pass.projection.data.matrix =  Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
 
     #if !SIDE_BY_SIDE
                 // App has hinted that it would like to render to a smaller viewport.  Tell unity to render to that viewport.
@@ -558,6 +598,7 @@ private:
             texture_desc.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
             // TODO: do we need depth?
             texture_desc.depthFormat = kUnityXRDepthTextureFormat24bitOrGreater;
+            //texture_desc.depthFormat = kUnityXRDepthTextureFormatReference;
             texture_desc.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
             texture_desc.width = tex_width;
             texture_desc.height = tex_height;
@@ -631,7 +672,7 @@ private:
     
     bool textures_initialized_ = false;
     
-    bool native_textures_got_ = false;
+    bool native_textures_queried_ = false;
     
     bool metal_initialized_ = false;
     
@@ -641,6 +682,10 @@ private:
     
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
+    
+    bool is_xr_mode_enabled_;
+    
+    bool render_mode_changed_;
     
     static std::unique_ptr<HoloKitDisplayProvider> display_provider_;
 };

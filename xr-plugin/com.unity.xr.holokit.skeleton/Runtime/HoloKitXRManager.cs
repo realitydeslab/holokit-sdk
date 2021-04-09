@@ -231,7 +231,7 @@ namespace UnityEngine.XR.HoloKit
                 Debug.Log($"XRGeneralSettings is null.");
                 return;
             }
-
+            
             var xrManager = xrSettings.Manager;
             if (xrManager == null)
             {

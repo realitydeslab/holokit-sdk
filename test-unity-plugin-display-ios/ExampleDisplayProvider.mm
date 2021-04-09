@@ -229,7 +229,7 @@ NSString* texShader = @
         "   return half4(texture.sample(s, mappingVertex.textureCoordinate));\n"
         "}\n";
 
-NSString* shaderStr = @
+NSString* side_by_side_shader = @
         "#include <metal_stdlib>\n"
         "using namespace metal;\n"
         "struct AppData\n"
@@ -328,7 +328,7 @@ UnitySubsystemErrorCode ExampleDisplayProvider::GfxThread_SubmitCurrentFrame()
     // do an extral draw call
     MTLPixelFormat extraDrawCallPixelFormat = texture.pixelFormat;
     NSUInteger extraDrawCallSampleCount = texture.sampleCount;
-    id<MTLLibrary> lib = [mtlDevice newLibraryWithSource:shaderStr options:nil error:nil];
+    id<MTLLibrary> lib = [mtlDevice newLibraryWithSource:side_by_side_shader options:nil error:nil];
     //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
     id<MTLFunction> g_VProg = [lib newFunctionWithName:@"vprog"];
     id<MTLFunction> g_FShaderColor = [lib newFunctionWithName:@"fshader_color"];

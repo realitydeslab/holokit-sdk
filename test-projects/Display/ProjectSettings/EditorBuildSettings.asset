@@ -9,6 +9,8 @@ EditorBuildSettings:
     path: Assets/display.unity
     guid: 0bfa44461ffca4302a283627681f23b6
   m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 5a3ca412859ff477aa1381b715c095aa,
+      type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: f5da7fa43da92414ca18205e9fbf35fe,
       type: 2}
     UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: 0b0e5dade2a62447b8edaf7e5aeb256e,

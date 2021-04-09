@@ -35,6 +35,8 @@ public:
     
     float GetHorizontalAlignmentMarkerOffset() { return horizontal_alignment_marker_offset_; }
     
+    ARSessionDelegateController* GetArSessionHandler() { return ar_session_handler_; }
+    
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
 private:
@@ -66,6 +68,9 @@ private:
     float horizontal_alignment_marker_offset_;
     
     ARSessionDelegateController* ar_session_handler_;
+    
+    /// @brief True for XR mode and false for AR mode.
+    bool is_xr_mode_enabled_;
     
     static std::unique_ptr<HoloKitApi> holokit_api_;
     

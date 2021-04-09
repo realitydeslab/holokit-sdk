@@ -33,6 +33,8 @@ public:
     
     IUnityXRTrace* GetTrace() { return trace_; }
     
+    void SetUnityInterfaces(IUnityInterfaces* xr_interfaces) { xr_interfaces_ = xr_interfaces; }
+    
     static std::unique_ptr<HoloKitInputProvider>& GetInstance();
     
 #pragma mark - Input Lifecycle Methods
@@ -81,7 +83,6 @@ public:
         // Register ar session handler
         ar_session_handler_ = [ARSessionDelegateController sharedARSessionDelegateController];
         
-        // TODO: Connect input devices
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHme);
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandLeft);
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandRight);
@@ -92,15 +93,24 @@ public:
     void Stop(UnitySubsystemHandle handle) {
         HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Stop()", GetCurrentTime());
         
-        // TODO: disconnect devices
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHme);
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandLeft);
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandRight);
     }
     
     UnitySubsystemErrorCode Tick() {
-        //HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Tick()", GetCurrentTime());
-        
+        /*
+        HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Tick()", GetCurrentTime());
+        NSLog(@"current frame count %d", s_FrameCount++);
+        if(s_FrameCount == 1000) {
+            NSLog(@"trying to load display subsystem");
+            if(LoadDisplay(xr_interfaces_) == kUnitySubsystemErrorCodeSuccess) {
+                NSLog(@"display loading succeeded");
+            } else {
+                NSLog(@"display loading failed");
+            }
+        }
+         */
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -113,8 +123,6 @@ public:
         
         switch (device_id) {
             case kDeviceIdHoloKitHme: {
-                
-                HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(), "<<<<<<<<<< connecting device HoloKitHme...");
                 input_->DeviceDefinition_SetName(definition, "HoloKit HMD");
                 input_->DeviceDefinition_SetCharacteristics(definition, kHmeCharacteristics);
                 // features
@@ -131,7 +139,6 @@ public:
             case kDeviceIdHoloKitHandLeft:
             case kDeviceIdHoloKitHandRight:
             {
-                HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(), "<<<<<<<<<< connecting device HoloKitHandLeft...");
                 if (device_id == kDeviceIdHoloKitHandLeft) {
                     input_->DeviceDefinition_SetName(definition, "HoloKit Left Hand");
                     input_->DeviceDefinition_SetCharacteristics(definition, kLeftHandCharacteristics);
@@ -172,12 +179,9 @@ public:
 
                 break;
             }
-            
             default:
                 return kUnitySubsystemErrorCodeFailure;
         }
-        
-        
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -491,6 +495,8 @@ private:
     static std::unique_ptr<HoloKitInputProvider> input_provider_;
     
     ARSessionDelegateController* ar_session_handler_;
+    
+    IUnityInterfaces* xr_interfaces_;
 };
 
 std::unique_ptr<HoloKitInputProvider> HoloKitInputProvider::input_provider_;
@@ -502,18 +508,21 @@ std::unique_ptr<HoloKitInputProvider>& HoloKitInputProvider::GetInstance() {
 } //namespace
 
 
-UnitySubsystemErrorCode LoadInput(IUnityInterfaces* xr_interface) {
-    auto* input = xr_interface->Get<IUnityXRInputInterface>();
+UnitySubsystemErrorCode LoadInput(IUnityInterfaces* xr_interfaces) {
+    auto* input = xr_interfaces->Get<IUnityXRInputInterface>();
     if (input == NULL) {
         return kUnitySubsystemErrorCodeFailure;
     }
     
-    auto* trace = xr_interface->Get<IUnityXRTrace>();
+    auto* trace = xr_interfaces->Get<IUnityXRTrace>();
     if (trace == NULL) {
         return kUnitySubsystemErrorCodeFailure;
     }
+    HOLOKIT_INPUT_XR_TRACE_LOG(trace, "%f LoadInput()", GetCurrentTime());
+    
     HoloKitInputProvider::GetInstance().reset(new HoloKitInputProvider(trace, input));
-     HOLOKIT_INPUT_XR_TRACE_LOG(trace, "%f LoadInput()", GetCurrentTime());
+
+    HoloKitInputProvider::GetInstance()->SetUnityInterfaces(xr_interfaces);
     
     UnityLifecycleProvider input_lifecycle_handler;
     input_lifecycle_handler.userData = NULL;

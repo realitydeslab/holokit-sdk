@@ -36,27 +36,16 @@
 
 static const float kMaxLandmarkDistance = 0.8f;
 
-/*
-@interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
+@interface ARSessionDelegateController ()
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
 @property (nonatomic, strong) NSOperationQueue* motionQueue;
 @property (nonatomic, strong) HandTracker* handTracker;
-//@property (nonatomic, strong) NSArray<NSArray<Landmark *> *> *landmarks;
-@property (nonatomic, strong) NSMutableArray<LandmarkPosition *> *leftHandLandmarkPositions;
-@property (nonatomic, strong) NSMutableArray<LandmarkPosition *> *rightHandLandmarkPositions;
 @property (assign) double lastHandTrackingTimestamp;
-@property (assign) bool isLeftHandTracked;
-@property (assign) bool isRightHandTracked;
-// open or close hand tracking
-@property (assign) bool isHandTrackingEnabled;
-
-@property (nonatomic, strong) ARSession* session;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
 @end
-*/
 
 @implementation ARSessionDelegateController
 
@@ -203,7 +192,6 @@ static const float kMaxLandmarkDistance = 0.8f;
             //ARDepthData* sceneDepth = self.frame.sceneDepth;
             ARDepthData* sceneDepth = self.session.currentFrame.sceneDepth;
             if(!sceneDepth) {
-                NSLog(@"ViewController");
                 NSLog(@"Failed to acquire scene depth.");
                 return;
             } else {
@@ -223,7 +211,7 @@ static const float kMaxLandmarkDistance = 0.8f;
             
             // eliminate landmark which is too distant to the user, which is obviously wrong data
             if(landmarkDepth > kMaxLandmarkDistance) {
-                NSLog(@"depth value is too large");
+                //NSLog(@"depth value is too large");
                 if(handIndex == 0){
                     self.isLeftHandTracked = false;
                     self.isRightHandTracked = false;
