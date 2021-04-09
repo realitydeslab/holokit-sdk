@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.ARFoundation;
+using System.Runtime.InteropServices;
 
 public class RenderingSettings : MonoBehaviour
 {
-    ARCameraBackground camBackground;
+    static ARCameraBackground camBackground;
+
+    [DllImport("__Internal")]
+    public static extern void UnityHoloKit_SetIsXrModeEnabled(bool val);
 
     // Start is called before the first frame update
     void Start()
@@ -23,5 +27,11 @@ public class RenderingSettings : MonoBehaviour
     void Update()
     {
 
-    }    
+    }
+
+    public static void EnableARBackground(bool val)
+    {
+        camBackground.enabled = val;
+        UnityHoloKit_SetIsXrModeEnabled(!val);
+    }
 }

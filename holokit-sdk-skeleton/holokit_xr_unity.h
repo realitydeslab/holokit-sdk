@@ -37,6 +37,10 @@ public:
     
     ARSessionDelegateController* GetArSessionHandler() { return ar_session_handler_; }
     
+    bool GetIsXrModeEnabled() { return is_xr_mode_enabled_; }
+    
+    void SetIsXrModeEnabled(bool val) { is_xr_mode_enabled_ = val; }
+    
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
 private:
@@ -83,3 +87,4 @@ std::unique_ptr<HoloKitApi>& HoloKitApi::GetInstance() {
 }
 
 } // namespace holokit
+

@@ -198,6 +198,7 @@ public:
         
         //holokit_api_.reset(holokit::HoloKitApi::GetInstance());
         is_xr_mode_enabled_ = false;
+        render_mode_changed_ = false;
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -386,6 +387,7 @@ public:
             // initialize HoloKitApi at the first frame
             holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
             holokit::HoloKitApi::GetInstance()->Initialize();
+            is_holokit_api_initialized_ = true;
             
             textures_initialized_ = false;
             native_textures_queried_ = false;
@@ -406,6 +408,10 @@ public:
             CreateTextures(num_textures, texture_array_length, frame_hints->appSetup.textureResolutionScale);
         }
         
+        // Skip the splash screen phase, since holokit api is not initialized.
+        if (is_holokit_api_initialized_) {
+            is_xr_mode_enabled_ = holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled();
+        }
         // AR mode rendering
         if (!is_xr_mode_enabled_) {
             next_frame->renderPassesCount = 1;
@@ -414,8 +420,10 @@ public:
             render_pass.textureId = unity_textures_[0];
             render_pass.renderParamsCount = 1;
             render_pass.cullingPassIndex = 1;
+            
             auto& culling_pass = next_frame->cullingPasses[0];
             // TODO: culling pass separation
+            //culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
             
             auto& render_params = render_pass.renderParams[0];
             // view matrix
@@ -426,6 +434,7 @@ public:
             // projection matrix
             // get ARKit projection matrix
             simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
+            LogMatrix4x4(projection_matrix);
             render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
             // viewport
@@ -501,7 +510,7 @@ public:
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
         // TODO: reset holokit api
         
-        is_initialized_ = false;
+        is_holokit_api_initialized_ = false;
         return kUnitySubsystemErrorCodeSuccess;
     }
 
@@ -646,7 +655,7 @@ private:
     UnitySubsystemHandle handle_;
     
     ///@brief Tracks HoloKit API initialization status.
-    bool is_initialized_ = false;
+    bool is_holokit_api_initialized_ = false;
     
     ///@brief Screen width in pixels.
     int width_;

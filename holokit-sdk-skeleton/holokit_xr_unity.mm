@@ -6,6 +6,7 @@
 //
 
 #include "holokit_xr_unity.h"
+#include "IUnityInterface.h"
 #include <sys/utsname.h>
 
 const float kUserInterpupillaryDistance = 0.064;
@@ -134,3 +135,8 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
 }
 
 } // namespace
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetIsXrModeEnabled(bool val) {
+    holokit::HoloKitApi::GetInstance()->SetIsXrModeEnabled(val);
+}
