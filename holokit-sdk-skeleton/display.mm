@@ -198,7 +198,7 @@ public:
         
         //holokit_api_.reset(holokit::HoloKitApi::GetInstance());
         is_xr_mode_enabled_ = false;
-        render_mode_changed_ = false;
+        display_mode_changed_ = false;
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -353,6 +353,15 @@ public:
 
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
         
+        // Skip the splash screen phase, since holokit api is not initialized.
+        if (is_holokit_api_initialized_) {
+            if (is_xr_mode_enabled_ != holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled()) {
+                NSLog(@"Display mode switched.");
+                is_xr_mode_enabled_ = holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled();
+                display_mode_changed_ = true;
+            }
+        }
+        
         bool reallocate_textures = (unity_textures_.size() == 0);
         if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0)
         {
@@ -378,16 +387,19 @@ public:
         {
             // App changed focus plane, configure compositor if possible.
         }
-        if (render_mode_changed_) {
+        if (display_mode_changed_) {
             reallocate_textures = true;
+            display_mode_changed_ = false;
         }
 
         if (reallocate_textures)
         {
             // initialize HoloKitApi at the first frame
-            holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
-            holokit::HoloKitApi::GetInstance()->Initialize();
-            is_holokit_api_initialized_ = true;
+            if (!is_holokit_api_initialized_){
+                holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
+                holokit::HoloKitApi::GetInstance()->Initialize();
+                is_holokit_api_initialized_ = true;
+            }
             
             textures_initialized_ = false;
             native_textures_queried_ = false;
@@ -408,10 +420,6 @@ public:
             CreateTextures(num_textures, texture_array_length, frame_hints->appSetup.textureResolutionScale);
         }
         
-        // Skip the splash screen phase, since holokit api is not initialized.
-        if (is_holokit_api_initialized_) {
-            is_xr_mode_enabled_ = holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled();
-        }
         // AR mode rendering
         if (!is_xr_mode_enabled_) {
             next_frame->renderPassesCount = 1;
@@ -419,7 +427,7 @@ public:
             auto& render_pass = next_frame->renderPasses[0];
             render_pass.textureId = unity_textures_[0];
             render_pass.renderParamsCount = 1;
-            render_pass.cullingPassIndex = 1;
+            render_pass.cullingPassIndex = 0;
             
             auto& culling_pass = next_frame->cullingPasses[0];
             // TODO: culling pass separation
@@ -434,7 +442,7 @@ public:
             // projection matrix
             // get ARKit projection matrix
             simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
-            LogMatrix4x4(projection_matrix);
+            //LogMatrix4x4(projection_matrix);
             render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
             // viewport
@@ -692,9 +700,11 @@ private:
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
     
+    /// @brief This value is true if XR mode is enabled, false if AR mode is enabled.
     bool is_xr_mode_enabled_;
     
-    bool render_mode_changed_;
+    /// @brief This value is set to true when the user switched from AR mode to XR model, vice versa.
+    bool display_mode_changed_;
     
     static std::unique_ptr<HoloKitDisplayProvider> display_provider_;
 };
