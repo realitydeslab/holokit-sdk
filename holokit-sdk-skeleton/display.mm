@@ -197,7 +197,7 @@ public:
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
         //holokit_api_.reset(holokit::HoloKitApi::GetInstance());
-        is_xr_mode_enabled_ = true;
+        is_xr_mode_enabled_ = false;
         
         return kUnitySubsystemErrorCodeSuccess;
     }

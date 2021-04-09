@@ -9,7 +9,6 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #import <ARKit/ARKit.h>
-
 #import <HandTracker/HandTracker.h>
 
 @interface ViewController : UIViewController

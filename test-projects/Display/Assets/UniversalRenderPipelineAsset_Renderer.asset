@@ -51,6 +51,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ae4d376c05df421b98c5b39b25b0d29, type: 3}
-  m_Name: ndererFeaturendRendererFeature
+  m_Name: AR Background
   m_EditorClassIdentifier: 
   m_Active: 1
