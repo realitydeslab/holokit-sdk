@@ -42,6 +42,7 @@ UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
             return;
     }
     HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "HoloKit input subsystem successfully loaded.");
+    
 }
 
 // @brief Unloads Unity XR Display and Input subsystems.

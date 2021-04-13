@@ -53,7 +53,7 @@ static const float kMaxLandmarkDistance = 0.8f;
     if(self = [super init]) {
         self.handTracker = [[HandTracker alloc] init];
         self.handTracker.delegate = self;
-        [self.handTracker startGraph];
+        //[self.handTracker startGraph];
         
         self.handTrackingQueue = [[NSOperationQueue alloc] init];
         self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
@@ -76,7 +76,7 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.isRightHandTracked = true;
         self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
         
-        self.isHandTrackingEnabled = YES;
+        self.isHandTrackingEnabled = NO;
         
         //[self startAccelerometer];
         //[self startGyroscope];
@@ -192,9 +192,10 @@ static const float kMaxLandmarkDistance = 0.8f;
             //ARDepthData* sceneDepth = self.frame.sceneDepth;
             ARDepthData* sceneDepth = self.session.currentFrame.sceneDepth;
             if(!sceneDepth) {
-                NSLog(@"Failed to acquire scene depth.");
+                NSLog(@"[AR Session]: Failed to acquire scene depth.");
                 return;
             } else {
+                //NSLog(@"[AR Session]: Got scene depth.");
                 //NSLog(@"Scene depth was acquired successfully!");
                 CVPixelBufferRef depthPixelBuffer = sceneDepth.depthMap;
                 CVPixelBufferLockBaseAddress(depthPixelBuffer, 0);

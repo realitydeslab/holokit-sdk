@@ -28,6 +28,8 @@ public:
     
     void Initialize();
     
+    simd_float4x4 GetCurrentViewMatrix();
+    
     simd_float3 GetEyePosition(int eye_index);
     
     simd_float4x4 GetProjectionMatrix(int eye_index);
@@ -39,6 +41,8 @@ public:
     ARSessionDelegateController* GetArSessionHandler() { return ar_session_handler_; }
     
     bool GetIsXrModeEnabled() { return is_xr_mode_enabled_; }
+    
+    bool GetIsInitialized() { return is_initialized_; }
     
     /// @brief This method might fail due to NFC check, in which case it returns false.
     bool SetIsXrModeEnabled(bool val);
@@ -84,6 +88,8 @@ private:
     bool is_nfc_validated_;
     
     static std::unique_ptr<HoloKitApi> holokit_api_;
+    
+    bool is_initialized_ = false;
     
 }; // class HoloKitApi
 

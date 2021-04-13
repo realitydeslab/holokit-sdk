@@ -5,7 +5,7 @@
 //  Created by Yuchen on 2021/3/29.
 //
 
-#include "holokit_xr_unity.h"
+#include "holokit_api.h"
 #include "IUnityInterface.h"
 #include <sys/utsname.h>
 
@@ -15,7 +15,7 @@ namespace holokit {
 
 #pragma mark - Initialize()
 void HoloKitApi::Initialize() {
-    NSLog(@"[HoloKitApi]: Initialize()");
+    NSLog(@"[HoloKitApi]: Initialized.");
     
     // TODO: do this more elegantly
     width_ = 2778;
@@ -45,6 +45,8 @@ void HoloKitApi::Initialize() {
     is_nfc_enabled_ = true;
     
     is_nfc_validated_ = false;
+    
+    is_initialized_ = true;
 }
 
 void HoloKitApi::InitOpticalParameters() {
@@ -155,6 +157,10 @@ bool HoloKitApi::SetIsXrModeEnabled(bool val) {
         return true;
     }
     return false;
+}
+
+simd_float4x4 HoloKitApi::GetCurrentViewMatrix() {
+    return ar_session_handler_.session.currentFrame.camera.transform;
 }
 
 } // namespace

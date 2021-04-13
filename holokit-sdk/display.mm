@@ -13,7 +13,7 @@
 #include "UnitySubsystemTypes.h"
 #include "load.h"
 #include "math_helpers.h"
-#include "holokit_xr_unity.h"
+#include "holokit_api.h"
 
 #if __APPLE__
 #define XR_METAL 1
@@ -196,7 +196,6 @@ public:
     UnitySubsystemErrorCode Start() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
-        //holokit_api_.reset(holokit::HoloKitApi::GetInstance());
         is_xr_mode_enabled_ = true;
         display_mode_changed_ = false;
         
