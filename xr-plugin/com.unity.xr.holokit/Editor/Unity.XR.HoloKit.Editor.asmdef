@@ -1,5 +1,5 @@
 {
-    "name": "Unity.XR.HoloKit.Skeleton.Editor",
+    "name": "Unity.XR.HoloKit.Editor",
     "rootNamespace": "",
     "references": [
         "GUID:e40ba710768534012815d3193fa296cb",
