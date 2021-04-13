@@ -50,13 +50,14 @@ namespace UnityEngine.XR.HoloKit
             );
         }
     }
+    
 #endif
 
-    public class HoloKitXRManager
+    public class DisplaySampleXRManager
     {
-        public  const string kHoloKitDisplayProviderId = "HoloKit-Display";
-        public  const string kHoloKitInputProviderId = "HoloKit-Input";
-
+        public const string kHoloKitDisplayProviderId = "HoloKit Display";
+        public const string kHoloKitInputProviderId = "HoloKit Input";
+        
         static XRDisplaySubsystemDescriptor GetHoloKitDisplaySubsystemDescriptor()
         {
             List<XRDisplaySubsystemDescriptor> displayProviders = new List<XRDisplaySubsystemDescriptor>();
@@ -66,12 +67,13 @@ namespace UnityEngine.XR.HoloKit
             {
                 if (d.id.Equals(kHoloKitDisplayProviderId))
                 {
+                    Debug.Log("++++++++++ found display provider");
                     return d;
                 }
             }
             return null;
         }
-
+        
         static XRInputSubsystemDescriptor GetHoloKitInputSubsystemDescriptor()
         {
             List<XRInputSubsystemDescriptor> inputProviders = new List<XRInputSubsystemDescriptor>();
@@ -81,14 +83,17 @@ namespace UnityEngine.XR.HoloKit
             {
                 if (d.id.Equals(kHoloKitInputProviderId))
                 {
+                    Debug.Log("++++++++++ found head tracking input provider");
                     return d;
                 }
             }
             return null;
         }
-
+        
+        
         static XRSessionSubsystem GetLoadedXRSessionSubsystem()
         {
+            Debug.Log("[HoloKitXRManager]: GetLoadedXRSessionSubsystem()");
             List<XRSessionSubsystem> xrSessionSubsystems = new List<XRSessionSubsystem>();
             SubsystemManager.GetSubsystems(xrSessionSubsystems);
 
@@ -96,64 +101,60 @@ namespace UnityEngine.XR.HoloKit
             {
                 // if (d.running) 
                 // {
-                    Debug.Log("xrSession is founded. id" + d.subsystemDescriptor.id + "running" + d.running + " session id" + d.sessionId + " nativePtr" + d.nativePtr + " state" + d.trackingState);
-                    return d;
-//                }
+                //Debug.Log("xrSession is founded. id" + d.subsystemDescriptor.id + "running" + d.running + " session id" + d.sessionId + " nativePtr" + d.nativePtr + " state" + d.trackingState);
+                return d;
+                //                }
             }
             return null;
         }
+        
 
-
-
-        //Before AfterAssembliesLoaded
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void OnSubsystemRegistration ()
+        static void LoadHoloKitXRSubsystem() 
         {
-            Debug.LogWarning("OnSubsystemRegistration");
-        
-            var xrSettings = XRGeneralSettings.Instance;
-            if (xrSettings == null)
+            /*
+            Debug.Log("XRManager::LoadHoloKitXRSubsystem()");
+            //Debug.Log("Input providers:");
+            List<XRInputSubsystemDescriptor> inputProviders = new List<XRInputSubsystemDescriptor>();
+            SubsystemManager.GetSubsystemDescriptors(inputProviders);
+            foreach (var d in inputProviders)
             {
-                Debug.Log($"XRGeneralSettings is null.");
-                return;
+                //Debug.Log("Input Provider: " + d.id); 
             }
 
-            var xrManager = xrSettings.Manager;
-            if (xrManager == null)
+            //Debug.Log("Input subsystems:");
+            List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
+            SubsystemManager.GetSubsystems(inputSubsystems);
+            foreach (var d in inputSubsystems)
             {
-                Debug.Log($"XRManagerSettings is null.");
-                return;
+                //Debug.Log("Input Subsystem: " + d.subsystemDescriptor.id);
             }
-            Debug.Log($"Set automaticloading = false.");
-            xrManager.automaticLoading = false;
-         }
-        
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-        static void OnAfterAssembliesLoaded() {
-           Debug.LogWarning("OnAfterAssembliesLoaded");
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-        static void OnBeforeSplashScreen() {
-           Debug.LogWarning("OnBeforeSplashScreen");
-
-             bool holokitDisplayStarted = false;
+            */
+            
+            bool holokitDisplayStarted = false;
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
             foreach (var d in displaySubsystems)
-            {
-                 Debug.Log("BeforeSplashScreen Current" + d.subsystemDescriptor.id);
-
+            {   
+                Debug.Log("LoadHoloKitXRSubsystem " + d.subsystemDescriptor.id);
                 if (d.running)
                 {
+                    
                     if (!d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
-                    {                        
+                    {
+                        Debug.Log("sorry got another display provider...");
                         d.Stop();
                     }
                     else
                     {
+                        Debug.Log("++++++++++ holokit display subsystem has started automatically");
                         holokitDisplayStarted = true;
                     }
+                    
+                    //if (d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
+                    //{
+                    //    Debug.Log("++++++++++ holokit display subsystem has started automatically");
+                    //    holokitDisplayStarted = true;
+                    //}
                 }
             }
 
@@ -165,11 +166,12 @@ namespace UnityEngine.XR.HoloKit
                     var holokitDisplaySubsystem = holokitDisplaySubsystemDescriptor.Create();
                     if (holokitDisplaySubsystem != null)
                     {
-                       holokitDisplaySubsystem.Start();
+                       Debug.Log("++++++++++ try manually start holokit display subsystem");
+                        holokitDisplaySubsystem.Start();
                     }
                 }
             }
-
+            
             bool holokitInputStarted = false;
             List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
             SubsystemManager.GetSubsystems(inputSubsystems);
@@ -179,6 +181,7 @@ namespace UnityEngine.XR.HoloKit
                 {
                     if (d.subsystemDescriptor.id.Equals(kHoloKitInputProviderId))
                     {
+                        Debug.Log("++++++++++ holokit input subsystem has started automatically");
                         holokitInputStarted = true;
                     }
                 }
@@ -192,35 +195,90 @@ namespace UnityEngine.XR.HoloKit
                     var holokitInputSubsystem = holokitInputSubsystemDescriptor.Create();
                     if (holokitInputSubsystem != null)
                     {
+                        Debug.Log("+++++++++++ try manually start holokit input subsystem");
                         holokitInputSubsystem.Start();
                     }
                 }
             }
-
+            
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
-            if (xrSessionSubsystem != null) {
-                Debug.Log("xrSessionSubsystem" + xrSessionSubsystem.sessionId + " " + xrSessionSubsystem.trackingState + " " + xrSessionSubsystem.nativePtr);
-                Debug.Log("Setup xrSessionSubsystem");
+            if (xrSessionSubsystem != null)
+            {
+                Debug.Log("[LoadHoloKitXRSubsystem] xrSessionSubsystem sessionId=" + xrSessionSubsystem.sessionId + " xrSessionSubsystem.trackingState=" + xrSessionSubsystem.trackingState + " xrSessionSubsystem.nativePtr=" + xrSessionSubsystem.nativePtr);
+                Debug.Log("[LoadHoloKitXRSubsystem] Setup xrSessionSubsystem");
+#if UNITY_IOS
                 UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
+                Debug.Log("[HoloKitXRManager]: UnityHoloKit_SetARSession()");
+#endif
             }
 
 #if UNITY_INPUT_SYSTEM
             InputLayoutLoader.RegisterInputLayouts();
+            //Debug.Log("<<<<<<<<<<RegisterInputLayours()");
 #endif
+            
+        }
+
+        //Before AfterAssembliesLoaded
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void OnSubsystemRegistration()
+        {
+            Debug.Log("[OnSubsystemRegistration] Start");
+
+            var xrSettings = XRGeneralSettings.Instance;
+            if (xrSettings == null)
+            {
+                Debug.Log($"XRGeneralSettings is null.");
+                return;
+            }
+            
+            var xrManager = xrSettings.Manager;
+            if (xrManager == null)
+            {
+                Debug.Log($"XRManagerSettings is null.");
+                return;
+            }
+
+            Debug.Log($"[OnSubsystemRegistration] Set automaticloading = false.");
+            xrManager.automaticLoading = false;
+            
+            // do something here
+            // manually force to initialize all loaders
+            Debug.Log($"number of loaders: {xrManager.loaders.Count}");
+            //Debug.Log($"number of registered loaders: {xrManager.}")
+            foreach(var loader in xrManager.loaders)
+            {   
+                Debug.Log($"trying to initialize loader number");
+                loader.Initialize();
+            }
+            
+        }
+        
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void OnAfterAssembliesLoaded() {
+           Debug.Log("[OnAfterAssembliesLoaded] Start");
+           
+        }   
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        static void OnBeforeSplashScreen() {
+            Debug.Log("[OnBeforeSplashScreen] Start");
+
+            //Debug.Log("xrManager loaders");
+            LoadHoloKitXRSubsystem();
         }
  
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoad() {
-            Debug.LogWarning("OnBeforeSceneLoad ======> " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + ".unity");
+            Debug.Log("[OnBeforeSceneLoad] ======> " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + ".unity");
             
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad() {
-            Debug.LogWarning("OnAfterSceneLoad ======> " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + ".unity");
+            Debug.Log("[OnAfterSceneLoad] ======> " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().name + ".unity");
             
         }
-
 
         [DllImport("__Internal")]
         public static extern void UnityHoloKit_SetARSession(IntPtr ptr);

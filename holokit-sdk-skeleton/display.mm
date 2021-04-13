@@ -197,7 +197,7 @@ public:
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
         //holokit_api_.reset(holokit::HoloKitApi::GetInstance());
-        is_xr_mode_enabled_ = false;
+        is_xr_mode_enabled_ = true;
         display_mode_changed_ = false;
         
         return kUnitySubsystemErrorCodeSuccess;
@@ -264,53 +264,56 @@ public:
             native_textures_queried_ = true;
         }
         
-        // do an extral draw call
-        id<MTLBuffer> vertex_buffer = [mtl_device_ newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
-        id<MTLBuffer> index_buffer = [mtl_device_ newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
-        
-        id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:side_by_side_shader options:nil error:nil];
-        //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
-        id<MTLFunction> vertex_function = [lib newFunctionWithName:@"vprog"];
-        id<MTLFunction> fragment_function = [lib newFunctionWithName:@"fshader_tex"];
-        
-        NSBundle* mtl_bundle = metal_interface_->MetalBundle();
-        
-        MTLVertexBufferLayoutDescriptor* buffer_layout_descriptor = [[mtl_bundle classNamed:@"MTLVertexBufferLayoutDescriptor"] new];
-        buffer_layout_descriptor.stride = 4 * sizeof(float);
-        buffer_layout_descriptor.stepFunction = MTLVertexStepFunctionPerVertex;
-        buffer_layout_descriptor.stepRate = 1;
-        
-        MTLVertexAttributeDescriptor* attribute_descriptor = [[mtl_bundle classNamed:@"MTLVertexAttributeDescriptor"] new];
-        attribute_descriptor.format = MTLVertexFormatFloat4;
-        
-        MTLVertexDescriptor* vertex_descriptor = [[mtl_bundle classNamed:@"MTLVertexDescriptor"] vertexDescriptor];
-        vertex_descriptor.attributes[0] = attribute_descriptor;
-        vertex_descriptor.layouts[0] = buffer_layout_descriptor;
-        
-        MTLRenderPipelineDescriptor* render_pipeline_descriptor = [[mtl_bundle classNamed:@"MTLRenderPipelineDescriptor"] new];
+        // Metal initialization is expensive and we only want to run it once.
+        if (!is_metal_initialized_) {
+            // set up buffers
+            vertex_buffer_ = [mtl_device_ newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
+            index_buffer_ = [mtl_device_ newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
+            // Set up library and functions
+            id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:side_by_side_shader options:nil error:nil];
+            //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
+            id<MTLFunction> vertex_function = [lib newFunctionWithName:@"vprog"];
+            id<MTLFunction> fragment_function = [lib newFunctionWithName:@"fshader_tex"];
+            mtl_bundle_ = metal_interface_->MetalBundle();
+            
+            MTLVertexBufferLayoutDescriptor* buffer_layout_descriptor = [[mtl_bundle_ classNamed:@"MTLVertexBufferLayoutDescriptor"] new];
+            buffer_layout_descriptor.stride = 4 * sizeof(float);
+            buffer_layout_descriptor.stepFunction = MTLVertexStepFunctionPerVertex;
+            buffer_layout_descriptor.stepRate = 1;
+            
+            MTLVertexAttributeDescriptor* attribute_descriptor = [[mtl_bundle_ classNamed:@"MTLVertexAttributeDescriptor"] new];
+            attribute_descriptor.format = MTLVertexFormatFloat4;
+            
+            MTLVertexDescriptor* vertex_descriptor = [[mtl_bundle_ classNamed:@"MTLVertexDescriptor"] vertexDescriptor];
+            vertex_descriptor.attributes[0] = attribute_descriptor;
+            vertex_descriptor.layouts[0] = buffer_layout_descriptor;
+            
+            MTLRenderPipelineDescriptor* render_pipeline_descriptor = [[mtl_bundle_ classNamed:@"MTLRenderPipelineDescriptor"] new];
 
-        MTLRenderPipelineColorAttachmentDescriptor* color_attachment_descriptor = [[mtl_bundle classNamed:@"MTLRenderPipelineColorAttachmentDescriptor"] new];
-        color_attachment_descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
-        render_pipeline_descriptor.colorAttachments[0] = color_attachment_descriptor;
+            MTLRenderPipelineColorAttachmentDescriptor* color_attachment_descriptor = [[mtl_bundle_ classNamed:@"MTLRenderPipelineColorAttachmentDescriptor"] new];
+            color_attachment_descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
+            render_pipeline_descriptor.colorAttachments[0] = color_attachment_descriptor;
 
-        //pipeDesc.fragmentFunction = g_FShaderColor;
-        render_pipeline_descriptor.fragmentFunction = fragment_function;
-        render_pipeline_descriptor.vertexFunction = vertex_function;
-        render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
-        render_pipeline_descriptor.sampleCount = 1;
-        id<MTLRenderPipelineState> render_pipeline_state = [mtl_device_ newRenderPipelineStateWithDescriptor:render_pipeline_descriptor error:nil];
+            //pipeDesc.fragmentFunction = g_FShaderColor;
+            render_pipeline_descriptor.fragmentFunction = fragment_function;
+            render_pipeline_descriptor.vertexFunction = vertex_function;
+            render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
+            render_pipeline_descriptor.sampleCount = 1;
+            render_pipeline_state_ = [mtl_device_ newRenderPipelineStateWithDescriptor:render_pipeline_descriptor error:nil];
+            is_metal_initialized_ = true;
+        }
         
         id<MTLRenderCommandEncoder> render_command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [render_command_encoder setRenderPipelineState:render_pipeline_state];
+        [render_command_encoder setRenderPipelineState:render_pipeline_state_];
         [render_command_encoder setCullMode:MTLCullModeNone];
-        [render_command_encoder setVertexBuffer:vertex_buffer offset:0 atIndex:0];
+        [render_command_encoder setVertexBuffer:vertex_buffer_ offset:0 atIndex:0];
         [render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:0];
 #if SIDE_BY_SIDE
         [render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:1];
 #else
         [render_command_encoder setFragmentTexture:metal_color_textures_[1] atIndex:1];
 #endif
-        [render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:index_buffer indexBufferOffset:0];
+        [render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:index_buffer_ indexBufferOffset:0];
         
         RenderWidgets();
         //NSLog(@"horizontal alignment offset: %f", holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset());
@@ -318,27 +321,31 @@ public:
     }
     
     void RenderWidgets() {
-        vertex_data[0] = vertex_data[4] = holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset();
+        if (!is_metal_initialized_widgets_) {
+            vertex_data[0] = vertex_data[4] = holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset();
+            
+            vertex_buffer_widgets_ = [mtl_device_ newBufferWithBytes:vertex_data length:sizeof(vertex_data) options:MTLResourceOptionCPUCacheModeDefault];
+            vertex_buffer_widgets_.label = @"vertices";
+            //id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
+            //vertex_color_buffer.label = @"colors";
+            
+            id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:myShader options:nil error:nil];
+            id<MTLFunction> vertex_function = [lib newFunctionWithName:@"passThroughVertex"];
+            id<MTLFunction> fragment_function = [lib newFunctionWithName:@"passThroughFragment"];
+            
+            MTLRenderPipelineDescriptor* pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
+            pipeline_descriptor.vertexFunction = vertex_function;
+            pipeline_descriptor.fragmentFunction = fragment_function;
+            pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+            pipeline_descriptor.sampleCount = 1;
+            
+            render_pipeline_state_widgets_ = [mtl_device_ newRenderPipelineStateWithDescriptor:pipeline_descriptor error:nil];
+            is_metal_initialized_widgets_ = true;
+        }
         
-        id<MTLBuffer> vertex_buffer = [mtl_device_ newBufferWithBytes:vertex_data length:sizeof(vertex_data) options:MTLResourceOptionCPUCacheModeDefault];
-        vertex_buffer.label = @"vertices";
-        //id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
-        //vertex_color_buffer.label = @"colors";
-        
-        id<MTLLibrary> lib = [mtl_device_ newLibraryWithSource:myShader options:nil error:nil];
-        id<MTLFunction> vertex_function = [lib newFunctionWithName:@"passThroughVertex"];
-        id<MTLFunction> fragment_function = [lib newFunctionWithName:@"passThroughFragment"];
-        
-        MTLRenderPipelineDescriptor* pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
-        pipeline_descriptor.vertexFunction = vertex_function;
-        pipeline_descriptor.fragmentFunction = fragment_function;
-        pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-        pipeline_descriptor.sampleCount = 1;
-        
-        id<MTLRenderPipelineState> pipeline_state = [mtl_device_ newRenderPipelineStateWithDescriptor:pipeline_descriptor error:nil];
         id<MTLRenderCommandEncoder> command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [command_encoder setRenderPipelineState:pipeline_state];
-        [command_encoder setVertexBuffer:vertex_buffer offset:0 atIndex:0];
+        [command_encoder setRenderPipelineState:render_pipeline_state_widgets_];
+        [command_encoder setVertexBuffer:vertex_buffer_widgets_ offset:0 atIndex:0];
         //[command_encoder setVertexBuffer:vertex_color_buffer offset:0 atIndex:1];
         [command_encoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:(sizeof(vertex_data) / sizeof(float))];
         //NSLog(@"draw call");
@@ -691,11 +698,25 @@ private:
     
     bool native_textures_queried_ = false;
     
-    bool metal_initialized_ = false;
+    /// @brief This value is set to true when Metal is initialized for the first time.
+    bool is_metal_initialized_ = false;
     
-    id<MTLDevice> mtl_device_;
+    id <MTLDevice> mtl_device_;
     
     NSBundle* mtl_bundle_;
+    
+    id <MTLBuffer> vertex_buffer_;
+    
+    id <MTLBuffer> index_buffer_;
+    
+    id <MTLRenderPipelineState> render_pipeline_state_;
+    
+    /// @brief This value is used for rendering widgets.
+    bool is_metal_initialized_widgets_ = false;
+    
+    id <MTLBuffer> vertex_buffer_widgets_;
+    
+    id <MTLRenderPipelineState> render_pipeline_state_widgets_;
     
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;

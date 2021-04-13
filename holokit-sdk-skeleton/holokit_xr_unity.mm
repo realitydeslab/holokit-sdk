@@ -39,7 +39,7 @@ void HoloKitApi::Initialize() {
         NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
     }
     
-    is_xr_mode_enabled_ = false;
+    is_xr_mode_enabled_ = true;
     
     // MODIFY HERE
     is_nfc_enabled_ = true;
