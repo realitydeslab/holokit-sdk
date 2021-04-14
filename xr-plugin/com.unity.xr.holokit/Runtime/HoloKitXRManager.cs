@@ -58,7 +58,11 @@ namespace UnityEngine.XR.HoloKit
         public const string kHoloKitDisplayProviderId = "HoloKit Display";
         public const string kHoloKitInputProviderId = "HoloKit Input";
         public static bool isHoloKitInitialized = false;
-        
+
+        public const string kARKitInputProviderId = "ARKit-Input";
+        public const string kARKitMeshingProviderId = "ARKit-Meshing";
+
+
         static XRDisplaySubsystemDescriptor GetHoloKitDisplaySubsystemDescriptor()
         {
             List<XRDisplaySubsystemDescriptor> displayProviders = new List<XRDisplaySubsystemDescriptor>();
@@ -112,7 +116,33 @@ namespace UnityEngine.XR.HoloKit
         static void LoadHoloKitXRSubsystem() 
         {
             Debug.Log("[HoloKitXRManager]: LoadHoloKitXRSubsystem()");
-            
+
+            Debug.Log("[HoloKitXRManager]: start ARKit");
+            List<XRInputSubsystem> arKitInputSubsystems = new List<XRInputSubsystem>();
+            SubsystemManager.GetSubsystems(arKitInputSubsystems);
+            foreach(var d in arKitInputSubsystems)
+            {
+                Debug.Log("[HoloKitXRManager]: Loaded input subsystem " + d.subsystemDescriptor.id);
+                if (d.subsystemDescriptor.id.Equals(kARKitInputProviderId))
+                {
+                    Debug.Log("fuck arkit input");
+                    d.Start();
+                }
+            }
+
+            List<XRMeshSubsystem> meshSubsystems = new List<XRMeshSubsystem>();
+            SubsystemManager.GetSubsystems(meshSubsystems);
+            foreach (var d in meshSubsystems)
+            {
+                Debug.Log("[HoloKitXRManager]: Loaded mesh subsystem " + d.subsystemDescriptor.id);
+                if (d.subsystemDescriptor.id.Equals(kARKitMeshingProviderId))
+                {
+                    Debug.Log("fuck arkit meshing");
+                    d.Start();
+                }
+            }
+
+            Debug.Log("[HoloKitXRManager]: start HoloKit");
             //bool holokitDisplayStarted = false;
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
@@ -169,7 +199,6 @@ namespace UnityEngine.XR.HoloKit
                 {
                     d.Start();
                 }
-                
                 /*
                 if (d.running)
                 {
@@ -271,13 +300,16 @@ namespace UnityEngine.XR.HoloKit
             foreach (var loader in xrManager.activeLoaders)
             {
                 Debug.Log($"[HoloKitXRManager]: initialize {loader.name}");
+                if (loader.name.Equals("AR Kit Loader"))
+                {
+                    loader.Initialize();
+                }
                 if (loader.name.Equals("Holo Kit XR Loader"))
                 {
                     isHoloKitInitialized = true;
+                    loader.Initialize();
                 }
-                loader.Initialize();
             }
-            
         }   
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]

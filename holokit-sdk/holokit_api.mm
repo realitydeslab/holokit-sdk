@@ -26,7 +26,7 @@ void HoloKitApi::Initialize() {
     struct utsname system_info;
     uname(&system_info);
     device_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
-    NSLog(@"device name %@", device_name_);
+    NSLog(@"device name %@", device_name_); 
     
     InitOpticalParameters();
     
