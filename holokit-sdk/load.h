@@ -7,7 +7,6 @@
 
 #include "IUnityInterface.h"
 #include "UnitySubsystemTypes.h"
-#include "holokit_xr_unity.h"
 
 /// @brief Loads a UnityLifecycleProvider for the display provider.
 ///

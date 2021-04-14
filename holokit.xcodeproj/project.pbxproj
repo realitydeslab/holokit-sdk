@@ -847,7 +847,7 @@
 			path = "official-app";
 			sourceTree = "<group>";
 		};
-		965106A92576659000F076B5 /* holokit-app-clip */ = {
+		965106A92576659000F076B5 /* test-holokit-app-clip */ = {
 			isa = PBXGroup;
 			children = (
 				965106AA2576659000F076B5 /* AppDelegate.swift */,
@@ -859,7 +859,7 @@
 				965106B82576659100F076B5 /* Info.plist */,
 				965106B92576659100F076B5 /* holokit_app_clip.entitlements */,
 			);
-			path = "holokit-app-clip";
+			path = "test-holokit-app-clip";
 			sourceTree = "<group>";
 		};
 		965106DB25766AB100F076B5 /* test-external-holokit-game */ = {
@@ -880,19 +880,19 @@
 		96602134253930CC004019A5 = {
 			isa = PBXGroup;
 			children = (
+				9651053B2575FC9800F076B5 /* official-app */,
+				4BE7B60C261104ED001F39F2 /* holokit-sdk */,
 				9660219C25393723004019A5 /* sdk */,
 				9666E96F2571E2A300A7F127 /* test-metalarkit */,
 				9666E9E3257260D800A7F127 /* test-headtracking2 */,
-				9699F67A2575E2160011D823 /* holokit-app-extension */,
-				9651053B2575FC9800F076B5 /* official-app */,
-				965106A92576659000F076B5 /* holokit-app-clip */,
+				9699F67A2575E2160011D823 /* test-holokit-app-extension */,
+				965106A92576659000F076B5 /* test-holokit-app-clip */,
 				965106DB25766AB100F076B5 /* test-external-holokit-game */,
 				4B6CC26725D42C2C0068CB66 /* test-stereoscopic-rendering */,
 				4B2B2FF725E23E94002AC24F /* test-monocular-handtracking */,
 				4B38240725E7491B00B39EEB /* test-unity-plugin-input */,
 				4B2D6E4225E7CFD500DAAD13 /* test-unity-input-ios */,
 				4B0606CC25F5CA08006DF0B0 /* test-unity-plugin-display-ios */,
-				4BE7B60C261104ED001F39F2 /* holokit-sdk */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -1167,14 +1167,14 @@
 			path = LowLatencyTracking;
 			sourceTree = "<group>";
 		};
-		9699F67A2575E2160011D823 /* holokit-app-extension */ = {
+		9699F67A2575E2160011D823 /* test-holokit-app-extension */ = {
 			isa = PBXGroup;
 			children = (
 				9699F6B02575E6C10011D823 /* nfcverification.entitlements */,
 				9699F67D2575E2160011D823 /* ActionRequestHandler.swift */,
 				9699F6812575E2160011D823 /* Info.plist */,
 			);
-			path = "holokit-app-extension";
+			path = "test-holokit-app-extension";
 			sourceTree = "<group>";
 		};
 		96BC68B925396851008B557A /* calibrations */ = {
@@ -2955,6 +2955,7 @@
 		9666E9F8257260DA00A7F127 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "test-headtracking2/test-headtracking2.entitlements";
@@ -2969,19 +2970,16 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include/eigen3/,
-					"/Users/yuchen/Projects/ceres-solver/config",
-					"/Users/yuchen/Projects/ceres-solver/internal/ceres/miniglog",
-					"/Users/yuchen/Projects/ceres-solver/include",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
 				);
 				INFOPLIST_FILE = "test-headtracking2/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"/Users/yuchen/Projects/ceres-solver/build2/lib",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-headtracking.test-headtracking2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2995,6 +2993,7 @@
 		9666E9F9257260DA00A7F127 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "test-headtracking2/test-headtracking2.entitlements";
@@ -3005,19 +3004,16 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "CERES_NO_THREADS=1";
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include/eigen3/,
-					"/Users/yuchen/Projects/ceres-solver/config",
-					"/Users/yuchen/Projects/ceres-solver/internal/ceres/miniglog",
-					"/Users/yuchen/Projects/ceres-solver/include",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
 				);
 				INFOPLIST_FILE = "test-headtracking2/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"/Users/yuchen/Projects/ceres-solver/build2/lib",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-headtracking.test-headtracking2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
