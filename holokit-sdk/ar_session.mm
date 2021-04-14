@@ -53,7 +53,7 @@ static const float kMaxLandmarkDistance = 0.8f;
     if(self = [super init]) {
         self.handTracker = [[HandTracker alloc] init];
         self.handTracker.delegate = self;
-        //[self.handTracker startGraph];
+        [self.handTracker startGraph];
         
         self.handTrackingQueue = [[NSOperationQueue alloc] init];
         self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
@@ -76,7 +76,7 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.isRightHandTracked = true;
         self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
         
-        self.isHandTrackingEnabled = NO;
+        self.isHandTrackingEnabled = YES;
         
         //[self startAccelerometer];
         //[self startGyroscope];
@@ -189,7 +189,6 @@ static const float kMaxLandmarkDistance = 0.8f;
             size_t depthBufferWidth;
             size_t depthBufferHeight;
             Float32* depthBufferBaseAddress;
-            //ARDepthData* sceneDepth = self.frame.sceneDepth;
             ARDepthData* sceneDepth = self.session.currentFrame.sceneDepth;
             if(!sceneDepth) {
                 NSLog(@"[AR Session]: Failed to acquire scene depth.");

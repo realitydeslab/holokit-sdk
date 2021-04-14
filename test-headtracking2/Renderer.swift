@@ -451,7 +451,7 @@ class Renderer {
         
         let uniforms = sharedUniformBufferAddress.assumingMemoryBound(to: SharedUniforms.self)
         
-        uniforms.pointee.viewMatrix = frame.camera.viewMatrix(for: .landscapeRight)
+        uniforms.pointee.viewMatrix = frame.camera.viewMatrix(for: .landscapeRight) 
         uniforms.pointee.projectionMatrix = frame.camera.projectionMatrix(for: .landscapeRight, viewportSize: viewportSize, zNear: 0.001, zFar: 1000)
         
         
