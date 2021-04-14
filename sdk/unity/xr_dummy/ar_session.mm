@@ -18,8 +18,6 @@
 @interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
 {}
 @property (weak, nonatomic) HandTracker* _handTracker;
-
-//- (instancetype)initWithARSessionDelegate:(ARSessionDelegate *)unityARSessionDelegate;
 @end
 
 
@@ -55,6 +53,7 @@
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
+        
     NSLog(@"frame.timestamp: %f,  systemuptime: %f", frame.timestamp, [[NSProcessInfo processInfo] systemUptime]);
     OSType type = CVPixelBufferGetPixelFormatType(frame.capturedImage);
     OSType type2 = CVPixelBufferGetPixelFormatType(frame.smoothedSceneDepth.depthMap);
@@ -64,6 +63,8 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [handTracker processVideoFrame: frame.capturedImage];
     });
+    
+    
 
     
 //    
@@ -96,6 +97,8 @@
     
 }
 @end
+
+
 
 void SetARSession(UnityXRNativeSession* ar_native_session) {
     printout("SetARSession is called");

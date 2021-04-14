@@ -143,7 +143,29 @@ static const float kMaxLandmarkDistance = 0.8f;
             [self.handTracker processVideoFrame: frame.capturedImage];
         }];
     }
+    
+    if (self.unityARSessionDelegate != NULL) {
+        [self.unityARSessionDelegate session:session didUpdateFrame:frame];
+    }
 }
+
+- (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
+    if (self.unityARSessionDelegate != NULL) {
+        [self.unityARSessionDelegate session:session didAddAnchors:anchors];
+    }
+}
+- (void)session:(ARSession *)session didUpdateAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
+    if (self.unityARSessionDelegate != NULL) {
+        [self.unityARSessionDelegate session:session didUpdateAnchors:anchors];
+    }
+}
+
+- (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
+    if (self.unityARSessionDelegate != NULL) {
+        [self.unityARSessionDelegate session:session didRemoveAnchors:anchors];
+    }
+}
+
 
 #pragma mark - HandTracking
 
@@ -336,6 +358,9 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
 
 //
     NSLog(@"before session.delegate=%zu\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
+    
+    ARSessionDelegateController* dd = [ARSessionDelegateController sharedARSessionDelegateController];
+    dd.unityARSessionDelegate = session.delegate;
     
     [session setDelegate:ARSessionDelegateController.sharedARSessionDelegateController];
     //session.delegate = ARSessionDelegateController.sharedARSessionDelegateController;

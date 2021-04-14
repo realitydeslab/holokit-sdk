@@ -117,6 +117,7 @@ namespace UnityEngine.XR.HoloKit
         {
             Debug.Log("[HoloKitXRManager]: LoadHoloKitXRSubsystem()");
 
+            /*
             Debug.Log("[HoloKitXRManager]: start ARKit");
             List<XRInputSubsystem> arKitInputSubsystems = new List<XRInputSubsystem>();
             SubsystemManager.GetSubsystems(arKitInputSubsystems);
@@ -141,6 +142,7 @@ namespace UnityEngine.XR.HoloKit
                     d.Start();
                 }
             }
+            */
 
             Debug.Log("[HoloKitXRManager]: start HoloKit");
             //bool holokitDisplayStarted = false;
@@ -302,7 +304,7 @@ namespace UnityEngine.XR.HoloKit
                 Debug.Log($"[HoloKitXRManager]: initialize {loader.name}");
                 if (loader.name.Equals("AR Kit Loader"))
                 {
-                    loader.Initialize();
+                   // loader.Initialize();
                 }
                 if (loader.name.Equals("Holo Kit XR Loader"))
                 {
@@ -316,10 +318,48 @@ namespace UnityEngine.XR.HoloKit
         static void OnBeforeSplashScreen() {
             Debug.Log("[HoloKitXRManager]: OnBeforeSplashScreen()");
 
+            var xrSettings = XRGeneralSettings.Instance;
+            if (xrSettings == null)
+            {
+                Debug.Log($"XRGeneralSettings is null.");
+                return;
+            }
+
+            var xrManager = xrSettings.Manager;
+            if (xrManager == null)
+            {
+                Debug.Log($"XRManagerSettings is null.");
+                return;
+            }
+            Debug.Log($"[HoloKitXRManager]: number of loaders: {xrManager.activeLoaders.Count}");
+            foreach (var loader in xrManager.activeLoaders)
+            {
+                Debug.Log($"[HoloKitXRManager]: start {loader.name}");
+                if (loader.name.Equals("AR Kit Loader"))
+                {
+                   // loader.Start();
+                }
+                if (loader.name.Equals("Holo Kit XR Loader"))
+                {
+                    loader.Start();
+                }
+            }
+
+            var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
+            if (xrSessionSubsystem != null)
+            {
+                Debug.Log("[HoloKitXRManager]: xrSessionSubsystem sessionId=" + xrSessionSubsystem.sessionId + " xrSessionSubsystem.trackingState=" + xrSessionSubsystem.trackingState + " xrSessionSubsystem.nativePtr=" + xrSessionSubsystem.nativePtr);
+#if UNITY_IOS
+                UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
+                Debug.Log("[HoloKitXRManager]: UnityHoloKit_SetARSession()");
+#endif
+            }
+            /*
             if (isHoloKitInitialized)
             {
                 LoadHoloKitXRSubsystem();
             }
+            */
         }
  
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

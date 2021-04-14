@@ -9,12 +9,12 @@
 #include <vector>
 #include <memory>
 
-#include "UnityXRTypes.h"
 #include <Metal/Metal.h>
 #include <MetalKit/MetalKit.h>
+#include <simd/simd.h>
+#include "UnityXRTypes.h"
 #include "ar_session.h"
 #include "math_helpers.h"
-#include <simd/simd.h>
 #include "holokit_profile.h"
 #include "nfc_session.h"
 
@@ -28,7 +28,7 @@ public:
     
     void Initialize();
     
-    simd_float4x4 GetCurrentViewMatrix();
+    simd_float4x4 GetCurrentCameraTransform();
     
     simd_float3 GetEyePosition(int eye_index);
     
@@ -77,7 +77,7 @@ private:
     
     float horizontal_alignment_marker_offset_;
     
-    ARSessionDelegateController* ar_session_handler_;
+    ARSessionDelegateController* ar_session_handler_ = nullptr;
     
     /// @brief True for XR mode and false for AR mode.
     bool is_xr_mode_enabled_;

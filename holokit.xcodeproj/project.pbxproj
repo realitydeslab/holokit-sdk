@@ -43,7 +43,7 @@
 		4B6C94892614C2E300CBDFB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		4B6C94BA2614C32300CBDFB4 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
 		4B6C94C92614C32500CBDFB4 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
-		4B6C94D82614C32700CBDFB4 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* main.mm */; };
+		4B6C94D82614C32700CBDFB4 /* load.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* load.mm */; };
 		4B6C94E72614C32A00CBDFB4 /* math_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B66A2611055A001F39F2 /* math_helpers.mm */; };
 		4B6C95132614C33300CBDFB4 /* holokit_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B6C826117AE1001F39F2 /* holokit_api.mm */; };
 		4B6C95222614C33500CBDFB4 /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ar_session.mm */; };
@@ -75,7 +75,7 @@
 		4BE7B4C026105532001F39F2 /* ArSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B4BF26105532001F39F2 /* ArSession.mm */; };
 		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
 		4BE7B63E2611051A001F39F2 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
-		4BE7B64F26110544001F39F2 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* main.mm */; };
+		4BE7B64F26110544001F39F2 /* load.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* load.mm */; };
 		4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B66A2611055A001F39F2 /* math_helpers.mm */; };
 		4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B6C826117AE1001F39F2 /* holokit_api.mm */; };
 		4BFE562A260E98470074B70D /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
@@ -390,7 +390,7 @@
 		4BE7B62126110504001F39F2 /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 		4BE7B63D2611051A001F39F2 /* input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = input.mm; sourceTree = "<group>"; };
 		4BE7B64C26110537001F39F2 /* load.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = load.h; sourceTree = "<group>"; };
-		4BE7B64D26110544001F39F2 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		4BE7B64D26110544001F39F2 /* load.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = load.mm; sourceTree = "<group>"; };
 		4BE7B66A2611055A001F39F2 /* math_helpers.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = math_helpers.mm; sourceTree = "<group>"; };
 		4BE7B6862611056A001F39F2 /* math_helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = math_helpers.h; sourceTree = "<group>"; };
 		4BE7B6C826117AE1001F39F2 /* holokit_api.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = holokit_api.mm; sourceTree = "<group>"; };
@@ -815,7 +815,7 @@
 				4BE7B62126110504001F39F2 /* display.mm */,
 				4BE7B63D2611051A001F39F2 /* input.mm */,
 				4BE7B64C26110537001F39F2 /* load.h */,
-				4BE7B64D26110544001F39F2 /* main.mm */,
+				4BE7B64D26110544001F39F2 /* load.mm */,
 				4BE7B6862611056A001F39F2 /* math_helpers.h */,
 				4BE7B66A2611055A001F39F2 /* math_helpers.mm */,
 				4BE7B6C926117AE1001F39F2 /* holokit_api.h */,
@@ -1945,7 +1945,7 @@
 				4B6C94822614C2E300CBDFB4 /* LandmarkPosition.m in Sources */,
 				4B6C94BA2614C32300CBDFB4 /* display.mm in Sources */,
 				4B6C94C92614C32500CBDFB4 /* input.mm in Sources */,
-				4B6C94D82614C32700CBDFB4 /* main.mm in Sources */,
+				4B6C94D82614C32700CBDFB4 /* load.mm in Sources */,
 				4B6C94E72614C32A00CBDFB4 /* math_helpers.mm in Sources */,
 				4B6C95222614C33500CBDFB4 /* ar_session.mm in Sources */,
 				4B6C95132614C33300CBDFB4 /* holokit_api.mm in Sources */,
@@ -1988,7 +1988,7 @@
 				4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
-				4BE7B64F26110544001F39F2 /* main.mm in Sources */,
+				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

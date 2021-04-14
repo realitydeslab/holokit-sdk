@@ -31,6 +31,7 @@ void HoloKitApi::Initialize() {
     InitOpticalParameters();
     
     ar_session_handler_ = [ARSessionDelegateController sharedARSessionDelegateController];
+    
     if ([device_name_ isEqualToString:@"iPhone13,3"] == NO &&
         [device_name_ isEqualToString:@"iPhone13,4"] == NO) {
         NSLog(@"[HoloKitApi]: the phone type does not support hand tracking.");
@@ -159,8 +160,12 @@ bool HoloKitApi::SetIsXrModeEnabled(bool val) {
     return false;
 }
 
-simd_float4x4 HoloKitApi::GetCurrentViewMatrix() {
-    return ar_session_handler_.session.currentFrame.camera.transform;
+simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
+    if (ar_session_handler_ != nullptr && ar_session_handler_.session != NULL && ar_session_handler_.session.currentFrame != NULL && ar_session_handler_.session.currentFrame.camera != NULL) {
+        return ar_session_handler_.session.currentFrame.camera.transform;
+    } else {
+        return matrix_identity_float4x4;
+    }
 }
 
 } // namespace

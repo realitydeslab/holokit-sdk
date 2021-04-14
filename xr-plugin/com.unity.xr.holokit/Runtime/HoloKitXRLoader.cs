@@ -22,10 +22,10 @@ namespace UnityEngine.XR.HoloKit
         {
         	Debug.Log("[HoloKitXRLoader]: Initialize()");
 
-            Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit Display");
+            //Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit Display");
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(s_DisplaySubsystemDescriptors, "HoloKit Display");
 
-            Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit Input");
+            //Debug.Log("[HoloKitXRLoader]: Create subsystem HoloKit Input");
             CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(s_InputSubsystemDescriptors, "HoloKit Input");
 
             return true;

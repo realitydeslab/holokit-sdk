@@ -14,9 +14,10 @@
 
 @interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
 
-@property (nonatomic, strong) ARSession* session;
-@property (nonatomic, strong) NSMutableArray<LandmarkPosition *> *leftHandLandmarkPositions;
-@property (nonatomic, strong) NSMutableArray<LandmarkPosition *> *rightHandLandmarkPositions;
+@property (nonatomic, strong, nullable) ARSession* session;
+@property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
+@property (nonatomic, strong, nullable) NSMutableArray<LandmarkPosition *> *leftHandLandmarkPositions;
+@property (nonatomic, strong, nullable) NSMutableArray<LandmarkPosition *> *rightHandLandmarkPositions;
 @property (assign) bool isLeftHandTracked;
 @property (assign) bool isRightHandTracked;
 @property (assign) bool isHandTrackingEnabled;

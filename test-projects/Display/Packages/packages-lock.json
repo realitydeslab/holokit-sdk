@@ -12,15 +12,6 @@
       "source": "builtin",
       "dependencies": {}
     },
-    "com.unity.ads": {
-      "version": "3.5.2",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.analytics": {
       "version": "3.5.3",
       "depth": 0,
@@ -52,12 +43,10 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.4",
+      "version": "3.0.5",
       "depth": 0,
       "source": "registry",
-      "dependencies": {
-        "com.unity.test-framework": "1.1.1"
-      },
+      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
@@ -84,20 +73,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.multiplayer-hlapi": {
-      "version": "1.0.4",
+      "version": "1.0.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "nuget.mono-cecil": "0.1.5-preview"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.purchasing": {
-      "version": "3.0.0-pre.6",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0"
+        "nuget.mono-cecil": "0.1.6-preview"
       },
       "url": "https://packages.unity.com"
     },
@@ -121,7 +101,7 @@
       }
     },
     "com.unity.searcher": {
-      "version": "4.3.1",
+      "version": "4.3.2",
       "depth": 2,
       "source": "registry",
       "dependencies": {},
@@ -146,7 +126,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.1.22",
+      "version": "1.1.24",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -157,7 +137,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "3.0.3",
+      "version": "3.0.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -166,7 +146,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.5.2",
+      "version": "1.5.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -191,7 +171,8 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.shadergraph": "11.0.0"
+        "com.unity.shadergraph": "11.0.0",
+        "com.unity.render-pipelines.core": "11.0.0"
       }
     },
     "com.unity.xr.arfoundation": {
@@ -258,7 +239,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.oculus": {
-      "version": "1.8.1",
+      "version": "1.9.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -268,7 +249,7 @@
       "url": "https://packages.unity.com"
     },
     "nuget.mono-cecil": {
-      "version": "0.1.5-preview",
+      "version": "0.1.6-preview",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
