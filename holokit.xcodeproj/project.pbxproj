@@ -64,6 +64,13 @@
 		4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* nfc_session.m */; };
 		4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		4BBDD2F025F397D200070CB4 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
+		4BC45AE2262813BD00BA98E4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE1262813BD00BA98E4 /* AppDelegate.swift */; };
+		4BC45AE4262813BD00BA98E4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE3262813BD00BA98E4 /* Shaders.metal */; };
+		4BC45AE7262813BD00BA98E4 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE6262813BD00BA98E4 /* Renderer.swift */; };
+		4BC45AE9262813BD00BA98E4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE8262813BD00BA98E4 /* ViewController.swift */; };
+		4BC45AEC262813BD00BA98E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEA262813BD00BA98E4 /* Main.storyboard */; };
+		4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AED262813BE00BA98E4 /* Assets.xcassets */; };
+		4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */; };
 		4BCDE0BD25F5BFEB00C52532 /* LandmarkPosition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C742625F5B948001935A8 /* LandmarkPosition.m */; };
 		4BDFC4E72600A54C0087F728 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4E62600A54C0087F728 /* Main.cpp */; };
 		4BDFC4F52600A5830087F728 /* ExampleDisplayProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */; };
@@ -378,6 +385,19 @@
 		4BB5587226205B7D00DC0213 /* nfc_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = nfc_session.m; sourceTree = "<group>"; };
 		4BB5588226205B8E00DC0213 /* nfc_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nfc_session.h; sourceTree = "<group>"; };
 		4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hand_tracking.mm; sourceTree = "<group>"; };
+		4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "factory-app-nfc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BC45AE1262813BD00BA98E4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		4BC45AE3262813BD00BA98E4 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		4BC45AE5262813BD00BA98E4 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		4BC45AE6262813BD00BA98E4 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		4BC45AE8262813BD00BA98E4 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4BC45AEB262813BD00BA98E4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		4BC45AED262813BE00BA98E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4BC45AF0262813BE00BA98E4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		4BC45AF2262813BE00BA98E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4BC45AF3262813BE00BA98E4 /* factory_app_nfc-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "factory_app_nfc-Bridging-Header.h"; sourceTree = "<group>"; };
+		4BC45B06262813CA00BA98E4 /* factory-app-nfc.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "factory-app-nfc.entitlements"; sourceTree = "<group>"; };
+		4BC45B25262815CB00BA98E4 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
 		4BDFC4E62600A54C0087F728 /* Main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
 		4BDFC4F32600A56E0087F728 /* ProviderContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProviderContext.h; sourceTree = "<group>"; };
 		4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ExampleDisplayProvider.mm; sourceTree = "<group>"; };
@@ -626,6 +646,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BC45ADC262813BD00BA98E4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4BDFC53C2600AB210087F728 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -809,6 +836,24 @@
 			path = "test-stereoscopic-rendering";
 			sourceTree = "<group>";
 		};
+		4BC45AE0262813BD00BA98E4 /* factory-app-nfc */ = {
+			isa = PBXGroup;
+			children = (
+				4BC45B06262813CA00BA98E4 /* factory-app-nfc.entitlements */,
+				4BC45AE1262813BD00BA98E4 /* AppDelegate.swift */,
+				4BC45AE3262813BD00BA98E4 /* Shaders.metal */,
+				4BC45AE5262813BD00BA98E4 /* ShaderTypes.h */,
+				4BC45AE6262813BD00BA98E4 /* Renderer.swift */,
+				4BC45AE8262813BD00BA98E4 /* ViewController.swift */,
+				4BC45AEA262813BD00BA98E4 /* Main.storyboard */,
+				4BC45AED262813BE00BA98E4 /* Assets.xcassets */,
+				4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */,
+				4BC45AF2262813BE00BA98E4 /* Info.plist */,
+				4BC45AF3262813BE00BA98E4 /* factory_app_nfc-Bridging-Header.h */,
+			);
+			path = "factory-app-nfc";
+			sourceTree = "<group>";
+		};
 		4BE7B60C261104ED001F39F2 /* holokit-sdk */ = {
 			isa = PBXGroup;
 			children = (
@@ -893,6 +938,7 @@
 				4B38240725E7491B00B39EEB /* test-unity-plugin-input */,
 				4B2D6E4225E7CFD500DAAD13 /* test-unity-input-ios */,
 				4B0606CC25F5CA08006DF0B0 /* test-unity-plugin-display-ios */,
+				4BC45AE0262813BD00BA98E4 /* factory-app-nfc */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -919,6 +965,7 @@
 				4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */,
 				4BE7B60B261104ED001F39F2 /* libholokit-sdk-skeleton.a */,
 				4B6C948F2614C2E300CBDFB4 /* libholokit-sdk-skeleton-2.a */,
+				4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -926,6 +973,7 @@
 		96602188253935D7004019A5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4BC45B25262815CB00BA98E4 /* CoreNFC.framework */,
 				4B04D8A9260CCCA20055020F /* MetalKit.framework */,
 				4B6615A325F39FED00CC4E81 /* Metal.framework */,
 				4B6615A125F39FE000CC4E81 /* ARKit.framework */,
@@ -1359,6 +1407,23 @@
 			productReference = 4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */;
 			productType = "com.apple.product-type.application";
 		};
+		4BC45ADE262813BD00BA98E4 /* factory-app-nfc */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BC45AF4262813BE00BA98E4 /* Build configuration list for PBXNativeTarget "factory-app-nfc" */;
+			buildPhases = (
+				4BC45ADB262813BD00BA98E4 /* Sources */,
+				4BC45ADC262813BD00BA98E4 /* Frameworks */,
+				4BC45ADD262813BD00BA98E4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "factory-app-nfc";
+			productName = "factory-app-nfc";
+			productReference = 4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */;
+			productType = "com.apple.product-type.application";
+		};
 		4BDFC53D2600AB210087F728 /* test-unity-plugin-display-mac */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4BDFC53F2600AB210087F728 /* Build configuration list for PBXNativeTarget "test-unity-plugin-display-mac" */;
@@ -1579,7 +1644,7 @@
 		96602135253930CC004019A5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1220;
+				LastSwiftUpdateCheck = 1240;
 				LastUpgradeCheck = 1220;
 				TargetAttributes = {
 					4B0606CA25F5CA08006DF0B0 = {
@@ -1596,6 +1661,9 @@
 					};
 					4B6CC26525D42C2C0068CB66 = {
 						CreatedOnToolsVersion = 12.3;
+					};
+					4BC45ADE262813BD00BA98E4 = {
+						CreatedOnToolsVersion = 12.4;
 					};
 					4BDFC53D2600AB210087F728 = {
 						CreatedOnToolsVersion = 12.4;
@@ -1663,6 +1731,7 @@
 				4BDFC53D2600AB210087F728 /* test-unity-plugin-display-mac */,
 				4BE7B60A261104ED001F39F2 /* holokit-sdk-skeleton */,
 				4B6C94802614C2E300CBDFB4 /* holokit-sdk-skeleton-2 */,
+				4BC45ADE262813BD00BA98E4 /* factory-app-nfc */,
 			);
 		};
 /* End PBXProject section */
@@ -1685,6 +1754,16 @@
 				4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */,
 				4B6CC27825D42C2D0068CB66 /* Assets.xcassets in Resources */,
 				4B6CC27625D42C2C0068CB66 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BC45ADD262813BD00BA98E4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */,
+				4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */,
+				4BC45AEC262813BD00BA98E4 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1965,6 +2044,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BC45ADB262813BD00BA98E4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BC45AE4262813BD00BA98E4 /* Shaders.metal in Sources */,
+				4BC45AE7262813BD00BA98E4 /* Renderer.swift in Sources */,
+				4BC45AE9262813BD00BA98E4 /* ViewController.swift in Sources */,
+				4BC45AE2262813BD00BA98E4 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4BDFC53B2600AB210087F728 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2173,6 +2263,22 @@
 			isa = PBXVariantGroup;
 			children = (
 				4B6CC27A25D42C2D0068CB66 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		4BC45AEA262813BD00BA98E4 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4BC45AEB262813BD00BA98E4 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4BC45AF0262813BE00BA98E4 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -2504,6 +2610,54 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-stereoscopic-rendering";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4BC45AF5262813BE00BA98E4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "factory-app-nfc/factory-app-nfc.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				INFOPLIST_FILE = "factory-app-nfc/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.factory-app";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "factory-app-nfc/factory_app_nfc-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4BC45AF6262813BE00BA98E4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "factory-app-nfc/factory-app-nfc.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				INFOPLIST_FILE = "factory-app-nfc/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.factory-app";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "factory-app-nfc/factory_app_nfc-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -3201,6 +3355,15 @@
 			buildConfigurations = (
 				4B6CC27F25D42C2D0068CB66 /* Debug */,
 				4B6CC28025D42C2D0068CB66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4BC45AF4262813BE00BA98E4 /* Build configuration list for PBXNativeTarget "factory-app-nfc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BC45AF5262813BE00BA98E4 /* Debug */,
+				4BC45AF6262813BE00BA98E4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

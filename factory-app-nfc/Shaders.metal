@@ -1,8 +1,8 @@
 //
 //  Shaders.metal
-//  HoloKitStereoscopicRendering
+//  factory-app-nfc
 //
-//  Created by Yuchen on 2021/2/4.
+//  Created by Yuchen on 2021/4/15.
 //
 
 #include <metal_stdlib>
@@ -22,25 +22,18 @@ typedef struct {
 typedef struct {
     float4 position [[position]];
     float2 texCoord;
-    ushort viewport [[viewport_array_index]];
 } ImageColorInOut;
 
 
 // Captured image vertex function
-vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]],
-                                                    ushort amp_id [[amplification_id]],
-                                                    ushort amp_count [[amplification_count]]) {
+vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]]) {
     ImageColorInOut out;
     
     // Pass through the image vertex's position
-    // manually set z value to zero
     out.position = float4(in.position, 0.0, 1.0);
     
     // Pass through the texture coordinate
     out.texCoord = in.texCoord;
-    
-    out.viewport = amp_id;
-    //out.viewport = 0;
     
     return out;
 }
@@ -48,9 +41,7 @@ vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]],
 // Captured image fragment function
 fragment float4 capturedImageFragmentShader(ImageColorInOut in [[stage_in]],
                                             texture2d<float, access::sample> capturedImageTextureY [[ texture(kTextureIndexY) ]],
-                                            texture2d<float, access::sample> capturedImageTextureCbCr [[ texture(kTextureIndexCbCr) ]],
-                                            depth2d<float, access::sample> arDepthTexture [[texture(3)]],
-                                            texture2d<uint> arDepthConfidence [[texture(4)]]) {
+                                            texture2d<float, access::sample> capturedImageTextureCbCr [[ texture(kTextureIndexCbCr) ]]) {
     
     constexpr sampler colorSampler(mip_filter::linear,
                                    mag_filter::linear,
@@ -67,15 +58,8 @@ fragment float4 capturedImageFragmentShader(ImageColorInOut in [[stage_in]],
     float4 ycbcr = float4(capturedImageTextureY.sample(colorSampler, in.texCoord).r,
                           capturedImageTextureCbCr.sample(colorSampler, in.texCoord).rg, 1.0);
     
-    constexpr sampler depthSampler(address::clamp_to_edge, filter::linear);
-    float depth = arDepthTexture.sample(depthSampler, in.texCoord);
-    return float4(depth, depth, depth, 1.0);
-    
     // Return converted RGB color
     return ycbcrToRGBTransform * ycbcr;
-    
-    // render black background
-    return float4(0.0, 0.0, 0.0, 1.0);
 }
 
 
@@ -91,40 +75,25 @@ typedef struct {
     float4 color;
     half3  eyePosition;
     half3  normal;
-    // for stereoscopic rendering (SR)
-    ushort viewport [[viewport_array_index]];
 } ColorInOut;
 
 
 // Anchor geometry vertex function
-// @param amp_id specifies which viewport to render into
-// @param amp_count this is 2
 vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
                                                 constant SharedUniforms &sharedUniforms [[ buffer(kBufferIndexSharedUniforms) ]],
                                                 constant InstanceUniforms *instanceUniforms [[ buffer(kBufferIndexInstanceUniforms) ]],
                                                 ushort vid [[vertex_id]],
-                                                ushort iid [[instance_id]],
-                                                ushort amp_id [[amplification_id]],
-                                                ushort amp_count [[amplification_count]]) {
+                                                ushort iid [[instance_id]]) {
     ColorInOut out;
     
     // Make position a float4 to perform 4x4 matrix math on it
     float4 position = float4(in.position, 1.0);
     
     float4x4 modelMatrix = instanceUniforms[iid].modelMatrix;
-    // use this matrix to scale down the anchor size
-    float4x4 scaleMatrix = float4x4(0);
-    scaleMatrix.columns[0].x = 0.1;
-    scaleMatrix.columns[1].y = 0.1;
-    scaleMatrix.columns[2].z = 0.1;
-    scaleMatrix.columns[3].w = 1;
-    // the order matters
-    modelMatrix = modelMatrix * scaleMatrix;
-    
-    float4x4 modelViewMatrix = sharedUniforms.viewMatrixPerEye[amp_id] * modelMatrix;
+    float4x4 modelViewMatrix = sharedUniforms.viewMatrix * modelMatrix;
     
     // Calculate the position of our vertex in clip space and output for clipping and rasterization
-    out.position = sharedUniforms.projectionMatrixPerEye[amp_id] * modelViewMatrix * position;
+    out.position = sharedUniforms.projectionMatrix * modelViewMatrix * position;
     
     // Color each face a different color
     ushort colorID = vid / 4 % 6;
@@ -134,8 +103,6 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
               : colorID == 3 ? float4(1.0, 0.5, 0.0, 1.0) // Bottom face
               : colorID == 4 ? float4(1.0, 1.0, 0.0, 1.0) // Back face
               : float4(1.0, 1.0, 1.0, 1.0); // Front face
-    // set landmark anchor color
-    out.color = instanceUniforms[iid].anchorColor;
     
     // Calculate the position of our vertex in eye space
     out.eyePosition = half3((modelViewMatrix * position).xyz);
@@ -143,9 +110,6 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     // Rotate our normals to world coordinates
     float4 normal = modelMatrix * float4(in.normal.x, in.normal.y, in.normal.z, 0.0f);
     out.normal = normalize(half3(normal.xyz));
-    
-    // which viewport to draw?
-    out.viewport = amp_id;
     
     return out;
 }
