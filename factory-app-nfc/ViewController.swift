@@ -20,20 +20,16 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate, NFCT
     var session: ARSession!
     var renderer: Renderer!
     var readerSession: NFCTagReaderSession?
-    var isNfcInitialized: Bool!
-    var privateKeyRawValue: String!
-    var publicKeyRawValue: String!
+    var isNfcInitialized: Bool! = false
+    var isUidQueried: Bool! = false
+    var privateKeyRawValue: String! = "8d4b14f96b338b949c8b4de898d3748f40104835cff129bc54fea0164442bd01"
+    var publicKeyRawValue: String! = "dfa65630f4e8a2429558e7bce61e89f321bd531af8bde64225a05894f8767246"
     var uid: String!
-    var isUidQueried: Bool!
+    let urlPrefix: String! = "https://holoi.com/holokit/holokitx?"
+    let pid: String! = "HoloKitX"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        isNfcInitialized = false
-        isUidQueried = false
-        // Run GenerateNewKeyPair() to get new private and public keys
-        privateKeyRawValue = "8d4b14f96b338b949c8b4de898d3748f40104835cff129bc54fea0164442bd01"
-        publicKeyRawValue = "dfa65630f4e8a2429558e7bce61e89f321bd531af8bde64225a05894f8767246"
         
         // Set the view's delegate
         session = ARSession()
@@ -110,7 +106,6 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate, NFCT
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         if (!isNfcInitialized) {
             GenerateNewKeyPair()
-            
             self.readerSession = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
             self.readerSession?.alertMessage = "Put your iPhone onto the HoloKit."
             self.readerSession?.begin()
@@ -163,7 +158,7 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate, NFCT
                 //print(sTag.identifier)
                 //session.alertMessage = "UID captured."
                 //session.invalidate()
-                
+                self.GenerateNfcTagUrl()
                 var str:String = "Farewell"
                 var strToUint8:[UInt8] = [UInt8](str.utf8)
                 
@@ -218,6 +213,19 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate, NFCT
         let signature = try! privateKey.signature(for: dataToSign)
         
         return signature.base64EncodedString()
+    }
+    
+    func GenerateContent() -> String {
+        let contentPrefix: String! = "content="
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.timeZone = .current
+        formatter.locale = .current
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        let formattedDate = formatter.string(from: date)
+        let rawContent: String! = "uid=" + self.uid + "&pid=" + pid + "&date=" + formattedDate;
+        print(rawContent)
+        return ""
     }
     
     func dataWithHexString(hex: String) -> Data {

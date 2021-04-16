@@ -240,7 +240,7 @@ public:
                 simd_quatf quaternion = simd_quaternion(camera_transform);
                 //quaternion = simd_inverse(quaternion);
                 // I got these negations by experimentation... don't know why
-                UnityXRVector4 rotation = UnityXRVector4 {-quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w};
+                UnityXRVector4 rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
                 //Is Tracked
                 input_->DeviceState_SetBinaryValue(state, feature_index++, true);
                 //Track State
