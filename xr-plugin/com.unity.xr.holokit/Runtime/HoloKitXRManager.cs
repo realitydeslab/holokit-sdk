@@ -302,10 +302,10 @@ namespace UnityEngine.XR.HoloKit
             foreach (var loader in xrManager.activeLoaders)
             {
                 Debug.Log($"[HoloKitXRManager]: initialize {loader.name}");
-                if (loader.name.Equals("AR Kit Loader"))
-                {
+                //if (loader.name.Equals("AR Kit Loader"))
+                //{
                    // loader.Initialize();
-                }
+                //}
                 if (loader.name.Equals("Holo Kit XR Loader"))
                 {
                     isHoloKitInitialized = true;
@@ -317,7 +317,10 @@ namespace UnityEngine.XR.HoloKit
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         static void OnBeforeSplashScreen() {
             Debug.Log("[HoloKitXRManager]: OnBeforeSplashScreen()");
-
+            if (!isHoloKitInitialized)
+            {
+                return;
+            }
             var xrSettings = XRGeneralSettings.Instance;
             if (xrSettings == null)
             {
@@ -335,10 +338,6 @@ namespace UnityEngine.XR.HoloKit
             foreach (var loader in xrManager.activeLoaders)
             {
                 Debug.Log($"[HoloKitXRManager]: start {loader.name}");
-                if (loader.name.Equals("AR Kit Loader"))
-                {
-                   // loader.Start();
-                }
                 if (loader.name.Equals("Holo Kit XR Loader"))
                 {
                     loader.Start();

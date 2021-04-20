@@ -20,7 +20,7 @@ public class RenderingSettings : MonoBehaviour
         {
             Debug.Log("hey");
         }
-        camBackground.enabled = false;
+        camBackground.enabled = true;
     }
 
     // Update is called once per frame

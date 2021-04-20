@@ -158,8 +158,10 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate, NFCT
                 //print(sTag.identifier)
                 //session.alertMessage = "UID captured."
                 //session.invalidate()
-                self.GenerateNfcTagUrl()
-                var str:String = "Farewell"
+                print("URL:")
+                
+                var str:String = self.GenerateUrl()
+                print(str)
                 var strToUint8:[UInt8] = [UInt8](str.utf8)
                 
                 sTag.queryNDEFStatus(completionHandler: { (ndefStatus: NFCNDEFStatus, capacity: Int, error: Error?) in
@@ -216,16 +218,25 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate, NFCT
     }
     
     func GenerateContent() -> String {
-        let contentPrefix: String! = "content="
         let date = Date()
         let formatter = DateFormatter()
         formatter.timeZone = .current
         formatter.locale = .current
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         let formattedDate = formatter.string(from: date)
-        let rawContent: String! = "uid=" + self.uid + "&pid=" + pid + "&date=" + formattedDate;
-        print(rawContent)
-        return ""
+        let content: String = "uid=" + self.uid + "&pid=" + pid + "&date=" + formattedDate;
+        
+        return content.data(using: .utf8)!.base64EncodedString()
+    }
+    
+    func GenerateUrl() -> String {
+        
+        let prefix: String = "https://holoi.com/holokit/holokitx?content="
+        let content: String = GenerateContent()
+        let signature: String = GenerateSignature(content: content)
+        let url: String = prefix + content + "&signature=" + signature + "&count=0"
+        
+        return url
     }
     
     func dataWithHexString(hex: String) -> Data {
