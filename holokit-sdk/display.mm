@@ -359,15 +359,15 @@ public:
 
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
         
-        // Skip the splash screen phase, since holokit api is not initialized.
-        if (is_holokit_api_initialized_) {
-            if (is_xr_mode_enabled_ != holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled()) {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Display mode switched.", GetCurrentTime());
-                NSLog(@"%d", holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled());
-                is_xr_mode_enabled_ = holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled();
-                display_mode_changed_ = true;
-            }
+        
+        // Check if holokit api has changed the display mode.
+        if (is_xr_mode_enabled_ != holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled()) {
+            HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Display mode switched.", GetCurrentTime());
+            NSLog(@"%d", holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled());
+            is_xr_mode_enabled_ = holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled();
+            display_mode_changed_ = true;
         }
+
         
         bool reallocate_textures = (unity_textures_.size() == 0);
         if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0)
@@ -399,15 +399,7 @@ public:
             display_mode_changed_ = false;
         }
 
-        if (reallocate_textures)
-        {
-            // initialize HoloKitApi at the first frame
-            if (!is_holokit_api_initialized_){
-                holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
-                holokit::HoloKitApi::GetInstance()->Initialize();
-                is_holokit_api_initialized_ = true;
-            }
-            
+        if (reallocate_textures) {
             textures_initialized_ = false;
             native_textures_queried_ = false;
             DestroyTextures();
@@ -451,7 +443,12 @@ public:
             simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
             //LogMatrix4x4(projection_matrix);
             render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-            render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
+            // Make sure we can see the splash screen when ar session is not initialized.
+            if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session == NULL) {
+                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(0));
+            } else {
+                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
+            }
             // viewport
             render_params.viewportRect = frame_hints->appSetup.renderViewport;
             return kUnitySubsystemErrorCodeSuccess;

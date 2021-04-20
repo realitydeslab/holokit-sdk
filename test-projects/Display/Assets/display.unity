@@ -497,7 +497,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &275560437
 Transform:
   m_ObjectHideFlags: 0
@@ -2527,6 +2527,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4293698627651975302, guid: d5a614d08ef8e4d3ca63e6ee8ab21ec1,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4293698627651975302, guid: d5a614d08ef8e4d3ca63e6ee8ab21ec1,
+        type: 3}
+      propertyPath: arBackgroundEnabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8898290559145466401, guid: d5a614d08ef8e4d3ca63e6ee8ab21ec1,
         type: 3}
       propertyPath: m_Name

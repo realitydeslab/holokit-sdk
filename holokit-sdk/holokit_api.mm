@@ -15,18 +15,13 @@ namespace holokit {
 
 #pragma mark - Initialize()
 void HoloKitApi::Initialize() {
-    NSLog(@"[HoloKitApi]: Initialized.");
+    NSLog(@"[HoloKitApi]: Initialize()");
     
     // TODO: do this more elegantly
     width_ = 2778;
     height_ = 1284;
     
-    // Retrive device model
-    // see: https://stackoverflow.com/questions/9617301/how-to-print-out-string-constant-with-nslog-on-ios
-    struct utsname system_info;
-    uname(&system_info);
-    device_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
-    NSLog(@"device name %@", device_name_); 
+    GetDeviceModel();
     
     InitOpticalParameters();
     
@@ -40,14 +35,22 @@ void HoloKitApi::Initialize() {
         NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
     }
     
-    is_xr_mode_enabled_ = true;
+    is_xr_mode_enabled_ = false;
     
     // MODIFY HERE
-    is_nfc_enabled_ = true;
+    is_nfc_enabled_ = false;
     
     is_nfc_validated_ = false;
     
     is_initialized_ = true;
+}
+
+void HoloKitApi::GetDeviceModel() {
+    // see: https://stackoverflow.com/questions/9617301/how-to-print-out-string-constant-with-nslog-on-ios
+    struct utsname system_info;
+    uname(&system_info);
+    device_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
+    NSLog(@"device name %@", device_name_);
 }
 
 void HoloKitApi::InitOpticalParameters() {
@@ -103,7 +106,7 @@ void HoloKitApi::InitOpticalParameters() {
     viewport_rects_[0] = leftRect;
     viewport_rects_[1] = rightRect;
     
-    // view matrix
+    // view matrices
     simd_float3 offset = phone.cameraOffset + model.mrOffset;
     eye_positions_.resize(2);
     eye_positions_[0] = simd_make_float3(offset.x - ipd / 2, offset.y, -offset.z);
@@ -143,16 +146,20 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     return simd_make_float3(0);
 }
 
+/// @brief Return true if xr mode is set successfully.
 bool HoloKitApi::SetIsXrModeEnabled(bool val) {
+    // If NFC is not enabled, change the mode directly.
     if(!is_nfc_enabled_) {
         is_xr_mode_enabled_ = val;
         return true;;
     }
+    // Do NFC validation when changing from AR mode to XR mode for the first time.
     if (is_nfc_enabled_ && !is_nfc_validated_) {
         [[NFCSession sharedNFCSession] startReaderSession];
         is_nfc_validated_ = true;
         return false;
     }
+    // We only do NFC validation once.
     if (is_nfc_enabled_ && is_nfc_validated_) {
         is_xr_mode_enabled_ = val;
         return true;
@@ -161,7 +168,7 @@ bool HoloKitApi::SetIsXrModeEnabled(bool val) {
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
-    if (ar_session_handler_ != nullptr && ar_session_handler_.session != NULL && ar_session_handler_.session.currentFrame != NULL && ar_session_handler_.session.currentFrame.camera != NULL) {
+    if (ar_session_handler_ != nullptr && ar_session_handler_.session != NULL) {
         return ar_session_handler_.session.currentFrame.camera.transform;
     } else {
         return matrix_identity_float4x4;

@@ -54,6 +54,9 @@ private:
     /// @brief Initializes view matrix, projection matrix and viewport rectangles.
     void InitOpticalParameters();
     
+    /// @brief Gets the phone model of the device.
+    void GetDeviceModel();
+    
 private:
     
     /// @brief The device name of the phone.

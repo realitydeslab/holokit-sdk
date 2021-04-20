@@ -7,6 +7,7 @@
 
 #include "IUnityXRTrace.h"
 #include "load.h"
+#include "holokit_api.h"
 
 // @def Logs to @p trace the @p message.
 #define HOLOKIT_MAIN_XR_TRACE_LOG(trace, message) \
@@ -26,9 +27,8 @@ UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
     
     // Set up HoloKitApi instance
     // I did this in the beginning of the second frame in display
-    //holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
-    //holokit::HoloKitApi::GetInstance()->Initialize();
-    
+    holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
+    holokit::HoloKitApi::GetInstance()->Initialize();
     
     if (LoadDisplay(unity_interfaces) != kUnitySubsystemErrorCodeSuccess) {
         HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "Error loading HoloKit display subsystem.");

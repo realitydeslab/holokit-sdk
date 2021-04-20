@@ -9,6 +9,9 @@ public class RenderingSettings : MonoBehaviour
 {
     static ARCameraBackground camBackground;
 
+    [SerializeField]
+    private bool arBackgroundEnabled = true;
+
     [DllImport("__Internal")]
     public static extern bool UnityHoloKit_SetIsXrModeEnabled(bool val);
 
@@ -20,7 +23,7 @@ public class RenderingSettings : MonoBehaviour
         {
             Debug.Log("hey");
         }
-        camBackground.enabled = true;
+        camBackground.enabled = arBackgroundEnabled;
     }
 
     // Update is called once per frame
