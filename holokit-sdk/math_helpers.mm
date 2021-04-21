@@ -66,7 +66,7 @@ UnityXRRectf Float4ToUnityXRRect(simd_float4 in_float4) {
 
 UnityXRPose EyePositionToUnityXRPose(simd_float3 eye_position) {
     UnityXRPose unity_pose;
-    unity_pose.position = UnityXRVector3 { eye_position.x, eye_position.y, eye_position.z };
+    unity_pose.position = UnityXRVector3 { eye_position.x, eye_position.y, -eye_position.z };
     unity_pose.rotation = UnityXRVector4 { 0, 0, 0, 1 };
     return unity_pose;
 }

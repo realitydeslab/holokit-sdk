@@ -23,7 +23,7 @@ namespace holokit {
                 phone_model.screenHeight = 0.06458f;
                 phone_model.screenBottom = 0.00557f;
                 phone_model.centerLineOffset = 0.0f;
-                phone_model.cameraOffset = simd_make_float3(0.06318f, -0.05787f, -0.00988f);
+                phone_model.cameraOffset = simd_make_float3(0.06318f, -0.05787f, 0.00988f);
                 phone_model.screenResolutionWidth = 1792;
                 phone_model.screenResolutionHeight = 828;
                 break;
@@ -33,7 +33,7 @@ namespace holokit {
                 phone_model.screenHeight = 0.06233f;
                 phone_model.screenBottom = 0.00452f;
                 phone_model.centerLineOffset = 0.0f;
-                phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, -0.00591f);
+                phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, 0.00591f);
                 phone_model.screenResolutionWidth = 2436;
                 phone_model.screenResolutionHeight = 1125;
                 break;
@@ -43,7 +43,7 @@ namespace holokit {
                 phone_model.screenHeight = 0.06881f;
                 phone_model.screenBottom = 0.00452f;
                 phone_model.centerLineOffset = 0.0f;
-                phone_model.cameraOffset = simd_make_float3(0.066945f, -0.061695f, -0.0091f);
+                phone_model.cameraOffset = simd_make_float3(0.066945f, -0.061695f, 0.0091f);
                 phone_model.screenResolutionWidth = 2688;
                 phone_model.screenResolutionHeight = 1242;
                 break;
@@ -53,7 +53,7 @@ namespace holokit {
                 phone_model.screenHeight = 0.05767f;
                 phone_model.screenBottom = 0.00327f;
                 phone_model.centerLineOffset = 0.0f;
-                phone_model.cameraOffset = simd_make_float3(0.06318f, -0.05787f, -0.00988f);
+                phone_model.cameraOffset = simd_make_float3(0.06318f, -0.05787f, 0.00988f);
                 phone_model.screenResolutionWidth = 2340;
                 phone_model.screenResolutionHeight = 1080;
                 break;
@@ -63,7 +63,7 @@ namespace holokit {
                 phone_model.screenHeight = 0.06458f;
                 phone_model.screenBottom = 0.00347f;
                 phone_model.centerLineOffset = 0.0f;
-                phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, -0.00591f);
+                phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, 0.00591f);
                 phone_model.screenResolutionWidth = 2532;
                 phone_model.screenResolutionHeight = 1170;
                 break;
@@ -73,7 +73,7 @@ namespace holokit {
                 phone_model.screenHeight = 0.06458f;
                 phone_model.screenBottom = 0.00347f;
                 phone_model.centerLineOffset = 0.0f;
-                phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, -0.00591f);
+                phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, 0.00591f);
                 phone_model.screenResolutionWidth = 2532;
                 phone_model.screenResolutionHeight = 1170;
                 break;
@@ -83,7 +83,8 @@ namespace holokit {
                 phone_model.screenHeight = 0.07113f;
                 phone_model.screenBottom = 0.00347f;
                 phone_model.centerLineOffset = 0.0f;
-                phone_model.cameraOffset = simd_make_float3(0.066945f, -0.061695f, -0.0091f);
+                //phone_model.cameraOffset = simd_make_float3(0.066945f, -0.061695f, 0.0091f);
+                phone_model.cameraOffset = simd_make_float3(0.0495f, -0.061695f, 0.0091f);
                 phone_model.screenResolutionWidth = 2778;
                 phone_model.screenResolutionHeight = 1284;
                 break;
@@ -98,7 +99,7 @@ namespace holokit {
         switch(type) {
             case(HoloKitX):
                 holokit_model.opticalAxisDistance = 0.064f;
-                holokit_model.mrOffset = simd_make_float3(0.0f, -0.02894f, -0.07055f);
+                holokit_model.mrOffset = simd_make_float3(0.0f, -0.02894f, 0.07055f);
                 holokit_model.distortion = 0.0f;
                 holokit_model.viewportInner = 0.0292f;
                 holokit_model.viewportOuter = 0.0292f;

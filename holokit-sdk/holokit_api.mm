@@ -56,7 +56,7 @@ void HoloKitApi::InitOpticalParameters() {
     screen_height_ = phone.screenResolutionHeight;
     
     // projection matrices
-    float center_x = 0.5 * phone.screenWidth + phone.centerLineOffset;
+    float center_x = 0.5f * phone.screenWidth + phone.centerLineOffset;
     float center_y = phone.screenHeight - (model.axisToBottom - phone.screenBottom);
     float full_width = model.viewportOuter * 2 + model.opticalAxisDistance + model.viewportCushion * 2;
     float width = model.viewportOuter + model.viewportInner + model.viewportCushion * 2;
@@ -86,6 +86,7 @@ void HoloKitApi::InitOpticalParameters() {
     double y_min_in_pixel = (double)((center_y - (model.viewportTop + model.viewportCushion)) / phone.screenHeight * (float)screen_height_);
     double x_min_right_in_pixel = (double)((center_x + full_width / 2 - width) / phone.screenWidth * (float)screen_width_);
     double x_min_left_in_pixel = (double)((center_x - full_width / 2) / phone.screenWidth * (float)screen_width_);
+    
     double width_in_pixel = (double)(width / phone.screenWidth * (float)screen_width_);
     double height_in_pixel = (double)(height / phone.screenHeight * (float)screen_height_);
     
@@ -107,12 +108,12 @@ void HoloKitApi::InitOpticalParameters() {
     // view matrices
     simd_float3 offset = phone.cameraOffset + model.mrOffset;
     // offset is in Unity coordinate and camera_to_center_eye_offset is in ARKit coordinate.
-    camera_to_center_eye_offset_ = simd_make_float3(offset.x, offset.y, -offset.z);
+    camera_to_center_eye_offset_ = offset;
     eye_positions_.resize(2);
     eye_positions_[0] = simd_make_float3(offset.x - ipd / 2, offset.y, offset.z);
     eye_positions_[1] = simd_make_float3(offset.x + ipd / 2, offset.y, offset.z);
-    //eye_positions_[0] = simd_make_float3(-(ipd / 2), 0.0f, 0.0f);
-    //eye_positions_[1] = simd_make_float3((ipd / 2), 0.0f, 0.0f);
+    //eye_positions_[0] = simd_make_float3(- ipd / 2, 0, 0);
+    //eye_positions_[1] = simd_make_float3(+ ipd / 2, 0, 0);
     
     // horizontal alignment marker offset
     horizontal_alignment_marker_offset_ = model.horizontalAlignmentMarkerOffset / (phone.screenWidth / 2);

@@ -57,7 +57,7 @@ struct HoloKitModel {
     let viewportCushion: Float = 0.0000
     let horizontalAlignmentMarkerOffset: Float = 0.05075
 }
-
+/*
 struct PhoneModel {
     let screenWidth: Float = 0.13977 //Checked
     let screenHeight: Float = 0.06458 //Checked
@@ -65,6 +65,16 @@ struct PhoneModel {
     let centerLineOffset: Float = 0.0
     // The 3D offset vector from center of the camera to the center of the display area's bottomline. (in meters)
     let cameraOffset = simd_float3(0.05996, -0.02364 - 0.03494, 0.00591) //left handed
+}
+*/
+
+struct PhoneModel {
+    let screenWidth: Float = 0.15390 //Checked
+    let screenHeight: Float = 0.07113 //Checked
+    let screenBottom: Float = 0.00347
+    let centerLineOffset: Float = 0.0
+    // The 3D offset vector from center of the camera to the center of the display area's bottomline. (in meters)
+    let cameraOffset = simd_float3(0.066945, -0.061695, 0.0091) //left handed
 }
 
 extension Comparable {
@@ -445,6 +455,9 @@ class Renderer {
         
         let rightViewport = MTLViewport(originX: xMinRightInPixel, originY: yMinInPixel, width: widthInPixel, height: heightInPixel, znear: 0, zfar: 1)
         let leftViewport = MTLViewport(originX: xMinLeftInPixel, originY: yMinInPixel, width: widthInPixel, height: heightInPixel, znear: 0, zfar: 1)
+        //print("left viewport")
+        //print(leftViewport)
+        
         
         
         self.viewportPerEye = [leftViewport, rightViewport]

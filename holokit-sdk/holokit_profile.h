@@ -12,12 +12,13 @@ namespace holokit {
 class Profile{
 
 public:
-    // All vectors are in left-handed Unity coordinate system.
+    // All vectors are in right-handed ARKit coordinate system.
     typedef struct PhoneModel {
         float screenWidth;
         float screenHeight;
         float screenBottom;
         float centerLineOffset;
+        // The 3D offset vector from center of the camera to the center of the display area's bottomline. (in meters)
         simd_float3 cameraOffset;
         // resolution in pixel
         int screenResolutionWidth;
