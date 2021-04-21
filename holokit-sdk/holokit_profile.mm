@@ -24,6 +24,8 @@ namespace holokit {
                 phone_model.screenBottom = 0.00557f;
                 phone_model.centerLineOffset = 0.0f;
                 phone_model.cameraOffset = simd_make_float3(0.06318f, -0.05787f, -0.00988f);
+                phone_model.screenResolutionWidth = 1792;
+                phone_model.screenResolutionHeight = 828;
                 break;
             case(iPhone11Pro):
                 NSLog(@"Profile::iPhone11Pro");
@@ -32,6 +34,8 @@ namespace holokit {
                 phone_model.screenBottom = 0.00452f;
                 phone_model.centerLineOffset = 0.0f;
                 phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, -0.00591f);
+                phone_model.screenResolutionWidth = 2436;
+                phone_model.screenResolutionHeight = 1125;
                 break;
             case(iPhone11ProMax):
                 NSLog(@"Profile::iPhone11ProMax");
@@ -40,6 +44,8 @@ namespace holokit {
                 phone_model.screenBottom = 0.00452f;
                 phone_model.centerLineOffset = 0.0f;
                 phone_model.cameraOffset = simd_make_float3(0.066945f, -0.061695f, -0.0091f);
+                phone_model.screenResolutionWidth = 2688;
+                phone_model.screenResolutionHeight = 1242;
                 break;
             case(iPhone12Mini):
                 NSLog(@"Profile::iPhone12Mini");
@@ -48,6 +54,8 @@ namespace holokit {
                 phone_model.screenBottom = 0.00327f;
                 phone_model.centerLineOffset = 0.0f;
                 phone_model.cameraOffset = simd_make_float3(0.06318f, -0.05787f, -0.00988f);
+                phone_model.screenResolutionWidth = 2340;
+                phone_model.screenResolutionHeight = 1080;
                 break;
             case(iPhone12):
                 NSLog(@"Profile::iPhone12");
@@ -56,6 +64,8 @@ namespace holokit {
                 phone_model.screenBottom = 0.00347f;
                 phone_model.centerLineOffset = 0.0f;
                 phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, -0.00591f);
+                phone_model.screenResolutionWidth = 2532;
+                phone_model.screenResolutionHeight = 1170;
                 break;
             case(iPhone12Pro):
                 NSLog(@"Profile::iPhone12Pro");
@@ -64,14 +74,18 @@ namespace holokit {
                 phone_model.screenBottom = 0.00347f;
                 phone_model.centerLineOffset = 0.0f;
                 phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, -0.00591f);
+                phone_model.screenResolutionWidth = 2532;
+                phone_model.screenResolutionHeight = 1170;
                 break;
             case(iPhone12ProMax):
                 NSLog(@"Profile::iPhone12ProMax");
-                phone_model.screenWidth = 0.15390;
-                phone_model.screenHeight = 0.07113;
-                phone_model.screenBottom = 0.00347;
-                phone_model.centerLineOffset = 0.0;
-                phone_model.cameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
+                phone_model.screenWidth = 0.15390f;
+                phone_model.screenHeight = 0.07113f;
+                phone_model.screenBottom = 0.00347f;
+                phone_model.centerLineOffset = 0.0f;
+                phone_model.cameraOffset = simd_make_float3(0.066945f, -0.061695f, -0.0091f);
+                phone_model.screenResolutionWidth = 2778;
+                phone_model.screenResolutionHeight = 1284;
                 break;
             default:
                 break;
@@ -83,19 +97,19 @@ namespace holokit {
         HoloKitModel holokit_model;
         switch(type) {
             case(HoloKitX):
-                holokit_model.opticalAxisDistance = 0.064;
-                holokit_model.mrOffset = simd_make_float3(0, -0.02894, 0.07055);
-                holokit_model.distortion = 0.0;
-                holokit_model.viewportInner = 0.0292;
-                holokit_model.viewportOuter = 0.0292;
-                holokit_model.viewportTop = 0.02386;
-                holokit_model.viewportBottom = 0.02386;
-                holokit_model.focalLength = 0.065;
-                holokit_model.screenToLens = 0.02715 + 0.03136 + 0.002;
-                holokit_model.lensToEye = 0.02497 + 0.03898;
-                holokit_model.axisToBottom = 0.02990;
-                holokit_model.viewportCushion = 0.0000;
-                holokit_model.horizontalAlignmentMarkerOffset = 0.05075;
+                holokit_model.opticalAxisDistance = 0.064f;
+                holokit_model.mrOffset = simd_make_float3(0.0f, -0.02894f, -0.07055f);
+                holokit_model.distortion = 0.0f;
+                holokit_model.viewportInner = 0.0292f;
+                holokit_model.viewportOuter = 0.0292f;
+                holokit_model.viewportTop = 0.02386f;
+                holokit_model.viewportBottom = 0.02386f;
+                holokit_model.focalLength = 0.065f;
+                holokit_model.screenToLens = 0.02715f + 0.03136f + 0.002f;
+                holokit_model.lensToEye = 0.02497f + 0.03898f;
+                holokit_model.axisToBottom = 0.02990f;
+                holokit_model.viewportCushion = 0.0000f;
+                holokit_model.horizontalAlignmentMarkerOffset = 0.05075f;
                 break;
             default:
                 break;

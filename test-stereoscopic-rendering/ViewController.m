@@ -96,6 +96,7 @@
     // for scene depth
     //configuration.frameSemantics = ARFrameSemanticSmoothedSceneDepth;
     configuration.frameSemantics = ARFrameSemanticSceneDepth;
+    configuration.supportedVideoFormats;
 
     [self.session runWithConfiguration:configuration];
 }

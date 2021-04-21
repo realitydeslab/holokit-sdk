@@ -221,8 +221,7 @@ public:
     
 
 #pragma mark - SubmitCurrentFrame()
-    UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame()
-    {
+    UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
         // delete this

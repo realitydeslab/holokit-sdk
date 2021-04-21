@@ -38,6 +38,8 @@ public:
     
     float GetHorizontalAlignmentMarkerOffset() { return horizontal_alignment_marker_offset_; }
     
+    simd_float3 GetCameraToCenterEyeOffset() { return camera_to_center_eye_offset_; }
+    
     ARSessionDelegateController* GetArSessionHandler() { return ar_session_handler_; }
     
     bool GetIsXrModeEnabled() { return is_xr_mode_enabled_; }
@@ -73,12 +75,15 @@ private:
     std::vector<simd_float3> eye_positions_;
     
     /// @brief Screen width in pixels.
-    int width_;
+    int screen_width_;
     
     /// @brief Screen height in pixels. 
-    int height_;
+    int screen_height_;
     
     float horizontal_alignment_marker_offset_;
+    
+    /// @brief The vector from camera pointing to the center of the eyes.
+    simd_float3 camera_to_center_eye_offset_;
     
     ARSessionDelegateController* ar_session_handler_ = nullptr;
     

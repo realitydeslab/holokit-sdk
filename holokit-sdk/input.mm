@@ -234,12 +234,12 @@ public:
                 
                 simd_float4x4 camera_transform = arSessionDelegateController.session.currentFrame.camera.transform;
                 
-                //LogMatrix4x4(camera_transform);
-                //TODO(Math Helper)
-                UnityXRVector3 position = UnityXRVector3 { camera_transform.columns[3].x, camera_transform.columns[3].y, -camera_transform.columns[3].z };
+                simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
+                simd_float3 center_eye_position = camera_position;
+                //simd_float3 center_eye_position = camera_position + holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
+                UnityXRVector3 position = UnityXRVector3 { center_eye_position.x, center_eye_position.y, -center_eye_position.z };
+                
                 simd_quatf quaternion = simd_quaternion(camera_transform);
-                //quaternion = simd_inverse(quaternion);
-                // I got these negations by experimentation... don't know why
                 UnityXRVector4 rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
                 //Is Tracked
                 input_->DeviceState_SetBinaryValue(state, feature_index++, true);

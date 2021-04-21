@@ -6,6 +6,7 @@ TagManager:
   tags:
   - LandmarkLeft
   - LandmarkRight
+  - qrcode
   layers:
   - Default
   - TransparentFX
