@@ -209,6 +209,7 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
     
+#pragma mark - UpdateDeviceState()
     
     UnitySubsystemErrorCode UpdateDeviceState(
         UnityXRInternalInputDeviceId device_id, UnityXRInputDeviceState* state) {
@@ -217,7 +218,7 @@ public:
         
         
         static const UnityXRInputFeatureIndex parentBone[] = {kUnityInvalidXRInputFeatureIndex, 0, 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 0, 17, 18, 19};
-
+        
         static const UnityXRHand hand = {0, {
             {1, 2, 3, 4, kUnityInvalidXRInputFeatureIndex},
             {5, 6, 7, 8, kUnityInvalidXRInputFeatureIndex},
@@ -235,13 +236,15 @@ public:
                 simd_float4x4 camera_transform = arSessionDelegateController.session.currentFrame.camera.transform;
                 
                 simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
-                simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
+                //simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
                 simd_float3 center_eye_position = camera_position;
                 //simd_float3 center_eye_position = camera_position + offset;
                 UnityXRVector3 position = UnityXRVector3 { center_eye_position.x, center_eye_position.y, -center_eye_position.z };
+                //UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
                 
                 simd_quatf quaternion = simd_quaternion(camera_transform);
                 UnityXRVector4 rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
+                //UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
                 //Is Tracked
                 input_->DeviceState_SetBinaryValue(state, feature_index++, true);
                 //Track State
