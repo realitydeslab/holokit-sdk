@@ -126,7 +126,7 @@ static const float kMaxLandmarkDistance = 0.8f;
     //NSLog(@"type depth %d", type2);
 
     if(self.session == NULL) {
-        NSLog(@"initialize ARSession reference.");
+        NSLog(@"[ar_session]: got session reference.");
         self.session = session;
     }
     
@@ -137,7 +137,6 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.isRightHandTracked = false;
     }
     
-    //NSLog(@"trying to run mediapipe...");
     if (self.isHandTrackingEnabled) {
         [self.handTrackingQueue addOperationWithBlock:^{
             [self.handTracker processVideoFrame: frame.capturedImage];
@@ -169,16 +168,10 @@ static const float kMaxLandmarkDistance = 0.8f;
 
 #pragma mark - HandTracking
 
-- (simd_float3)unprojectScreenPoint:(CGPoint)screenPoint depth:(float)z currentFrame:(ARFrame *) frame {
+- (simd_float3)unprojectScreenPoint:(CGPoint)screenPoint depth:(float)z {
     simd_float4x4 translation = matrix_identity_float4x4;
     translation.columns[3].z = -z;
-    //simd_float4x4 planeOrigin = simd_mul(frame.camera.transform, translation);
     simd_float4x4 planeOrigin = simd_mul(self.session.currentFrame.camera.transform, translation);
-    //NSLog(@"frame camera transform------------------------------------");
-    //[self logMatrix4x4:frame.camera.transform];
-    //NSLog(@"session camera transform------------------------------------");
-    //[self logMatrix4x4:self.session.currentFrame.camera.transform];
-    //NSLog(@"camera coordinate [%f, %f, %f]", self.cameraTransform.columns[3].x, self.cameraTransform.columns[3].y, self.cameraTransform.columns[3].z);
     simd_float3 xAxis = simd_make_float3(1, 0, 0);
     simd_float4x4 rotation = simd_matrix4x4(simd_quaternion(0.5 * M_PI, xAxis));
     simd_float4x4 plane = simd_mul(planeOrigin, rotation);
@@ -197,10 +190,10 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.isRightHandTracked = false;
     }
     
-    //NSLog(@"handTracker()");
     int handIndex = 0;
     for(NSArray<Landmark *> *landmarks in multiLandmarks) {
         int landmarkIndex = 0;
+        float totalLandmarkDepth = 0;
         for(Landmark *landmark in landmarks) {
         
             int x = (CGFloat)landmark.x * self.session.currentFrame.camera.imageResolution.width;
@@ -216,8 +209,6 @@ static const float kMaxLandmarkDistance = 0.8f;
                 NSLog(@"[AR Session]: Failed to acquire scene depth.");
                 return;
             } else {
-                //NSLog(@"[AR Session]: Got scene depth.");
-                //NSLog(@"Scene depth was acquired successfully!");
                 CVPixelBufferRef depthPixelBuffer = sceneDepth.depthMap;
                 CVPixelBufferLockBaseAddress(depthPixelBuffer, 0);
                 depthBufferWidth = CVPixelBufferGetWidth(depthPixelBuffer);
@@ -232,24 +223,10 @@ static const float kMaxLandmarkDistance = 0.8f;
             //float landmarkDepth = 0.5;
             
             // eliminate landmark which is too distant to the user, which is obviously wrong data
-            if(landmarkDepth > kMaxLandmarkDistance) {
-                //NSLog(@"depth value is too large");
-                if(handIndex == 0){
-                    self.isLeftHandTracked = false;
-                    self.isRightHandTracked = false;
-                    return;
-                } else if(handIndex == 1) {
-                    self.isRightHandTracked = false;
-                    return;
-                }
-            }
-            
-            simd_float3 unprojectedPoint = [self unprojectScreenPoint:screenPoint depth:landmarkDepth currentFrame:self.session.currentFrame];
-            
-            //NSLog(@"raw landmark coordinate: [%f, %f]", landmark.x, landmark.y);
-            //NSLog(@"point in world: [%f, %f, %f]", unprojectedPoint.x, unprojectedPoint.y, unprojectedPoint.z);
+            totalLandmarkDepth += landmarkDepth;
+
+            simd_float3 unprojectedPoint = [self unprojectScreenPoint:screenPoint depth:landmarkDepth];
             LandmarkPosition *position = [[LandmarkPosition alloc] initWithX:unprojectedPoint.x y:unprojectedPoint.y z:unprojectedPoint.z];
-            //NSLog(@"position: [%f, %f, %f]", position.x, position.y, position.z);
             if (handIndex == 0) {
                 [self.leftHandLandmarkPositions replaceObjectAtIndex:landmarkIndex withObject:position];
             } else if (handIndex == 1) {
@@ -257,78 +234,30 @@ static const float kMaxLandmarkDistance = 0.8f;
             }
             landmarkIndex++;
         }
-        //NSLog(@"landmark position: [%f, %f]", self.rightHandLandmarkPositions[0].x, self.rightHandLandmarkPositions[0].y);
+        // If the average depth is too far away?
+        if((totalLandmarkDepth / 21) > kMaxLandmarkDistance) {
+            NSLog(@"[ar_session]: wrong hand data detected.");
+            if(handIndex == 0){
+                self.isLeftHandTracked = false;
+                self.isRightHandTracked = false;
+                return;
+            } else if(handIndex == 1) {
+                self.isRightHandTracked = false;
+                return;
+            }
+        }
         handIndex++;
-        // Gesture detection
-        //float thumbDist = [self euclideanDistance:simd_make_float2(landmarks[1].x, landmarks[1].y) point2:simd_make_float2(landmarks[4].x, landmarks[4].y)];
-        //float indexDist = [self euclideanDistance:simd_make_float2(landmarks[5].x, landmarks[5].y) point2:simd_make_float2(landmarks[8].x, landmarks[8].y)];
-        //float middleDist = [self euclideanDistance:simd_make_float2(landmarks[9].x, landmarks[9].y) point2:simd_make_float2(landmarks[12].x, landmarks[12].y)];
-        //float ringDist = [self euclideanDistance:simd_make_float2(landmarks[13].x, landmarks[13].y) point2:simd_make_float2(landmarks[16].x, landmarks[16].y)];
-        //float pinkyDist = [self euclideanDistance:simd_make_float2(landmarks[17].x, landmarks[17].y) point2:simd_make_float2(landmarks[20].x, landmarks[20].y)];
-        //NSLog(@"thunb dist: %f", thumbDist);
-        //NSLog(@"index dist: %f", indexDist);
-        //NSLog(@"middle dist: %f", middleDist);
-        //NSLog(@"ring dist: %f", ringDist);
-        //NSLog(@"pinky dist: %f", pinkyDist);
-        //NSLog(@"-----------------------------------------------------");
-        //
-        //float thumbThreshold = 0.35;
-        //float indexThreshold = 0.15;
-        //float middleThreshold = 0.15;
-        //float ringThreshold = 0.15;
-        //float pinkyThreshold = 0.15;
-        //NSLog(@"is thumb open? %d", (thumbDist > thumbThreshold));
-        //NSLog(@"is index open? %d", (indexDist > indexThreshold));
-        //NSLog(@"is middle open? %d", (middleDist > middleThreshold));
-        //NSLog(@"is ring open? %d", (ringDist > ringThreshold));
-        //NSLog(@"is pinky open? %d", (pinkyDist > pinkyThreshold));
-        //NSLog(@"----------------------------------------------------");
-        
-        bool thumbIsOpen = YES;
-        bool indexIsOpen = (landmarks[7].y < landmarks[6].y) && (landmarks[8].y < landmarks[6].y);
-        bool middleIsOpen = (landmarks[11].y < landmarks[10].y) && (landmarks[12].y < landmarks[10].y);
-        bool ringIsOpen = (landmarks[15].y < landmarks[14].y) && (landmarks[16].y < landmarks[14].y);
-        bool pinkyIsOpen = (landmarks[19].y < landmarks[18].y) && (landmarks[20].y < landmarks[18].y);
-        //NSLog(@"is thumb open? %d", thumbIsOpen);
-        //NSLog(@"is index open? %d", indexIsOpen);
-        //NSLog(@"is middle open? %d", middleIsOpen);
-        //NSLog(@"is ring open? %d", ringIsOpen);
-        //NSLog(@"is pinky open? %d", pinkyIsOpen);
-        //
-        //if((indexIsOpen + middleIsOpen + ringIsOpen + pinkyIsOpen) < 1) {
-        //    NSLog(@"Fist");
-        //} else {
-        //    NSLog(@"Bloom");
-        //}
-        //NSLog(@"----------------------------------------------------");
     }
-    
-    //NSLog(@"Left %d, Right %d", self.isLeftHandTracked, self.isRightHandTracked);
 }
     
 
 - (void)handTracker: (HandTracker*)handTracker didOutputHandednesses: (NSArray<Handedness *> *)handednesses {
-    //NSLog(@"handedness function is called");
-    //NSLog(@"current number of hands is: %d", [handednesses count]);
-    //for(int i = 0; i < [handednesses count] ; i++){
-    //    NSLog(@"hand index: %d and score: %f", handednesses[i].index, handednesses[i].score);
-    //}
-    //NSLog(@"---------------------------------------------");
 }
 
 - (void)handTracker: (HandTracker*)handTracker didOutputPixelBuffer: (CVPixelBufferRef)pixelBuffer { }
 
 - (float)euclideanDistance:(simd_float2)point1 point2:(simd_float2)point2 {
     return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
-}
-
-// print out the matrix column by column
-- (void)logMatrix4x4:(simd_float4x4)mat {
-    //NSLog(@"simd_float4x4;");
-    NSLog(@"[%f %f %f %f]", mat.columns[0].x, mat.columns[0].y, mat.columns[0].z, mat.columns[0].w);
-    NSLog(@"[%f %f %f %f]", mat.columns[1].x, mat.columns[1].y, mat.columns[1].z, mat.columns[1].w);
-    NSLog(@"[%f %f %f %f]", mat.columns[2].x, mat.columns[2].y, mat.columns[2].z, mat.columns[2].w);
-    NSLog(@"[%f %f %f %f]", mat.columns[3].x, mat.columns[3].y, mat.columns[3].z, mat.columns[3].w);
 }
 
 @end
@@ -352,24 +281,15 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
         NSLog(@"session.currentFrame.camera.intrinsics.columns[0]=%f", session.currentFrame.camera.intrinsics.columns[0]);
     }
 
-    
 //    NSObject *obj = session.delegate;
 //    NSLog(@"%@", NSStringFromClass( [someObject class] );
 
-//
     NSLog(@"before session.delegate=%zu\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
     
-    ARSessionDelegateController* dd = [ARSessionDelegateController sharedARSessionDelegateController];
-    dd.unityARSessionDelegate = session.delegate;
+    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+    ar_session_handler.unityARSessionDelegate = session.delegate;
     
     [session setDelegate:ARSessionDelegateController.sharedARSessionDelegateController];
-    //session.delegate = ARSessionDelegateController.sharedARSessionDelegateController;
-    
-    //ARWorldTrackingConfiguration *newConfiguration = [ARWorldTrackingConfiguration new];
-    //newConfiguration.frameSemantics = ARFrameSemanticSceneDepth;
-    //NSLog(@"before runWithConfig");
-    //[session runWithConfiguration:newConfiguration];
-    //NSLog(@"after runWithConfig");
     
     NSLog(@"after session.delegate=%zu\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
 

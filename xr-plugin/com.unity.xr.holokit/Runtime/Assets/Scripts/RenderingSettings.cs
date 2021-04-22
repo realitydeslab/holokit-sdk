@@ -24,6 +24,9 @@ public class RenderingSettings : MonoBehaviour
             Debug.Log("hey");
         }
         camBackground.enabled = arBackgroundEnabled;
+
+        // TODO: adjust brightness when switching to XR mode
+        Screen.brightness = 1.0f;
     }
 
     // Update is called once per frame
