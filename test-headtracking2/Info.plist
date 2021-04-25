@@ -38,6 +38,13 @@
 	<true/>
 	<key>UIStatusBarHidden</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>asda</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_aasda._tcp</string>
+		<string>_aasda._udp</string>
+	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeRight</string>
@@ -46,5 +53,7 @@
 	<array>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSNearbyInteractionAllowOnceUsageDescription</key>
+	<string>asdsad</string>
 </dict>
 </plist>
