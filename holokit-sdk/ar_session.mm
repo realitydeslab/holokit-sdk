@@ -80,7 +80,7 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
         
         // MODIFY HERE
-        self.isHandTrackingEnabled = NO;
+        self.isHandTrackingEnabled = YES;
         
         // Set up multipeer session
         void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {

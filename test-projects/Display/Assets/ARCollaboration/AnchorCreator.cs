@@ -22,6 +22,7 @@ public class AnchorCreator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
         if (Input.touchCount == 0)
             return;
 
@@ -37,5 +38,6 @@ public class AnchorCreator : MonoBehaviour
         {
             anchor = gameObject.AddComponent<ARAnchor>();
         }
+        */
     }
 }
