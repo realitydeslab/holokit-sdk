@@ -15,6 +15,11 @@ namespace UnityEngine.XR.HoloKit
 
         public static bool landmarksInvisible = false;
 
+        private HoloKitHandGesture currentGesture = HoloKitHandGesture.None;
+
+        [SerializeField]
+        private GameObject prefab;
+
         void Start()
         {
             var devices = new List<InputDevice>();
@@ -44,7 +49,7 @@ namespace UnityEngine.XR.HoloKit
             multiHandLandmakrs.Add(GameObject.FindGameObjectsWithTag("LandmarkLeft"));
             multiHandLandmakrs.Add(GameObject.FindGameObjectsWithTag("LandmarkRight"));
 
-            // TODO: color the landmarks
+            // Color the landmarks
             for (int i = 0; i < 2; i++)
             {
                 for (int j = 0; j < 21; j++)
@@ -81,6 +86,31 @@ namespace UnityEngine.XR.HoloKit
         void FixedUpdate()
         {
             UpdateHandLandmarks();
+            HoloKitHandGesture tempGesture = GetCurrentGesture(multiHandLandmakrs[0]);
+            if (currentGesture == HoloKitHandGesture.Fist && tempGesture == HoloKitHandGesture.None)
+            {
+                Debug.Log("Create anchor.");
+                if (multiHandLandmakrs[0][0] != null)
+                {
+                    Quaternion rotation = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
+                    var gameObject = Instantiate(prefab, multiHandLandmakrs[0][0].transform.position, rotation);
+                    ARAnchor anchor;
+                    anchor = gameObject.GetComponent<ARAnchor>();
+                    if (anchor == null)
+                    {
+                        anchor = gameObject.AddComponent<ARAnchor>();
+                    }
+                }
+                else
+                {
+                    Debug.Log("null");
+                }
+            }
+            currentGesture = tempGesture;
+            
+            //Debug.Log("Right hand");
+            //GetCurrentGesture(multiHandLandmakrs[1]);
+            
         }
 
         void UpdateHandLandmarks()
@@ -154,11 +184,24 @@ namespace UnityEngine.XR.HoloKit
             float ringDist = Vector3.Distance(handLandmarks[(int)HoloKitHandLandmark.RingStart].transform.position, handLandmarks[(int)HoloKitHandLandmark.Ring2].transform.position);
             float pinkyDist = Vector3.Distance(handLandmarks[(int)HoloKitHandLandmark.PinkyStart].transform.position, handLandmarks[(int)HoloKitHandLandmark.Pinky2].transform.position);
 
-            Debug.Log($"thumb dist: {thumbDist}");
-            Debug.Log($"index dist: {indexDist}");
-            Debug.Log($"middle dist: {middleDist}");
-            Debug.Log($"ring dist: {ringDist}");
-            Debug.Log($"pinky dist: {pinkyDist}");
+            //Debug.Log($"thumb dist: {thumbDist}");
+            //Debug.Log($"index dist: {indexDist}");
+            //Debug.Log($"middle dist: {middleDist}");
+            //Debug.Log($"ring dist: {ringDist}");
+            //Debug.Log($"pinky dist: {pinkyDist}");
+
+            float maxDist = 0.033f;
+            float minDist = 0.0001f;
+            if(indexDist < maxDist && middleDist < maxDist && ringDist < maxDist && pinkyDist < maxDist &&
+                indexDist > minDist && middleDist > minDist && ringDist > minDist && pinkyDist > minDist)
+            {
+                //Debug.Log("Fist");
+                return HoloKitHandGesture.Fist;
+            } else
+            {
+                //Debug.Log("None");
+                return HoloKitHandGesture.None;
+            }
 
             return HoloKitHandGesture.None;
         }
