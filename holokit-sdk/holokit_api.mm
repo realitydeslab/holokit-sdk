@@ -34,7 +34,7 @@ void HoloKitApi::Initialize() {
     is_xr_mode_enabled_ = true;
     
     // MODIFY HERE
-    is_nfc_enabled_ = false;
+    is_nfc_enabled_ = true;
     
     is_nfc_validated_ = false;
     

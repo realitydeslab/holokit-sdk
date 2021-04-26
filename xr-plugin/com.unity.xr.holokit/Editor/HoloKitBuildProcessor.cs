@@ -9,6 +9,8 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.iOS.Xcode;
 using UnityEditor.iOS.Xcode.Extensions;
 using UnityEditor.iOS;
+using UnityEditor.Callbacks;
+using UnityEngine;
 using UnityEngine.XR.ARKit;
 using OSVersion = UnityEngine.XR.ARKit.OSVersion;
 
@@ -73,6 +75,11 @@ namespace UnityEditor.XR.HoloKit
             //     Input System overwrites the preloaded assets array
             public int callbackOrder => 1;
 
+            public void OnPostprocessBuild(BuildReport report)
+            {
+                PostprocessBuild(report);
+            }
+
             void PostprocessBuild(BuildReport report)
             {
                 if (report.summary.platform != BuildTarget.iOS)
@@ -80,12 +87,45 @@ namespace UnityEditor.XR.HoloKit
                     return;
                 }
 
+                ChangeXcodePlist(report.summary.outputPath);
+                //AddCapabilities(report.summary.outputPath);
                 AddDynamicFramework(report.summary.outputPath);
             }
 
-            public void OnPostprocessBuild(BuildReport report)
+            static void ChangeXcodePlist(string path) 
             {
-                PostprocessBuild(report);
+                string plistPath = path + "/Info.plist";
+                PlistDocument plist = new PlistDocument();
+                plist.ReadFromFile(plistPath);
+
+                PlistElementDict rootDict = plist.root;
+
+                Debug.Log("[HoloKitBuildProcessor]: ChangeXcodePlist()");
+
+                // For NFC
+                rootDict.SetString("NFCReaderUsageDescription", "For HoloKit to authenticate the NFC chip.");
+
+                // For AR collaboration
+                rootDict.SetString("NSLocalNetworkUsageDescription", "For HoloKit to enable nearby AR collaboration.");
+                PlistElementArray array = rootDict.CreateArray("NSBonjourServices");
+                array.AddString("_ar-collab._tcp");
+                array.AddString("_ar-collab._udp");
+
+
+                File.WriteAllText(plistPath, plist.WriteToString());
+            }
+
+            static void AddCapabilities(string path)
+            {
+                string projPath = PBXProject.GetPBXProjectPath(path);
+                PBXProject proj = new PBXProject();
+                proj.ReadFromString(File.ReadAllText(projPath));
+
+                string mainTargetGuid = proj.GetUnityMainTargetGuid();
+
+                ProjectCapabilityManager manager = new ProjectCapabilityManager(projPath, "Entitlements.entitlements", null, mainTargetGuid);
+                manager.AddiCloud(true, false, null);
+                manager.WriteToFile();
             }
 
             static void AddDynamicFramework(string pathToBuiltProject)

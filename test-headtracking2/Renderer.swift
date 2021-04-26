@@ -191,7 +191,7 @@ class Renderer {
                 
                 renderEncoder.label = "MyRenderEncoder"
                 
-                drawCapturedImage(renderEncoder: renderEncoder)
+             //   drawCapturedImage(renderEncoder: renderEncoder)
                 drawAnchorGeometry(renderEncoder: renderEncoder)
                 
                 // We're done encoding commands
@@ -436,7 +436,7 @@ class Renderer {
         leftEyeProjectionMatrix.columns.0.x = 2 * near / width
         leftEyeProjectionMatrix.columns.1.y = 2 * near / height
         leftEyeProjectionMatrix.columns.2.x = (fullWidth - ipd - width) / width
-        print( (fullWidth - ipd - width) )
+      //  print( (fullWidth - ipd - width) )
         leftEyeProjectionMatrix.columns.2.y = (hme.viewportTop - hme.viewportBottom) / height
         leftEyeProjectionMatrix.columns.2.z = -(far + near) / (far - near)
         leftEyeProjectionMatrix.columns.3.z = -(2.0 * far * near) / (far - near)

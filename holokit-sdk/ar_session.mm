@@ -45,10 +45,13 @@ static const float kMaxLandmarkDistance = 0.8f;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
+@property (nonatomic, strong) MultipeerSession *multipeerSession;
+
 @end
 
 @implementation ARSessionDelegateController
 
+#pragma mark - init
 - (instancetype)init {
     if(self = [super init]) {
         self.handTracker = [[HandTracker alloc] init];
@@ -76,7 +79,20 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.isRightHandTracked = true;
         self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
         
-        self.isHandTrackingEnabled = YES;
+        // MODIFY HERE
+        self.isHandTrackingEnabled = NO;
+        
+        // Set up multipeer session
+        void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
+            //NSLog(@"receivedDataHandler");
+            ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
+            if (collaborationData != NULL) {
+                [self.session updateWithCollaborationData:collaborationData];
+                return;
+            }
+            NSLog(@"Failed to receive data.");
+        };
+        self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
         
         //[self startAccelerometer];
         //[self startGyroscope];
@@ -120,11 +136,10 @@ static const float kMaxLandmarkDistance = 0.8f;
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
     //NSLog(@"[Frame] thread=%@, frame.timestamp=%f,  systemuptime=%f", [NSThread currentThread], frame.timestamp, [[NSProcessInfo processInfo] systemUptime]);
-    //OSType type = CVPixelBufferGetPixelFormatType(frame.capturedImage);
-    //OSType type2 = CVPixelBufferGetPixelFormatType(frame.smoothedSceneDepth.depthMap);
-    //NSLog(@"type %d", type);
-    //NSLog(@"type depth %d", type2);
-
+    if (self.unityARSessionDelegate != NULL) {
+        [self.unityARSessionDelegate session:session didUpdateFrame:frame];
+    }
+    
     if(self.session == NULL) {
         NSLog(@"[ar_session]: got session reference.");
         self.session = session;
@@ -137,14 +152,11 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.isRightHandTracked = false;
     }
     
+    // Hand tracking
     if (self.isHandTrackingEnabled) {
         [self.handTrackingQueue addOperationWithBlock:^{
             [self.handTracker processVideoFrame: frame.capturedImage];
         }];
-    }
-    
-    if (self.unityARSessionDelegate != NULL) {
-        [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
 }
 
@@ -152,17 +164,43 @@ static const float kMaxLandmarkDistance = 0.8f;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
+    NSLog(@"[ar_session]: did add anchor.");
+    for (ARAnchor *anchor in anchors) {
+        // Check if this anchor is a new peer
+        if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
+            NSLog(@"A new peer is connected into the collaboration session.");
+            [self.session addAnchor:anchor];
+        }
+    }
 }
 - (void)session:(ARSession *)session didUpdateAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateAnchors:anchors];
     }
+    NSLog(@"[ar_session]: did update anchor.");
 }
 
 - (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didRemoveAnchors:anchors];
     }
+}
+
+- (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data {
+    if (self.unityARSessionDelegate != NULL) {
+        [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
+    }
+    if (self.multipeerSession == nil) {
+        return;
+    }
+    if ([self.multipeerSession GetConnectedPeers].count == 0) {
+        //NSLog(@"Deferred sending collaboration to later because there are no peers.");
+        return;
+    }
+    // If there is at least one peer nearby, send the newly updated collaboration data
+    // to all peers.
+    NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:YES error:nil];
+    [self.multipeerSession sendToAllPeers:encodedData];
 }
 
 
@@ -236,7 +274,7 @@ static const float kMaxLandmarkDistance = 0.8f;
         }
         // If the average depth is too far away?
         if((totalLandmarkDepth / 21) > kMaxLandmarkDistance) {
-            NSLog(@"[ar_session]: wrong hand data detected.");
+            //NSLog(@"[ar_session]: wrong hand data detected.");
             if(handIndex == 0){
                 self.isLeftHandTracked = false;
                 self.isRightHandTracked = false;
@@ -262,6 +300,7 @@ static const float kMaxLandmarkDistance = 0.8f;
 
 @end
 
+#pragma mark - SetARSession
 void SetARSession(UnityXRNativeSession* ar_native_session) {
     
     NSLog(@"ar_native_session=%zu\n", reinterpret_cast<size_t>(ar_native_session));
@@ -285,7 +324,7 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
 //    NSLog(@"%@", NSStringFromClass( [someObject class] );
 
     NSLog(@"before session.delegate=%zu\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
-    
+
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     ar_session_handler.unityARSessionDelegate = session.delegate;
     
@@ -314,6 +353,7 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_EnableHandTracking(bool enabled) {
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     ar_session_handler.isHandTrackingEnabled = enabled;
+    NSLog(@"[ar_session]: EnableHandTracking(%d)", enabled);
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

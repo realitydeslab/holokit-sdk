@@ -11,6 +11,7 @@
 #import <CoreVideo/CoreVideo.h>
 #import <CoreMotion/CoreMotion.h>
 #import "LandmarkPosition.h"
+#import "MultipeerSession.h"
 
 @interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
 

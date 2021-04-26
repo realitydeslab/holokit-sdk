@@ -57,7 +57,7 @@ class ViewController: UIViewController {
         arSession.delegate = self
         
         // Set hand Tracker
-        handTracker.startGraph()
+     //   handTracker.startGraph()
         handTracker.delegate = self
         
         // Set nearby
@@ -65,10 +65,10 @@ class ViewController: UIViewController {
         niSession.delegate = self
         sharedTokenWithPeer = false
         
-        startMultipeerSession()
+       // startMultipeerSession()
         
         DispatchQueue.global(qos: .background).async {
-            solve()
+      //      solve()
         }
 
         // Set the view to use the default device
@@ -115,7 +115,7 @@ class ViewController: UIViewController {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
-        configuration.isCollaborationEnabled = true
+        configuration.isCollaborationEnabled = false
         // Run the view's session
         arSession.run(configuration)
     }
@@ -178,7 +178,8 @@ class ViewController: UIViewController {
         {
           fatalError("Ese token no se puede codificar. 😭")
         }
-
+        
+        print("send to all peers with ni token")
         sendToAllPeers(encodedData)
 
         sharedTokenWithPeer = true
@@ -214,9 +215,9 @@ extension ViewController: ARSessionDelegate
         let imageResolution = session.currentFrame!.camera.imageResolution
         let xFov = yFov * Float(imageResolution.width / imageResolution.height)
         let xFovDegrees = xFov * 180/Float.pi
-        print(xFovDegrees, yFovDegrees)
+       // print(xFovDegrees, yFovDegrees)
 
-        self.handTracker.processVideoFrame(frame.capturedImage)
+      //  self.handTracker.processVideoFrame(frame.capturedImage)
     }
     
     
@@ -282,7 +283,7 @@ extension ViewController: NISessionDelegate
                 let transform = simd_mul(currentFrame.camera.transform, translation)
                 
                 
-                
+                print("nearbyinteraction")
                 let arAnchor = ARAnchor(name: "nearbyinteraction-" + nearbyObject.discoveryToken.hash.description, transform: transform)
                 
                 arSession.add(anchor: arAnchor)
