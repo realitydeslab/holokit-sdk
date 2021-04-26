@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEditor.iOS.Xcode;
@@ -88,7 +89,7 @@ namespace UnityEditor.XR.HoloKit
                 }
 
                 ChangeXcodePlist(report.summary.outputPath);
-                //AddCapabilities(report.summary.outputPath);
+                AddNFCCapability(report.summary.outputPath);
                 AddDynamicFramework(report.summary.outputPath);
             }
 
@@ -115,19 +116,6 @@ namespace UnityEditor.XR.HoloKit
                 File.WriteAllText(plistPath, plist.WriteToString());
             }
 
-            static void AddCapabilities(string path)
-            {
-                string projPath = PBXProject.GetPBXProjectPath(path);
-                PBXProject proj = new PBXProject();
-                proj.ReadFromString(File.ReadAllText(projPath));
-
-                string mainTargetGuid = proj.GetUnityMainTargetGuid();
-
-                ProjectCapabilityManager manager = new ProjectCapabilityManager(projPath, "Entitlements.entitlements", null, mainTargetGuid);
-                manager.AddiCloud(true, false, null);
-                manager.WriteToFile();
-            }
-
             static void AddDynamicFramework(string pathToBuiltProject)
             {
                 string projPath = PBXProject.GetPBXProjectPath(pathToBuiltProject);
@@ -148,6 +136,44 @@ namespace UnityEditor.XR.HoloKit
                 proj.SetBuildProperty(mainTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
 
                 proj.WriteToFile(projPath);
+            }
+
+            private static void AddNFCCapability(string buildPath)
+            {
+                string projectPath = PBXProject.GetPBXProjectPath(buildPath);
+                PBXProject project = new PBXProject();
+                project.ReadFromFile(projectPath);
+                string target = project.GetUnityMainTargetGuid();
+
+                string packageName = UnityEngine.Application.identifier;
+                string name = packageName.Substring(packageName.LastIndexOf('.') + 1);
+                string entitlementFileName = name + ".entitlements";
+                string entitlementPath = Path.Combine(buildPath, entitlementFileName);
+                ProjectCapabilityManager projectCapabilityManager = new ProjectCapabilityManager(projectPath, entitlementFileName, null, target);
+                PlistDocument entitlementDocument = AddNFCEntitlement(projectCapabilityManager);
+                entitlementDocument.WriteToFile(entitlementPath);
+
+                var projectInfo = projectCapabilityManager.GetType().GetField("project", BindingFlags.NonPublic | BindingFlags.Instance);
+                project = (PBXProject)projectInfo.GetValue(projectCapabilityManager);
+
+                var constructor = typeof(PBXCapabilityType).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(string), typeof(bool), typeof(string), typeof(bool) }, null);
+                PBXCapabilityType nfcCapability = (PBXCapabilityType)constructor.Invoke(new object[] { "com.apple.NearFieldCommunicationTagReading", true, "", false });
+                project.AddCapability(target, nfcCapability, entitlementFileName);
+
+                projectCapabilityManager.WriteToFile();
+            }
+
+            private static PlistDocument AddNFCEntitlement(ProjectCapabilityManager projectCapabilityManager)
+            {
+                MethodInfo getMethod = projectCapabilityManager.GetType().GetMethod("GetOrCreateEntitlementDoc", BindingFlags.NonPublic | BindingFlags.Instance);
+                PlistDocument entitlementDoc = (PlistDocument)getMethod.Invoke(projectCapabilityManager, new object[] { });
+
+                PlistElementDict dictionary = entitlementDoc.root;
+                PlistElementArray array = dictionary.CreateArray("com.apple.developer.nfc.readersession.formats");
+                array.values.Add(new PlistElementString("NDEF"));
+                array.values.Add(new PlistElementString("TAG"));
+
+                return entitlementDoc;
             }
         }
 
