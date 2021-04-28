@@ -15,6 +15,8 @@
     "com.unity.visualeffectgraph": "12.0.0",
     "com.unity.xr.arfoundation": "4.1.7",
     "com.unity.xr.arkit": "4.1.7",
+    "com.unity.render-pipelines.universal": "11.0.0",
+    "com.unity.visualeffectgraph": "11.0.0",
     "com.unity.xr.holokit": "file:../../../xr-plugin/com.unity.xr.holokit",
     "com.unity.xr.oculus": "1.9.0",
     "com.unity.modules.ai": "1.0.0",

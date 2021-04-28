@@ -184,3 +184,21 @@ extern "C" bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetIsXrModeEnabled(bool val) {
     return holokit::HoloKitApi::GetInstance()->SetIsXrModeEnabled(val);
 }
+
+extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetCameraToCenterEyeOffsetX() {
+    simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
+    return offset.x;
+}
+
+extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetCameraToCenterEyeOffsetY() {
+    simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
+    return offset.y;
+}
+
+extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetCameraToCenterEyeOffsetZ() {
+    simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
+    return offset.z;
+}

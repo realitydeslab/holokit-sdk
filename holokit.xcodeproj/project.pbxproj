@@ -86,6 +86,7 @@
 		4BE7B64F26110544001F39F2 /* load.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* load.mm */; };
 		4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B66A2611055A001F39F2 /* math_helpers.mm */; };
 		4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B6C826117AE1001F39F2 /* holokit_api.mm */; };
+		4BEB40BF263997E9002516E8 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
 		4BFE562A260E98470074B70D /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		961B8AEF253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
 		961B8AF0253BB99F0025BA7D /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 961B8AEE253BB99F0025BA7D /* ar_session.mm */; };
@@ -670,6 +671,7 @@
 				4B6C94492614B70200CBDFB4 /* HandTracker.framework in Frameworks */,
 				4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */,
 				4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */,
+				4BEB40BF263997E9002516E8 /* libceres.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -860,6 +862,7 @@
 		4BE7B60C261104ED001F39F2 /* holokit-sdk */ = {
 			isa = PBXGroup;
 			children = (
+				4BEB40BD26398013002516E8 /* low-latency-tracking */,
 				4BE7B62126110504001F39F2 /* display.mm */,
 				4BE7B63D2611051A001F39F2 /* input.mm */,
 				4BE7B64C26110537001F39F2 /* load.h */,
@@ -880,6 +883,13 @@
 				4B260C9826368C280004B771 /* MultipeerSession.m */,
 			);
 			path = "holokit-sdk";
+			sourceTree = "<group>";
+		};
+		4BEB40BD26398013002516E8 /* low-latency-tracking */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "low-latency-tracking";
 			sourceTree = "<group>";
 		};
 		9651053B2575FC9800F076B5 /* official-app */ = {
@@ -2716,9 +2726,17 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
-					"$(SRCROOT)/sdk",
+					"$(SRCROOT)/sdk/",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
+					/usr/local/include/eigen3/,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -2734,9 +2752,17 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
-					"$(SRCROOT)/sdk",
+					"$(SRCROOT)/sdk/",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
+					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
+					/usr/local/include/eigen3/,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
