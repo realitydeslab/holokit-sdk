@@ -410,7 +410,7 @@
 		4BDFC58E2600EC470087F728 /* GetCurrentTime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GetCurrentTime.h; sourceTree = "<group>"; };
 		4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GetCurrentTime.mm; sourceTree = "<group>"; };
 		4BE7B4BF26105532001F39F2 /* ArSession.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ArSession.mm; sourceTree = "<group>"; };
-		4BE7B60B261104ED001F39F2 /* libholokit-sdk-skeleton.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk-skeleton.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE7B62126110504001F39F2 /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 		4BE7B63D2611051A001F39F2 /* input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = input.mm; sourceTree = "<group>"; };
 		4BE7B64C26110537001F39F2 /* load.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = load.h; sourceTree = "<group>"; };
@@ -978,7 +978,7 @@
 				4B2D6E4125E7CFD500DAAD13 /* libtest-unity-plugin-input-ios.a */,
 				4B0606CB25F5CA08006DF0B0 /* libtest-unity-plugin-display-ios.a */,
 				4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */,
-				4BE7B60B261104ED001F39F2 /* libholokit-sdk-skeleton.a */,
+				4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */,
 				4B6C948F2614C2E300CBDFB4 /* libholokit-sdk-skeleton-2.a */,
 				4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */,
 			);
@@ -1457,9 +1457,9 @@
 			productReference = 4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
-		4BE7B60A261104ED001F39F2 /* holokit-sdk-skeleton */ = {
+		4BE7B60A261104ED001F39F2 /* holokit-sdk */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4BE7B613261104ED001F39F2 /* Build configuration list for PBXNativeTarget "holokit-sdk-skeleton" */;
+			buildConfigurationList = 4BE7B613261104ED001F39F2 /* Build configuration list for PBXNativeTarget "holokit-sdk" */;
 			buildPhases = (
 				4BE7B607261104ED001F39F2 /* Sources */,
 				4BE7B608261104ED001F39F2 /* Frameworks */,
@@ -1470,9 +1470,9 @@
 			);
 			dependencies = (
 			);
-			name = "holokit-sdk-skeleton";
+			name = "holokit-sdk";
 			productName = "holokit-sdk-skeleton";
-			productReference = 4BE7B60B261104ED001F39F2 /* libholokit-sdk-skeleton.a */;
+			productReference = 4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		965105392575FC9800F076B5 /* official-app */ = {
@@ -1744,7 +1744,7 @@
 				4B2D6E4025E7CFD500DAAD13 /* test-unity-plugin-input-ios */,
 				4B0606CA25F5CA08006DF0B0 /* test-unity-plugin-display-ios */,
 				4BDFC53D2600AB210087F728 /* test-unity-plugin-display-mac */,
-				4BE7B60A261104ED001F39F2 /* holokit-sdk-skeleton */,
+				4BE7B60A261104ED001F39F2 /* holokit-sdk */,
 				4B6C94802614C2E300CBDFB4 /* holokit-sdk-skeleton-2 */,
 				4BC45ADE262813BD00BA98E4 /* factory-app-nfc */,
 			);
@@ -2725,12 +2725,11 @@
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
 				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
-					"$(SRCROOT)/sdk/",
+					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
-					/usr/local/include/eigen3/,
+					"$(SRCROOT)/sdk/third_party/eigen",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LIBRARY_SEARCH_PATHS = (
@@ -2751,12 +2750,11 @@
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
 				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/sdk/third_party/unity_plugin_api",
-					"$(SRCROOT)/sdk/",
+					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
-					/usr/local/include/eigen3/,
+					"$(SRCROOT)/sdk/third_party/eigen",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LIBRARY_SEARCH_PATHS = (
@@ -3409,7 +3407,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4BE7B613261104ED001F39F2 /* Build configuration list for PBXNativeTarget "holokit-sdk-skeleton" */ = {
+		4BE7B613261104ED001F39F2 /* Build configuration list for PBXNativeTarget "holokit-sdk" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4BE7B611261104ED001F39F2 /* Debug */,

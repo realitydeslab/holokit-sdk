@@ -86,6 +86,7 @@ namespace UnityEngine.XR.HoloKit
         void FixedUpdate()
         {
             UpdateHandLandmarks();
+            /*
             HoloKitHandGesture tempGesture = GetCurrentGesture(multiHandLandmakrs[0]);
             if (currentGesture == HoloKitHandGesture.Fist && tempGesture == HoloKitHandGesture.None)
             {
@@ -107,7 +108,7 @@ namespace UnityEngine.XR.HoloKit
                 }
             }
             currentGesture = tempGesture;
-            
+            */
             //Debug.Log("Right hand");
             //GetCurrentGesture(multiHandLandmakrs[1]);
             

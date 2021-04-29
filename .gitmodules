@@ -1,3 +1,6 @@
 [submodule "sdk/third_party/ceres-solver"]
 	path = sdk/third_party/ceres-solver
 	url = https://github.com/ceres-solver/ceres-solver
+[submodule "sdk/third_party/eigen"]
+	path = sdk/third_party/eigen
+	url = https://github.com/eigenteam/eigen-git-mirror
