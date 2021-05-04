@@ -38,7 +38,7 @@ int solve() {
 
   // Run the solver!
   Solver::Options options;
-  options.linear_solver_type = ceres::DENSE_QR;
+  options.linear_solver_type = ceres::DENSE_SCHUR;
   options.minimizer_progress_to_stdout = true;
   Solver::Summary summary;
   Solve(options, &problem, &summary);

@@ -12,10 +12,11 @@
 #include "UnityXRTypes.h"
 #include "IUnityInterface.h"
 #include "XR/UnitySubsystemTypes.h"
-
+#include "math_helpers.h"
 #import "hand_tracking.h"
 #import <vector>
 #import "LandmarkPosition.h"
+#import "ARcore.h"
 
 //#if TARGET_OS_IPHONE
 #import <Foundation/Foundation.h>
@@ -23,6 +24,7 @@
 #import <ARKit/ARKit.h>
 #import <CoreVideo/CoreVideo.h>
 #import <CoreMotion/CoreMotion.h>
+
 
 #define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
@@ -35,6 +37,8 @@
   })
 
 static const float kMaxLandmarkDistance = 0.8f;
+
+std::unique_ptr<AR::ARCore> AR_estimator;
 
 @interface ARSessionDelegateController ()
 
@@ -94,17 +98,28 @@ static const float kMaxLandmarkDistance = 0.8f;
         };
         self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
         
-        //[self startAccelerometer];
-        //[self startGyroscope];
+        AR_estimator.reset(new AR::ARCore());
+        AR_estimator->start(30);
+
+        [self startAccelerometer];
+        [self startGyroscope];
     }
     return self;
 }
+
 
 - (void)startAccelerometer {
     if ([self.motionManager isAccelerometerAvailable] == YES) {
         self.motionManager.accelerometerUpdateInterval = 1.0 / 100.0;
         [self.motionManager startAccelerometerUpdatesToQueue:self.motionQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
-        //NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
+            //NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
+            AR::ImuAccData cur_acc;
+            cur_acc.delivery_timestamp = [[NSProcessInfo processInfo] systemUptime];
+            cur_acc.event_timestamp = accelerometerData.timestamp;
+            cur_acc.ax = accelerometerData.acceleration.x;
+            cur_acc.ay = accelerometerData.acceleration.y;
+            cur_acc.az = accelerometerData.acceleration.z;
+            AR_estimator->addAccMeasurement(cur_acc);
         }];
     }
 }
@@ -113,11 +128,18 @@ static const float kMaxLandmarkDistance = 0.8f;
     if ([self.motionManager isGyroAvailable] == YES) {
         self.motionManager.gyroUpdateInterval = 1.0 / 100.0;
         [self.motionManager startGyroUpdatesToQueue:self.motionQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
-           // self.gy_x = gyroData.rotationRate.x;
-           // self.gy_y = gyroData.rotationRate.y;
-           // self.gy_z = gyroData.rotationRate.z;
-        //    NSLog(@"[Gyro] thread=%@, gyroData.timestamp=%f, systemuptime=%f, gyroData.rotationRate.x=%f, gyroData.rotationRate.y=%f, gyroData.rotationRate.z=%f", [NSThread currentThread], gyroData.timestamp, [[NSProcessInfo processInfo] systemUptime], gyroData.rotationRate.x, gyroData.rotationRate.y,
-          //        gyroData.rotationRate.z);
+            
+            AR::ImuGyrData cur_gyr;
+            cur_gyr.delivery_timestamp = [[NSProcessInfo processInfo] systemUptime];
+            cur_gyr.event_timestamp = gyroData.timestamp;
+            cur_gyr.wx = gyroData.rotationRate.x;
+            cur_gyr.wy = gyroData.rotationRate.y;
+            cur_gyr.wz = gyroData.rotationRate.z;
+            AR_estimator->addGyrMeasurement(cur_gyr);
+
+           
+           // NSLog(@"[Gyro] thread=%@, gyroData.timestamp=%f, systemuptime=%f, gyroData.rotationRate.x=%f, gyroData.rotationRate.y=%f, gyroData.rotationRate.z=%f", [NSThread currentThread], gyroData.timestamp, [[NSProcessInfo processInfo] systemUptime], gyroData.rotationRate.x, gyroData.rotationRate.y,
+           //       gyroData.rotationRate.z);
         }];
     }
 }
@@ -135,6 +157,21 @@ static const float kMaxLandmarkDistance = 0.8f;
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
     //NSLog(@"[Frame] thread=%@, frame.timestamp=%f,  systemuptime=%f", [NSThread currentThread], frame.timestamp, [[NSProcessInfo processInfo] systemUptime]);
+    
+    //LogMatrix4x4(frame.camera.transform);
+    //frame.camera.intrinsics
+    
+    simd_float4x4 trans = frame.camera.transform;
+    simd_quatf quat = /*simd_normalize*/(simd_quaternion(trans));
+    
+    AR::ARkitData cur_ARkit;
+    cur_ARkit.delivery_timestamp = [[NSProcessInfo processInfo] systemUptime];
+    cur_ARkit.event_timestamp = frame.timestamp;
+    cur_ARkit.ARkit_Position = AR::ARVector3d{trans.columns[3][0], trans.columns[3][1], trans.columns[3][2]};
+    cur_ARkit.ARkit_Rotation = AR::ARQuaterniond{quat.vector[3], quat.vector[0], quat.vector[1], quat.vector[2]};
+
+    AR_estimator->addARKitMeasurement(cur_ARkit);
+    
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }

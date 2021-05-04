@@ -171,8 +171,11 @@ bool HoloKitApi::SetIsXrModeEnabled(bool val) {
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
+    //<- [[NSProcessInfo processInfo] systemUptime
+     
     if (ar_session_handler_ != nullptr && ar_session_handler_.session != NULL) {
         return ar_session_handler_.session.currentFrame.camera.transform;
+        //return HeadTracker.
     } else {
         return matrix_identity_float4x4;
     }

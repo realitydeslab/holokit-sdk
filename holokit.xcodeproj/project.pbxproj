@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E795017263CD87100F9C661 /* ARcore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0E795015263CD87100F9C661 /* ARcore.mm */; };
+		0E79501C263D58AF00F9C661 /* estimator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0E79501A263D58AF00F9C661 /* estimator.mm */; };
+		0E795021263D5A7D00F9C661 /* marginalization_factor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0E79501F263D5A7D00F9C661 /* marginalization_factor.mm */; };
+		0E795024263D5B3700F9C661 /* initial_alignment.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0E795022263D5B3700F9C661 /* initial_alignment.mm */; };
+		0E795028263D6F7500F9C661 /* pose_local_parameterization.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0E795026263D6F7500F9C661 /* pose_local_parameterization.mm */; };
+		0E79502A263D7F2200F9C661 /* param.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0E795029263D7F2200F9C661 /* param.mm */; };
+		0E79502C263D9C4E00F9C661 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E79502B263D9C4E00F9C661 /* Accelerate.framework */; };
 		4B04D8A8260CCC9C0055020F /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B04D8AA260CCCA20055020F /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B04D8A9260CCCA20055020F /* MetalKit.framework */; };
 		4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B4FFDF42604AA93002FC8D7 /* Shaders.metal */; };
@@ -253,13 +260,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4BE7B609261104ED001F39F2 /* CopyFiles */ = {
+		4BE7B609261104ED001F39F2 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		965105752575FCBC00F076B5 /* Embed App Clips */ = {
@@ -327,6 +335,22 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0E795015263CD87100F9C661 /* ARcore.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ARcore.mm; sourceTree = "<group>"; };
+		0E795016263CD87100F9C661 /* ARcore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARcore.h; sourceTree = "<group>"; };
+		0E795018263D569E00F9C661 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		0E795019263D577700F9C661 /* external_struct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = external_struct.h; sourceTree = "<group>"; };
+		0E79501A263D58AF00F9C661 /* estimator.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = estimator.mm; sourceTree = "<group>"; };
+		0E79501B263D58AF00F9C661 /* estimator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = estimator.h; sourceTree = "<group>"; };
+		0E79501D263D596800F9C661 /* integration_base.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = integration_base.h; sourceTree = "<group>"; };
+		0E79501F263D5A7D00F9C661 /* marginalization_factor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = marginalization_factor.mm; sourceTree = "<group>"; };
+		0E795020263D5A7D00F9C661 /* marginalization_factor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = marginalization_factor.h; sourceTree = "<group>"; };
+		0E795022263D5B3700F9C661 /* initial_alignment.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = initial_alignment.mm; sourceTree = "<group>"; };
+		0E795023263D5B3700F9C661 /* initial_alignment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = initial_alignment.h; sourceTree = "<group>"; };
+		0E795025263D5D7700F9C661 /* factor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = factor.h; sourceTree = "<group>"; };
+		0E795026263D6F7500F9C661 /* pose_local_parameterization.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = pose_local_parameterization.mm; sourceTree = "<group>"; };
+		0E795027263D6F7500F9C661 /* pose_local_parameterization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pose_local_parameterization.h; sourceTree = "<group>"; };
+		0E795029263D7F2200F9C661 /* param.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = param.mm; sourceTree = "<group>"; };
+		0E79502B263D9C4E00F9C661 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 		4B04D8A9260CCCA20055020F /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B06069C25F5C963006DF0B0 /* test_display.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_display.cpp; sourceTree = "<group>"; };
 		4B0606CB25F5CA08006DF0B0 /* libtest-unity-plugin-display-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtest-unity-plugin-display-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -668,6 +692,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E79502C263D9C4E00F9C661 /* Accelerate.framework in Frameworks */,
 				4B6C94492614B70200CBDFB4 /* HandTracker.framework in Frameworks */,
 				4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */,
 				4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */,
@@ -888,6 +913,21 @@
 		4BEB40BD26398013002516E8 /* low-latency-tracking */ = {
 			isa = PBXGroup;
 			children = (
+				0E795015263CD87100F9C661 /* ARcore.mm */,
+				0E79501A263D58AF00F9C661 /* estimator.mm */,
+				0E795025263D5D7700F9C661 /* factor.h */,
+				0E79501B263D58AF00F9C661 /* estimator.h */,
+				0E79501F263D5A7D00F9C661 /* marginalization_factor.mm */,
+				0E795026263D6F7500F9C661 /* pose_local_parameterization.mm */,
+				0E795027263D6F7500F9C661 /* pose_local_parameterization.h */,
+				0E795020263D5A7D00F9C661 /* marginalization_factor.h */,
+				0E79501D263D596800F9C661 /* integration_base.h */,
+				0E795016263CD87100F9C661 /* ARcore.h */,
+				0E795018263D569E00F9C661 /* util.h */,
+				0E795029263D7F2200F9C661 /* param.mm */,
+				0E795022263D5B3700F9C661 /* initial_alignment.mm */,
+				0E795023263D5B3700F9C661 /* initial_alignment.h */,
+				0E795019263D577700F9C661 /* external_struct.h */,
 			);
 			path = "low-latency-tracking";
 			sourceTree = "<group>";
@@ -988,6 +1028,7 @@
 		96602188253935D7004019A5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0E79502B263D9C4E00F9C661 /* Accelerate.framework */,
 				4BC45B25262815CB00BA98E4 /* CoreNFC.framework */,
 				4B04D8A9260CCCA20055020F /* MetalKit.framework */,
 				4B6615A325F39FED00CC4E81 /* Metal.framework */,
@@ -1463,7 +1504,7 @@
 			buildPhases = (
 				4BE7B607261104ED001F39F2 /* Sources */,
 				4BE7B608261104ED001F39F2 /* Frameworks */,
-				4BE7B609261104ED001F39F2 /* CopyFiles */,
+				4BE7B609261104ED001F39F2 /* Copy Files */,
 				4BE7B6F22611CE4B001F39F2 /* ShellScript */,
 			);
 			buildRules = (
@@ -2089,12 +2130,18 @@
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
 				4B260C9926368C280004B771 /* MultipeerSession.m in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
+				0E795017263CD87100F9C661 /* ARcore.mm in Sources */,
+				0E79501C263D58AF00F9C661 /* estimator.mm in Sources */,
 				4BAD1933262026C3006884F1 /* widgets_view_controller.m in Sources */,
+				0E79502A263D7F2200F9C661 /* param.mm in Sources */,
+				0E795021263D5A7D00F9C661 /* marginalization_factor.mm in Sources */,
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
 				4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
+				0E795024263D5B3700F9C661 /* initial_alignment.mm in Sources */,
+				0E795028263D6F7500F9C661 /* pose_local_parameterization.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2721,15 +2768,23 @@
 		4BE7B611261104ED001F39F2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
+				ENABLE_BITCODE = YES;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"CERES_NO_THREADS=1",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
+					/usr/local/include/eigen3/,
 					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
-					"$(SRCROOT)/sdk/third_party/eigen",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LIBRARY_SEARCH_PATHS = (
@@ -2746,15 +2801,19 @@
 		4BE7B612261104ED001F39F2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
+				ENABLE_BITCODE = YES;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
+				GCC_PREPROCESSOR_DEFINITIONS = "CERES_NO_THREADS=1";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
+					/usr/local/include/eigen3/,
 					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
-					"$(SRCROOT)/sdk/third_party/eigen",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LIBRARY_SEARCH_PATHS = (

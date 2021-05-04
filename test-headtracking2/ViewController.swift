@@ -68,7 +68,7 @@ class ViewController: UIViewController {
        // startMultipeerSession()
         
         DispatchQueue.global(qos: .background).async {
-      //      solve()
+            solve()
         }
 
         // Set the view to use the default device
