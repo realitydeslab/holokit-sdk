@@ -47,7 +47,9 @@ namespace AR{
         void addARKitMeasurement(const ARkitData& arkit_data);
 
         bool GetPoseAtTimestamp(Eigen::Matrix4d & pose); //返回最新的预测的pose,与IMU的delay一致,基本忽略不计,pose from world to cam
-        bool GetPoseAtTimestamp(const double need_time, Eigen::Matrix4d & pose); //返回距离这个时间最近的预测,IMU频率很快，没必要再用匀速模型猜测
+        bool GetPoseAtTimestampFordebug(const double need_time, Eigen::Matrix4d & pose); //返回距离这个时间最近的预测,IMU频率很快，没必要再用匀速模型猜测
+        
+        bool GetPoseAtTimestamp(const double need_time, Eigen::Matrix4d & pose); //返回距离这个时间最近的预测,当前系统时间离IMU最近的时间戳很近，先不用匀速预测模型了
 
     private:
         void predict();
@@ -124,8 +126,10 @@ namespace AR{
 
         std::string m_output_path_;
 
-        //debug
-        std::vector<std::pair<double,Eigen::Matrix4d>> predict_pose_history;
+        //only debug for gt
+        std::queue<std::pair<double,Eigen::Matrix4d>> debug_predict_pose_history;
+        
+        std::queue<std::pair<double,Eigen::Matrix4d>> predict_pose_history;
 
     };
 

@@ -360,7 +360,6 @@ namespace AR
 
         if(fabs(cur_time - m_arkit_now.event_timestamp) < 1e-6 )//case1
             inter_idx = 0;
-
         CHECK_GT(m_IMU_frontend_buf.size(),1);
         for (int k = 0; k < m_IMU_frontend_buf.size(); ++k)
         {
@@ -371,7 +370,6 @@ namespace AR
                 if(k + 1 < m_IMU_frontend_buf.size()
                    && m_IMU_frontend_buf[k+1].inter_event_timestamp >= m_arkit_now.event_timestamp)
                 {
-
                     double inter_time = m_arkit_now.event_timestamp;
                     double inter_dt =  m_IMU_frontend_buf[k+1].inter_event_timestamp - m_IMU_frontend_buf[k].inter_event_timestamp;
                     double inter_alpha = (inter_time -  m_IMU_frontend_buf[k].inter_event_timestamp) / inter_dt;
@@ -382,7 +380,6 @@ namespace AR
                     temp_data.gyr = LinearInterpolation(m_IMU_frontend_buf[k].gyr,
                                                         m_IMU_frontend_buf[k+1].gyr,
                                                         inter_alpha);
-
                     m_vec_imu_data.push_back(temp_data);
                     inter_idx++;
                 }
@@ -469,12 +466,13 @@ namespace AR
         Twb_predict.block<3,1>(0,3) = tmp_P;
 
         Eigen::Matrix4d Tw2_c_predict  = Aligned_Mat.inverse() * Twb_predict * TIC;
-
-
+        
         m_GetPredictPose.lock();
         predict_pose = std::make_pair(m_vec_imu_data.back().inter_event_timestamp,Tw2_c_predict);
-        predict_pose_history.push_back(std::make_pair(m_vec_imu_data.back().inter_event_timestamp,Tw2_c_predict));
+        predict_pose_history.push(std::make_pair(m_vec_imu_data.back().inter_event_timestamp,Tw2_c_predict));
 
+        debug_predict_pose_history.push(std::make_pair(m_vec_imu_data.back().inter_event_timestamp,Tw2_c_predict));
+        
         m_GetPredictPose.unlock();
         m_vec_imu_data.clear();
 
@@ -489,7 +487,7 @@ namespace AR
         Eigen::Matrix4d predict_pose_ = GetArkitpose(arkit_now);
 
         bool Isinit = false;
-        Isinit =GetPoseAtTimestamp(arkit_now.event_timestamp,predict_pose_);
+        Isinit =GetPoseAtTimestampFordebug(arkit_now.event_timestamp,predict_pose_);
 
         if(Isinit)
         {
@@ -527,6 +525,44 @@ namespace AR
 
 
 
+bool ARCore::GetPoseAtTimestampFordebug(const double need_time,Eigen::Matrix4d & pose) //为了比对真值才弄了这个接口
+{
+    std::unique_lock<std::mutex> lock(m_GetPredictPose);
+
+    if(predict_pose.first<= 0)
+    {
+        pose = Eigen::Matrix4d::Identity();
+        return false;
+    }
+
+    if(need_time <= debug_predict_pose_history.front().first)
+    {
+        pose = debug_predict_pose_history.front().second;
+        return false;
+    }
+    else if(need_time >= debug_predict_pose_history.back().first)
+    {
+        pose = debug_predict_pose_history.back().second;
+        return true;
+    }
+    else
+    {
+        std::pair<double,Eigen::Matrix4d> cur_pose;
+        while(1)
+        {
+            cur_pose = debug_predict_pose_history.front();
+            debug_predict_pose_history.pop();
+            if(cur_pose.first <= need_time && debug_predict_pose_history.front().first >= need_time)
+                break;
+        }
+        
+        pose =  (need_time - cur_pose.first) > (debug_predict_pose_history.front().first - need_time)
+        ? debug_predict_pose_history.front().second : cur_pose.second;
+        return true;
+    }
+
+}
+
 bool ARCore::GetPoseAtTimestamp(const double need_time,Eigen::Matrix4d & pose) //为了比对真值才弄了这个接口
 {
     std::unique_lock<std::mutex> lock(m_GetPredictPose);
@@ -537,24 +573,38 @@ bool ARCore::GetPoseAtTimestamp(const double need_time,Eigen::Matrix4d & pose) /
         return false;
     }
 
-    if(need_time < predict_pose_history[0].first || need_time > predict_pose_history[predict_pose_history.size()-1].first)
+    if(need_time <= predict_pose_history.front().first)
     {
-        pose = predict_pose.second;
+        pose = predict_pose_history.front().second;
         return false;
+    }
+    else if(need_time >= predict_pose_history.back().first)
+    {
+        std::cout<<"diff:"<< fabs((predict_pose_history.back().first - need_time)*1000)<<"\n";
+        pose = predict_pose_history.back().second;
+        return true;
     }
     else
     {
-        int i;
-        for (i = 0; i < predict_pose_history.size()-1; ++i) {
-            if(predict_pose_history[i].first < need_time && predict_pose_history[i+1].first > need_time)
+        std::pair<double,Eigen::Matrix4d> cur_pose;
+        while(1)
+        {
+            cur_pose = predict_pose_history.front();
+            predict_pose_history.pop();
+            if(cur_pose.first <= need_time && predict_pose_history.front().first >= need_time)
                 break;
         }
-
-        pose =  (need_time - predict_pose_history[i].first) > (predict_pose_history[i+1].first - need_time)
-        ? predict_pose_history[i+1].second : predict_pose_history[i].second;
+        
+        pose =  (need_time - cur_pose.first) > (predict_pose_history.front().first - need_time)
+        ? predict_pose_history.front().second : cur_pose.second;
+        
+        double small_time = (need_time - cur_pose.first) > (predict_pose_history.front().first - need_time)
+        ? predict_pose_history.front().first : cur_pose.first;
+        
+        std::cout<<"diff:"<< fabs((small_time - need_time)*1000)<<"\n";
         return true;
-    }
 
+    }
 }
 
 } //namespace AR

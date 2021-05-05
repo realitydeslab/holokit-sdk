@@ -14,12 +14,13 @@
 #include "IUnityXRInput.h"
 #include "math_helpers.h"
 #include "holokit_api.h"
+#include "ARcore.h"
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_INPUT_XR_TRACE_LOG(trace, message, ...)                \
   XR_TRACE_LOG(trace, "[HoloKitInputProvider]: " message "\n", \
                ##__VA_ARGS__)
-
+extern std::unique_ptr<AR::ARCore> AR_estimator;
 namespace{
 
 static int s_FrameCount = 0;
@@ -233,7 +234,17 @@ public:
             case kDeviceIdHoloKitHmd: {
                 ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
                 
-                simd_float4x4 camera_transform = arSessionDelegateController.session.currentFrame.camera.transform;
+                Eigen::Matrix4d predict_pose = Eigen::Matrix4d::Identity();
+
+                bool predict_success = AR_estimator->GetPoseAtTimestamp([[NSProcessInfo processInfo] systemUptime],predict_pose);
+                            
+                simd_float4x4 camera_transform;
+                if(predict_success)
+                    camera_transform = EigenToSimd_float4x4(predict_pose);
+                else
+                    camera_transform = arSessionDelegateController.session.currentFrame.camera.transform;
+                
+                
                 
                 simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
                 //simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();

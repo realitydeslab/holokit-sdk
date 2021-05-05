@@ -21,6 +21,32 @@ void LogMatrix4x4(simd_float4x4 mat) {
     NSLog(@"[%f %f %f %f]", mat.columns[3].x, mat.columns[3].y, mat.columns[3].z, mat.columns[3].w);
 }
 
+simd_float4x4 EigenToSimd_float4x4(const Eigen::Matrix4d & mat)
+{
+    
+    simd_float4x4 unity_matrix;
+    unity_matrix.columns[0].x = (float)mat(0,0);
+    unity_matrix.columns[0].y = (float)mat(1,0);
+    unity_matrix.columns[0].z = (float)mat(2,0);
+    unity_matrix.columns[0].w = (float)mat(3,0);
+    
+    unity_matrix.columns[1].x = (float)mat(0,1);
+    unity_matrix.columns[1].y = (float)mat(1,1);
+    unity_matrix.columns[1].z = (float)mat(2,1);
+    unity_matrix.columns[1].w = (float)mat(3,1);
+    
+    unity_matrix.columns[2].x = (float)mat(0,2);
+    unity_matrix.columns[2].y = (float)mat(1,2);
+    unity_matrix.columns[2].z = (float)mat(2,2);
+    unity_matrix.columns[2].w = (float)mat(3,2);
+    
+    unity_matrix.columns[3].x = (float)mat(0,3);
+    unity_matrix.columns[3].y = (float)mat(1,3);
+    unity_matrix.columns[3].z = (float)mat(2,3);
+    unity_matrix.columns[3].w = (float)mat(3,3);
+    return unity_matrix;
+}
+
 simd_float4 MatrixVectorMultiplication(simd_float4x4 mat, simd_float4 vec) {
     simd_float4 ret;
     ret.x = mat.columns[0].x * vec.x + mat.columns[1].x * vec.y + mat.columns[2].x * vec.z + mat.columns[3].x * vec.w;

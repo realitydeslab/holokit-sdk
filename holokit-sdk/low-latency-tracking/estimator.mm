@@ -390,9 +390,10 @@ namespace AR
 
         ceres::Problem::Options options_for_problem;
 
-        ceres::Problem problem(options_for_problem);
+        ceres::Problem problem;
         ceres::LossFunction *loss_function;
-        loss_function = new ceres::TukeyLoss(20.0);
+//        loss_function = new ceres::TukeyLoss(20.0);
+        loss_function = new ceres::CauchyLoss(1.0);
 
         for (int i = 0; i <= WINDOW_SIZE; i++)
         {
@@ -403,8 +404,6 @@ namespace AR
             problem.AddParameterBlock(para_Bas[i], SIZE_BIAS_ACC);
             problem.AddParameterBlock(para_Bgs[i], SIZE_BIAS_GYR);
 
-//            problem.SetParameterBlockConstant(para_Pose_R[i]);
-//            problem.SetParameterBlockConstant(para_Pose_T[i]);
 
         }
 
