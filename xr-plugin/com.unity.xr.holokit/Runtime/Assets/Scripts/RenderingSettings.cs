@@ -19,10 +19,6 @@ public class RenderingSettings : MonoBehaviour
     void Start()
     {
         camBackground = FindObjectOfType<ARCameraBackground>();
-        if (camBackground)
-        {
-            Debug.Log("hey");
-        }
         camBackground.enabled = arBackgroundEnabled;
 
         // TODO: adjust brightness when switching to XR mode

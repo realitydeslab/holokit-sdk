@@ -34,7 +34,10 @@
   __x > __high ? __high : (__x < __low ? __low : __x);\
   })
 
-static const float kMaxLandmarkDistance = 0.8f;
+static const float kMaxLandmarkDepth = 0.6f;
+
+typedef void (*DelegateCallbackFunction)(int number);
+DelegateCallbackFunction delegate = NULL;
 
 @interface ARSessionDelegateController ()
 
@@ -157,17 +160,20 @@ static const float kMaxLandmarkDistance = 0.8f;
             [self.handTracker processVideoFrame: frame.capturedImage];
         }];
     }
+    
+    //delegate(24);
 }
 
 - (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
-    NSLog(@"[ar_session]: did add anchor.");
+    //NSLog(@"[ar_session]: did add anchor.");
     for (ARAnchor *anchor in anchors) {
+        //NSLog(@"Anchor name: %@", anchor.name);
         // Check if this anchor is a new peer
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            NSLog(@"A new peer is connected into the collaboration session.");
+            //NSLog(@"A new peer is connected into the collaboration session.");
             [self.session addAnchor:anchor];
         }
     }
@@ -176,7 +182,7 @@ static const float kMaxLandmarkDistance = 0.8f;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateAnchors:anchors];
     }
-    NSLog(@"[ar_session]: did update anchor.");
+    //NSLog(@"[ar_session]: did update anchor.");
 }
 
 - (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
@@ -230,7 +236,8 @@ static const float kMaxLandmarkDistance = 0.8f;
     int handIndex = 0;
     for(NSArray<Landmark *> *landmarks in multiLandmarks) {
         int landmarkIndex = 0;
-        float totalLandmarkDepth = 0;
+        float totalLandmarkDepth = 0.0f;
+        float landmarkDepths[21];
         for(Landmark *landmark in landmarks) {
         
             int x = (CGFloat)landmark.x * self.session.currentFrame.camera.imageResolution.width;
@@ -258,6 +265,14 @@ static const float kMaxLandmarkDistance = 0.8f;
             int bufferY = CLAMP(landmark.y, 0, 1) * depthBufferHeight;
             float landmarkDepth = depthBufferBaseAddress[bufferY * depthBufferWidth + bufferX];
             //float landmarkDepth = 0.5;
+            // To make sure every landmark depth is reasonable.
+            if (landmarkIndex != 0 && landmarkDepth > kMaxLandmarkDepth) {
+                NSLog(@"[ar_session]: unusual depth value: %f", landmarkDepth);
+                int landmarkParentIndex = [ARSessionDelegateController getParentLandmarkIndex:landmarkIndex];
+                landmarkDepth = landmarkDepths[landmarkParentIndex];
+                NSLog(@"corrected depth: %f", landmarkDepth);
+            }
+            landmarkDepths[landmarkIndex] = landmarkDepth;
             
             // eliminate landmark which is too distant to the user, which is obviously wrong data
             totalLandmarkDepth += landmarkDepth;
@@ -272,7 +287,7 @@ static const float kMaxLandmarkDistance = 0.8f;
             landmarkIndex++;
         }
         // If the average depth is too far away?
-        if((totalLandmarkDepth / 21) > kMaxLandmarkDistance) {
+        if((totalLandmarkDepth / 21) > kMaxLandmarkDepth) {
             //NSLog(@"[ar_session]: wrong hand data detected.");
             if(handIndex == 0){
                 self.isLeftHandTracked = false;
@@ -287,8 +302,27 @@ static const float kMaxLandmarkDistance = 0.8f;
     }
 }
     
++ (int)getParentLandmarkIndex:(int)landmarkIndex {
+    int parentIndex;
+    if (landmarkIndex == 0 || landmarkIndex == 5 || landmarkIndex == 9 || landmarkIndex == 13 || landmarkIndex == 17) {
+        parentIndex = 0;
+    } else{
+        parentIndex = landmarkIndex - 1;
+    }
+    return parentIndex;
+}
 
 - (void)handTracker: (HandTracker*)handTracker didOutputHandednesses: (NSArray<Handedness *> *)handednesses {
+    /*
+    int index = 0;
+    for (Handedness *handedness in handednesses) {
+        NSLog(@"Handedness number: %d", index);
+        NSLog(@"Handedness index: %d", handedness.index);
+        NSLog(@"Handedness score: %f", handedness.score);
+        index++;
+    }
+    NSLog(@"-----------------");
+     */
 }
 
 - (void)handTracker: (HandTracker*)handTracker didOutputPixelBuffer: (CVPixelBufferRef)pixelBuffer { }
@@ -334,8 +368,6 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
 //    NSLog(@"controller=%d\n", reinterpret_cast<size_t>((__bridge void *)(controller)));
 //    session.delegate = controller;
 }
-
-
 
 //#else
 //void SetARSession(UnityXRNativeSession* ar_native_session) {
@@ -385,3 +417,8 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     [ar_session_handler.session setWorldOrigin:(transform_matrix)];
 }
 
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDelegate(DelegateCallbackFunction callback) {
+    NSLog(@"hi");
+    delegate = callback;
+}

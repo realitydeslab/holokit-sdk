@@ -207,5 +207,32 @@ namespace UnityEngine.XR.HoloKit
             return HoloKitHandGesture.None;
         }
 
+        public void DisableBoxCollider()
+        {
+            Debug.Log("[HandTracking]: DisableBoxCollider()");
+            for (int i = 0; i < 2; i++)
+            {
+                GameObject[] handLandmarks = multiHandLandmakrs[i];
+                for (int j = 0; j < 21; j++)
+                {
+                    GameObject handLandmark = handLandmarks[j];
+                    handLandmark.GetComponent<BoxCollider>().enabled = false;
+                }
+            }
+        }
+
+        public void ResetLandmarksPosition()
+        {
+            Debug.Log("[HandTracking]: ResetLandmarksPosition()");
+            for (int i = 0; i < 2; i++)
+            {
+                GameObject[] handLandmarks = multiHandLandmakrs[i];
+                for (int j = 0; j < 21; j++)
+                {
+                    GameObject handLandmark = handLandmarks[j];
+                    handLandmark.transform.position = Vector3.zero;
+                }
+            }
+        }
     }
 }

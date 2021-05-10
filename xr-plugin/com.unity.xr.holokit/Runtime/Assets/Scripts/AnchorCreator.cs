@@ -57,6 +57,7 @@ namespace UnityEngine.XR.HoloKit
             {
                 anchor = gameObject.AddComponent<ARAnchor>();
             }
+            anchor.name = "aaa";
         }
     }
 }

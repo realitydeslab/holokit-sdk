@@ -350,14 +350,11 @@ public:
     }
 
 #pragma mark - PopulateNextFrame()
-    UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame)
-    {
-        
+    UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
         WORKAROUND_SKIP_FIRST_FRAME();
 
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
-        
         
         // Check if holokit api has changed the display mode.
         if (is_xr_mode_enabled_ != holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled()) {
@@ -366,7 +363,6 @@ public:
             is_xr_mode_enabled_ = holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled();
             display_mode_changed_ = true;
         }
-
         
         bool reallocate_textures = (unity_textures_.size() == 0);
         if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0)
@@ -414,7 +410,6 @@ public:
                 num_textures = 1;
                 texture_array_length = 0;
             }
-            
             CreateTextures(num_textures, texture_array_length, frame_hints->appSetup.textureResolutionScale);
         }
         
