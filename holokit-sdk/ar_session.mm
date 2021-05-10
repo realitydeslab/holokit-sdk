@@ -267,10 +267,10 @@ DelegateCallbackFunction delegate = NULL;
             //float landmarkDepth = 0.5;
             // To make sure every landmark depth is reasonable.
             if (landmarkIndex != 0 && landmarkDepth > kMaxLandmarkDepth) {
-                NSLog(@"[ar_session]: unusual depth value: %f", landmarkDepth);
+                //NSLog(@"[ar_session]: unusual depth value: %f", landmarkDepth);
                 int landmarkParentIndex = [ARSessionDelegateController getParentLandmarkIndex:landmarkIndex];
                 landmarkDepth = landmarkDepths[landmarkParentIndex];
-                NSLog(@"corrected depth: %f", landmarkDepth);
+                //NSLog(@"corrected depth: %f", landmarkDepth);
             }
             landmarkDepths[landmarkIndex] = landmarkDepth;
             
