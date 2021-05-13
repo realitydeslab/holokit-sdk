@@ -1,10 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.XR;
-using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARKit;
-using UnityEngine.XR.ARSubsystems;
+using System.Runtime.InteropServices;
 
 namespace UnityEngine.XR.HoloKit
 {
@@ -18,10 +14,20 @@ namespace UnityEngine.XR.HoloKit
         private HoloKitHandGesture currentGesture = HoloKitHandGesture.None;
 
         [SerializeField]
-        private GameObject prefab;
+        private bool handTrackingEnabled = true;
+
+        [DllImport("__Internal")]
+        public static extern bool UnityHoloKit_EnableHandTracking(bool enabled);
 
         void Start()
         {
+            UnityHoloKit_EnableHandTracking(handTrackingEnabled);
+            if (!handTrackingEnabled)
+            {
+                transform.gameObject.SetActive(false);
+                return;
+            }
+
             var devices = new List<InputDevice>();
             // Get left hand device
             var desiredCharacteristics = InputDeviceCharacteristics.Left | InputDeviceCharacteristics.HandTracking |
@@ -86,32 +92,6 @@ namespace UnityEngine.XR.HoloKit
         void FixedUpdate()
         {
             UpdateHandLandmarks();
-            /*
-            HoloKitHandGesture tempGesture = GetCurrentGesture(multiHandLandmakrs[0]);
-            if (currentGesture == HoloKitHandGesture.Fist && tempGesture == HoloKitHandGesture.None)
-            {
-                Debug.Log("Create anchor.");
-                if (multiHandLandmakrs[0][0] != null)
-                {
-                    Quaternion rotation = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
-                    var gameObject = Instantiate(prefab, multiHandLandmakrs[0][0].transform.position, rotation);
-                    ARAnchor anchor;
-                    anchor = gameObject.GetComponent<ARAnchor>();
-                    if (anchor == null)
-                    {
-                        anchor = gameObject.AddComponent<ARAnchor>();
-                    }
-                }
-                else
-                {
-                    Debug.Log("null");
-                }
-            }
-            currentGesture = tempGesture;
-            */
-            //Debug.Log("Right hand");
-            //GetCurrentGesture(multiHandLandmakrs[1]);
-            
         }
 
         void UpdateHandLandmarks()
@@ -207,9 +187,9 @@ namespace UnityEngine.XR.HoloKit
             return HoloKitHandGesture.None;
         }
 
-        public void DisableBoxCollider()
+        public void DisableCollider()
         {
-            Debug.Log("[HandTracking]: DisableBoxCollider()");
+            Debug.Log("[HandTracking]: DisableCollider()");
             for (int i = 0; i < 2; i++)
             {
                 GameObject[] handLandmarks = multiHandLandmakrs[i];
@@ -221,9 +201,9 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        public void ResetLandmarksPosition()
+        public void ResetPosition()
         {
-            Debug.Log("[HandTracking]: ResetLandmarksPosition()");
+            Debug.Log("[HandTracking]: ResetPosition()");
             for (int i = 0; i < 2; i++)
             {
                 GameObject[] handLandmarks = multiHandLandmakrs[i];

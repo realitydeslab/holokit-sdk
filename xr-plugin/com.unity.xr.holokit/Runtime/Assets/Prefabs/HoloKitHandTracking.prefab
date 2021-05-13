@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3614668015497972429}
   - component: {fileID: 4255458024852999675}
   m_Layer: 0
-  m_Name: HoloKitHands
+  m_Name: HoloKitHandTracking
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8103ea89d23654bb4b4477b291c29a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefab: {fileID: 0}
 --- !u!1 &3614668016061954655
 GameObject:
   m_ObjectHideFlags: 0

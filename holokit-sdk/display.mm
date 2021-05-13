@@ -20,6 +20,8 @@
 #define XR_ANDROID 0
 #include "IUnityGraphicsMetal.h"
 #include <Metal/Metal.h>
+#include <MetalKit/MetalKit.h>
+#import <simd/simd.h>
 #else
 #define XR_METAL 0
 #define XR_ANDROID 1
@@ -125,6 +127,43 @@ NSString* myShader = @
 "    return half4(1, 1, 1, 1);\n"
 "};\n";
 
+const float black_vertices[] = {
+    -1.0f, 1.0f,
+    -1.0f, -1.0f,
+    1.0f, -1.0f,
+    1.0f, 1.0f
+};
+
+const uint16_t black_indexes[] = {0, 1, 2, 2, 3, 0};
+
+NSString* kBlackShaders = @
+    R"msl(
+    #include <metal_stdlib>
+    using namespace metal;
+
+    struct VertexInput {
+        float2 in_position [[attribute(0)]];
+    };
+
+    struct VertexOutput {
+        float4 out_position [[position]];
+    };
+
+    struct FragmentOutput {
+        half4 color [[color(0)]];
+    };
+
+    vertex VertexOutput vertex_main(VertexInput input [[stage_in]]) {
+        VertexOutput out = { float4(input.in_position, 0, 1) };
+        return out;
+    }
+
+    fragment FragmentOutput fragment_main(VertexOutput input [[stage_in]]) {
+        FragmentOutput out = { half4(0, 1, 0, 1) };
+        return out;
+    }
+    )msl";
+
 namespace {
 class HoloKitDisplayProvider {
 public:
@@ -139,8 +178,6 @@ public:
     void SetHandle(UnitySubsystemHandle handle) { handle_ = handle; }
     
     void SetMtlDevice(id<MTLDevice> device) { mtl_device_ = device; }
-    
-    void SetNSBundle(NSBundle* bundle) { mtl_bundle_ = bundle; }
     
     void SetMtlInterface(IUnityGraphicsMetal* mtl_interface) { metal_interface_ = mtl_interface; }
     
@@ -272,34 +309,50 @@ public:
             //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
             id<MTLFunction> vertex_function = [lib newFunctionWithName:@"vprog"];
             id<MTLFunction> fragment_function = [lib newFunctionWithName:@"fshader_tex"];
-            mtl_bundle_ = metal_interface_->MetalBundle();
             
-            MTLVertexBufferLayoutDescriptor* buffer_layout_descriptor = [[mtl_bundle_ classNamed:@"MTLVertexBufferLayoutDescriptor"] new];
+            MTLVertexBufferLayoutDescriptor* buffer_layout_descriptor = [[MTLVertexBufferLayoutDescriptor alloc] init];
             buffer_layout_descriptor.stride = 4 * sizeof(float);
             buffer_layout_descriptor.stepFunction = MTLVertexStepFunctionPerVertex;
             buffer_layout_descriptor.stepRate = 1;
             
-            MTLVertexAttributeDescriptor* attribute_descriptor = [[mtl_bundle_ classNamed:@"MTLVertexAttributeDescriptor"] new];
+            MTLVertexAttributeDescriptor* attribute_descriptor = [[MTLVertexAttributeDescriptor alloc] init];
             attribute_descriptor.format = MTLVertexFormatFloat4;
             
-            MTLVertexDescriptor* vertex_descriptor = [[mtl_bundle_ classNamed:@"MTLVertexDescriptor"] vertexDescriptor];
+            MTLVertexDescriptor* vertex_descriptor = [[MTLVertexDescriptor alloc] init];
             vertex_descriptor.attributes[0] = attribute_descriptor;
             vertex_descriptor.layouts[0] = buffer_layout_descriptor;
             
-            MTLRenderPipelineDescriptor* render_pipeline_descriptor = [[mtl_bundle_ classNamed:@"MTLRenderPipelineDescriptor"] new];
+            MTLRenderPipelineDescriptor* render_pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
 
-            MTLRenderPipelineColorAttachmentDescriptor* color_attachment_descriptor = [[mtl_bundle_ classNamed:@"MTLRenderPipelineColorAttachmentDescriptor"] new];
-            color_attachment_descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
-            render_pipeline_descriptor.colorAttachments[0] = color_attachment_descriptor;
-
+//            MTLRenderPipelineColorAttachmentDescriptor* color_attachment_descriptor = [[MTLRenderPipelineColorAttachmentDescriptor alloc] init];
+//            color_attachment_descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
+//            render_pipeline_descriptor.colorAttachments[0] = color_attachment_descriptor;
+            
             //pipeDesc.fragmentFunction = g_FShaderColor;
             render_pipeline_descriptor.fragmentFunction = fragment_function;
             render_pipeline_descriptor.vertexFunction = vertex_function;
             render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
             render_pipeline_descriptor.sampleCount = 1;
+            render_pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+            render_pipeline_descriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+            render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+            render_pipeline_descriptor.colorAttachments[0].blendingEnabled = YES;
+            render_pipeline_descriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
+            render_pipeline_descriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+            render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+            //render_pipeline_descriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorZero; // MTLBlendFactorSourceAlpha;
+            // TODO: this pamameter is vital.
+            //render_pipeline_descriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+            render_pipeline_descriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOne;
+            //render_pipeline_descriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorZero;// MTLBlendFactorOneMinusSourceAlpha;
+            
             render_pipeline_state_ = [mtl_device_ newRenderPipelineStateWithDescriptor:render_pipeline_descriptor error:nil];
             is_metal_initialized_ = true;
         }
+        
+        // Draw a black screen beforehand to eliminate left viewport glitch
+        // This does not work...
+        //RenderBlackScreen();
         
         id<MTLRenderCommandEncoder> render_command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
         [render_command_encoder setRenderPipelineState:render_pipeline_state_];
@@ -322,8 +375,8 @@ public:
         if (!is_metal_initialized_widgets_) {
             vertex_data[0] = vertex_data[4] = holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset();
             
-            vertex_buffer_widgets_ = [mtl_device_ newBufferWithBytes:vertex_data length:sizeof(vertex_data) options:MTLResourceOptionCPUCacheModeDefault];
-            vertex_buffer_widgets_.label = @"vertices";
+            widgets_vertex_buffer_ = [mtl_device_ newBufferWithBytes:vertex_data length:sizeof(vertex_data) options:MTLResourceOptionCPUCacheModeDefault];
+            widgets_vertex_buffer_.label = @"vertices";
             //id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
             //vertex_color_buffer.label = @"colors";
             
@@ -343,10 +396,73 @@ public:
         
         id<MTLRenderCommandEncoder> command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
         [command_encoder setRenderPipelineState:render_pipeline_state_widgets_];
-        [command_encoder setVertexBuffer:vertex_buffer_widgets_ offset:0 atIndex:0];
+        [command_encoder setVertexBuffer:widgets_vertex_buffer_ offset:0 atIndex:0];
         //[command_encoder setVertexBuffer:vertex_color_buffer offset:0 atIndex:1];
         [command_encoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:(sizeof(vertex_data) / sizeof(float))];
         //NSLog(@"draw call");
+    }
+    
+    void RenderBlackScreen() {
+        if (!is_black_screen_renderer_setup_) {
+            // Pass vertex buffer data to the GPU
+            black_vertex_buffer_ = [mtl_device_ newBufferWithBytes:black_vertices length:sizeof(black_vertices) options:MTLResourceOptionCPUCacheModeDefault];
+            black_index_buffer_ = [mtl_device_ newBufferWithBytes:black_indexes length:sizeof(black_indexes) options:MTLResourceOptionCPUCacheModeDefault];
+            
+            id<MTLLibrary> mtl_library = [mtl_device_ newLibraryWithSource:kBlackShaders options:nil error:nil];
+            
+            if (mtl_library == nil) {
+                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Failed to compile Metal library.");
+                return;
+            }
+            
+            id<MTLFunction> vertex_function = [mtl_library newFunctionWithName:@"vertex_main"];
+            id<MTLFunction> fragment_function = [mtl_library newFunctionWithName:@"fragment_main"];
+            
+            // Setup vertex descriptor
+            MTLVertexBufferLayoutDescriptor* buffer_layout_descriptor = [[MTLVertexBufferLayoutDescriptor alloc] init];
+            buffer_layout_descriptor.stride = 2 * sizeof(float);
+            buffer_layout_descriptor.stepFunction = MTLVertexStepFunctionPerVertex;
+            buffer_layout_descriptor.stepRate = 1;
+            
+            MTLVertexAttributeDescriptor* attribute_descriptor = [[MTLVertexAttributeDescriptor alloc] init];
+            attribute_descriptor.format = MTLVertexFormatFloat2;
+            
+            MTLVertexDescriptor* vertex_descriptor = [[MTLVertexDescriptor alloc] init];
+            vertex_descriptor.layouts[0] = buffer_layout_descriptor;
+            vertex_descriptor.attributes[0] = attribute_descriptor;
+            
+            // Create pipeline
+            MTLRenderPipelineDescriptor* mtl_render_pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
+            mtl_render_pipeline_descriptor.vertexFunction = vertex_function;
+            mtl_render_pipeline_descriptor.fragmentFunction = fragment_function;
+            mtl_render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
+            mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+//            mtl_render_pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+//            mtl_render_pipeline_descriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+            mtl_render_pipeline_descriptor.sampleCount = 1;
+//            mtl_render_pipeline_descriptor.colorAttachments[0].blendingEnabled = YES;
+//            mtl_render_pipeline_descriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
+//            mtl_render_pipeline_descriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+//            mtl_render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+//            mtl_render_pipeline_descriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
+//            mtl_render_pipeline_descriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+//            mtl_render_pipeline_descriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+            
+            black_render_pipeline_state_ = [mtl_device_ newRenderPipelineStateWithDescriptor:mtl_render_pipeline_descriptor error:nil];
+            if (black_render_pipeline_state_ == nil) {
+                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Failed to create Metal render pipeline.");
+                return;
+            }
+            is_black_screen_renderer_setup_ = true;
+        }
+        
+        // Rendering commands that are executed for each frame.
+        id<MTLRenderCommandEncoder> mtl_render_command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
+        [mtl_render_command_encoder setRenderPipelineState:black_render_pipeline_state_];
+        [mtl_render_command_encoder setCullMode:MTLCullModeNone];
+        [mtl_render_command_encoder setVertexBuffer:black_vertex_buffer_ offset:0 atIndex:0];
+        [mtl_render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:black_index_buffer_ indexBufferOffset:0];
+        NSLog(@"Draw black screen");
     }
 
 #pragma mark - PopulateNextFrame()
@@ -445,6 +561,12 @@ public:
             }
             // viewport
             render_params.viewportRect = frame_hints->appSetup.renderViewport;
+            render_params.viewportRect = {
+                0.0f,                    // x
+                0.0f,                    // y
+                0.5f,                    // width
+                0.5f                     // height
+            };
             return kUnitySubsystemErrorCodeSuccess;
         }
 
@@ -691,22 +813,26 @@ private:
     /// @brief This value is set to true when Metal is initialized for the first time.
     bool is_metal_initialized_ = false;
     
+    bool is_black_screen_renderer_setup_ = false;
+    
     id <MTLDevice> mtl_device_;
-    
-    NSBundle* mtl_bundle_;
-    
-    id <MTLBuffer> vertex_buffer_;
-    
-    id <MTLBuffer> index_buffer_;
     
     id <MTLRenderPipelineState> render_pipeline_state_;
     
     /// @brief This value is used for rendering widgets.
     bool is_metal_initialized_widgets_ = false;
     
-    id <MTLBuffer> vertex_buffer_widgets_;
+    id <MTLBuffer> vertex_buffer_;
+    id <MTLBuffer> index_buffer_;
+    
+    id <MTLBuffer> widgets_vertex_buffer_;
+    
+    id <MTLBuffer> black_vertex_buffer_;
+    id <MTLBuffer> black_index_buffer_;
     
     id <MTLRenderPipelineState> render_pipeline_state_widgets_;
+    
+    id <MTLRenderPipelineState> black_render_pipeline_state_;
     
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
@@ -742,7 +868,6 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
     
     HoloKitDisplayProvider::GetInstance()->SetMtlInterface(xr_interfaces->Get<IUnityGraphicsMetal>());
     HoloKitDisplayProvider::GetInstance()->SetMtlDevice(xr_interfaces->Get<IUnityGraphicsMetal>()->MetalDevice());
-    HoloKitDisplayProvider::GetInstance()->SetNSBundle(xr_interfaces->Get<IUnityGraphicsMetal>()->MetalBundle());
     
     UnityLifecycleProvider display_lifecycle_handler;
     display_lifecycle_handler.userData = NULL;

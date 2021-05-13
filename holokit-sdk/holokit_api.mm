@@ -35,7 +35,6 @@ void HoloKitApi::Initialize() {
     
     // MODIFY HERE
     is_nfc_enabled_ = true;
-    
     is_nfc_validated_ = false;
     
     is_initialized_ = true;
@@ -149,7 +148,7 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     return simd_make_float3(0);
 }
 
-/// @brief Return true if xr mode is set successfully.
+/// @brief Return true if mode is set successfully.
 bool HoloKitApi::SetIsXrModeEnabled(bool val) {
     // If NFC is not enabled, change the mode directly.
     if(!is_nfc_enabled_) {

@@ -37,16 +37,14 @@
 }
 
 - (void)readerSession:(NFCNDEFReaderSession *)session didDetectNDEFs:(NSArray<NFCNDEFMessage *> *)messages {
-    NSLog(@"didDetectNDEFs.");
-    // TODO: do something useful
-    NSArray<NFCNDEFPayload *> *records = messages[0].records;
-    NSLog(@"num of records: %d", records.count);
-    for(NFCNDEFPayload *record in records) {
-        NSLog(@"identifier %x", record.identifier);
-        NSLog(@"payload %x", record.payload);
-        NSLog(@"type %x", record.type);
-        NSLog(@"typeNameFormat %x", record.typeNameFormat);
+    NFCNDEFPayload* payload = messages[0].records[0];
+    NSString* nfcUrl = [[NSString alloc] initWithData:payload.payload encoding:NSUTF8StringEncoding];
+    if (nfcUrl == NULL) {
+        NSLog(@"[nfc_session]: failed to interpret nfc url.");
+        return;
     }
+    NSLog(@"[nfc_session]: %@", nfcUrl);
+    // TODO: validate the url
 }
 
 - (void)readerSession:(NFCNDEFReaderSession *)session didInvalidateWithError:(NSError *)error {
