@@ -17,14 +17,14 @@ public class InteractiveCube : MonoBehaviour
 
     private void OnEnable()
     {
-        UnityEngine.XR.HoloKit.HandTracking.OnChangedToBloom += StartTelekinesis;
-        UnityEngine.XR.HoloKit.HandTracking.OnChangedToNone += StopTelekinesis;
+        UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToBloom += StartTelekinesis;
+        UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToNone += StopTelekinesis;
     }
 
     private void OnDisable()
     {
-        UnityEngine.XR.HoloKit.HandTracking.OnChangedToBloom -= StartTelekinesis;
-        UnityEngine.XR.HoloKit.HandTracking.OnChangedToNone -= StopTelekinesis;
+        UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToBloom -= StartTelekinesis;
+        UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToNone -= StopTelekinesis;
     }
 
     void StartTelekinesis()

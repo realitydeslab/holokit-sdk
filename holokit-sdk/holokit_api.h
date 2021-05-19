@@ -17,6 +17,7 @@
 #include "math_helpers.h"
 #include "holokit_profile.h"
 #include "nfc_session.h"
+#include "view_controller.h"
 
 namespace holokit {
 

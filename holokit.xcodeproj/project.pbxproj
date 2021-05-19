@@ -12,7 +12,7 @@
 		4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B4FFDF42604AA93002FC8D7 /* Shaders.metal */; };
 		4B06069D25F5C963006DF0B0 /* test_display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B06069C25F5C963006DF0B0 /* test_display.cpp */; };
 		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
-		4B260C9926368C280004B771 /* MultipeerSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B260C9826368C280004B771 /* MultipeerSession.m */; };
+		4B260C9926368C280004B771 /* multipeer_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B260C9826368C280004B771 /* multipeer_session.m */; };
 		4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
 		4B2B2FE825E23588002AC24F /* HandTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FF925E23E94002AC24F /* AppDelegate.m */; };
@@ -51,7 +51,7 @@
 		4B99658F25F715E3006AF9A5 /* hand_tracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */; };
 		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
 		4B9C742725F5B948001935A8 /* LandmarkPosition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C742625F5B948001935A8 /* LandmarkPosition.m */; };
-		4BAD1933262026C3006884F1 /* widgets_view_controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BAD1932262026C3006884F1 /* widgets_view_controller.m */; };
+		4BAD1933262026C3006884F1 /* view_controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BAD1932262026C3006884F1 /* view_controller.m */; };
 		4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* nfc_session.m */; };
 		4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		4BBDD2F025F397D200070CB4 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
@@ -313,8 +313,8 @@
 		4B0606CB25F5CA08006DF0B0 /* libtest-unity-plugin-display-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtest-unity-plugin-display-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B06070C25F5F8F4006DF0B0 /* ProviderContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProviderContext.h; sourceTree = "<group>"; };
 		4B06977225ECADA3009D51BD /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = System/Library/Frameworks/Vision.framework; sourceTree = SDKROOT; };
-		4B260C9826368C280004B771 /* MultipeerSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MultipeerSession.m; sourceTree = "<group>"; };
-		4B260CA926368C3A0004B771 /* MultipeerSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MultipeerSession.h; sourceTree = "<group>"; };
+		4B260C9826368C280004B771 /* multipeer_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = multipeer_session.m; sourceTree = "<group>"; };
+		4B260CA926368C3A0004B771 /* multipeer_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = multipeer_session.h; sourceTree = "<group>"; };
 		4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-monocular-handtracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2B2FF825E23E94002AC24F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B2B2FF925E23E94002AC24F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -364,8 +364,8 @@
 		4B9C52BE261F0B330020E4C8 /* ar_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_session.h; sourceTree = "<group>"; };
 		4B9C742525F5B909001935A8 /* LandmarkPosition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LandmarkPosition.h; sourceTree = "<group>"; };
 		4B9C742625F5B948001935A8 /* LandmarkPosition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LandmarkPosition.m; sourceTree = "<group>"; };
-		4BAD1932262026C3006884F1 /* widgets_view_controller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = widgets_view_controller.m; sourceTree = "<group>"; };
-		4BAD1942262026D3006884F1 /* widgets_view_controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = widgets_view_controller.h; sourceTree = "<group>"; };
+		4BAD1932262026C3006884F1 /* view_controller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = view_controller.m; sourceTree = "<group>"; };
+		4BAD1942262026D3006884F1 /* view_controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = view_controller.h; sourceTree = "<group>"; };
 		4BB5587226205B7D00DC0213 /* nfc_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = nfc_session.m; sourceTree = "<group>"; };
 		4BB5588226205B8E00DC0213 /* nfc_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nfc_session.h; sourceTree = "<group>"; };
 		4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hand_tracking.mm; sourceTree = "<group>"; };
@@ -845,12 +845,12 @@
 				4B6C941F261493E300CBDFB4 /* ar_session.mm */,
 				4B9C52AF261EF13A0020E4C8 /* holokit_profile.h */,
 				4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */,
-				4BAD1942262026D3006884F1 /* widgets_view_controller.h */,
-				4BAD1932262026C3006884F1 /* widgets_view_controller.m */,
+				4BAD1942262026D3006884F1 /* view_controller.h */,
+				4BAD1932262026C3006884F1 /* view_controller.m */,
 				4BB5588226205B8E00DC0213 /* nfc_session.h */,
 				4BB5587226205B7D00DC0213 /* nfc_session.m */,
-				4B260CA926368C3A0004B771 /* MultipeerSession.h */,
-				4B260C9826368C280004B771 /* MultipeerSession.m */,
+				4B260CA926368C3A0004B771 /* multipeer_session.h */,
+				4B260C9826368C280004B771 /* multipeer_session.m */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -2005,9 +2005,9 @@
 				4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */,
 				4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */,
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
-				4B260C9926368C280004B771 /* MultipeerSession.m in Sources */,
+				4B260C9926368C280004B771 /* multipeer_session.m in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
-				4BAD1933262026C3006884F1 /* widgets_view_controller.m in Sources */,
+				4BAD1933262026C3006884F1 /* view_controller.m in Sources */,
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
 				4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
