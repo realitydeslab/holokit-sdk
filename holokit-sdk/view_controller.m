@@ -1,5 +1,5 @@
 //
-//  widgets_view_controller.m
+//  view_controller.m
 //  holokit-sdk-skeleton
 //
 //  Created by Yuchen on 2021/4/9.

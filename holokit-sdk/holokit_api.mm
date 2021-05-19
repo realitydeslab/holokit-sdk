@@ -163,9 +163,6 @@ bool HoloKitApi::SetIsXrModeEnabled(bool val) {
         NSLog(@"[holokit_api]: NFC authorization finished.");
         is_nfc_validated_ = true;
         
-        ViewController *view_controller = [[ViewController alloc] init];
-        [view_controller view];
-        
         return false;
     }
     // We only do NFC validation once.
