@@ -11,6 +11,8 @@
 
 - (void) startReaderSession;
 
+- (bool) isUrlValid;
+
 + (id) sharedNFCSession;
 
 @end

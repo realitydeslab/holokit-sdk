@@ -561,12 +561,12 @@ public:
             }
             // viewport
             render_params.viewportRect = frame_hints->appSetup.renderViewport;
-            render_params.viewportRect = {
-                0.0f,                    // x
-                0.0f,                    // y
-                0.5f,                    // width
-                0.5f                     // height
-            };
+//            render_params.viewportRect = {
+//                0.0f,                    // x
+//                0.0f,                    // y
+//                0.5f,                    // width
+//                0.5f                     // height
+//            };
             return kUnitySubsystemErrorCodeSuccess;
         }
 

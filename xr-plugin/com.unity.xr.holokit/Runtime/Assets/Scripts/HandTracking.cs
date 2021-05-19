@@ -11,13 +11,23 @@ namespace UnityEngine.XR.HoloKit
 
         public static bool landmarksInvisible = false;
 
-        private HoloKitHandGesture currentGesture = HoloKitHandGesture.None;
+        private List<HoloKitHandGesture> currentHandGestures = new List<HoloKitHandGesture>();
+
+        private int currentGestureInterval = 0;
+
+        private const int kMinGestureInterval = 3;
 
         [SerializeField]
         private bool handTrackingEnabled = true;
 
         [DllImport("__Internal")]
         public static extern bool UnityHoloKit_EnableHandTracking(bool enabled);
+
+        public delegate void BloomAction();
+        public static event BloomAction OnChangedToBloom;
+
+        public delegate void NoneAction();
+        public static event NoneAction OnChangedToNone;
 
         void Start()
         {
@@ -87,6 +97,9 @@ namespace UnityEngine.XR.HoloKit
                     }
                 }
             }
+
+            currentHandGestures.Add(HoloKitHandGesture.None);
+            currentHandGestures.Add(HoloKitHandGesture.None);
         }
 
         void FixedUpdate()
@@ -143,10 +156,35 @@ namespace UnityEngine.XR.HoloKit
                                     }
                                 }
                             }
+                            // Recognize current hand gesture
+                            bool primaryButtonValue;
+                            if (handDevices[handIndex].TryGetFeatureValue(CommonUsages.primaryButton, out primaryButtonValue))
+                            {
+                                if (primaryButtonValue && currentHandGestures[handIndex] == HoloKitHandGesture.None && currentGestureInterval > kMinGestureInterval)
+                                {
+                                    currentHandGestures[handIndex] = HoloKitHandGesture.Bloom;
+                                    currentGestureInterval = 0;
+                                    // TODO: send a Unity event
+                                    Debug.Log("[HandTracking]: current gesture changed to BLOOM.");
+                                    OnChangedToBloom();
+                                }
+                                else if (!primaryButtonValue && currentHandGestures[handIndex] == HoloKitHandGesture.Bloom && currentGestureInterval > kMinGestureInterval)
+                                {
+                                    currentHandGestures[handIndex] = HoloKitHandGesture.None;
+                                    currentGestureInterval = 0;
+                                    // TODO: send a Unity event
+                                    Debug.Log("[HandTracking]: current gesture changed to NONE.");
+                                    OnChangedToNone();
+                                }
+                                else
+                                {
+                                    currentGestureInterval++;
+                                }
+                            }
                         }
                         else
                         {
-                            //Debug.Log("Left hand is not tracked.");
+                            // TODO: do it more appropriately when the hand is not tracked
                             for (int i = 0; i < 21; i++)
                             {
                                 multiHandLandmakrs[handIndex][i].SetActive(false);
@@ -155,36 +193,6 @@ namespace UnityEngine.XR.HoloKit
                     }
                 }
             }
-        }
-
-        HoloKitHandGesture GetCurrentGesture(GameObject[] handLandmarks)
-        {
-            float thumbDist = Vector3.Distance(handLandmarks[(int)HoloKitHandLandmark.ThumbStart].transform.position, handLandmarks[(int)HoloKitHandLandmark.Thumb2].transform.position);
-            float indexDist = Vector3.Distance(handLandmarks[(int)HoloKitHandLandmark.IndexStart].transform.position, handLandmarks[(int)HoloKitHandLandmark.Index2].transform.position);
-            float middleDist = Vector3.Distance(handLandmarks[(int)HoloKitHandLandmark.MiddleStart].transform.position, handLandmarks[(int)HoloKitHandLandmark.Middle2].transform.position);
-            float ringDist = Vector3.Distance(handLandmarks[(int)HoloKitHandLandmark.RingStart].transform.position, handLandmarks[(int)HoloKitHandLandmark.Ring2].transform.position);
-            float pinkyDist = Vector3.Distance(handLandmarks[(int)HoloKitHandLandmark.PinkyStart].transform.position, handLandmarks[(int)HoloKitHandLandmark.Pinky2].transform.position);
-
-            //Debug.Log($"thumb dist: {thumbDist}");
-            //Debug.Log($"index dist: {indexDist}");
-            //Debug.Log($"middle dist: {middleDist}");
-            //Debug.Log($"ring dist: {ringDist}");
-            //Debug.Log($"pinky dist: {pinkyDist}");
-
-            float maxDist = 0.033f;
-            float minDist = 0.0001f;
-            if(indexDist < maxDist && middleDist < maxDist && ringDist < maxDist && pinkyDist < maxDist &&
-                indexDist > minDist && middleDist > minDist && ringDist > minDist && pinkyDist > minDist)
-            {
-                //Debug.Log("Fist");
-                return HoloKitHandGesture.Fist;
-            } else
-            {
-                //Debug.Log("None");
-                return HoloKitHandGesture.None;
-            }
-
-            return HoloKitHandGesture.None;
         }
 
         public void DisableCollider()

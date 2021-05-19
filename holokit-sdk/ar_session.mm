@@ -35,6 +35,10 @@
   })
 
 static const float kMaxLandmarkDepth = 0.6f;
+static const float kMaxLandmarkStartInterval = 0.12f;
+static const float kMaxLandmark1Interval = 0.05f;
+static const float kMaxLandmark2Interval = 0.03f;
+static const float kMaxLandmarkEndInterval = 0.024f;
 
 typedef void (*DelegateCallbackFunction)(int number);
 DelegateCallbackFunction delegate = NULL;
@@ -84,6 +88,9 @@ DelegateCallbackFunction delegate = NULL;
         
         // MODIFY HERE
         self.isHandTrackingEnabled = YES;
+        
+        self.primaryButtonLeft = NO;
+        self.primaryButtonRight = NO;
         
         // Set up multipeer session
         void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
@@ -160,8 +167,6 @@ DelegateCallbackFunction delegate = NULL;
             [self.handTracker processVideoFrame: frame.capturedImage];
         }];
     }
-    
-    //delegate(24);
 }
 
 - (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
@@ -223,6 +228,19 @@ DelegateCallbackFunction delegate = NULL;
     return unprojectedPoint;
 }
 
+- (bool)isBlooming:(NSArray<Landmark *> *)landmarks {
+    if (landmarks[4].y < landmarks[3].y < landmarks[2].y < landmarks[1].y &&
+        landmarks[8].y < landmarks[7].y < landmarks[6].y < landmarks[5].y &&
+        landmarks[12].y < landmarks[11].y < landmarks[10].y < landmarks[9].y &&
+        landmarks[16].y < landmarks[15].y < landmarks[14].y < landmarks[13].y &&
+        landmarks[20].y < landmarks[19].y < landmarks[18].y < landmarks[17].y) {
+        //NSLog(@"[ar_session]: blooming");
+        return true;
+    }
+    return false;
+}
+
+// The uppeer-left corner is the origin of landmark xy coordinates
 - (void)handTracker:(HandTracker *)handTracker didOutputLandmarks:(NSArray<NSArray<Landmark *> *> *)multiLandmarks {
     
     self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
@@ -235,6 +253,9 @@ DelegateCallbackFunction delegate = NULL;
     
     int handIndex = 0;
     for(NSArray<Landmark *> *landmarks in multiLandmarks) {
+        if (handIndex > 1) {
+            break;
+        }
         int landmarkIndex = 0;
         float totalLandmarkDepth = 0.0f;
         float landmarkDepths[21];
@@ -266,11 +287,28 @@ DelegateCallbackFunction delegate = NULL;
             float landmarkDepth = depthBufferBaseAddress[bufferY * depthBufferWidth + bufferX];
             //float landmarkDepth = 0.5;
             // To make sure every landmark depth is reasonable.
-            if (landmarkIndex != 0 && landmarkDepth > kMaxLandmarkDepth) {
-                //NSLog(@"[ar_session]: unusual depth value: %f", landmarkDepth);
+            if (landmarkIndex != 0) {
                 int landmarkParentIndex = [ARSessionDelegateController getParentLandmarkIndex:landmarkIndex];
-                landmarkDepth = landmarkDepths[landmarkParentIndex];
-                //NSLog(@"corrected depth: %f", landmarkDepth);
+                if (landmarkDepth > kMaxLandmarkDepth) {
+                    landmarkDepth = landmarkDepths[landmarkParentIndex];
+                }
+                if (landmarkIndex == 1 || landmarkIndex == 5 || landmarkIndex == 9 || landmarkIndex == 13 || landmarkIndex == 17) {
+                    if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmarkStartInterval) {
+                        landmarkDepth = landmarkDepths[landmarkParentIndex];
+                    }
+                } else if (landmarkIndex == 2 || landmarkIndex == 6 || landmarkIndex == 10 || landmarkIndex == 14 || landmarkIndex == 18) {
+                    if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmark1Interval) {
+                        landmarkDepth = landmarkDepths[landmarkParentIndex];
+                    }
+                } else if (landmarkIndex == 3 || landmarkIndex == 7 || landmarkIndex == 11 || landmarkIndex == 15 || landmarkIndex == 19) {
+                    if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmark2Interval) {
+                        landmarkDepth = landmarkDepths[landmarkParentIndex];
+                    }
+                } else {
+                    if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmarkEndInterval) {
+                        landmarkDepth = landmarkDepths[landmarkParentIndex];
+                    }
+                }
             }
             landmarkDepths[landmarkIndex] = landmarkDepth;
             
@@ -297,6 +335,14 @@ DelegateCallbackFunction delegate = NULL;
                 self.isRightHandTracked = false;
                 return;
             }
+        }
+        // Do hand gesture recognition using 2D landmarks
+        // Temporarily, do it only on the left hand (it is actually the right hand for me...)
+        bool isBlooming = [self isBlooming:landmarks];
+        if (handIndex == 0) {
+            self.primaryButtonLeft = isBlooming;
+        } else {
+            self.primaryButtonRight = isBlooming;
         }
         handIndex++;
     }

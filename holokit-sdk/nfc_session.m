@@ -10,6 +10,8 @@
 
 @interface NFCSession () <NFCNDEFReaderSessionDelegate>
 
+@property (assign) bool isUrlValid;
+
 @end
 
 @implementation NFCSession
@@ -30,6 +32,10 @@
     return _sharedObject;
 }
 
+- (bool) isUrlValid {
+    return self.isUrlValid;
+}
+
 - (void) startReaderSession {
     NFCNDEFReaderSession* readerSession = [[NFCNDEFReaderSession alloc] initWithDelegate:self queue:nil invalidateAfterFirstRead:YES];
     readerSession.alertMessage = @"HoloKit needs your NFC";
@@ -45,6 +51,7 @@
     }
     NSLog(@"[nfc_session]: %@", nfcUrl);
     // TODO: validate the url
+    self.isUrlValid = true;
 }
 
 - (void)readerSession:(NFCNDEFReaderSession *)session didInvalidateWithError:(NSError *)error {

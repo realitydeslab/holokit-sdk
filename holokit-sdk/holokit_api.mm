@@ -155,9 +155,12 @@ bool HoloKitApi::SetIsXrModeEnabled(bool val) {
         is_xr_mode_enabled_ = val;
         return true;;
     }
+    
     // Do NFC validation when changing from AR mode to XR mode for the first time.
     if (is_nfc_enabled_ && !is_nfc_validated_) {
-        [[NFCSession sharedNFCSession] startReaderSession];
+        NFCSession* nfcSession = [NFCSession sharedNFCSession];
+        [nfcSession startReaderSession];
+        NSLog(@"[holokit_api]: NFC authorization finished.");
         is_nfc_validated_ = true;
         return false;
     }

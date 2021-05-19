@@ -15,6 +15,8 @@ EditorBuildSettings:
       type: 2}
     UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: 0b0e5dade2a62447b8edaf7e5aeb256e,
       type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: 0150113e787954d61a423e7de064fbe9,
+      type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 310f17af4310e004db7c9bdccfedd9b0,
       type: 2}
     com.unity.xr.managment.loader_settings: {fileID: 11400000, guid: 310f17af4310e004db7c9bdccfedd9b0,

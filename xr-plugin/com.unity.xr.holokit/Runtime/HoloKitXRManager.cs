@@ -317,6 +317,12 @@ namespace UnityEngine.XR.HoloKit
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         static void OnBeforeSplashScreen() {
             Debug.Log("[HoloKitXRManager]: OnBeforeSplashScreen()");
+
+            if (Screen.orientation != ScreenOrientation.LandscapeLeft)
+            {
+                Screen.orientation = ScreenOrientation.LandscapeLeft;
+            }
+
             if (!isHoloKitInitialized)
             {
                 return;

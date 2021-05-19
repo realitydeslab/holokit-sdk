@@ -19,9 +19,11 @@
 @property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
 @property (nonatomic, strong, nullable) NSMutableArray<LandmarkPosition *> *leftHandLandmarkPositions;
 @property (nonatomic, strong, nullable) NSMutableArray<LandmarkPosition *> *rightHandLandmarkPositions;
+@property (assign) bool isHandTrackingEnabled;
 @property (assign) bool isLeftHandTracked;
 @property (assign) bool isRightHandTracked;
-@property (assign) bool isHandTrackingEnabled;
+@property (assign) bool primaryButtonLeft;
+@property (assign) bool primaryButtonRight;
 
 + (id) sharedARSessionDelegateController;
 

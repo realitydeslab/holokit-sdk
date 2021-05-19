@@ -178,28 +178,29 @@ public:
                 input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
                 input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates,
                                                              kUnityXRInputFeatureUsageTrackingState);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Primary Button", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
                 
                 // Finger Status
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Thumb Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Index Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Mid Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Ring Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Pinky Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Thumb Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageLegacyButton0);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Index Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageLegacyButton1);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Mid Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageLegacyButton2);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Ring Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageLegacyButton3);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Pinky Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageLegacyButton4);
                 
                 // Gesture Status
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Spider Man", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "One", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Two", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Three", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Four", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Five", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Fist", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Thumb Up", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Okay", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Spider Man", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "One", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Two", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Three", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Four", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Five", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Fist", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Thumb Up", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Okay", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
                 
                 // Movement
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Air Tap", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Bloom", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Air Tap", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Bloom", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
 
                 break;
             }
@@ -216,8 +217,7 @@ public:
         
         // TODO: use update_type for low latency tracking
         
-        
-        static const UnityXRInputFeatureIndex parentBone[] = {kUnityInvalidXRInputFeatureIndex, 0, 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 0, 17, 18, 19};
+        static const UnityXRInputFeatureIndex parent_bone_index[] = {kUnityInvalidXRInputFeatureIndex, 0, 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 0, 17, 18, 19};
         
         static const UnityXRHand hand = {0, {
             {1, 2, 3, 4, kUnityInvalidXRInputFeatureIndex},
@@ -231,10 +231,7 @@ public:
         
         switch (device_id) {
             case kDeviceIdHoloKitHmd: {
-                ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
-                
-                simd_float4x4 camera_transform = arSessionDelegateController.session.currentFrame.camera.transform;
-                
+                simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
                 simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
                 //simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
                 simd_float3 center_eye_position = camera_position;
@@ -266,23 +263,23 @@ public:
 
                 for (int i = 0; i < 21; i++) {
                   UnityXRVector3 position = {arSessionDelegateController.leftHandLandmarkPositions[i].x, arSessionDelegateController.leftHandLandmarkPositions[i].y, arSessionDelegateController.leftHandLandmarkPositions[i].z};
-                  input_->DeviceState_SetBoneValue(state, feature_index++, UnityXRBone {.parentBoneIndex = parentBone[i], .position = position, .rotation = {0, 0, 0, 1}});
+                  input_->DeviceState_SetBoneValue(state, feature_index++, UnityXRBone {.parentBoneIndex = parent_bone_index[i], .position = position, .rotation = {0, 0, 0, 1}});
                 }
-
 
                 input_->DeviceState_SetHandValue(state, feature_index++, hand);
 
-                //Is Tracked
+                // Is Tracked
                 input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.isLeftHandTracked);
                 input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
-
-
+                // Primary button
+                //NSLog(@"hahaha: %d", arSessionDelegateController.primaryButtonValues[0]);
+                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.primaryButtonLeft);
+                
                 bool isThumbFingerOpen = false;
-                bool isIndexFingerOpen = false;
+                bool isIndexFingerOpen = true;
                 bool isMidFingerOpen = false;
-                bool isRingFingerOpen = false;
+                bool isRingFingerOpen = true;
                 bool isPinkyFingerOpen = false;
-
 
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isThumbFingerOpen);
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isIndexFingerOpen);
@@ -302,7 +299,7 @@ public:
 
                 for (int i = 0; i < 21; i++) {
                   UnityXRVector3 position = {arSessionDelegateController.rightHandLandmarkPositions[i].x, arSessionDelegateController.rightHandLandmarkPositions[i].y, arSessionDelegateController.rightHandLandmarkPositions[i].z};
-                  input_->DeviceState_SetBoneValue(state, feature_index++, UnityXRBone {.parentBoneIndex = parentBone[i], .position = position, .rotation = {0, 0, 0, 1}});
+                  input_->DeviceState_SetBoneValue(state, feature_index++, UnityXRBone {.parentBoneIndex = parent_bone_index[i], .position = position, .rotation = {0, 0, 0, 1}});
                 }
 
 
@@ -311,14 +308,14 @@ public:
                 //Is Tracked
                 input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.isRightHandTracked);
                 input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
-
-
+                // Primary button
+                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.primaryButtonRight);
+                
                 bool isThumbFingerOpen = false;
                 bool isIndexFingerOpen = false;
                 bool isMidFingerOpen = false;
                 bool isRingFingerOpen = false;
                 bool isPinkyFingerOpen = false;
-
 
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isThumbFingerOpen);
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isIndexFingerOpen);
