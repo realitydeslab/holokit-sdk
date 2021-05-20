@@ -100,41 +100,32 @@ const float vdata[] = {
 
 const uint16_t idata[] = {0, 1, 2, 2, 3, 0};
 
+NSString* myShader = @
+    "#include <metal_stdlib>\n"
+    "using namespace metal;\n"
+    "struct VertexInOut\n"
+    "{\n"
+    "    float4  position [[position]];\n"
+    "    float4  color;\n"
+    "};\n"
+    "vertex VertexInOut passThroughVertex(uint vid [[ vertex_id ]],\n"
+    "                                     constant packed_float4* position  [[ buffer(0) ]])\n"
+    "{\n"
+    "    VertexInOut outVertex;\n"
+    "    outVertex.position = position[vid];\n"
+    "    return outVertex;\n"
+    "};\n"
+    "fragment half4 passThroughFragment(VertexInOut inFrag [[stage_in]])\n"
+    "{\n"
+    "//  return half4(1, 0, 0, 1);\n"
+    "    return half4(1, 1, 1, 1);\n"
+    "};\n";
+
 // widgets data
 float vertex_data[] = {
     0.829760, 1, 0.0, 1.0,
     0.829760, 0.7, 0.0, 1.0
 };
-
-NSString* myShader = @
-"#include <metal_stdlib>\n"
-"using namespace metal;\n"
-"struct VertexInOut\n"
-"{\n"
-"    float4  position [[position]];\n"
-"    float4  color;\n"
-"};\n"
-"vertex VertexInOut passThroughVertex(uint vid [[ vertex_id ]],\n"
-"                                     constant packed_float4* position  [[ buffer(0) ]])\n"
-"{\n"
-"    VertexInOut outVertex;\n"
-"    outVertex.position = position[vid];\n"
-"    return outVertex;\n"
-"};\n"
-"fragment half4 passThroughFragment(VertexInOut inFrag [[stage_in]])\n"
-"{\n"
-"//  return half4(1, 0, 0, 1);\n"
-"    return half4(1, 1, 1, 1);\n"
-"};\n";
-
-const float black_vertices[] = {
-    -1.0f, 1.0f,
-    -1.0f, -1.0f,
-    1.0f, -1.0f,
-    1.0f, 1.0f
-};
-
-const uint16_t black_indexes[] = {0, 1, 2, 2, 3, 0};
 
 NSString* kBlackShaders = @
     R"msl(
@@ -163,6 +154,15 @@ NSString* kBlackShaders = @
         return out;
     }
     )msl";
+
+const float black_vertices[] = {
+    -1.0f, 1.0f,
+    -1.0f, -1.0f,
+    1.0f, -1.0f,
+    1.0f, 1.0f
+};
+
+const uint16_t black_indexes[] = {0, 1, 2, 2, 3, 0};
 
 namespace {
 class HoloKitDisplayProvider {
@@ -261,43 +261,9 @@ public:
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
-        // delete this
-        //id<MTLTexture> texture = metal_interface_->CurrentRenderPassDescriptor().depthAttachment.texture;
-        //NSLog(@"depth format %d", texture.pixelFormat);
-        //  MTLPixelFormatDepth32Float_Stencil8
-        
         if(textures_initialized_ == NO) {
             return kUnitySubsystemErrorCodeSuccess;
         }
-//        if(native_textures_queried_ == NO) {
-//            // Query left eye texture
-//            UnityXRRenderTextureDesc unity_texture_desc;
-//            memset(&unity_texture_desc, 0, sizeof(UnityXRRenderTextureDesc));
-//            UnitySubsystemErrorCode query_result = display_->QueryTextureDesc(handle_, unity_textures_[0], &unity_texture_desc);
-//            if (query_result == kUnitySubsystemErrorCodeSuccess) {
-//                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
-//            } else {
-//                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
-//            }
-//            native_color_textures_[0] = unity_texture_desc.color.nativePtr;
-//            native_depth_textures_[0] = unity_texture_desc.depth.nativePtr;
-//            metal_color_textures_[0] = (__bridge id<MTLTexture>)native_color_textures_[0];
-//            metal_depth_textures_[0] = (__bridge id<MTLTexture>)native_depth_textures_[0];
-//            // TODO: query the right eye texture when SIDE_BY_SIDE = 0
-//    #if !SIDE_BY_SIDE
-//            query_result = display_->QueryTextureDesc(handle_, unity_textures_[1], &unity_texture_desc);
-//            if (query_result == kUnitySubsystemErrorCodeSuccess) {
-//                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
-//            } else {
-//                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
-//            }
-//            native_color_textures_[1] = unity_texture_desc.color.nativePtr;
-//            native_depth_textures_[1] = unity_texture_desc.depth.nativePtr;
-//            metal_color_textures_[1] = (__bridge id<MTLTexture>)native_color_textures_[1];
-//            metal_depth_textures_[1] = (__bridge id<MTLTexture>)native_depth_textures_[1];
-//    #endif
-//            native_textures_queried_ = true;
-//        }
         
         // Metal initialization is expensive and we only want to run it once.
         if (!is_metal_initialized_) {
@@ -324,11 +290,6 @@ public:
             
             MTLRenderPipelineDescriptor* render_pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
 
-//            MTLRenderPipelineColorAttachmentDescriptor* color_attachment_descriptor = [[MTLRenderPipelineColorAttachmentDescriptor alloc] init];
-//            color_attachment_descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
-//            render_pipeline_descriptor.colorAttachments[0] = color_attachment_descriptor;
-            
-            //pipeDesc.fragmentFunction = g_FShaderColor;
             render_pipeline_descriptor.fragmentFunction = fragment_function;
             render_pipeline_descriptor.vertexFunction = vertex_function;
             render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
@@ -437,16 +398,7 @@ public:
             mtl_render_pipeline_descriptor.fragmentFunction = fragment_function;
             mtl_render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
             mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-//            mtl_render_pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-//            mtl_render_pipeline_descriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
             mtl_render_pipeline_descriptor.sampleCount = 1;
-//            mtl_render_pipeline_descriptor.colorAttachments[0].blendingEnabled = YES;
-//            mtl_render_pipeline_descriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
-//            mtl_render_pipeline_descriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
-//            mtl_render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
-//            mtl_render_pipeline_descriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
-//            mtl_render_pipeline_descriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-//            mtl_render_pipeline_descriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
             
             black_render_pipeline_state_ = [mtl_device_ newRenderPipelineStateWithDescriptor:mtl_render_pipeline_descriptor error:nil];
             if (black_render_pipeline_state_ == nil) {
@@ -512,7 +464,6 @@ public:
 
         if (reallocate_textures) {
             textures_initialized_ = false;
-            native_textures_queried_ = false;
             DestroyTextures();
 
     #if SIDE_BY_SIDE
@@ -570,6 +521,7 @@ public:
             return kUnitySubsystemErrorCodeSuccess;
         }
         
+        // CHANGE THIS TO SWITCH BETWEEN RENDERING MODES
         bool single_pass_rendering = true;
         // Frame hints tells us if we should setup our renderpasses with a single pass
         if (!single_pass_rendering)
@@ -738,26 +690,6 @@ private:
         metal_depth_textures_.resize(num_textures);
 #endif
         
-        // Create texture color buffer.
-        NSDictionary* color_surface_attribs = @{
-            (NSString*)kIOSurfaceIsGlobal : @ YES,
-            (NSString*)kIOSurfaceWidth : @(screen_width),
-            (NSString*)kIOSurfaceHeight : @(screen_height),
-            (NSString*)kIOSurfaceBytesPerElement : @4u
-        };
-        color_surfaces_[0] = IOSurfaceCreate((CFDictionaryRef)color_surface_attribs);
-        MTLTextureDescriptor* texture_color_buffer_descriptor = [[MTLTextureDescriptor alloc] init];
-        texture_color_buffer_descriptor.textureType = MTLTextureType2D;
-        texture_color_buffer_descriptor.width = screen_width;
-        texture_color_buffer_descriptor.height = screen_height;
-        texture_color_buffer_descriptor.pixelFormat = MTLPixelFormatRGBA8Unorm;
-        texture_color_buffer_descriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
-        metal_color_textures_[0] = [mtl_device_ newTextureWithDescriptor:texture_color_buffer_descriptor iosurface:color_surfaces_[0] plane:0];
-        uint64_t color_buffer = reinterpret_cast<uint64_t>(color_surfaces_[0]);
-        native_color_textures_[0] = reinterpret_cast<void*>(color_buffer);
-        uint64_t depth_buffer = 0;
-        native_depth_textures_[0] = reinterpret_cast<void*>(depth_buffer);
-        
         for (int i = 0; i < num_textures; i++) {
             UnityXRRenderTextureDesc texture_descriptor;
             memset(&texture_descriptor, 0, sizeof(UnityXRRenderTextureDesc));
@@ -765,14 +697,30 @@ private:
             texture_descriptor.width = screen_width;
             texture_descriptor.height = screen_height;
             texture_descriptor.flags = 0;
-            //texture_descriptor.colorFormat = kUnityXRRenderTextureFormatRGBA32;
-            // we will query the pointer of unity created texture later
-            //texture_descriptor.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
             texture_descriptor.depthFormat = kUnityXRDepthTextureFormatNone;
+            
+            // Create texture color buffer.
+            NSDictionary* color_surface_attribs = @{
+                (NSString*)kIOSurfaceIsGlobal : @ YES,
+                (NSString*)kIOSurfaceWidth : @(screen_width),
+                (NSString*)kIOSurfaceHeight : @(screen_height),
+                (NSString*)kIOSurfaceBytesPerElement : @4u
+            };
+            color_surfaces_[i] = IOSurfaceCreate((CFDictionaryRef)color_surface_attribs);
+            MTLTextureDescriptor* texture_color_buffer_descriptor = [[MTLTextureDescriptor alloc] init];
+            texture_color_buffer_descriptor.textureType = MTLTextureType2D;
+            texture_color_buffer_descriptor.width = screen_width;
+            texture_color_buffer_descriptor.height = screen_height;
+            texture_color_buffer_descriptor.pixelFormat = MTLPixelFormatRGBA8Unorm;
+            texture_color_buffer_descriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+            metal_color_textures_[i] = [mtl_device_ newTextureWithDescriptor:texture_color_buffer_descriptor iosurface:color_surfaces_[i] plane:0];
+            uint64_t color_buffer = reinterpret_cast<uint64_t>(color_surfaces_[i]);
+            native_color_textures_[i] = reinterpret_cast<void*>(color_buffer);
+            uint64_t depth_buffer = 0;
+            native_depth_textures_[i] = reinterpret_cast<void*>(depth_buffer);
+            
             texture_descriptor.color.nativePtr = native_color_textures_[i];
             texture_descriptor.depth.nativePtr = native_depth_textures_[i];
-            //texture_desc.depthFormat = kUnityXRDepthTextureFormatReference;
-            //texture_descriptor.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
             
             texture_descriptor.textureArrayLength = texture_array_length;
             
@@ -845,8 +793,6 @@ private:
     std::vector<id<MTLTexture>> metal_depth_textures_;
     
     bool textures_initialized_ = false;
-    
-    bool native_textures_queried_ = false;
     
     /// @brief This value is set to true when Metal is initialized for the first time.
     bool is_metal_initialized_ = false;
