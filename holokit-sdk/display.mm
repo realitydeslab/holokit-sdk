@@ -569,9 +569,10 @@ public:
 //            };
             return kUnitySubsystemErrorCodeSuccess;
         }
-
+        
+        bool single_pass_rendering = true;
         // Frame hints tells us if we should setup our renderpasses with a single pass
-        if (!frame_hints->appSetup.singlePassRendering)
+        if (!single_pass_rendering)
         {
 
             // Can increase render pass count to do wide FOV or to have a separate view into scene.
@@ -628,9 +629,26 @@ public:
         }
         else
         {
+            // Single-pass rendering
+            next_frame->renderPassesCount = 1;
+            auto& render_pass = next_frame->renderPasses[0];
+            render_pass.textureId = unity_textures_[0];
             
+            render_pass.renderParamsCount = 2;
+            // TODO: what is this?
+            render_pass.cullingPassIndex = 0;
+            for (int i = 0; i < 2; i++) {
+                auto& culling_pass = next_frame->cullingPasses[i];
+                // TODO: what is this?
+                culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
+                
+                auto& render_params = render_pass.renderParams[i];
+                render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(i));
+                render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
+                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(i));
+                render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(i));
+            }
         }
-        
         return kUnitySubsystemErrorCodeSuccess;
     }
     
