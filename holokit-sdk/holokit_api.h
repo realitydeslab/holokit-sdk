@@ -46,6 +46,10 @@ public:
     
     bool GetIsInitialized() { return is_initialized_; }
     
+    int GetScreenWidth() { return screen_width_; }
+    
+    int GetScreenHeight() { return screen_height_; }
+    
     /// @brief This method might fail due to NFC check, in which case it returns false.
     bool SetIsXrModeEnabled(bool val);
     

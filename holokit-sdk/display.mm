@@ -707,15 +707,9 @@ private:
     void CreateTextures(int num_textures, int texture_array_length, float requested_texture_scale) {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f CreateTextures()", GetCurrentTime());
         
-        // initialize or reset holokit_api_
-        //holokit_api_.reset(new holokit::HoloKitApi);
-        //holokit_api_->Initialize();
-        //NSLog(@"holokit_api_ initialization succeeded!!@!!!!");
-        //is_initialized_ = true;
-        
         // TODO: improve this
-        const int tex_width = 2778;//(int)(2778.0f * requested_texture_scale);
-        const int tex_height = 1284;//(int)(1284.0f * requested_texture_scale);
+        const int tex_width = holokit::HoloKitApi::GetInstance()->GetScreenWidth() * requested_texture_scale;
+        const int tex_height = holokit::HoloKitApi::GetInstance()->GetScreenHeight() * requested_texture_scale;
         
         unity_textures_.resize(num_textures);
         native_color_textures_.resize(num_textures);
