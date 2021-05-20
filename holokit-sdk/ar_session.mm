@@ -35,10 +35,13 @@
   })
 
 static const float kMaxLandmarkDepth = 0.6f;
+
 static const float kMaxLandmarkStartInterval = 0.12f;
 static const float kMaxLandmark1Interval = 0.05f;
 static const float kMaxLandmark2Interval = 0.03f;
 static const float kMaxLandmarkEndInterval = 0.024f;
+
+static const float kLostHandTrackingInterval = 0.5f;
 
 typedef void (*DelegateCallbackFunction)(int number);
 DelegateCallbackFunction delegate = NULL;
@@ -80,10 +83,9 @@ DelegateCallbackFunction delegate = NULL;
             [self.leftHandLandmarkPositions addObject:position];
             [self.rightHandLandmarkPositions addObject:position];
         }
-        NSLog(@"array capacities: %lu and %d", [self.leftHandLandmarkPositions count], [self.rightHandLandmarkPositions count]);
         
-        self.isLeftHandTracked = true;
-        self.isRightHandTracked = true;
+        self.isLeftHandTracked = false;
+        self.isRightHandTracked = false;
         self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
         
         // MODIFY HERE
@@ -150,15 +152,18 @@ DelegateCallbackFunction delegate = NULL;
     }
     
     if(self.session == NULL) {
-        NSLog(@"[ar_session]: got session reference.");
+        NSLog(@"[ar_session]: got ar session reference.");
         self.session = session;
     }
     
-    float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];
-    if((currentTimestamp - self.lastHandTrackingTimestamp) > 1.0f) {
-        //NSLog(@"No hand found");
-        self.isLeftHandTracked = false;
-        self.isRightHandTracked = false;
+    // If hands are lost.
+    if (self.isLeftHandTracked || self.isRightHandTracked) {
+        float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];
+        if((currentTimestamp - self.lastHandTrackingTimestamp) > kLostHandTrackingInterval) {
+            NSLog(@"[ar_session]: hand tracking lost.");
+            self.isLeftHandTracked = false;
+            self.isRightHandTracked = false;
+        }
     }
     
     // Hand tracking
@@ -243,22 +248,17 @@ DelegateCallbackFunction delegate = NULL;
 // The uppeer-left corner is the origin of landmark xy coordinates
 - (void)handTracker:(HandTracker *)handTracker didOutputLandmarks:(NSArray<NSArray<Landmark *> *> *)multiLandmarks {
     
-    self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
-    self.isLeftHandTracked = true;
-    if([multiLandmarks count] > 1) {
-        self.isRightHandTracked = true;
-    } else{
-        self.isRightHandTracked = false;
-    }
+    //NSLog(@"[ar_session]: hands detected.");
     
     int handIndex = 0;
     for(NSArray<Landmark *> *landmarks in multiLandmarks) {
+        // There cannot be more than 2 hands.
         if (handIndex > 1) {
             break;
         }
         int landmarkIndex = 0;
-        float totalLandmarkDepth = 0.0f;
         float landmarkDepths[21];
+        bool isHand = true;
         for(Landmark *landmark in landmarks) {
         
             int x = (CGFloat)landmark.x * self.session.currentFrame.camera.imageResolution.width;
@@ -271,7 +271,7 @@ DelegateCallbackFunction delegate = NULL;
             Float32* depthBufferBaseAddress;
             ARDepthData* sceneDepth = self.session.currentFrame.sceneDepth;
             if(!sceneDepth) {
-                NSLog(@"[AR Session]: Failed to acquire scene depth.");
+                NSLog(@"[ar_session]: Failed to acquire scene depth.");
                 return;
             } else {
                 CVPixelBufferRef depthPixelBuffer = sceneDepth.depthMap;
@@ -280,13 +280,18 @@ DelegateCallbackFunction delegate = NULL;
                 depthBufferHeight = CVPixelBufferGetHeight(depthPixelBuffer);
                 depthBufferBaseAddress = (Float32*)CVPixelBufferGetBaseAddress(depthPixelBuffer);
             }
-            
             // fetch the depth value of this landmark
             int bufferX = CLAMP(landmark.x, 0, 1) * depthBufferWidth;
             int bufferY = CLAMP(landmark.y, 0, 1) * depthBufferHeight;
             float landmarkDepth = depthBufferBaseAddress[bufferY * depthBufferWidth + bufferX];
             //float landmarkDepth = 0.5;
             // To make sure every landmark depth is reasonable.
+            if (landmarkIndex == 0 && landmarkDepth > kMaxLandmarkDepth) {
+                // The depth of the wrist is not reasonable, which means that
+                // this result is false positive, abandon it.
+                isHand = false;
+                break;
+            }
             if (landmarkIndex != 0) {
                 int landmarkParentIndex = [ARSessionDelegateController getParentLandmarkIndex:landmarkIndex];
                 if (landmarkDepth > kMaxLandmarkDepth) {
@@ -311,9 +316,6 @@ DelegateCallbackFunction delegate = NULL;
                 }
             }
             landmarkDepths[landmarkIndex] = landmarkDepth;
-            
-            // eliminate landmark which is too distant to the user, which is obviously wrong data
-            totalLandmarkDepth += landmarkDepth;
 
             simd_float3 unprojectedPoint = [self unprojectScreenPoint:screenPoint depth:landmarkDepth];
             LandmarkPosition *position = [[LandmarkPosition alloc] initWithX:unprojectedPoint.x y:unprojectedPoint.y z:unprojectedPoint.z];
@@ -324,28 +326,31 @@ DelegateCallbackFunction delegate = NULL;
             }
             landmarkIndex++;
         }
-        // If the average depth is too far away?
-        if((totalLandmarkDepth / 21) > kMaxLandmarkDepth) {
-            //NSLog(@"[ar_session]: wrong hand data detected.");
-            if(handIndex == 0){
-                self.isLeftHandTracked = false;
-                self.isRightHandTracked = false;
-                return;
-            } else if(handIndex == 1) {
-                self.isRightHandTracked = false;
-                return;
+        if (isHand) {
+            // Do hand gesture recognition using 2D landmarks
+            // Temporarily, do it only on the left hand (it is actually the right hand for me...)
+            bool isBlooming = [self isBlooming:landmarks];
+            if (handIndex == 0) {
+                self.primaryButtonLeft = isBlooming;
+            } else if (handIndex == 1){
+                self.primaryButtonRight = isBlooming;
             }
+            handIndex++;
         }
-        // Do hand gesture recognition using 2D landmarks
-        // Temporarily, do it only on the left hand (it is actually the right hand for me...)
-        bool isBlooming = [self isBlooming:landmarks];
-        if (handIndex == 0) {
-            self.primaryButtonLeft = isBlooming;
-        } else {
-            self.primaryButtonRight = isBlooming;
-        }
-        handIndex++;
     }
+    if (handIndex == 0) {
+        self.isLeftHandTracked = self.isRightHandTracked = false;
+    } else {
+        self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
+        if (handIndex == 1) {
+            self.isLeftHandTracked = true;
+            self.isRightHandTracked = false;
+        } else if (handIndex == 2) {
+            self.isLeftHandTracked = self.isRightHandTracked = true;
+        }
+    }
+    //NSLog(@"[ar_session]: is left hand tracked: %d", self.isLeftHandTracked);
+    //NSLog(@"[ar_session]: is right hand tracked: %d", self.isRightHandTracked);
 }
     
 + (int)getParentLandmarkIndex:(int)landmarkIndex {

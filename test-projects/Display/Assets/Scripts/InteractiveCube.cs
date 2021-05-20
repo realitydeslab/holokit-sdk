@@ -9,7 +9,7 @@ public class InteractiveCube : MonoBehaviour
 
     private float speed = 0.05f;
 
-    private const float kMinDistance = 0.08f;
+    private const float kMinDistance = 0.2f;
 
     public enum InteractiveCubeState { idle, telekinesis };
 

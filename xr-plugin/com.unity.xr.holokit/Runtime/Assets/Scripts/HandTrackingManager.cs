@@ -22,9 +22,13 @@ namespace UnityEngine.XR.HoloKit
 
         private AROcclusionManager occlusionManager;
 
+        private List<GameObject> holoKitHands = new List<GameObject>();
+
         [SerializeField] private bool handTrackingEnabled = true;
 
         [SerializeField] private bool landmarksVisible = true;
+
+        [SerializeField] private bool colliderEnabled = true;
 
         [DllImport("__Internal")]
         public static extern bool UnityHoloKit_EnableHandTracking(bool enabled);
@@ -50,6 +54,8 @@ namespace UnityEngine.XR.HoloKit
         void Start()
         {
             occlusionManager = GameObject.Find("HoloKitCamera").GetComponent<AROcclusionManager>();
+            holoKitHands.Add(transform.GetChild(0).GetChild(0).gameObject);
+            holoKitHands.Add(transform.GetChild(0).GetChild(1).gameObject);
 
             var devices = new List<InputDevice>();
             // Get left hand device
@@ -115,6 +121,11 @@ namespace UnityEngine.XR.HoloKit
                 }
             }
 
+            if (!colliderEnabled)
+            {
+                DisableCollider();
+            }
+
             currentHandGestures.Add(HoloKitHandGesture.None);
             currentHandGestures.Add(HoloKitHandGesture.None);
 
@@ -148,6 +159,10 @@ namespace UnityEngine.XR.HoloKit
                     {
                         if (isTracked)
                         {
+                            if (!holoKitHands[handIndex].activeSelf)
+                            {
+                                holoKitHands[handIndex].SetActive(true);
+                            }
                             int landmarkIndex = 0;
                             Hand hand;
                             if (handDevices[handIndex].TryGetFeatureValue(CommonUsages.handData, out hand))
@@ -160,7 +175,6 @@ namespace UnityEngine.XR.HoloKit
                                     if (bone.TryGetPosition(out position))
                                     {
                                         position.z = -position.z;
-                                        multiHandLandmakrs[handIndex][landmarkIndex].SetActive(true);
                                         multiHandLandmakrs[handIndex][landmarkIndex++].transform.position = position;
                                     }
                                 }
@@ -177,7 +191,6 @@ namespace UnityEngine.XR.HoloKit
                                             if (fingerBone.TryGetPosition(out position))
                                             {
                                                 position.z = -position.z;
-                                                multiHandLandmakrs[handIndex][landmarkIndex].SetActive(true);
                                                 multiHandLandmakrs[handIndex][landmarkIndex++].transform.position = position;
                                             }
                                             fingerBoneIndex++;
@@ -213,10 +226,11 @@ namespace UnityEngine.XR.HoloKit
                         }
                         else
                         {
-                            // TODO: do it more appropriately when the hand is not tracked
-                            for (int i = 0; i < 21; i++)
+                            // When hand tracking is lost
+                            if (holoKitHands[handIndex].activeSelf)
                             {
-                                multiHandLandmakrs[handIndex][i].SetActive(false);
+                                ResetPosition();
+                                holoKitHands[handIndex].SetActive(false);
                             }
                         }
                     }
