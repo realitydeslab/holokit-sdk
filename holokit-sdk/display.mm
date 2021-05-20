@@ -269,35 +269,35 @@ public:
         if(textures_initialized_ == NO) {
             return kUnitySubsystemErrorCodeSuccess;
         }
-        if(native_textures_queried_ == NO) {
-            // Query left eye texture
-            UnityXRRenderTextureDesc unity_texture_desc;
-            memset(&unity_texture_desc, 0, sizeof(UnityXRRenderTextureDesc));
-            UnitySubsystemErrorCode query_result = display_->QueryTextureDesc(handle_, unity_textures_[0], &unity_texture_desc);
-            if (query_result == kUnitySubsystemErrorCodeSuccess) {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
-            } else {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
-            }
-            native_color_textures_[0] = unity_texture_desc.color.nativePtr;
-            native_depth_textures_[0] = unity_texture_desc.depth.nativePtr;
-            metal_color_textures_[0] = (__bridge id<MTLTexture>)native_color_textures_[0];
-            metal_depth_textures_[0] = (__bridge id<MTLTexture>)native_depth_textures_[0];
-            // TODO: query the right eye texture when SIDE_BY_SIDE = 0
-    #if !SIDE_BY_SIDE
-            query_result = display_->QueryTextureDesc(handle_, unity_textures_[1], &unity_texture_desc);
-            if (query_result == kUnitySubsystemErrorCodeSuccess) {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
-            } else {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
-            }
-            native_color_textures_[1] = unity_texture_desc.color.nativePtr;
-            native_depth_textures_[1] = unity_texture_desc.depth.nativePtr;
-            metal_color_textures_[1] = (__bridge id<MTLTexture>)native_color_textures_[1];
-            metal_depth_textures_[1] = (__bridge id<MTLTexture>)native_depth_textures_[1];
-    #endif
-            native_textures_queried_ = true;
-        }
+//        if(native_textures_queried_ == NO) {
+//            // Query left eye texture
+//            UnityXRRenderTextureDesc unity_texture_desc;
+//            memset(&unity_texture_desc, 0, sizeof(UnityXRRenderTextureDesc));
+//            UnitySubsystemErrorCode query_result = display_->QueryTextureDesc(handle_, unity_textures_[0], &unity_texture_desc);
+//            if (query_result == kUnitySubsystemErrorCodeSuccess) {
+//                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
+//            } else {
+//                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
+//            }
+//            native_color_textures_[0] = unity_texture_desc.color.nativePtr;
+//            native_depth_textures_[0] = unity_texture_desc.depth.nativePtr;
+//            metal_color_textures_[0] = (__bridge id<MTLTexture>)native_color_textures_[0];
+//            metal_depth_textures_[0] = (__bridge id<MTLTexture>)native_depth_textures_[0];
+//            // TODO: query the right eye texture when SIDE_BY_SIDE = 0
+//    #if !SIDE_BY_SIDE
+//            query_result = display_->QueryTextureDesc(handle_, unity_textures_[1], &unity_texture_desc);
+//            if (query_result == kUnitySubsystemErrorCodeSuccess) {
+//                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query succeeded()", GetCurrentTime());
+//            } else {
+//                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Texture query failed()", GetCurrentTime());
+//            }
+//            native_color_textures_[1] = unity_texture_desc.color.nativePtr;
+//            native_depth_textures_[1] = unity_texture_desc.depth.nativePtr;
+//            metal_color_textures_[1] = (__bridge id<MTLTexture>)native_color_textures_[1];
+//            metal_depth_textures_[1] = (__bridge id<MTLTexture>)native_depth_textures_[1];
+//    #endif
+//            native_textures_queried_ = true;
+//        }
         
         // Metal initialization is expensive and we only want to run it once.
         if (!is_metal_initialized_) {
@@ -628,7 +628,7 @@ public:
         }
         else
         {
-            // TODO: single-pass rendering
+            
         }
         
         return kUnitySubsystemErrorCodeSuccess;
@@ -708,34 +708,58 @@ private:
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f CreateTextures()", GetCurrentTime());
         
         // TODO: improve this
-        const int tex_width = holokit::HoloKitApi::GetInstance()->GetScreenWidth() * requested_texture_scale;
-        const int tex_height = holokit::HoloKitApi::GetInstance()->GetScreenHeight() * requested_texture_scale;
+        const int screen_width = holokit::HoloKitApi::GetInstance()->GetScreenWidth() * requested_texture_scale;
+        const int screen_height = holokit::HoloKitApi::GetInstance()->GetScreenHeight() * requested_texture_scale;
         
         unity_textures_.resize(num_textures);
         native_color_textures_.resize(num_textures);
         native_depth_textures_.resize(num_textures);
 #if XR_METAL
+        color_surfaces_.resize(num_textures);
         metal_color_textures_.resize(num_textures);
         metal_depth_textures_.resize(num_textures);
 #endif
         
+        // Create texture color buffer.
+        NSDictionary* color_surface_attribs = @{
+            (NSString*)kIOSurfaceIsGlobal : @ YES,
+            (NSString*)kIOSurfaceWidth : @(screen_width),
+            (NSString*)kIOSurfaceHeight : @(screen_height),
+            (NSString*)kIOSurfaceBytesPerElement : @4u
+        };
+        color_surfaces_[0] = IOSurfaceCreate((CFDictionaryRef)color_surface_attribs);
+        MTLTextureDescriptor* texture_color_buffer_descriptor = [[MTLTextureDescriptor alloc] init];
+        texture_color_buffer_descriptor.textureType = MTLTextureType2D;
+        texture_color_buffer_descriptor.width = screen_width;
+        texture_color_buffer_descriptor.height = screen_height;
+        texture_color_buffer_descriptor.pixelFormat = MTLPixelFormatRGBA8Unorm;
+        texture_color_buffer_descriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+        metal_color_textures_[0] = [mtl_device_ newTextureWithDescriptor:texture_color_buffer_descriptor iosurface:color_surfaces_[0] plane:0];
+        uint64_t color_buffer = reinterpret_cast<uint64_t>(color_surfaces_[0]);
+        native_color_textures_[0] = reinterpret_cast<void*>(color_buffer);
+        uint64_t depth_buffer = 0;
+        native_depth_textures_[0] = reinterpret_cast<void*>(depth_buffer);
+        
         for (int i = 0; i < num_textures; i++) {
-            UnityXRRenderTextureDesc texture_desc;
-            memset(&texture_desc, 0, sizeof(UnityXRRenderTextureDesc));
+            UnityXRRenderTextureDesc texture_descriptor;
+            memset(&texture_descriptor, 0, sizeof(UnityXRRenderTextureDesc));
             
-            texture_desc.colorFormat = kUnityXRRenderTextureFormatRGBA32;
+            texture_descriptor.width = screen_width;
+            texture_descriptor.height = screen_height;
+            texture_descriptor.flags = 0;
+            //texture_descriptor.colorFormat = kUnityXRRenderTextureFormatRGBA32;
             // we will query the pointer of unity created texture later
-            texture_desc.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
-            // TODO: do we need depth?
-            texture_desc.depthFormat = kUnityXRDepthTextureFormat24bitOrGreater;
+            //texture_descriptor.color.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
+            texture_descriptor.depthFormat = kUnityXRDepthTextureFormatNone;
+            texture_descriptor.color.nativePtr = native_color_textures_[i];
+            texture_descriptor.depth.nativePtr = native_depth_textures_[i];
             //texture_desc.depthFormat = kUnityXRDepthTextureFormatReference;
-            texture_desc.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
-            texture_desc.width = tex_width;
-            texture_desc.height = tex_height;
-            texture_desc.textureArrayLength = texture_array_length;
+            //texture_descriptor.depth.nativePtr = (void*)kUnityXRRenderTextureIdDontCare;
+            
+            texture_descriptor.textureArrayLength = texture_array_length;
             
             UnityXRRenderTextureId unity_texture_id;
-            display_->CreateTexture(handle_, &texture_desc, &unity_texture_id);
+            display_->CreateTexture(handle_, &texture_descriptor, &unity_texture_id);
             unity_textures_[i] = unity_texture_id;
         }
         textures_initialized_ = true;
@@ -787,16 +811,18 @@ private:
     /// @brief HoloKit SDK API wrapper.
     std::unique_ptr<holokit::HoloKitApi> holokit_api_;
     
-    /// @brief An array of native texture pointers.
-    std::vector<void*> native_color_textures_;
-    
     /// @brief An array of UnityXRRenderTextureId.
     std::vector<UnityXRRenderTextureId> unity_textures_;
     
-    /// @brief An array of metal textures.
-    std::vector<id<MTLTexture>> metal_color_textures_;
+    /// @brief An array of native texture pointers.
+    std::vector<void*> native_color_textures_;
     
     std::vector<void*> native_depth_textures_;
+    
+    std::vector<IOSurfaceRef> color_surfaces_;
+    
+    /// @brief An array of metal textures.
+    std::vector<id<MTLTexture>> metal_color_textures_;
     
     std::vector<id<MTLTexture>> metal_depth_textures_;
     
