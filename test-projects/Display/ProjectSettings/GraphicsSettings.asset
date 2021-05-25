@@ -45,7 +45,7 @@ GraphicsSettings:
     type: 0}
   m_CustomRenderPipeline: {fileID: 11400000, guid: d69a22a2866e1414399edd7b6dbdb616,
     type: 2}
-  m_TransparencySortMode: 0
+  m_TransparencySortMode: 1
   m_TransparencySortAxis: {x: 0, y: 0, z: 1}
   m_DefaultRenderingPath: 1
   m_DefaultMobileRenderingPath: 1

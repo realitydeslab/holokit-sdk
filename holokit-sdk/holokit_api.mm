@@ -31,7 +31,7 @@ void HoloKitApi::Initialize() {
         NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
     }
     
-    is_xr_mode_enabled_ = true;
+    is_xr_mode_enabled_ = false;
     
     // MODIFY HERE
     is_nfc_enabled_ = true;
@@ -150,6 +150,10 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
 
 /// @brief Return true if mode is set successfully.
 bool HoloKitApi::SetIsXrModeEnabled(bool val) {
+    
+    is_xr_mode_enabled_ = val;
+    return true;
+    
     // If NFC is not enabled, change the mode directly.
     if(!is_nfc_enabled_) {
         is_xr_mode_enabled_ = val;

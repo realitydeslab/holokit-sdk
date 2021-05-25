@@ -164,6 +164,8 @@ const float black_vertices[] = {
 
 const uint16_t black_indexes[] = {0, 1, 2, 2, 3, 0};
 
+simd_float4x4 unity_projection_matrix;
+
 namespace {
 class HoloKitDisplayProvider {
 public:
@@ -502,6 +504,7 @@ public:
             // projection matrix
             // get ARKit projection matrix
             simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
+            projection_matrix = unity_projection_matrix;
             //LogMatrix4x4(projection_matrix);
             render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             // Make sure we can see the splash screen when ar session is not initialized.
@@ -875,3 +878,26 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
 }
 
 void UnloadDisplay() { HoloKitDisplayProvider::GetInstance().reset(); }
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetUnityProjectionMatrix(float column0[4], float column1[4], float column2[4], float column3[4]) {
+    unity_projection_matrix.columns[0].x = column0[0];
+    unity_projection_matrix.columns[0].y = column0[1];
+    unity_projection_matrix.columns[0].z = column0[2];
+    unity_projection_matrix.columns[0].w = column0[3];
+    
+    unity_projection_matrix.columns[1].x = column1[0];
+    unity_projection_matrix.columns[1].y = column1[1];
+    unity_projection_matrix.columns[1].z = column1[2];
+    unity_projection_matrix.columns[1].w = column1[3];
+    
+    unity_projection_matrix.columns[2].x = column2[0];
+    unity_projection_matrix.columns[2].y = column2[1];
+    unity_projection_matrix.columns[2].z = column2[2];
+    unity_projection_matrix.columns[2].w = column2[3];
+    
+    unity_projection_matrix.columns[3].x = column3[0];
+    unity_projection_matrix.columns[3].y = column3[1];
+    unity_projection_matrix.columns[3].z = column3[2];
+    unity_projection_matrix.columns[3].w = column3[3];
+}

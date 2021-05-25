@@ -7,6 +7,7 @@ TagManager:
   - LandmarkLeft
   - LandmarkRight
   - qrcode
+  - HandInteractable
   layers:
   - Default
   - TransparentFX

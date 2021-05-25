@@ -11,7 +11,7 @@ namespace UnityEngine.XR.HoloKit.Input
     /// HoloKit Mixed Reality XR headset.
     /// </summary>
     [Preserve]
-    [InputControlLayout(displayName = "HoloKit HMD")]
+    [InputControlLayout(displayName = "HoloKit HMD Demo")]
     public class HoloKitHMD : XRHMD
     {
         [Preserve]
@@ -39,7 +39,7 @@ namespace UnityEngine.XR.HoloKit.Input
     }
 
     [Preserve]
-    [InputControlLayout(displayName = "HoloKit Hand")]
+    [InputControlLayout(displayName = "HoloKit Hand Demo")]
     public class HoloKitHand : XRController
     {
         [Preserve]

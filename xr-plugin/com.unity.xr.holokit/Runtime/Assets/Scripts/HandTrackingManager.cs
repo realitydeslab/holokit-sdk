@@ -229,7 +229,6 @@ namespace UnityEngine.XR.HoloKit
                             // When hand tracking is lost
                             if (holoKitHands[handIndex].activeSelf)
                             {
-                                ResetPosition();
                                 holoKitHands[handIndex].SetActive(false);
                             }
                         }
@@ -283,6 +282,11 @@ namespace UnityEngine.XR.HoloKit
             transform.GetChild(0).transform.gameObject.SetActive(false);
             handTrackingEnabled = false;
             Debug.Log("[HandTrackingManager]: hand tracking disabled.");
+        }
+
+        public bool GetHandTrackingEnabled()
+        {
+            return handTrackingEnabled;
         }
     }
 }

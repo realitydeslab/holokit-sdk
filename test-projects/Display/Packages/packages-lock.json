@@ -155,6 +155,13 @@
       },
       "url": "https://packages.unity.cn"
     },
+    "com.unity.textcore": {
+      "version": "1.0.0-preview.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.cn"
+    },
     "com.unity.textmeshpro": {
       "version": "3.0.4",
       "depth": 0,
@@ -184,6 +191,16 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
+    },
+    "com.unity.ui": {
+      "version": "1.0.0-preview.14",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.uielementsnative": "1.0.0",
+        "com.unity.textcore": "1.0.0-preview.2"
+      },
+      "url": "https://packages.unity.cn"
     },
     "com.unity.visualeffectgraph": {
       "version": "11.0.0",
