@@ -11,24 +11,27 @@ namespace UnityEngine.XR.HoloKit
 
         public static HandTrackingManager Instance { get { return _instance; } }
 
-        private List<InputDevice> handDevices = new List<InputDevice>();
-        private List<GameObject[]> multiHandLandmakrs = new List<GameObject[]>();
+        private List<InputDevice> m_HandDevices = new List<InputDevice>();
+        private List<GameObject[]> m_MultiHandLandmakrs = new List<GameObject[]>();
 
-        private List<HoloKitHandGesture> currentHandGestures = new List<HoloKitHandGesture>();
+        private List<HoloKitHandGesture> m_CurrentHandGestures = new List<HoloKitHandGesture>();
 
-        private int currentGestureInterval = 0;
+        private int m_CurrentGestureInterval = 0;
 
-        private const int kMinGestureInterval = 3;
+        // The number of frames it takes to change from one hand gesture to another.
+        private const int k_MinGestureInterval = 3;
 
-        private AROcclusionManager occlusionManager;
+        private AROcclusionManager m_OcclusionManager;
 
-        private List<GameObject> holoKitHands = new List<GameObject>();
+        private List<GameObject> m_HoloKitHands = new List<GameObject>();
 
-        [SerializeField] private bool handTrackingEnabled = true;
+        [SerializeField] private bool m_HandTrackingEnabled = true;
 
-        [SerializeField] private bool landmarksVisible = true;
+        [SerializeField] private bool m_LandmarksVisibilityEnabled = true;
 
-        [SerializeField] private bool colliderEnabled = true;
+        [SerializeField] private bool m_ColliderEnabled = true;
+
+        [SerializeField] private bool m_GestureRecognitionEnabled = true;
 
         [DllImport("__Internal")]
         public static extern bool UnityHoloKit_EnableHandTracking(bool enabled);
@@ -53,9 +56,9 @@ namespace UnityEngine.XR.HoloKit
 
         void Start()
         {
-            occlusionManager = GameObject.Find("HoloKitCamera").GetComponent<AROcclusionManager>();
-            holoKitHands.Add(transform.GetChild(0).GetChild(0).gameObject);
-            holoKitHands.Add(transform.GetChild(0).GetChild(1).gameObject);
+            m_OcclusionManager = GameObject.Find("HoloKitCamera").GetComponent<AROcclusionManager>();
+            m_HoloKitHands.Add(transform.GetChild(0).GetChild(0).gameObject);
+            m_HoloKitHands.Add(transform.GetChild(0).GetChild(1).gameObject);
 
             var devices = new List<InputDevice>();
             // Get left hand device
@@ -65,7 +68,7 @@ namespace UnityEngine.XR.HoloKit
             InputDevices.GetDevicesWithCharacteristics(desiredCharacteristics, devices);
             foreach (var device in devices)
             {
-                handDevices.Add(device);
+                m_HandDevices.Add(device);
                 //Debug.Log("HoloKit left hand connected.");
             }
 
@@ -76,7 +79,7 @@ namespace UnityEngine.XR.HoloKit
             InputDevices.GetDevicesWithCharacteristics(desiredCharacteristics, devices);
             foreach (var device in devices)
             {
-                handDevices.Add(device);
+                m_HandDevices.Add(device);
                 //Debug.Log("HoloKit right hand connected.");
             }
 
@@ -85,51 +88,51 @@ namespace UnityEngine.XR.HoloKit
             GameObject[] rightLandmarks = GameObject.FindGameObjectsWithTag("LandmarkRight");
             System.Array.Reverse(leftLandmarks);
             System.Array.Reverse(rightLandmarks);
-            multiHandLandmakrs.Add(leftLandmarks);
-            multiHandLandmakrs.Add(rightLandmarks);
+            m_MultiHandLandmakrs.Add(leftLandmarks);
+            m_MultiHandLandmakrs.Add(rightLandmarks);
 
             // Color the landmarks
             for (int i = 0; i < 2; i++)
             {
                 for (int j = 0; j < 21; j++)
                 {
-                    multiHandLandmakrs[i][j].GetComponent<Renderer>().enabled = landmarksVisible;
-                    if (!landmarksVisible)
+                    m_MultiHandLandmakrs[i][j].GetComponent<Renderer>().enabled = m_LandmarksVisibilityEnabled;
+                    if (!m_LandmarksVisibilityEnabled)
                     {
                         continue;
                     }
                     if (j == 0)
                     {
-                        multiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.gray;
+                        m_MultiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.gray;
                     }
                     if (j == 1 || j == 5 || j == 9 || j == 13 || j == 17)
                     {
-                        multiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.red;
+                        m_MultiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.red;
                     }
                     if (j == 2 || j == 6 || j == 10 || j == 14 || j == 18)
                     {
-                        multiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.green;
+                        m_MultiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.green;
                     }
                     if (j == 3 || j == 7 || j == 11 || j == 15 || j == 19)
                     {
-                        multiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.blue;
+                        m_MultiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.blue;
                     }
                     if (j == 4 || j == 8 || j == 12 || j == 16 || j == 20)
                     {
-                        multiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.cyan;
+                        m_MultiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.cyan;
                     }
                 }
             }
 
-            if (!colliderEnabled)
+            if (!m_ColliderEnabled)
             {
                 DisableCollider();
             }
 
-            currentHandGestures.Add(HoloKitHandGesture.None);
-            currentHandGestures.Add(HoloKitHandGesture.None);
+            m_CurrentHandGestures.Add(HoloKitHandGesture.None);
+            m_CurrentHandGestures.Add(HoloKitHandGesture.None);
 
-            if (handTrackingEnabled)
+            if (m_HandTrackingEnabled)
             {
                 EnableHandTracking();
             }
@@ -141,7 +144,7 @@ namespace UnityEngine.XR.HoloKit
 
         void FixedUpdate()
         {
-            if(handTrackingEnabled)
+            if(m_HandTrackingEnabled)
             {
                 UpdateHandLandmarks();
             }
@@ -151,21 +154,21 @@ namespace UnityEngine.XR.HoloKit
         {
             for (int handIndex = 0; handIndex < 2; handIndex++)
             {
-                if (handDevices[handIndex].isValid)
+                if (m_HandDevices[handIndex].isValid)
                 {
                     // check if left hand is currently tracked
                     bool isTracked;
-                    if (handDevices[handIndex].TryGetFeatureValue(CommonUsages.isTracked, out isTracked))
+                    if (m_HandDevices[handIndex].TryGetFeatureValue(CommonUsages.isTracked, out isTracked))
                     {
                         if (isTracked)
                         {
-                            if (!holoKitHands[handIndex].activeSelf)
+                            if (!m_HoloKitHands[handIndex].activeSelf)
                             {
-                                holoKitHands[handIndex].SetActive(true);
+                                m_HoloKitHands[handIndex].SetActive(true);
                             }
                             int landmarkIndex = 0;
                             Hand hand;
-                            if (handDevices[handIndex].TryGetFeatureValue(CommonUsages.handData, out hand))
+                            if (m_HandDevices[handIndex].TryGetFeatureValue(CommonUsages.handData, out hand))
                             {
                                 // Get root bone
                                 Bone bone;
@@ -175,7 +178,7 @@ namespace UnityEngine.XR.HoloKit
                                     if (bone.TryGetPosition(out position))
                                     {
                                         position.z = -position.z;
-                                        multiHandLandmakrs[handIndex][landmarkIndex++].transform.position = position;
+                                        m_MultiHandLandmakrs[handIndex][landmarkIndex++].transform.position = position;
                                     }
                                 }
                                 // Get finger bones
@@ -191,45 +194,49 @@ namespace UnityEngine.XR.HoloKit
                                             if (fingerBone.TryGetPosition(out position))
                                             {
                                                 position.z = -position.z;
-                                                multiHandLandmakrs[handIndex][landmarkIndex++].transform.position = position;
+                                                m_MultiHandLandmakrs[handIndex][landmarkIndex++].transform.position = position;
                                             }
                                             fingerBoneIndex++;
                                         }
                                     }
                                 }
                             }
-                            // Recognize current hand gesture
-                            bool primaryButtonValue;
-                            if (handDevices[handIndex].TryGetFeatureValue(CommonUsages.primaryButton, out primaryButtonValue))
+                            if (m_GestureRecognitionEnabled)
                             {
-                                if (primaryButtonValue && currentHandGestures[handIndex] == HoloKitHandGesture.None && currentGestureInterval > kMinGestureInterval)
+                                // Recognize current hand gesture
+                                bool primaryButtonValue;
+                                if (m_HandDevices[handIndex].TryGetFeatureValue(CommonUsages.primaryButton, out primaryButtonValue))
                                 {
-                                    currentHandGestures[handIndex] = HoloKitHandGesture.Bloom;
-                                    currentGestureInterval = 0;
-                                    // TODO: send a Unity event
-                                    Debug.Log("[HandTracking]: current gesture changed to BLOOM.");
-                                    OnChangedToBloom();
-                                }
-                                else if (!primaryButtonValue && currentHandGestures[handIndex] == HoloKitHandGesture.Bloom && currentGestureInterval > kMinGestureInterval)
-                                {
-                                    currentHandGestures[handIndex] = HoloKitHandGesture.None;
-                                    currentGestureInterval = 0;
-                                    // TODO: send a Unity event
-                                    Debug.Log("[HandTracking]: current gesture changed to NONE.");
-                                    OnChangedToNone();
-                                }
-                                else
-                                {
-                                    currentGestureInterval++;
+                                    if (primaryButtonValue && m_CurrentHandGestures[handIndex] == HoloKitHandGesture.None && m_CurrentGestureInterval > k_MinGestureInterval)
+                                    {
+                                        m_CurrentHandGestures[handIndex] = HoloKitHandGesture.Bloom;
+                                        m_CurrentGestureInterval = 0;
+                                        // TODO: send a Unity event
+                                        Debug.Log("[HandTracking]: current gesture changed to BLOOM.");
+                                        OnChangedToBloom();
+                                    }
+                                    else if (!primaryButtonValue && m_CurrentHandGestures[handIndex] == HoloKitHandGesture.Bloom && m_CurrentGestureInterval > k_MinGestureInterval)
+                                    {
+                                        m_CurrentHandGestures[handIndex] = HoloKitHandGesture.None;
+                                        m_CurrentGestureInterval = 0;
+                                        // TODO: send a Unity event
+                                        Debug.Log("[HandTracking]: current gesture changed to NONE.");
+                                        OnChangedToNone();
+                                    }
+                                    else
+                                    {
+                                        m_CurrentGestureInterval++;
+                                    }
                                 }
                             }
+                            
                         }
                         else
                         {
                             // When hand tracking is lost
-                            if (holoKitHands[handIndex].activeSelf)
+                            if (m_HoloKitHands[handIndex].activeSelf)
                             {
-                                holoKitHands[handIndex].SetActive(false);
+                                m_HoloKitHands[handIndex].SetActive(false);
                             }
                         }
                     }
@@ -242,7 +249,7 @@ namespace UnityEngine.XR.HoloKit
             Debug.Log("[HandTracking]: DisableCollider()");
             for (int i = 0; i < 2; i++)
             {
-                GameObject[] handLandmarks = multiHandLandmakrs[i];
+                GameObject[] handLandmarks = m_MultiHandLandmakrs[i];
                 for (int j = 0; j < 21; j++)
                 {
                     GameObject handLandmark = handLandmarks[j];
@@ -256,7 +263,7 @@ namespace UnityEngine.XR.HoloKit
             Debug.Log("[HandTracking]: ResetPosition()");
             for (int i = 0; i < 2; i++)
             {
-                GameObject[] handLandmarks = multiHandLandmakrs[i];
+                GameObject[] handLandmarks = m_MultiHandLandmakrs[i];
                 for (int j = 0; j < 21; j++)
                 {
                     GameObject handLandmark = handLandmarks[j];
@@ -268,25 +275,25 @@ namespace UnityEngine.XR.HoloKit
         public void EnableHandTracking()
         {
             UnityHoloKit_EnableHandTracking(true);
-            occlusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Best;
+            m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Best;
             transform.GetChild(0).transform.gameObject.SetActive(true);
-            handTrackingEnabled = true;
+            m_HandTrackingEnabled = true;
             Debug.Log("[HandTrackingManager]: hand tracking enabled.");
         }
 
         public void DisableHandTracking()
         {
             UnityHoloKit_EnableHandTracking(false);
-            occlusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Disabled;
+            m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Disabled;
             ResetPosition();
             transform.GetChild(0).transform.gameObject.SetActive(false);
-            handTrackingEnabled = false;
+            m_HandTrackingEnabled = false;
             Debug.Log("[HandTrackingManager]: hand tracking disabled.");
         }
 
         public bool GetHandTrackingEnabled()
         {
-            return handTrackingEnabled;
+            return m_HandTrackingEnabled;
         }
     }
 }
