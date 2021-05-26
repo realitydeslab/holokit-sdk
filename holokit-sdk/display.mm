@@ -313,10 +313,6 @@ public:
             is_metal_initialized_ = true;
         }
         
-        // Draw a black screen beforehand to eliminate left viewport glitch
-        // This does not work...
-        //RenderBlackScreen();
-        
         id<MTLRenderCommandEncoder> render_command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
         [render_command_encoder setRenderPipelineState:render_pipeline_state_];
         [render_command_encoder setCullMode:MTLCullModeNone];
@@ -329,12 +325,15 @@ public:
 #endif
         [render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:index_buffer_ indexBufferOffset:0];
         
-        RenderWidgets();
+        if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL) {
+            RenderAlignmentMarker();
+        }
+            
         //NSLog(@"horizontal alignment offset: %f", holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset());
         return kUnitySubsystemErrorCodeSuccess;
     }
     
-    void RenderWidgets() {
+    void RenderAlignmentMarker() {
         if (!is_metal_initialized_widgets_) {
             vertex_data[0] = vertex_data[4] = holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset();
             
@@ -362,7 +361,6 @@ public:
         [command_encoder setVertexBuffer:widgets_vertex_buffer_ offset:0 atIndex:0];
         //[command_encoder setVertexBuffer:vertex_color_buffer offset:0 atIndex:1];
         [command_encoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:(sizeof(vertex_data) / sizeof(float))];
-        //NSLog(@"draw call");
     }
     
     void RenderBlackScreen() {

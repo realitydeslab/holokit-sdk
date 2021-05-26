@@ -1877,7 +1877,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nPRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios/arm64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/Display/Build/Libraries/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\n";
+			shellScript = "PRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios/arm64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/Display/Build/Libraries/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/HoloKitOfficialApp/Build/Libraries/com.unity.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n";
 		};
 		968D6948253ABF2000CFBBB3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

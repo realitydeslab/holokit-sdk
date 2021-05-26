@@ -102,7 +102,6 @@ private:
     static std::unique_ptr<HoloKitApi> holokit_api_;
     
     bool is_initialized_ = false;
-    
 }; // class HoloKitApi
 
 std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;
