@@ -89,7 +89,7 @@ namespace UnityEditor.XR.HoloKit
                 }
 
                 ChangeXcodePlist(report.summary.outputPath);
-                AddNFCCapability(report.summary.outputPath);
+                AddXcodeCapabilities(report.summary.outputPath);
                 AddDynamicFramework(report.summary.outputPath);
             }
 
@@ -138,7 +138,7 @@ namespace UnityEditor.XR.HoloKit
                 proj.WriteToFile(projPath);
             }
 
-            private static void AddNFCCapability(string buildPath)
+            private static void AddXcodeCapabilities(string buildPath)
             {
                 string projectPath = PBXProject.GetPBXProjectPath(buildPath);
                 PBXProject project = new PBXProject();
@@ -159,6 +159,8 @@ namespace UnityEditor.XR.HoloKit
                 var constructor = typeof(PBXCapabilityType).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(string), typeof(bool), typeof(string), typeof(bool) }, null);
                 PBXCapabilityType nfcCapability = (PBXCapabilityType)constructor.Invoke(new object[] { "com.apple.NearFieldCommunicationTagReading", true, "", false });
                 project.AddCapability(target, nfcCapability, entitlementFileName);
+
+                projectCapabilityManager.AddSignInWithApple();
 
                 projectCapabilityManager.WriteToFile();
             }
