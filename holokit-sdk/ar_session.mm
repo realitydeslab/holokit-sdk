@@ -154,6 +154,7 @@ DelegateCallbackFunction delegate = NULL;
     if(self.session == NULL) {
         NSLog(@"[ar_session]: got ar session reference.");
         self.session = session;
+        
     }
     
     // If hands are lost.

@@ -31,11 +31,7 @@ void HoloKitApi::Initialize() {
         NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
     }
     
-    is_xr_mode_enabled_ = false;
-    
-    // MODIFY HERE
-    is_nfc_enabled_ = true;
-    is_nfc_validated_ = false;
+    current_rendering_mode_ = RenderingMode::UIMode;
     
     is_initialized_ = true;
 }
@@ -148,33 +144,10 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     return simd_make_float3(0);
 }
 
-/// @brief Return true if mode is set successfully.
-bool HoloKitApi::SetIsXrModeEnabled(bool val) {
-    
-    is_xr_mode_enabled_ = val;
-    return true;
-    
-    // If NFC is not enabled, change the mode directly.
-    if(!is_nfc_enabled_) {
-        is_xr_mode_enabled_ = val;
-        return true;;
-    }
-    
-    // Do NFC validation when changing from AR mode to XR mode for the first time.
-    if (is_nfc_enabled_ && !is_nfc_validated_) {
-        NFCSession* nfcSession = [NFCSession sharedNFCSession];
-        [nfcSession startReaderSession];
-        NSLog(@"[holokit_api]: NFC authorization finished.");
-        is_nfc_validated_ = true;
-        
-        return false;
-    }
-    // We only do NFC validation once.
-    if (is_nfc_enabled_ && is_nfc_validated_) {
-        is_xr_mode_enabled_ = val;
-        return true;
-    }
-    return false;
+void HoloKitApi::StartNfcVerification() {
+    NFCSession* nfcSession = [NFCSession sharedNFCSession];
+    [nfcSession startReaderSession];
+    NSLog(@"[holokit_api]: NFC authorization finished.");
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
@@ -187,9 +160,9 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
 
 } // namespace
 
-extern "C" bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetIsXrModeEnabled(bool val) {
-    return holokit::HoloKitApi::GetInstance()->SetIsXrModeEnabled(val);
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetRenderingMode(int val) {
+    holokit::HoloKitApi::GetInstance()->SetRenderingMode((holokit::RenderingMode)val);
 }
 
 extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -208,4 +181,9 @@ extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetCameraToCenterEyeOffsetZ() {
     simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
     return offset.z;
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_StartNfcVerification() {
+    holokit::HoloKitApi::GetInstance()->StartNfcVerification();
 }

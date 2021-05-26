@@ -15,8 +15,17 @@ namespace UnityEngine.XR.HoloKit
 
         private bool m_AutoLoginAttempted = false;
 
+        private bool m_InOrientationSwith = false;
+
+        private UIDocument m_UIDocument;
+
+        [SerializeField] private VisualTreeAsset m_OrientationSwitchWindowAsset;
+
         [DllImport("__Internal")]
-        public static extern bool UnityHoloKit_SetIsXrModeEnabled(bool val);
+        public static extern void UnityHoloKit_SetRenderingMode(int val);
+
+        [DllImport("__Internal")]
+        public static extern void UnityHoloKit_StartNfcVerification();
 
         public delegate void AutoLoginAction();
         public static event AutoLoginAction OnAutoLoginStarted;
@@ -26,7 +35,8 @@ namespace UnityEngine.XR.HoloKit
 
         private void OnEnable()
         {
-            var rootVisualElement = GetComponent<UIDocument>().rootVisualElement;
+            m_UIDocument = GetComponent<UIDocument>();
+            var rootVisualElement = m_UIDocument.rootVisualElement;
             signInButton = rootVisualElement.Q<Button>("sign-in-button");
 
             signInButton.RegisterCallback<ClickEvent>(ev => SignIn());
@@ -36,9 +46,30 @@ namespace UnityEngine.XR.HoloKit
         {
             if (!m_AutoLoginAttempted)
             {
+                // Attemp an automatic login
                 OnAutoLoginStarted();
                 m_AutoLoginAttempted = true;
             }
+
+            if (m_InOrientationSwith)
+            {
+                if (Screen.orientation == ScreenOrientation.LandscapeLeft)
+                {
+                    Screen.autorotateToLandscapeRight = false;
+                    Screen.autorotateToPortrait = false;
+                    Screen.autorotateToPortraitUpsideDown = false;
+                    UnityHoloKit_StartNfcVerification();
+                    m_InOrientationSwith = false;
+
+                    SetupStarterScene();
+                }
+            }
+        }
+
+        private void SetupOrientationSwitchWindow()
+        {
+            m_UIDocument.visualTreeAsset = m_OrientationSwitchWindowAsset;
+            m_InOrientationSwith = true;
         }
 
         private void SignIn()
@@ -46,9 +77,14 @@ namespace UnityEngine.XR.HoloKit
             //Debug.Log("Apple account signed in.");
 
             //OnLoginButtonPressed();
-            
+
+            SetupOrientationSwitchWindow();
+        }
+
+        private void SetupStarterScene()
+        {
             SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
-            UnityHoloKit_SetIsXrModeEnabled(true);
+            UnityHoloKit_SetRenderingMode(2);
         }
     }
 }

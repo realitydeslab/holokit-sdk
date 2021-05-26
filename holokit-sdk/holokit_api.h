@@ -20,6 +20,12 @@
 
 namespace holokit {
 
+enum RenderingMode {
+    UIMode = 0,
+    ARMode = 1,
+    XRMode = 2
+};
+
 /// Wrapper of HoloKit SDK
 class HoloKitApi {
 public:
@@ -42,16 +48,19 @@ public:
     
     ARSessionDelegateController* GetArSessionHandler() { return ar_session_handler_; }
     
-    bool GetIsXrModeEnabled() { return is_xr_mode_enabled_; }
-    
     bool GetIsInitialized() { return is_initialized_; }
     
     int GetScreenWidth() { return screen_width_; }
     
     int GetScreenHeight() { return screen_height_; }
     
-    /// @brief This method might fail due to NFC check, in which case it returns false.
-    bool SetIsXrModeEnabled(bool val);
+    RenderingMode GetRenderingMode() { return current_rendering_mode_; }
+    
+    void SetRenderingMode(RenderingMode new_mode) {current_rendering_mode_ = new_mode; }
+    
+    void StartNfcVerification();
+    
+    bool GetNfcVerificationResult() { return nfc_verification_result_; }
     
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
@@ -91,17 +100,13 @@ private:
     
     ARSessionDelegateController* ar_session_handler_ = nullptr;
     
-    /// @brief True for XR mode and false for AR mode.
-    bool is_xr_mode_enabled_;
-    
-    /// @brief If this value is true, the app will do NFC check when the user switches to XR mode.
-    bool is_nfc_enabled_;
-    
-    bool is_nfc_validated_;
-    
     static std::unique_ptr<HoloKitApi> holokit_api_;
     
     bool is_initialized_ = false;
+    
+    RenderingMode current_rendering_mode_;
+    
+    bool nfc_verification_result_ = false;
 }; // class HoloKitApi
 
 std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;

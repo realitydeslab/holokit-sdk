@@ -166,7 +166,7 @@ const uint16_t black_indexes[] = {0, 1, 2, 2, 3, 0};
 
 simd_float4x4 unity_projection_matrix;
 
-namespace {
+namespace holokit {
 class HoloKitDisplayProvider {
 public:
     HoloKitDisplayProvider(IUnityXRTrace* trace,
@@ -235,7 +235,7 @@ public:
     UnitySubsystemErrorCode Start() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
-        is_xr_mode_enabled_ = true;
+        rendering_mode_ = RenderingMode::UIMode;
         display_mode_changed_ = false;
         
         return kUnitySubsystemErrorCodeSuccess;
@@ -425,10 +425,9 @@ public:
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
         
         // Check if holokit api has changed the display mode.
-        if (is_xr_mode_enabled_ != holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled()) {
-            HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Display mode switched.", GetCurrentTime());
-            NSLog(@"%d", holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled());
-            is_xr_mode_enabled_ = holokit::HoloKitApi::GetInstance()->GetIsXrModeEnabled();
+        if (rendering_mode_ != holokit::HoloKitApi::GetInstance()->GetRenderingMode()) {
+            HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Rendering mode switched.", GetCurrentTime());
+            rendering_mode_ = holokit::HoloKitApi::GetInstance()->GetRenderingMode();
             display_mode_changed_ = true;
         }
         
@@ -473,7 +472,7 @@ public:
             int num_textures = 2;
             int texture_array_length = frame_hints->appSetup.singlePassRendering ? 2 : 0;
     #endif
-            if (!is_xr_mode_enabled_) {
+            if (rendering_mode_ != RenderingMode::XRMode) {
                 num_textures = 1;
                 texture_array_length = 0;
             }
@@ -481,7 +480,7 @@ public:
         }
         
         // AR mode rendering
-        if (!is_xr_mode_enabled_) {
+        if (rendering_mode_ != RenderingMode::XRMode) {
             next_frame->renderPassesCount = 1;
             
             auto& render_pass = next_frame->renderPasses[0];
@@ -502,7 +501,7 @@ public:
             // projection matrix
             // get ARKit projection matrix
             simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
-            projection_matrix = unity_projection_matrix;
+            //projection_matrix = unity_projection_matrix;
             //LogMatrix4x4(projection_matrix);
             render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             // Make sure we can see the splash screen when ar session is not initialized.
@@ -823,7 +822,7 @@ private:
     IUnityGraphicsMetal* metal_interface_;
     
     /// @brief This value is true if XR mode is enabled, false if AR mode is enabled.
-    bool is_xr_mode_enabled_;
+    RenderingMode rendering_mode_;
     
     /// @brief This value is set to true when the user switched from AR mode to XR model, vice versa.
     bool display_mode_changed_;
@@ -848,34 +847,34 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
     if(trace == NULL) {
         return kUnitySubsystemErrorCodeFailure;
     }
-    HoloKitDisplayProvider::GetInstance().reset(new HoloKitDisplayProvider(trace, display));
+    holokit::HoloKitDisplayProvider::GetInstance().reset(new holokit::HoloKitDisplayProvider(trace, display));
     HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, "%f LoadDisplay()", GetCurrentTime());
     
-    HoloKitDisplayProvider::GetInstance()->SetMtlInterface(xr_interfaces->Get<IUnityGraphicsMetal>());
-    HoloKitDisplayProvider::GetInstance()->SetMtlDevice(xr_interfaces->Get<IUnityGraphicsMetal>()->MetalDevice());
+    holokit::HoloKitDisplayProvider::GetInstance()->SetMtlInterface(xr_interfaces->Get<IUnityGraphicsMetal>());
+    holokit::HoloKitDisplayProvider::GetInstance()->SetMtlDevice(xr_interfaces->Get<IUnityGraphicsMetal>()->MetalDevice());
     
     UnityLifecycleProvider display_lifecycle_handler;
     display_lifecycle_handler.userData = NULL;
     display_lifecycle_handler.Initialize = [](UnitySubsystemHandle handle, void*) -> UnitySubsystemErrorCode {
-        return HoloKitDisplayProvider::GetInstance()->Initialize(handle);
+        return holokit::HoloKitDisplayProvider::GetInstance()->Initialize(handle);
     };
     display_lifecycle_handler.Start = [](UnitySubsystemHandle, void*) -> UnitySubsystemErrorCode {
-        return HoloKitDisplayProvider::GetInstance()->Start();
+        return holokit::HoloKitDisplayProvider::GetInstance()->Start();
     };
     display_lifecycle_handler.Stop = [](UnitySubsystemHandle, void*) -> void {
-        return HoloKitDisplayProvider::GetInstance()->Stop();
+        return holokit::HoloKitDisplayProvider::GetInstance()->Stop();
     };
     display_lifecycle_handler.Shutdown = [](UnitySubsystemHandle, void*) -> void {
-        return HoloKitDisplayProvider::GetInstance()->Shutdown();
+        return holokit::HoloKitDisplayProvider::GetInstance()->Shutdown();
     };
     
     // the names do matter
     // The parameters passed to RegisterLifecycleProvider must match the name and id fields in your manifest file.
     // see https://docs.unity3d.com/Manual/xrsdk-provider-setup.html
-    return HoloKitDisplayProvider::GetInstance()->GetDisplay()->RegisterLifecycleProvider("HoloKit XR Plugin", "HoloKit Display", &display_lifecycle_handler);
+    return holokit::HoloKitDisplayProvider::GetInstance()->GetDisplay()->RegisterLifecycleProvider("HoloKit XR Plugin", "HoloKit Display", &display_lifecycle_handler);
 }
 
-void UnloadDisplay() { HoloKitDisplayProvider::GetInstance().reset(); }
+void UnloadDisplay() { holokit::HoloKitDisplayProvider::GetInstance().reset(); }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetUnityProjectionMatrix(float column0[4], float column1[4], float column2[4], float column3[4]) {
