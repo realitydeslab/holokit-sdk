@@ -165,6 +165,11 @@ UnityHoloKit_SetRenderingMode(int val) {
     holokit::HoloKitApi::GetInstance()->SetRenderingMode((holokit::RenderingMode)val);
 }
 
+extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetRenderingMode() {
+    return holokit::HoloKitApi::GetInstance()->GetRenderingMode();
+}
+
 extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetCameraToCenterEyeOffsetX() {
     simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();

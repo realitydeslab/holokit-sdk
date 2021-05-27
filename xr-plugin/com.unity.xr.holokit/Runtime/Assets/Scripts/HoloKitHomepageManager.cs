@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Runtime.InteropServices;
+using UnityEngine.XR.ARFoundation;
 
 namespace UnityEngine.XR.HoloKit
 {
@@ -12,6 +13,10 @@ namespace UnityEngine.XR.HoloKit
         [SerializeField] private string sceneName;
 
         private Button signInButton;
+
+        private Button XrModeButton;
+
+        private Button ArModeButton;
 
         private bool m_AutoLoginAttempted = false;
 
@@ -55,13 +60,17 @@ namespace UnityEngine.XR.HoloKit
             {
                 if (Screen.orientation == ScreenOrientation.LandscapeLeft)
                 {
-                    Screen.autorotateToLandscapeRight = false;
-                    Screen.autorotateToPortrait = false;
-                    Screen.autorotateToPortraitUpsideDown = false;
-                    UnityHoloKit_StartNfcVerification();
-                    m_InOrientationSwith = false;
-
-                    SetupStarterScene();
+                    XrModeButton.SetEnabled(true);
+                    XrModeButton.visible = true;
+                    ArModeButton.SetEnabled(true);
+                    ArModeButton.visible = true;
+                }
+                else
+                {
+                    XrModeButton.SetEnabled(false);
+                    XrModeButton.visible = false;
+                    ArModeButton.SetEnabled(false);
+                    ArModeButton.visible = false;
                 }
             }
         }
@@ -69,6 +78,17 @@ namespace UnityEngine.XR.HoloKit
         private void SetupOrientationSwitchWindow()
         {
             m_UIDocument.visualTreeAsset = m_OrientationSwitchWindowAsset;
+            var rootVisualElement = m_UIDocument.rootVisualElement;
+            XrModeButton = rootVisualElement.Q<Button>("xr-mode-button");
+            XrModeButton.RegisterCallback<ClickEvent>(ev => EnterXrMode());
+            XrModeButton.SetEnabled(false);
+            XrModeButton.visible = false;
+
+            ArModeButton = rootVisualElement.Q<Button>("ar-mode-button");
+            ArModeButton.RegisterCallback<ClickEvent>(ev => EnterArMode());
+            ArModeButton.SetEnabled(false);
+            ArModeButton.visible = false;
+
             m_InOrientationSwith = true;
         }
 
@@ -82,9 +102,29 @@ namespace UnityEngine.XR.HoloKit
 
         private void SetupStarterScene()
         {
+            Screen.autorotateToLandscapeRight = false;
+            Screen.autorotateToPortrait = false;
+            Screen.autorotateToPortraitUpsideDown = false;
+            //UnityHoloKit_StartNfcVerification();
+            m_InOrientationSwith = false;
+
             Debug.Log("SetupStarterScene.");
             SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+        }
+
+        private void EnterXrMode()
+        {
+            Debug.Log("Enter XR mode.");
             UnityHoloKit_SetRenderingMode(2);
+            SetupStarterScene();
+        }
+
+        private void EnterArMode()
+        {
+            Debug.Log("Enter AR mode.");
+            UnityHoloKit_SetRenderingMode(1);
+            SetupStarterScene();
+            Camera.main.GetComponent<ARCameraBackground>().enabled = true;
         }
     }
 }
