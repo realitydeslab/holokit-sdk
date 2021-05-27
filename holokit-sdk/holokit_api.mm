@@ -185,5 +185,6 @@ UnityHoloKit_GetCameraToCenterEyeOffsetZ() {
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_StartNfcVerification() {
+    NSLog(@"[holokit_api]: StartNfcVerification()");
     holokit::HoloKitApi::GetInstance()->StartNfcVerification();
 }

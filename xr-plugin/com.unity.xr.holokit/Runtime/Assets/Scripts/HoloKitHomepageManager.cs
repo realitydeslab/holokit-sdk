@@ -76,13 +76,13 @@ namespace UnityEngine.XR.HoloKit
         {
             //Debug.Log("Apple account signed in.");
 
-            //OnLoginButtonPressed();
-
+            OnLoginButtonPressed();
             SetupOrientationSwitchWindow();
         }
 
         private void SetupStarterScene()
         {
+            Debug.Log("SetupStarterScene.");
             SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             UnityHoloKit_SetRenderingMode(2);
         }

@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbadcf69a65c74ab6ba4da17a1127f6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: StarterScene
+  sceneName: Tonondi2Starter
   m_OrientationSwitchWindowAsset: {fileID: 9197481963319205126, guid: eb3266e13a9c34ee8bcf49cb251ad634, type: 3}
 --- !u!114 &998533673
 MonoBehaviour:

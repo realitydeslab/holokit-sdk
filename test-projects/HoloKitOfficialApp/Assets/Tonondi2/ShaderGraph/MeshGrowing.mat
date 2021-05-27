@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MeshGrowing
+  m_Shader: {fileID: -6465566751694194690, guid: e47df74927d4a4b5b84733281553f113, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - Texture2D_bca61365dd854368a2c78b553dc8cddc:
+        m_Texture: {fileID: 2800000, guid: b2fe52d368fe4418ea45ca5d81d85cf9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2D:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_5e555accc992404d8bbec98c913e8fe1_Out_0:
+        m_Texture: {fileID: 2800000, guid: 0319720cf33e1ac4c85541f88adac7b1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - Fresnel_Power: 0.25
+    - Fresnel_Power_Power: 2
+    - Impact_0: 0
+    - Impact_1: 0
+    - Impact_2: 0
+    - Metallic: 0
+    - Smoothness: 0
+    - Vector1_1: 12
+    - Vector1_15712fceec90487abe1422abc2c48e62: 2
+    - Vector1_5b06e22102d34bad9483c73a0d31e74c: 0.494
+    - Vector1_60333a3b2d3a4307a463902eb7b4986c: 1
+    - Vector1_846d7fe0dfb349819f0fdddd4404f9ec: 33
+    - Vector1_b854b40a46444cb2ad67318b3a6576e9: 0.3
+    - Vector1_b854b40a46444cb2ad67318b3a6576e9_1: 0.05
+    - Vector1_c17797cabf1547fca4e2f1b622b53f3b: 0.95
+    - Vector1_c17797cabf1547fca4e2f1b622b53f3b_1: 2.91
+    - Vector1_cee35a8eeb8f4895ae5c7c8a0812f842: 1
+    - VertexColor: 0
+    m_Colors:
+    - Color_1: {r: 0.777657, g: 0, b: 1, a: 0}
+    - Color_6b423cc197a64de7aff465ab6ce205b7: {r: 1, g: 0, b: 0, a: 0}
+    - Position_0: {r: 999, g: 999, b: 999, a: 0}
+    - Position_1: {r: 999, g: 999, b: 999, a: 0}
+    - Position_2: {r: 999, g: 999, b: 999, a: 0}
+    - Vector3_1: {r: 2.35, g: 0, b: 0, a: 0}
+    - Vector3_205804d905014f0cbfae2eb5c6688f2c: {r: 0, g: 0, b: 0, a: 0}
+    - _Color: {r: 0.7490196, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []

@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/HoloKitHomepage.unity
     guid: fc874e066a12a43c1b9556495ffe68e6
   - enabled: 1
-    path: Assets/Scenes/StarterScene.unity
+    path: Assets/Tonondi2/Tonondi2Starter.unity
     guid: a51cfe7741dd64af18517cb81253e8f1
   m_configObjects:
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 467ba54f5b3134027bec8e40d52e2d70, type: 2}

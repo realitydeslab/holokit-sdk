@@ -285,6 +285,10 @@ namespace UnityEngine.XR.HoloKit
         {
             UnityHoloKit_EnableHandTracking(false);
             m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Disabled;
+            // Enable human segmentation hand tracking
+            m_OcclusionManager.requestedHumanDepthMode = ARSubsystems.HumanSegmentationDepthMode.Fastest;
+            m_OcclusionManager.requestedHumanStencilMode = ARSubsystems.HumanSegmentationStencilMode.Fastest;
+            m_OcclusionManager.requestedOcclusionPreferenceMode = ARSubsystems.OcclusionPreferenceMode.PreferHumanOcclusion;
             ResetPosition();
             transform.GetChild(0).transform.gameObject.SetActive(false);
             m_HandTrackingEnabled = false;
