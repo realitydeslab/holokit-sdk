@@ -237,10 +237,10 @@ public:
                 Eigen::Matrix4d predict_pose = Eigen::Matrix4d::Identity();
 
                 bool predict_success = AR_estimator->GetPoseAtTimestamp([[NSProcessInfo processInfo] systemUptime],predict_pose);
-                            
+//                predict_success = false;
                 simd_float4x4 camera_transform;
-                if(predict_success)
-                    camera_transform = EigenToSimd_float4x4(predict_pose);
+                if(predict_success)/*or EigenToSimd_float4x4*/
+                    camera_transform = EigenToSimd_float4x4_inverse(predict_pose,arSessionDelegateController.session.currentFrame.camera.transform);
                 else
                     camera_transform = arSessionDelegateController.session.currentFrame.camera.transform;
                 

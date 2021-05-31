@@ -132,6 +132,8 @@ namespace AR
                             current_event_time = t;
                         }
                         double dt = t - current_event_time;
+                        if(dt < 0)
+                            std::cout<<std::to_string(t)<<","<<std::to_string(current_event_time)<<"\n";
                         assert(dt >= 0);
                         current_event_time = t;
 
@@ -350,8 +352,6 @@ namespace AR
         }
         m_IMU_frontend_buf = std::vector<ImuData>(m_IMU_frontend_buf.begin() + discard_idx ,m_IMU_frontend_buf.end());
 
-
-
         int inter_idx = -1;//m_vec_imu_data中这个idx之后的都是最新影像的IMU
 
         //两种情况 1. curtime == m_arkit_now.event_timestamp
@@ -364,7 +364,7 @@ namespace AR
         for (int k = 0; k < m_IMU_frontend_buf.size(); ++k)
         {
             m_vec_imu_data.push_back(m_IMU_frontend_buf[k]);
-            if(m_IMU_frontend_buf[k].inter_event_timestamp < m_arkit_now.event_timestamp)
+            if(m_IMU_frontend_buf[k].inter_event_timestamp <= m_arkit_now.event_timestamp)
             {
                 inter_idx = m_vec_imu_data.size();
                 if(k + 1 < m_IMU_frontend_buf.size()
@@ -433,12 +433,10 @@ namespace AR
         Eigen::Matrix4d Twc_raw = GetArkitpose(m_arkit_now);
         //trans to estimate frame
         Eigen::Matrix4d Twb_new = Aligned_Mat * GetArkitpose(m_arkit_now) * TCI;
-//        std::cout<<"tmp_P1:"<<tmp_P.transpose()<<"\n";
-//        std::cout<<"tmp_Q1:"<<tmp_Q.toRotationMatrix()<<"\n";
+
         tmp_P = Twb_new.block<3,1>(0,3);
         tmp_Q = Eigen::Quaterniond(Twb_new.block<3,3>(0,0));
-//        std::cout<<"tmp_P2:"<<tmp_P.transpose()<<"\n";
-//        std::cout<<"tmp_Q2:"<<tmp_Q.toRotationMatrix()<<"\n";
+
 
         for (int j = inter_idx; j < m_vec_imu_data.size(); ++j) {
             double dt = m_vec_imu_data[j].inter_event_timestamp - latest_time;
@@ -469,7 +467,7 @@ namespace AR
         
         m_GetPredictPose.lock();
         predict_pose = std::make_pair(m_vec_imu_data.back().inter_event_timestamp,Tw2_c_predict);
-        predict_pose_history.push(std::make_pair(m_vec_imu_data.back().inter_event_timestamp,Tw2_c_predict));
+        predict_pose_history.push(std::make_pair(m_vec_imu_data.back().inter_event_timestamp,std::make_pair(Tw2_c_predict,tmp_V)));
 
         debug_predict_pose_history.push(std::make_pair(m_vec_imu_data.back().inter_event_timestamp,Tw2_c_predict));
         
@@ -491,12 +489,14 @@ namespace AR
 
         if(Isinit)
         {
+            Eigen::Vector3d gt_ypr,pre_ypr;
             //gt
             {
                 Eigen::Quaterniond Qw2_c  = Eigen::Quaterniond(old_Twc.block<3,3>(0,0));
                 Eigen::Vector3d tw2_c  = old_Twc.block<3,1>(0,3);
 
                 std::cout <<"gt:"<< std::to_string(arkit_now.event_timestamp) <<" "<<tw2_c[0]<<" "<<tw2_c[1]<<" "<<tw2_c[2]<<"\n";
+                gt_ypr = R2ypr(Qw2_c.toRotationMatrix());
             }
 
             //predict
@@ -506,7 +506,13 @@ namespace AR
                 Eigen::Vector3d tw2_c  = predict_pose_.block<3,1>(0,3);
 
                 std::cout<<"predict:" << std::to_string(arkit_now.event_timestamp) << " "<<tw2_c[0]<<" "<<tw2_c[1]<<" "<<tw2_c[2]<<"\n";
+                pre_ypr = R2ypr(Qw2_c.toRotationMatrix());
+
             }
+            Eigen::Vector3d angle_diff = gt_ypr - pre_ypr;
+            std::cout<<"angle_diff(ypr):"<<fabs(angle_diff[0])<<","
+            <<fabs(angle_diff[1])<<","<<fabs(angle_diff[2])<<"\n";
+            
         }
 
         m_Arkit.lock();
@@ -575,18 +581,58 @@ bool ARCore::GetPoseAtTimestamp(const double need_time,Eigen::Matrix4d & pose) /
 
     if(need_time <= predict_pose_history.front().first)
     {
-        pose = predict_pose_history.front().second;
+        pose = predict_pose_history.front().second.first;
         return false;
     }
     else if(need_time >= predict_pose_history.back().first)
     {
-        std::cout<<"diff:"<< fabs((predict_pose_history.back().first - need_time)*1000)<<"\n";
-        pose = predict_pose_history.back().second;
+        std::cout<<"diff_out:"<< fabs((predict_pose_history.back().first - need_time)*1000)<<"\n";
+        
+        m_Predict.lock();
+        if(!m_Init_Aligned)
+        {
+            m_Predict.unlock();
+            pose = predict_pose_history.back().second.first;
+            return false;
+        }
+        Eigen::Vector3d Estimator_g = m_Estimator_g;
+        Eigen::Vector3d cur_acc_bias = m_cur_acc_bias;
+        Eigen::Vector3d cur_gyr_bias = m_cur_gyr_bias;
+        Eigen::Vector3d cur_speed = m_cur_speed;
+        Eigen::Matrix4d Aligned_Mat = m_Aligned_Mat;
+        m_Predict.unlock();
+
+        
+        Eigen::Matrix4d Twb_pre = Aligned_Mat * predict_pose_history.back().second.first * TCI;
+        
+        Eigen::Vector3d last_acc = acc_0;
+        Eigen::Vector3d last_gyr = gyr_0;
+        
+        Eigen::Vector3d tmp_P = Twb_pre.block<3,1>(0,3);
+        Eigen::Quaterniond tmp_Q = Eigen::Quaterniond(Twb_pre.block<3,3>(0,0));
+        Eigen::Vector3d tmp_V = predict_pose_history.back().second.second;
+        
+        double dt = need_time - predict_pose_history.back().first;
+    
+        Eigen::Vector3d un_acc = tmp_Q * (acc_0 - cur_acc_bias) - Estimator_g;
+
+        Eigen::Vector3d un_gyr = gyr_0 - cur_gyr_bias;
+        tmp_Q = tmp_Q * deltaQ(un_gyr * dt);
+
+        tmp_P = tmp_P + dt * tmp_V + 0.5 * dt * dt * un_acc;
+        tmp_V = tmp_V + dt * un_acc;
+        
+        Eigen::Matrix4d Twb_predict  = Eigen::Matrix4d::Identity();
+        Twb_predict.block<3,3>(0,0) = tmp_Q.toRotationMatrix();
+        Twb_predict.block<3,1>(0,3) = tmp_P;
+        Eigen::Matrix4d Tw2_c_predict  = Aligned_Mat.inverse() * Twb_predict * TIC;
+
+        pose = Tw2_c_predict;
         return true;
     }
     else
     {
-        std::pair<double,Eigen::Matrix4d> cur_pose;
+        std::pair<double,std::pair<Eigen::Matrix4d,Eigen::Vector3d>> cur_pose;
         while(1)
         {
             cur_pose = predict_pose_history.front();
@@ -596,7 +642,7 @@ bool ARCore::GetPoseAtTimestamp(const double need_time,Eigen::Matrix4d & pose) /
         }
         
         pose =  (need_time - cur_pose.first) > (predict_pose_history.front().first - need_time)
-        ? predict_pose_history.front().second : cur_pose.second;
+        ? predict_pose_history.front().second.first : cur_pose.second.first;
         
         double small_time = (need_time - cur_pose.first) > (predict_pose_history.front().first - need_time)
         ? predict_pose_history.front().first : cur_pose.first;

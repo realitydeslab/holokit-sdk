@@ -23,7 +23,7 @@ namespace AR
 {
 
     #define PI 3.14159265358979
-    #define WINDOW_SIZE 20
+    #define WINDOW_SIZE 15
     extern Eigen::Matrix4d TIC;
     extern Eigen::Matrix4d TCI;
     extern Eigen::Vector3d ACC_BIAS;

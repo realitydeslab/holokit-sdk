@@ -129,7 +129,7 @@ namespace AR{
         //only debug for gt
         std::queue<std::pair<double,Eigen::Matrix4d>> debug_predict_pose_history;
         
-        std::queue<std::pair<double,Eigen::Matrix4d>> predict_pose_history;
+        std::queue<std::pair<double,std::pair<Eigen::Matrix4d,Eigen::Vector3d>>> predict_pose_history;
 
     };
 

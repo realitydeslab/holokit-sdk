@@ -392,8 +392,8 @@ namespace AR
 
         ceres::Problem problem;
         ceres::LossFunction *loss_function;
-//        loss_function = new ceres::TukeyLoss(20.0);
-        loss_function = new ceres::CauchyLoss(1.0);
+        loss_function = new ceres::TukeyLoss(20.0);
+//        loss_function = new ceres::CauchyLoss(1.0);
 
         for (int i = 0; i <= WINDOW_SIZE; i++)
         {
@@ -403,7 +403,6 @@ namespace AR
             problem.AddParameterBlock(para_Speed[i], SIZE_SPEED);
             problem.AddParameterBlock(para_Bas[i], SIZE_BIAS_ACC);
             problem.AddParameterBlock(para_Bgs[i], SIZE_BIAS_GYR);
-
 
         }
 
@@ -486,19 +485,7 @@ namespace AR
             Eigen::Matrix4d new_TWb = Tnew_old * TWc * TCI;
             ARkitFactor * ARKit_factor = new ARkitFactor(new_TWb, trans_cov, rot_cov);
             problem.AddResidualBlock(ARKit_factor, NULL, para_Pose_T[k], para_Pose_R[k]);
-
-//            double *para[10];
-//            para[0] = para_Pose_T[k];
-//            para[1] = para_Pose_R[k];
-//
-//            double res[6];
-//            ARKit_factor->Evaluate(para, res, NULL);
-//
-//            Eigen::Map<Eigen::Matrix<double, 6, 1>> residual(res);
-//            dARkitResidual += 0.5 * residual.transpose().dot(residual);
         }
-//        LOG(WARNING)<<"$RSD ARkit "<< std::setprecision(std::numeric_limits<double>::max_digits10) << timestamp <<" "<<dARkitResidual;
-//        std::cout<<"$RSD ARkit "<< std::setprecision(std::numeric_limits<double>::max_digits10) << timestamp <<" "<<dARkitResidual<<"\n";
 
 
         ceres::Solver::Options options;
@@ -508,7 +495,7 @@ namespace AR
         //options.num_threads = 2;
         options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
         options.max_num_iterations = 15;
-        options.max_solver_time_in_seconds = 0.05;
+        options.max_solver_time_in_seconds = 0.1;
         options.minimizer_progress_to_stdout = false;
 
 //        LOG(WARNING) << "$CostFunctionCount: " << problem.NumResidualBlocks();
@@ -518,6 +505,9 @@ namespace AR
 
 
         double2vector();
+
+        std::cout<<"acc bais:"<<Bas[WINDOW_SIZE].transpose()<<"\n";
+        std::cout<<"gyr bais:"<<Bgs[WINDOW_SIZE].transpose()<<"\n";
 
         MarginalizationInfo *marginalization_info = new MarginalizationInfo();
         vector2double();

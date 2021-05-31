@@ -15,6 +15,12 @@ void LogMatrix4x4(simd_float4x4 mat);
 
 simd_float4x4 EigenToSimd_float4x4(const Eigen::Matrix4d & mat);
 
+simd_float4x4 EigenToSimd_float4x4(const Eigen::Matrix4d & mat,
+                                   const simd_float4x4 & mat2);
+
+simd_float4x4 EigenToSimd_float4x4_inverse(const Eigen::Matrix4d & mat,
+                                   const simd_float4x4 & mat2);
+
 simd_float4 MatrixVectorMultiplication(simd_float4x4 mat, simd_float4 vec);
 
 UnityXRMatrix4x4 Float4x4ToUnityXRMatrix(simd_float4x4 simd_matrix);
