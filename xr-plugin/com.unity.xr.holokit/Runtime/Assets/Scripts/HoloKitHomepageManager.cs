@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System.Runtime.InteropServices;
-using UnityEngine.XR.ARFoundation;
 
 namespace UnityEngine.XR.HoloKit
 {
@@ -124,7 +123,6 @@ namespace UnityEngine.XR.HoloKit
             Debug.Log("Enter AR mode.");
             UnityHoloKit_SetRenderingMode(1);
             SetupStarterScene();
-            Camera.main.GetComponent<ARCameraBackground>().enabled = true;
         }
     }
 }

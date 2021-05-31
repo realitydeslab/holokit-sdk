@@ -96,7 +96,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 		float3 diff = boid.position - obstacleBuffer[i].position; // the vector away from pbs
 		float diffLen = (length(diff));
 		float scaler = clamp(1.0 - diffLen / obstacleBuffer[i].scale, 0.0, 1.0); // the far the distance, the small the force
-		avoid += 10 * diff * (scaler / diffLen);
+		avoid += 100 * diff * (scaler / diffLen);
 	}
 
 

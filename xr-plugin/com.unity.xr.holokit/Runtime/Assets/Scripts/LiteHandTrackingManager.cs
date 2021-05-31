@@ -112,6 +112,7 @@ namespace UnityEngine.XR.HoloKit
             else
             {
                 m_IsHandValid = false;
+                m_HandSphere.transform.position = new Vector3(0f, 3f, 0f);
             }
             return new Vector3(accumulatedResult.x / totalWeight, accumulatedResult.y / totalWeight, accumulatedResult.z / totalWeight);
         }

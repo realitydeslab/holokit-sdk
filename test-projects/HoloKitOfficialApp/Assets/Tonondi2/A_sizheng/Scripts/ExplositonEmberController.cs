@@ -39,10 +39,11 @@ public class ExplositonEmberController : MonoBehaviour
             {
                 //Debug.Log("setimpacts");
                 float impact = Time.time - triggerTime[i];
-                MeshingRenderer.material.SetFloat("Impact_" + i, impact);
+                Shader.SetGlobalFloat("Impact_" + i, impact);
+                if (impact > 9) isEmpty[i] = true;
 
                 //Debug.Log("setpositions");
-                MeshingRenderer.material.SetVector("Position_" + i, positions[i]);
+                Shader.SetGlobalVector("Position_" + i, positions[i]);
             }
             else { }
         }

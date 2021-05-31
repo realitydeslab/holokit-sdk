@@ -235,8 +235,7 @@ public:
     UnitySubsystemErrorCode Start() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
-        rendering_mode_ = RenderingMode::UIMode;
-        display_mode_changed_ = false;
+        rendering_mode_ = holokit::HoloKitApi::GetInstance()->GetRenderingMode();
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -249,7 +248,7 @@ public:
             UnityXRRenderingCapabilities* rendering_caps) const {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Start()", GetCurrentTime());
         // Does the system use multi-pass rendering?
-        rendering_caps->noSinglePassRenderingSupport = true;
+        rendering_caps->noSinglePassRenderingSupport = false;
         rendering_caps->invalidateRenderStateAfterEachCallback = true;
         // Unity will swap buffers for us after GfxThread_SubmitCurrentFrame()
         // is executed.
@@ -262,10 +261,6 @@ public:
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
-        
-        if(textures_initialized_ == NO) {
-            return kUnitySubsystemErrorCodeSuccess;
-        }
         
         // Metal initialization is expensive and we only want to run it once.
         if (!is_metal_initialized_) {
@@ -362,107 +357,36 @@ public:
         //[command_encoder setVertexBuffer:vertex_color_buffer offset:0 atIndex:1];
         [command_encoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:(sizeof(vertex_data) / sizeof(float))];
     }
-    
-    void RenderBlackScreen() {
-        if (!is_black_screen_renderer_setup_) {
-            // Pass vertex buffer data to the GPU
-            black_vertex_buffer_ = [mtl_device_ newBufferWithBytes:black_vertices length:sizeof(black_vertices) options:MTLResourceOptionCPUCacheModeDefault];
-            black_index_buffer_ = [mtl_device_ newBufferWithBytes:black_indexes length:sizeof(black_indexes) options:MTLResourceOptionCPUCacheModeDefault];
-            
-            id<MTLLibrary> mtl_library = [mtl_device_ newLibraryWithSource:kBlackShaders options:nil error:nil];
-            
-            if (mtl_library == nil) {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Failed to compile Metal library.");
-                return;
-            }
-            
-            id<MTLFunction> vertex_function = [mtl_library newFunctionWithName:@"vertex_main"];
-            id<MTLFunction> fragment_function = [mtl_library newFunctionWithName:@"fragment_main"];
-            
-            // Setup vertex descriptor
-            MTLVertexBufferLayoutDescriptor* buffer_layout_descriptor = [[MTLVertexBufferLayoutDescriptor alloc] init];
-            buffer_layout_descriptor.stride = 2 * sizeof(float);
-            buffer_layout_descriptor.stepFunction = MTLVertexStepFunctionPerVertex;
-            buffer_layout_descriptor.stepRate = 1;
-            
-            MTLVertexAttributeDescriptor* attribute_descriptor = [[MTLVertexAttributeDescriptor alloc] init];
-            attribute_descriptor.format = MTLVertexFormatFloat2;
-            
-            MTLVertexDescriptor* vertex_descriptor = [[MTLVertexDescriptor alloc] init];
-            vertex_descriptor.layouts[0] = buffer_layout_descriptor;
-            vertex_descriptor.attributes[0] = attribute_descriptor;
-            
-            // Create pipeline
-            MTLRenderPipelineDescriptor* mtl_render_pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
-            mtl_render_pipeline_descriptor.vertexFunction = vertex_function;
-            mtl_render_pipeline_descriptor.fragmentFunction = fragment_function;
-            mtl_render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
-            mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-            mtl_render_pipeline_descriptor.sampleCount = 1;
-            
-            black_render_pipeline_state_ = [mtl_device_ newRenderPipelineStateWithDescriptor:mtl_render_pipeline_descriptor error:nil];
-            if (black_render_pipeline_state_ == nil) {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Failed to create Metal render pipeline.");
-                return;
-            }
-            is_black_screen_renderer_setup_ = true;
-        }
-        
-        // Rendering commands that are executed for each frame.
-        id<MTLRenderCommandEncoder> mtl_render_command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [mtl_render_command_encoder setRenderPipelineState:black_render_pipeline_state_];
-        [mtl_render_command_encoder setCullMode:MTLCullModeNone];
-        [mtl_render_command_encoder setVertexBuffer:black_vertex_buffer_ offset:0 atIndex:0];
-        [mtl_render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:black_index_buffer_ indexBufferOffset:0];
-        NSLog(@"Draw black screen");
-    }
 
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
-        WORKAROUND_SKIP_FIRST_FRAME();
+        //WORKAROUND_SKIP_FIRST_FRAME();
 
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
         
-        // Check if holokit api has changed the display mode.
+        bool reallocate_textures = (unity_textures_.size() == 0);
+//        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0) {
+//            NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedSinglePassRendering");
+//            //reallocate_textures = true;
+//        }
+//        if ((kUnityXRFrameSetupHintsChangedTextureResolutionScale & frame_hints->changedFlags) != 0) {
+//            NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedTextureResolutionScale");
+//            //reallocate_textures = true;
+//        }
+//        if ((kUnityXRFrameSetuphintsChangedReprojectionMode & frame_hints->changedFlags) != 0) {
+//            NSLog(@"FUCK::kUnityXRFrameSetuphintsChangedReprojectionMode");
+//            // App wants different reprojection mode, configure compositor if possible.
+//        }
+        
+        // If the rendering mode has been changed
         if (rendering_mode_ != holokit::HoloKitApi::GetInstance()->GetRenderingMode()) {
             HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Rendering mode switched.", GetCurrentTime());
             rendering_mode_ = holokit::HoloKitApi::GetInstance()->GetRenderingMode();
-            display_mode_changed_ = true;
-        }
-        
-        bool reallocate_textures = (unity_textures_.size() == 0);
-        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0)
-        {
             reallocate_textures = true;
-        }
-        if ((kUnityXRFrameSetupHintsChangedRenderViewport & frame_hints->changedFlags) != 0)
-        {
-            // Change sampling UVs for compositor, pass through new viewport on `nextFrame`
-        }
-        if ((kUnityXRFrameSetupHintsChangedTextureResolutionScale & frame_hints->changedFlags) != 0)
-        {
-            reallocate_textures = true;
-        }
-        if ((kUnityXRFrameSetuphintsChangedContentProtectionState & frame_hints->changedFlags) != 0)
-        {
-            // App wants different content protection mode.
-        }
-        if ((kUnityXRFrameSetuphintsChangedReprojectionMode & frame_hints->changedFlags) != 0)
-        {
-            // App wants different reprojection mode, configure compositor if possible.
-        }
-        if ((kUnityXRFrameSetuphintsChangedFocusPlane & frame_hints->changedFlags) != 0)
-        {
-            // App changed focus plane, configure compositor if possible.
-        }
-        if (display_mode_changed_) {
-            reallocate_textures = true;
-            display_mode_changed_ = false;
         }
 
         if (reallocate_textures) {
-            textures_initialized_ = false;
             DestroyTextures();
 
     #if SIDE_BY_SIDE
@@ -677,7 +601,6 @@ private:
     void CreateTextures(int num_textures, int texture_array_length, float requested_texture_scale) {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f CreateTextures()", GetCurrentTime());
         
-        // TODO: improve this
         const int screen_width = holokit::HoloKitApi::GetInstance()->GetScreenWidth() * requested_texture_scale;
         const int screen_height = holokit::HoloKitApi::GetInstance()->GetScreenHeight() * requested_texture_scale;
         
@@ -728,7 +651,6 @@ private:
             display_->CreateTexture(handle_, &texture_descriptor, &unity_texture_id);
             unity_textures_[i] = unity_texture_id;
         }
-        textures_initialized_ = true;
     }
     
     /// @brief Deallocate textures.
@@ -768,12 +690,6 @@ private:
     ///@brief Tracks HoloKit API initialization status.
     bool is_holokit_api_initialized_ = false;
     
-    ///@brief Screen width in pixels.
-    int width_;
-    
-    ///@brief Screen height in pixels.
-    int height_;
-    
     /// @brief HoloKit SDK API wrapper.
     std::unique_ptr<holokit::HoloKitApi> holokit_api_;
     
@@ -791,8 +707,6 @@ private:
     std::vector<id<MTLTexture>> metal_color_textures_;
     
     std::vector<id<MTLTexture>> metal_depth_textures_;
-    
-    bool textures_initialized_ = false;
     
     /// @brief This value is set to true when Metal is initialized for the first time.
     bool is_metal_initialized_ = false;
@@ -823,9 +737,6 @@ private:
     
     /// @brief This value is true if XR mode is enabled, false if AR mode is enabled.
     RenderingMode rendering_mode_;
-    
-    /// @brief This value is set to true when the user switched from AR mode to XR model, vice versa.
-    bool display_mode_changed_;
     
     static std::unique_ptr<HoloKitDisplayProvider> display_provider_;
 };

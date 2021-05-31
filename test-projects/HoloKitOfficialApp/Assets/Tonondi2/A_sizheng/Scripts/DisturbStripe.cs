@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VFX;
 
-[ExecuteInEditMode]
 public class DisturbStripe : MonoBehaviour
 {
     [Range(0.0f, 1.0f)]
     public float ScaleForBoom = 0f;
     public float explosionForceMultipier = 1;
     bool boomable = true;
+
+    public Transform Hand;
+    public float Radius;
 
 
 
@@ -38,6 +40,16 @@ public class DisturbStripe : MonoBehaviour
 
 
         // trigger condition:
+        if (Vector3.Distance(Hand.position, this.transform.position) < Radius)
+        {
+            ScaleForBoom += Time.deltaTime * 0.5f;
+            if (ScaleForBoom >= 1) ScaleForBoom = 1;
+        }
+        else
+        {
+            ScaleForBoom -= Time.deltaTime * 0.5f;
+            if (ScaleForBoom <= 0) ScaleForBoom = 0;
+        }
 
     }
 

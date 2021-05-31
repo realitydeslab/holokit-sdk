@@ -45,7 +45,7 @@ public class BoidMovementController : MonoBehaviour
             if (m_NextPointIndex == m_BoidTrajectoryPoints.transform.childCount - 1)
             {
                 m_NextPointIndex = 0;
-
+                // The first round has finished.
                 OnTriggerBallDisplayed();
             }
             else

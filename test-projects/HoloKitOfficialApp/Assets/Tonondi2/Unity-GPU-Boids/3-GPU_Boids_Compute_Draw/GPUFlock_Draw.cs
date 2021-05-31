@@ -98,7 +98,7 @@ public class GPUFlock_Draw : MonoBehaviour
         ObsBuffer.SetData(obstaclesData);
         _ComputeFlock.SetBuffer(this.kernelHandle, "obstacleBuffer", ObsBuffer);
 
-        _ComputeFlock.Dispatch(this.kernelHandle, this.BoidsCount / GROUP_SIZE + 1, 1, 1);
+        _ComputeFlock.Dispatch(this.kernelHandle, this.BoidsCount / GROUP_SIZE + 0, 1, 1);
 
         // operate material shader
         BoidMaterial.SetVector("_ObsPosition", Obstacles[0].transform.position);

@@ -118,7 +118,7 @@ public:
         UnityXRInternalInputDeviceId device_id,
         UnityXRInputDeviceDefinition* definition) {
         
-        HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(), "<<<<<<<<<< FillDeviceDefinition(): device id is %d", device_id );
+        HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(), "FillDeviceDefinition(): device id is %d", device_id );
         
         switch (device_id) {
             case kDeviceIdHoloKitHmd: {

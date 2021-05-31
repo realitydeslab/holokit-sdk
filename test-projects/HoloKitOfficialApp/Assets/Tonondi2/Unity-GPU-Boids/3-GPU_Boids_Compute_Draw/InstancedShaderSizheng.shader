@@ -89,7 +89,7 @@ Shader "Instanced/InstancedShaderSizheng" {
                     float3 color = v.color;
 
                     fixed4 fixedColor = _Color;
-                    if(distance(_ObsPosition,_BoidPosition)<_ObsScaler/2) fixedColor = _InteractColor;
+                    if(distance(_ObsPosition,_BoidPosition)<_ObsScaler) fixedColor = _InteractColor*1.5;
 
 
                     v2f o;
