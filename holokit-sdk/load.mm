@@ -47,31 +47,6 @@ UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
     HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "HoloKit input subsystem successfully loaded.");
 }
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityPluginLoadAtRuntime() {
-//    auto* xr_trace = unity_interfaces_->Get<IUnityXRTrace>();
-//
-//    HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "UnityPluginLoad()\n");
-//
-//    // Set up HoloKitApi instance
-//    // I did this in the beginning of the second frame in display
-//    holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
-//    holokit::HoloKitApi::GetInstance()->Initialize();
-//
-//    if (LoadDisplay(unity_interfaces_) != kUnitySubsystemErrorCodeSuccess) {
-//        HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "Error loading HoloKit display subsystem.");
-//        return;
-//    }
-//    HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "HoloKit display subsystem successfully loaded.");
-//
-//
-//    if (LoadInput(unity_interfaces_) != kUnitySubsystemErrorCodeSuccess) {
-//        HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "Error loading HoloKit input subsystem.");
-//        return;
-//    }
-//    HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "HoloKit input subsystem successfully loaded.");
-}
-
 // @brief Unloads Unity XR Display and Input subsystems.
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityPluginUnload() {
