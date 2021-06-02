@@ -31,7 +31,6 @@
 /// Otherwise, they will render to two separate textures.
 #define SIDE_BY_SIDE 1
 #define NUM_RENDER_PASSES 2
-static const float s_PoseXPositionPerPass[] = {-1.0f, 1.0f};
 
 // BEGIN WORKAROUND: skip first frame since we get invalid data.  Fix coming to trunk.
 static bool s_SkipFrame = true;
@@ -260,7 +259,7 @@ public:
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
-        //RenderContent();
+        RenderContent();
         if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL) {
             RenderAlignmentMarker();
         }
@@ -368,10 +367,10 @@ public:
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
         
         bool reallocate_textures = (unity_textures_.size() == 0);
-//        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0) {
-//            NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedSinglePassRendering");
-//            //reallocate_textures = true;
-//        }
+        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0) {
+            NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedSinglePassRendering");
+            reallocate_textures = true;
+        }
 //        if ((kUnityXRFrameSetupHintsChangedTextureResolutionScale & frame_hints->changedFlags) != 0) {
 //            NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedTextureResolutionScale");
 //            //reallocate_textures = true;
@@ -404,8 +403,7 @@ public:
             render_pass.cullingPassIndex = 0;
             
             auto& culling_pass = next_frame->cullingPasses[0];
-            // TODO: culling pass separation
-            //culling_pass.separation = fabs(s_PoseXPositionPerPass[1]) + fabs(s_PoseXPositionPerPass[0]);
+            culling_pass.separation = 0.064f;
             
             auto& render_params = render_pass.renderParams[0];
             // view matrix
@@ -413,11 +411,8 @@ public:
             UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
             UnityXRPose pose = { position, rotation };
             render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = pose;
-            // projection matrix
             // get ARKit projection matrix
             simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
-            //projection_matrix = unity_projection_matrix;
-            //LogMatrix4x4(projection_matrix);
             render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             // Make sure we can see the splash screen when ar session is not initialized.
             if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session == NULL) {
@@ -435,8 +430,8 @@ public:
         }
         
         // CHANGE THIS TO SWITCH BETWEEN RENDERING MODES
-        bool single_pass_rendering = true;
-        NSLog(@"Single-pass rendering: %d", single_pass_rendering);
+        bool single_pass_rendering = false;
+        //NSLog(@"Single-pass rendering: %d", single_pass_rendering);
         // Frame hints tells us if we should setup our renderpasses with a single pass
         if (!single_pass_rendering)
         {
@@ -505,10 +500,10 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
     
-//    UnitySubsystemErrorCode QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) {
-//        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f QueryMirrorViewBlitDesc()", GetCurrentTime());
-//        return kUnitySubsystemErrorCodeFailure;
-//    }
+    UnitySubsystemErrorCode QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) {
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f QueryMirrorViewBlitDesc()", GetCurrentTime());
+        return kUnitySubsystemErrorCodeFailure;
+    }
     
 #pragma mark - CreateTextures()
 private:
