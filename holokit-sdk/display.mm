@@ -299,13 +299,6 @@ public:
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
-//        if (frame_count_ < 10) {
-//            frame_count_++;
-//            RenderBlack();
-//            return kUnitySubsystemErrorCodeSuccess;
-//        }
-//        frame_count_++;
-        
         RenderContent2();
         if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL) {
             RenderAlignmentMarker();
@@ -522,8 +515,13 @@ public:
             CreateTextures(num_textures);
         }
         
+        // Refresh the texture with full black
+        if (refresh_texture_) {
+            
+        }
+        
         // AR mode rendering
-        if (rendering_mode_ != RenderingMode::XRMode) {
+        if (rendering_mode_ != RenderingMode::XRMode || refresh_texture_) {
             next_frame->renderPassesCount = 1;
             
             auto& render_pass = next_frame->renderPasses[0];
@@ -536,7 +534,12 @@ public:
             
             auto& render_params = render_pass.renderParams[0];
             // view matrix
-            UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
+            UnityXRVector3 position;
+            if (refresh_texture_) {
+                position = UnityXRVector3 { 0, 100, 0 };
+            } else {
+                position = UnityXRVector3 { 0, 0, 0 };
+            }
             UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
             UnityXRPose pose = { position, rotation };
             render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = pose;
@@ -555,6 +558,7 @@ public:
                 1.0f,                    // width
                 1.0f                     // height
             };
+            refresh_texture_ = false;
             return kUnitySubsystemErrorCodeSuccess;
         }
         
@@ -688,7 +692,7 @@ private:
             display_->CreateTexture(handle_, &texture_descriptor, &unity_texture_id);
             unity_textures_[i] = unity_texture_id;
             
-            frame_count_ = 0;
+            refresh_texture_ = true;
         }
     }
     
@@ -759,9 +763,10 @@ private:
     /// @brief The render pipeline state for rendering a black screen in order to fix the left viewport glitch.
     id<MTLRenderPipelineState> black_render_pipeline_state_;
     
-    bool black_metal_setup_ = false;
+    /// @brief If this value is set to true, the renderer
+    bool refresh_texture_ = false;
     
-    uint64_t frame_count_;
+    bool black_metal_setup_ = false;
     
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
