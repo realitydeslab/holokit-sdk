@@ -44,7 +44,7 @@ All you need to do is deleting the existing main camera in your scene and draggi
 
 In "HoloKit" prefab, there are some settings in the inspector panel. For example, your can untick "Hand Tracking Enabled" option to turn off hand tracking in order to improve efficiency (this is highly recommanded if you do not need it).
 
-<a href="https://ibb.co/zxrnWCQ"><img src="https://i.ibb.co/3d7r5V4/Screen-Shot-2021-06-15-at-12-02-27-PM.png" alt="Screen-Shot-2021-06-15-at-12-02-27-PM" border="0"></a><br /><a target='_blank' href='https://imgbb.com/'>space gif download</a><br />
+<a href="https://ibb.co/zxrnWCQ"><img src="https://i.ibb.co/3d7r5V4/Screen-Shot-2021-06-15-at-12-02-27-PM.png" alt="Screen-Shot-2021-06-15-at-12-02-27-PM" border="0"></a><br /><a target='_blank' href='https://imgbb.com/'></a><br />
 
 ### Step 3: Configuring Unity project settings
 
