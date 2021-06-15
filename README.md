@@ -20,7 +20,7 @@ If everything goes well, we should see the result like this.
 
 ### Step 1: Pasting HoloKit SDK into your Unity project folder
 
-In HoloKit SDK project folder, copty the folder "com.unity.xr.holokit"
+In HoloKit SDK project folder, copy the folder "com.unity.xr.holokit",
 
 <a href="https://ibb.co/Jz5Q5bz"><img src="https://i.ibb.co/HrndnMr/Screen-Shot-2021-06-15-at-11-41-24-AM.png" alt="Screen-Shot-2021-06-15-at-11-41-24-AM" border="0"></a><br /><a target='_blank' href='https://imgbb.com/'></a><br />
 
