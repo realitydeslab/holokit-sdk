@@ -51,15 +51,15 @@
     self.session.delegate = self;
     
     // Set hand tracker
-    _landmarkZMin = 1000;
-    _landmarkZMax = -1000;
-    self.handTracker = [[HandTracker alloc] init];
-    self.handTracker.delegate = self;
-    [self.handTracker startGraph];
+//    _landmarkZMin = 1000;
+//    _landmarkZMax = -1000;
+//    self.handTracker = [[HandTracker alloc] init];
+//    self.handTracker.delegate = self;
+//    [self.handTracker startGraph];
     
     // apple hand detection
-    //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
-    //self.handPoseRequest.maximumHandCount = 1;
+    self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
+    self.handPoseRequest.maximumHandCount = 1;
     
     // Set the view to use the default device
     MTKView *view = (MTKView *)self.view;
@@ -135,8 +135,8 @@
     // process capturedImage for handtracking
     
     //NSLog(@"handTracker.processVideoFrame is called");
-    [self.handTracker processVideoFrame: frame.capturedImage];
-    return;
+//    [self.handTracker processVideoFrame: frame.capturedImage];
+//    return;
     
     
     // for apple hand detection
@@ -146,6 +146,7 @@
         NSArray<VNRequest *> * requests = [[NSArray alloc] initWithObjects:_handPoseRequest, nil];
         [handler performRequests:requests error:nil];
         // TODO: check if hand detection is run in this frame
+        NSLog(@"apple hand tracking");
         
         VNHumanHandPoseObservation *observation = _handPoseRequest.results.firstObject;
         if(observation == nil) {
@@ -276,7 +277,7 @@
         float zValueOffset = 0.0;
         for(Landmark *landmark in landmarks){
             if(landmarkIndex > 0){
-                break;
+                //break;
             }
             
             //NSLog(@"idx: %d", landmarkIndex);
@@ -284,7 +285,7 @@
             int y = (CGFloat)landmark.y * currentFrame.camera.imageResolution.height;
             CGPoint screenPoint = CGPointMake(x, y);
             
-            NSLog(@"index: %d, coordinate: [%f, %f ,%f]", landmarkIndex++, landmark.x, landmark.y, landmark.z);
+            //NSLog(@"index: %d, coordinate: [%f, %f ,%f]", landmarkIndex++, landmark.x, landmark.y, landmark.z);
             
             //NSLog(@"landmark coordinate: [%f, %f]", landmark.x, landmark.y);
             /*

@@ -303,40 +303,7 @@ public:
         if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL) {
             RenderAlignmentMarker();
         }
-            
         return kUnitySubsystemErrorCodeSuccess;
-    }
-    
-    void RenderBlack() {
-        if (!black_metal_setup_) {
-            id<MTLDevice> mtl_device = metal_interface_->MetalDevice();
-            id<MTLLibrary> mtl_library = [mtl_device newLibraryWithSource:black_shader
-                                                                  options:nil
-                                                                    error:nil];
-            if (mtl_library == nil) {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Failed to compile Metal black library.");
-                return;
-            }
-            id<MTLFunction> vertex_function = [mtl_library newFunctionWithName:@"vertexShader"];
-            id<MTLFunction> fragment_function = [mtl_library newFunctionWithName:@"fragmentShader"];
-            
-            MTLRenderPipelineDescriptor* mtl_render_pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
-            mtl_render_pipeline_descriptor.vertexFunction = vertex_function;
-            mtl_render_pipeline_descriptor.fragmentFunction = fragment_function;
-            mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-            mtl_render_pipeline_descriptor.sampleCount = 1;
-            
-            black_render_pipeline_state_ = [mtl_device newRenderPipelineStateWithDescriptor:mtl_render_pipeline_descriptor error:nil];
-            black_metal_setup_ = true;
-        }
-        
-        id<MTLRenderCommandEncoder> mtl_render_command_encoder =
-            (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [mtl_render_command_encoder setRenderPipelineState:black_render_pipeline_state_];
-        [mtl_render_command_encoder setVertexBytes:main_vertices length:sizeof(main_vertices) atIndex:VertexInputIndexPosition];
-        [mtl_render_command_encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip
-                                       vertexStart:0
-                                       vertexCount:4];
     }
     
     // Mimic how Google Cardboard does the rendering
@@ -760,13 +727,8 @@ private:
     /// @brief The render pipeline state for rendering alignment marker.
     id <MTLRenderPipelineState> second_render_pipeline_state_;
     
-    /// @brief The render pipeline state for rendering a black screen in order to fix the left viewport glitch.
-    id<MTLRenderPipelineState> black_render_pipeline_state_;
-    
     /// @brief If this value is set to true, the renderer
     bool refresh_texture_ = false;
-    
-    bool black_metal_setup_ = false;
     
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
