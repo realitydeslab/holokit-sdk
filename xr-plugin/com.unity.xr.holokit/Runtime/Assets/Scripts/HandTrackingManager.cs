@@ -34,7 +34,7 @@ namespace UnityEngine.XR.HoloKit
         [SerializeField] private bool m_GestureRecognitionEnabled = true;
 
         [DllImport("__Internal")]
-        public static extern bool UnityHoloKit_EnableHandTracking(bool enabled);
+        public static extern void UnityHoloKit_EnableHandTracking(bool enabled);
 
         public delegate void BloomEvent();
         public static event BloomEvent OnChangedToBloom;

@@ -20,8 +20,17 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_aasda._tcp</string>
+		<string>_aasda._udp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string></string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>asda</string>
+	<key>NSNearbyInteractionUsageDescription</key>
+	<string>asdsad</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -38,13 +47,6 @@
 	<true/>
 	<key>UIStatusBarHidden</key>
 	<true/>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>asda</string>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_aasda._tcp</string>
-		<string>_aasda._udp</string>
-	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeRight</string>
@@ -53,7 +55,5 @@
 	<array>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSNearbyInteractionAllowOnceUsageDescription</key>
-	<string>asdsad</string>
 </dict>
 </plist>

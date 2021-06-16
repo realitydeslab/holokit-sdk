@@ -19,7 +19,6 @@
     "com.unity.xr.arfoundation": "4.1.7",
     "com.unity.xr.arkit": "4.1.7",
     "com.unity.xr.holokit": "file:../../../xr-plugin/com.unity.xr.holokit",
-    "com.lupidan.apple-signin-unity": "https://github.com/lupidan/apple-signin-unity.git#v1.4.1",
     "com.unity.xr.oculus": "1.9.0",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",

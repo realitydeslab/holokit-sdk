@@ -12,6 +12,7 @@ import ARKit
 import CoreMotion
 import MultipeerConnectivity
 import NearbyInteraction
+import os.signpost
 
 extension MTKView : RenderDestinationProvider {
 }
@@ -38,6 +39,8 @@ class ViewController: UIViewController {
     var mcAdvertiser: MCNearbyServiceAdvertiser?
     var mcBrowser: MCNearbyServiceBrowser?
     var mcPeerID: MCPeerID?
+    var frameCnt: Int = 0
+    
     
     override func viewDidLoad() {
         
@@ -65,7 +68,7 @@ class ViewController: UIViewController {
         niSession.delegate = self
         sharedTokenWithPeer = false
         
-       // startMultipeerSession()
+        startMultipeerSession()
         
         DispatchQueue.global(qos: .background).async {
       //      solve()
@@ -115,7 +118,7 @@ class ViewController: UIViewController {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
-        configuration.isCollaborationEnabled = false
+        configuration.isCollaborationEnabled = true
         // Run the view's session
         arSession.run(configuration)
     }
@@ -160,9 +163,11 @@ class ViewController: UIViewController {
 
     
     func receivedData(_ data: Data, from peer: MCPeerID) {
+     
         if let collaborationData = try? NSKeyedUnarchiver.unarchivedObject(ofClass: ARSession.CollaborationData.self, from: data) {
             arSession.update(with: collaborationData)
         }
+    
         if let niDiscoveryToken = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NIDiscoveryToken.self, from: data) {
             let configuration = NINearbyPeerConfiguration(peerToken: niDiscoveryToken)
             niSession?.run(configuration)
@@ -191,11 +196,22 @@ extension ViewController: MTKViewDelegate {
     // Called whenever view changes orientation or layout is changed
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         renderer.drawRectResized(size: size, drawableSize: size)
+        
     }
     
     // Called whenever the view needs to render
     func draw(in view: MTKView) {
+        let logHandler = OSLog(subsystem: "com.holoi.xr.holokit.test-headtracking.test-headtracking2", category: .pointsOfInterest)
+
+        
+        os_signpost(.begin, log: logHandler, name: "Processing", "begin processing for %{public}d", frameCnt)
+
+        
         renderer.update()
+        
+        os_signpost(.end, log: logHandler, name: "Processing", "finished processing for %{public}d", frameCnt)
+
+        
     }
     
 }
@@ -207,7 +223,11 @@ extension ViewController: ARSessionDelegate
        // matrix_float3x3 camMat = frame.camera.intrinsics;
         
 //        ARFusion_addArKit(frame.camera.transform, frame.timestamp)
-        
+        let logHandler = OSLog(subsystem: "com.holoi.xr.holokit.test-headtracking.test-headtracking2", category: .pointsOfInterest)
+
+        frameCnt += 1
+        os_signpost(.begin, log: logHandler, name: "ar session", "begin ar session for %{public}d", frameCnt)
+       
         let projection = session.currentFrame!.camera.projectionMatrix
         let yScale = projection[1,1]
         let yFov = 2 * atan(1/yScale) // in radians
@@ -218,6 +238,8 @@ extension ViewController: ARSessionDelegate
        // print(xFovDegrees, yFovDegrees)
 
       //  self.handTracker.processVideoFrame(frame.capturedImage)
+        os_signpost(.end, log: logHandler, name: "ar session", "finished ar session for %{public}d", frameCnt)
+        
     }
     
     

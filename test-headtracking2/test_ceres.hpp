@@ -9,7 +9,7 @@
 #define test_ceres_hpp
 
 #ifdef __cplusplus
-#include "ceres/ceres.h"
+//#include "ceres/ceres.h"
 #endif
 
 
