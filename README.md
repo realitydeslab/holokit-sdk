@@ -1,8 +1,10 @@
 # HoloKitSDK
 
-## A step by step guide on how to turn your existing Unity project into a HoloKit App.
+## A step by step guide on how to turn your existing Unity project into a HoloKit app.
 
-Please note that this method only works on iOS.
+Please note that this SDK only works on iOS platform. Some functionalities cannot run properly in Unity Editor on your Mac.
+
+Please use Unity version 2021.1.
 
 ### Step 0: Cloning HoloKit SDK project to your computer
 
@@ -46,6 +48,10 @@ In "HoloKit" prefab, there are some settings in the inspector panel. For example
 
 <a href="https://ibb.co/zxrnWCQ"><img src="https://i.ibb.co/3d7r5V4/Screen-Shot-2021-06-15-at-12-02-27-PM.png" alt="Screen-Shot-2021-06-15-at-12-02-27-PM" border="0"></a><br /><a target='_blank' href='https://imgbb.com/'></a><br />
 
+Another important setting is "Xr Mode Enabled". If this value is set to true, your HoloKit app will run in XR mode (stereoscopic rendeirng). If this value is set to false, your HoloKit app will run in AR mode (just like an ARKit app).
+
+<a href="https://ibb.co/zGDM2f9"><img src="https://i.ibb.co/kQv7Dcb/Screen-Shot-2021-06-16-at-5-28-49-PM.png" alt="Screen-Shot-2021-06-16-at-5-28-49-PM" border="0"></a><br /><a target='_blank' href='https://nonprofitlight.com/me/calais/washington-county-emergency-medical-services-authority'></a><br />
+
 ### Step 3: Configuring Unity project settings
 
 You still need to figure out some settings.
@@ -76,7 +82,7 @@ Go to Project Settings -> Graphics, and assign "Scriptable Render Pipeline Setti
 
 After changing the rendering pipeline to URP, some of your previous materials will possibly become invalid (they are purple now). Don't worry, that is because those objects are using standard render pipeline materials. Just give them some URP materials and everything will be fine.
 
-Now, theoretically, you can build your HoloKit App and run it on your iPhone!
+Now, theoretically, you can build your HoloKit app and run it on your iPhone!
 
 ### FAQ
 
