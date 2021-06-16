@@ -28,7 +28,7 @@ and paste it into your Unity project package folder.
 
 <a href="https://ibb.co/h888Mqf"><img src="https://i.ibb.co/ysssR3S/Screen-Shot-2021-06-15-at-11-43-39-AM.png" alt="Screen-Shot-2021-06-15-at-11-43-39-AM" border="0"></a><br /><a target='_blank' href='https://imgbb.com/'></a><br />
 
-Open your Unity project, and you should now see HoloKit SDK successfully installed.
+Open your Unity project, and you should now see HoloKit SDK has been successfully installed (and all its dependent packages including ARFoundation, ARKit, URP, etc.).
 
 <a href="https://ibb.co/b7CDQCW"><img src="https://i.ibb.co/N7JbtJV/Screen-Shot-2021-06-15-at-11-49-22-AM.png" alt="Screen-Shot-2021-06-15-at-11-49-22-AM" border="0"></a>
 
