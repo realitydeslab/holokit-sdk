@@ -20,10 +20,10 @@
     "url": "https://holoi.com"
   },
   "dependencies": {
-    "com.unity.xr.management": "4.0.5",
+    "com.unity.xr.management": "4.0.6",
     "com.unity.xr.arfoundation": "4.1.7",
     "com.unity.xr.arkit": "4.1.7",
-    "com.unity.render-pipelines.universal": "11.0.0",
-    "com.unity.visualeffectgraph": "11.0.0"
+    "com.unity.render-pipelines.universal": "12.0.0",
+    "com.unity.visualeffectgraph": "12.0.0"
   }
 }
