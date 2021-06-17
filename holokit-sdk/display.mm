@@ -17,6 +17,7 @@
 #include "load.h"
 #include "math_helpers.h"
 #include "holokit_api.h"
+#include "profiling_data.h"
 
 #if __APPLE__
 #define XR_METAL 1
@@ -262,12 +263,20 @@ public:
         // Register for callbacks on display provider.
         UnityXRDisplayProvider provider{NULL, NULL, NULL};
 //        provider.UpdateDisplayState = [](UnitySubsystemHandle, void*, UnityXRDisplayState* state) -> UnitySubsystemErrorCode {
-//            return GetInstance()->UpdateDisplayState(state);
+//            os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+//            os_signpost_id_t spid = os_signpost_id_generate(log);
+//            os_signpost_interval_begin(log, spid, "UpdateDisplayState");
+//            state->reprojectionMode = kUnityXRReprojectionModeOrientationOnly;
+//            NSLog(@"ReprojectionMode: %d", state->reprojectionMode);
+//            os_signpost_interval_end(log, spid, "UpdateDisplayState");
+//            return kUnitySubsystemErrorCodeSuccess;
+//            //return GetInstance()->UpdateDisplayState(state);
 //        };
         provider.QueryMirrorViewBlitDesc = [](UnitySubsystemHandle, void*, const UnityXRMirrorViewBlitInfo, UnityXRMirrorViewBlitDesc*) -> UnitySubsystemErrorCode {
-            os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-            os_signpost_id_t spid = os_signpost_id_generate(log);
-            os_signpost_event_emit(log, spid, "QueryMirrorViewBlitDesc");
+            //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+            //os_signpost_id_t spid = os_signpost_id_generate(log);
+            //os_signpost_interval_begin(log, spid, "QueryMirrorViewBlitDesc", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
+            //os_signpost_interval_end(log, spid, "QueryMirrorViewBlitDesc");
             return kUnitySubsystemErrorCodeFailure;
         };
         GetInstance()->GetDisplay()->RegisterProvider(handle, &provider);
@@ -305,16 +314,16 @@ public:
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
-        os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-        os_signpost_id_t spid = os_signpost_id_generate(log);
-        os_signpost_interval_begin(log, spid, "SubmitCurrentFrame");
+        //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+        //os_signpost_id_t spid = os_signpost_id_generate(log);
+        //os_signpost_interval_begin(log, spid, "SubmitCurrentFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
         
         RenderContent2();
         if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL) {
             RenderAlignmentMarker();
         }
         
-        os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
+        //os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -346,7 +355,8 @@ public:
             mtl_render_pipeline_descriptor.colorAttachments[0].blendingEnabled = YES;
             mtl_render_pipeline_descriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
             mtl_render_pipeline_descriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
-            mtl_render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+            //mtl_render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+            mtl_render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorZero;
             mtl_render_pipeline_descriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOne;
             
             main_render_pipeline_state_ = [mtl_device newRenderPipelineStateWithDescriptor:mtl_render_pipeline_descriptor error:nil];
@@ -468,9 +478,9 @@ public:
         // BlockUntilUnityShouldStartSubmittingRenderingCommands();
         
         // Reference: https://stackoverflow.com/questions/62667953/can-i-set-signposts-before-and-after-a-call-in-objective-c
-        os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-        os_signpost_id_t spid = os_signpost_id_generate(log);
-        os_signpost_interval_begin(log, spid, "PopulateNextFrame");
+        //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+        //os_signpost_id_t spid = os_signpost_id_generate(log);
+        //os_signpost_interval_begin(log, spid, "PopulateNextFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
         
         bool reallocate_textures = (unity_textures_.size() == 0);
 //        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0) {
@@ -603,7 +613,7 @@ public:
             culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             culling_pass.projection.data.matrix = next_frame->renderPasses[0].renderParams[0].projection.data.matrix;
         }
-        os_signpost_interval_end(log, spid, "PopulateNextFrame");
+        //os_signpost_interval_end(log, spid, "PopulateNextFrame");
         return kUnitySubsystemErrorCodeSuccess;
     }
     

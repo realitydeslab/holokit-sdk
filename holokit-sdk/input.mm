@@ -17,6 +17,7 @@
 #include "IUnityXRInput.h"
 #include "math_helpers.h"
 #include "holokit_api.h"
+#include "profiling_data.h"
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_INPUT_XR_TRACE_LOG(trace, message, ...)                \
@@ -53,8 +54,8 @@ public:
         input_provider.FillDeviceDefinition = [](UnitySubsystemHandle, void*, UnityXRInternalInputDeviceId device_id, UnityXRInputDeviceDefinition* definition) {
             return GetInstance()->FillDeviceDefinition(device_id, definition);
         };
-        input_provider.UpdateDeviceState = [](UnitySubsystemHandle, void*, UnityXRInternalInputDeviceId device_id, UnityXRInputUpdateType, UnityXRInputDeviceState* state) {
-            return GetInstance()->UpdateDeviceState(device_id, state);
+        input_provider.UpdateDeviceState = [](UnitySubsystemHandle, void*, UnityXRInternalInputDeviceId device_id, UnityXRInputUpdateType update_type, UnityXRInputDeviceState* state) {
+            return GetInstance()->UpdateDeviceState(device_id, update_type, state);
         };
         input_provider.HandleEvent = [](UnitySubsystemHandle, void*, unsigned int, UnityXRInternalInputDeviceId, void*, unsigned int) {
             HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(),
@@ -216,7 +217,7 @@ public:
 #pragma mark - UpdateDeviceState()
     
     UnitySubsystemErrorCode UpdateDeviceState(
-        UnityXRInternalInputDeviceId device_id, UnityXRInputDeviceState* state) {
+        UnityXRInternalInputDeviceId device_id, UnityXRInputUpdateType update_type, UnityXRInputDeviceState* state) {
         
         // TODO: use update_type for low latency tracking
         
@@ -235,9 +236,9 @@ public:
         switch (device_id) {
             case kDeviceIdHoloKitHmd: {
                 
-                os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-                os_signpost_id_t spid = os_signpost_id_generate(log);
-                os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation");
+                //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+                //os_signpost_id_t spid = os_signpost_id_generate(log);
+                //os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
                 
                 simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
                 simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
@@ -259,7 +260,7 @@ public:
                 //Center Eye Rotation
                 input_->DeviceState_SetRotationValue(state, feature_index++, rotation);
                 
-                os_signpost_interval_end(log, spid, "UpdateCenterEyePositionAndRotation");
+                //os_signpost_interval_end(log, spid, "UpdateCenterEyePositionAndRotation");
                 break;
             }
             case kDeviceIdHoloKitHandLeft: {

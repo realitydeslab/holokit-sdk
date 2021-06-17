@@ -336,6 +336,7 @@
 		4B38242C25E74B1200B39EEB /* MathHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelpers.h; sourceTree = "<group>"; };
 		4B38244025E757D100B39EEB /* test_input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = test_input.mm; sourceTree = "<group>"; };
 		4B4FFDF42604AA93002FC8D7 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		4B57A799267B4CC300A1ABAD /* profiling_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = profiling_data.h; sourceTree = "<group>"; };
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615B025F3A0C700CC4E81 /* hand_tracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hand_tracking.h; sourceTree = "<group>"; };
@@ -850,6 +851,7 @@
 				4BB5587226205B7D00DC0213 /* nfc_session.m */,
 				4B260CA926368C3A0004B771 /* multipeer_session.h */,
 				4B260C9826368C280004B771 /* multipeer_session.m */,
+				4B57A799267B4CC300A1ABAD /* profiling_data.h */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";

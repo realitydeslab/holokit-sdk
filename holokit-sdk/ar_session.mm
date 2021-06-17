@@ -13,6 +13,9 @@
 #include "IUnityInterface.h"
 #include "XR/UnitySubsystemTypes.h"
 
+#import <os/log.h>
+#import <os/signpost.h>
+
 #import "hand_tracking.h"
 #import <vector>
 #import "LandmarkPosition.h"
@@ -23,6 +26,7 @@
 #import <ARKit/ARKit.h>
 #import <CoreVideo/CoreVideo.h>
 #import <CoreMotion/CoreMotion.h>
+#import "profiling_data.h"
 
 #define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
@@ -108,6 +112,9 @@ DelegateCallbackFunction delegate = NULL;
         
         //[self startAccelerometer];
         //[self startGyroscope];
+        
+        frame_count = 0;
+        last_frame_time = 0.0f;
     }
     return self;
 }
@@ -147,6 +154,14 @@ DelegateCallbackFunction delegate = NULL;
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
     //NSLog(@"[Frame] thread=%@, frame.timestamp=%f,  systemuptime=%f", [NSThread currentThread], frame.timestamp, [[NSProcessInfo processInfo] systemUptime]);
+    
+    frame_count++;
+    last_frame_time = frame.timestamp;
+    
+    //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+    //os_signpost_id_t spid = os_signpost_id_generate(log);
+    //os_signpost_interval_begin(log, spid, "session_didUpdateFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
+    
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
@@ -154,7 +169,6 @@ DelegateCallbackFunction delegate = NULL;
     if(self.session == NULL) {
         NSLog(@"[ar_session]: got ar session reference.");
         self.session = session;
-        
     }
     
     // If hands are lost.
@@ -173,6 +187,8 @@ DelegateCallbackFunction delegate = NULL;
             [self.handTracker processVideoFrame: frame.capturedImage];
         }];
     }
+    
+    //os_signpost_interval_end(log, spid, "session_didUpdateFrame");
 }
 
 - (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
