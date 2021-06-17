@@ -8,6 +8,9 @@
 #include <memory>
 #include <iostream>
 
+#import <os/log.h>
+#import <os/signpost.h>
+
 #include "load.h"
 #include "IUnityInterface.h"
 #include "IUnityXRTrace.h"
@@ -231,6 +234,11 @@ public:
         
         switch (device_id) {
             case kDeviceIdHoloKitHmd: {
+                
+                os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+                os_signpost_id_t spid = os_signpost_id_generate(log);
+                os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation");
+                
                 simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
                 simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
                 //simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
@@ -251,6 +259,7 @@ public:
                 //Center Eye Rotation
                 input_->DeviceState_SetRotationValue(state, feature_index++, rotation);
                 
+                os_signpost_interval_end(log, spid, "UpdateCenterEyePositionAndRotation");
                 break;
             }
             case kDeviceIdHoloKitHandLeft: {
