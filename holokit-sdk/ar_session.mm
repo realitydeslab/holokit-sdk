@@ -12,6 +12,7 @@
 #include "UnityXRTypes.h"
 #include "IUnityInterface.h"
 #include "XR/UnitySubsystemTypes.h"
+#include "math_helpers.h"
 
 #import <os/log.h>
 #import <os/signpost.h>
@@ -49,6 +50,10 @@ static const float kLostHandTrackingInterval = 0.5f;
 
 typedef void (*DelegateCallbackFunction)(int number);
 DelegateCallbackFunction delegate = NULL;
+
+typedef void (*AnchorCallbackFunction)(int val, float position_x, float position_y, float position_z,
+                                       float rotation_x, float rotation_y, float rotation_z, float rotation_w);
+AnchorCallbackFunction AnchorRevoke = NULL;
 
 @interface ARSessionDelegateController ()
 
@@ -197,14 +202,25 @@ DelegateCallbackFunction delegate = NULL;
     }
     //NSLog(@"[ar_session]: did add anchor.");
     for (ARAnchor *anchor in anchors) {
-        //NSLog(@"Anchor name: %@", anchor.name);
         // Check if this anchor is a new peer
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            //NSLog(@"A new peer is connected into the collaboration session.");
+            NSLog(@"A new peer is connected into the collaboration session.");
             [self.session addAnchor:anchor];
+            continue;
+        }
+        if (anchor.name != nil) {
+            NSLog(@"[ar_session]: an anchor was added with name %@", anchor.name);
+            LogMatrix4x4(anchor.transform);
+            std::vector<float> position = TransformToUnityPosition(anchor.transform);
+            std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
+            NSLog(@"anchor position: %f, %f, %f", position[0], position[1], position[2]);
+            NSLog(@"anchor rotation: %f, %f, %f, %f", rotation[0], rotation[1], rotation[2], rotation[3]);
+            AnchorRevoke([anchor.name intValue], position[0], position[1], position[2],
+                         rotation[0], rotation[1], rotation[2], rotation[3]);
         }
     }
 }
+
 - (void)session:(ARSession *)session didUpdateAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateAnchors:anchors];
@@ -233,8 +249,8 @@ DelegateCallbackFunction delegate = NULL;
     // to all peers.
     NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:YES error:nil];
     [self.multipeerSession sendToAllPeers:encodedData];
+    //NSLog(@"didOutputCollaborationData");
 }
-
 
 #pragma mark - HandTracking
 
@@ -381,16 +397,7 @@ DelegateCallbackFunction delegate = NULL;
 }
 
 - (void)handTracker: (HandTracker*)handTracker didOutputHandednesses: (NSArray<Handedness *> *)handednesses {
-    /*
-    int index = 0;
-    for (Handedness *handedness in handednesses) {
-        NSLog(@"Handedness number: %d", index);
-        NSLog(@"Handedness index: %d", handedness.index);
-        NSLog(@"Handedness score: %f", handedness.score);
-        index++;
-    }
-    NSLog(@"-----------------");
-     */
+   
 }
 
 - (void)handTracker: (HandTracker*)handTracker didOutputPixelBuffer: (CVPixelBufferRef)pixelBuffer { }
@@ -457,29 +464,7 @@ UnityHoloKit_EnableHandTracking(bool enabled) {
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
-    simd_float4x4 transform_matrix = matrix_identity_float4x4;
-    NSLog(@"[ar_session]: set world origin.");
-    float converted_rotation[4];
-    // The structure of converted_rotation is { w, x, y, z }
-    converted_rotation[0] = rotation[3];
-    converted_rotation[1] = -rotation[0];
-    converted_rotation[2] = -rotation[1];
-    converted_rotation[3] = rotation[2];
-    // Convert quaternion to rotation matrix
-    // See: https://automaticaddison.com/how-to-convert-a-quaternion-to-a-rotation-matrix/
-    transform_matrix.columns[0].x = 2 * (converted_rotation[0] * converted_rotation[0] + converted_rotation[1] * converted_rotation[1]) - 1;
-    transform_matrix.columns[0].y = 2 * (converted_rotation[1] * converted_rotation[2] + converted_rotation[0] * converted_rotation[3]);
-    transform_matrix.columns[0].z = 2 * (converted_rotation[1] * converted_rotation[3] - converted_rotation[0] * converted_rotation[2]);
-    transform_matrix.columns[1].x = 2 * (converted_rotation[1] * converted_rotation[2] - converted_rotation[0] * converted_rotation[3]);
-    transform_matrix.columns[1].y = 2 * (converted_rotation[0] * converted_rotation[0] + converted_rotation[2] * converted_rotation[2]) - 1;
-    transform_matrix.columns[1].z = 2 * (converted_rotation[2] * converted_rotation[3] + converted_rotation[0] * converted_rotation[1]);
-    transform_matrix.columns[2].x = 2 * (converted_rotation[1] * converted_rotation[3] + converted_rotation[0] * converted_rotation[2]);
-    transform_matrix.columns[2].y = 2 * (converted_rotation[2] * converted_rotation[3] - converted_rotation[0] * converted_rotation[1]);
-    transform_matrix.columns[2].z = 2 * (converted_rotation[0] * converted_rotation[0] + converted_rotation[3] * converted_rotation[3]) - 1;
-    // Convert translate into matrix
-    transform_matrix.columns[3].x = position[0];
-    transform_matrix.columns[3].y = position[1];
-    transform_matrix.columns[3].z = -position[2];
+    simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_handler.session setWorldOrigin:(transform_matrix)];
@@ -489,4 +474,19 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetDelegate(DelegateCallbackFunction callback) {
     NSLog(@"hi");
     delegate = callback;
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_AddNativeAnchor(int anchorId, float position[3], float rotation[4]) {
+    simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
+    
+    ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithFormat:@"%d", anchorId] transform:transform_matrix];
+    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+    [ar_session_handler.session addAnchor:anchor];
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHolokit_SetAnchorRevoke(AnchorCallbackFunction callback) {
+    NSLog(@"UnityHolokit_SetAnchorRevoke");
+    AnchorRevoke = callback;
 }

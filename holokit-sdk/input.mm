@@ -216,15 +216,7 @@ public:
     
 #pragma mark - UpdateDeviceState()
     
-    static constexpr UnityXRInputFeatureIndex parent_bone_index[] = {kUnityInvalidXRInputFeatureIndex, 0, 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 0, 17, 18, 19};
     
-    static constexpr UnityXRHand hand = {0, {
-        {1, 2, 3, 4, kUnityInvalidXRInputFeatureIndex},
-        {5, 6, 7, 8, kUnityInvalidXRInputFeatureIndex},
-        {9, 10, 11, 12, kUnityInvalidXRInputFeatureIndex},
-        {13, 14, 15, 16, kUnityInvalidXRInputFeatureIndex},
-        {17, 18, 19, 20, kUnityInvalidXRInputFeatureIndex}
-    }};
     
     UnitySubsystemErrorCode UpdateDeviceState(
         UnityXRInternalInputDeviceId device_id, UnityXRInputUpdateType update_type, UnityXRInputDeviceState* state) {
@@ -233,6 +225,17 @@ public:
         if (update_type == kUnityXRInputUpdateTypeDynamic) {
             // This kind of update happens right before Unity iterates over MonoBehaviour::Update calls.
             // We update hand landmarks' position in this update.
+            
+            static constexpr UnityXRInputFeatureIndex parent_bone_index[] = {kUnityInvalidXRInputFeatureIndex, 0, 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 0, 17, 18, 19};
+            
+            static constexpr UnityXRHand hand = {0, {
+                {1, 2, 3, 4, kUnityInvalidXRInputFeatureIndex},
+                {5, 6, 7, 8, kUnityInvalidXRInputFeatureIndex},
+                {9, 10, 11, 12, kUnityInvalidXRInputFeatureIndex},
+                {13, 14, 15, 16, kUnityInvalidXRInputFeatureIndex},
+                {17, 18, 19, 20, kUnityInvalidXRInputFeatureIndex}
+            }};
+            
             if (device_id == kDeviceIdHoloKitHandLeft) {
                 ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
 

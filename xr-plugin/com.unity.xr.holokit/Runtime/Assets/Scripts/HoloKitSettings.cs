@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARKit;
 
 public class HoloKitSettings : MonoBehaviour
 {
 
     [SerializeField] private bool m_XrModeEnabled = true;
+
+    [SerializeField] private bool m_CollaborationEnabled = false;
 
     private Camera arCamera;
 
@@ -28,6 +31,14 @@ public class HoloKitSettings : MonoBehaviour
         {
             UnityHoloKit_SetRenderingMode(1);
             arCamera.GetComponent<ARCameraBackground>().enabled = true;
+        }
+
+        // Set up the collaboration setting.
+        if (m_CollaborationEnabled)
+        {
+            ARSession session = FindObjectOfType<ARSession>();
+            ARKitSessionSubsystem subsystem = session.subsystem as ARKitSessionSubsystem;
+            subsystem.collaborationRequested = true;
         }
 
         // Set the screen brightness to the maximum.

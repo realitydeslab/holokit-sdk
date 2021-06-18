@@ -70,3 +70,49 @@ UnityXRPose EyePositionToUnityXRPose(simd_float3 eye_position) {
     unity_pose.rotation = UnityXRVector4 { 0, 0, 0, 1 };
     return unity_pose;
 }
+
+simd_float4x4 TransformFromUnity(float position[3], float rotation[4]) {
+    simd_float4x4 transform_matrix = matrix_identity_float4x4;
+    float converted_rotation[4];
+    // The structure of converted_rotation is { w, x, y, z }
+    converted_rotation[0] = rotation[3];
+    converted_rotation[1] = -rotation[0];
+    converted_rotation[2] = -rotation[1];
+    converted_rotation[3] = rotation[2];
+    // Convert quaternion to rotation matrix
+    // See: https://automaticaddison.com/how-to-convert-a-quaternion-to-a-rotation-matrix/
+    transform_matrix.columns[0].x = 2 * (converted_rotation[0] * converted_rotation[0] + converted_rotation[1] * converted_rotation[1]) - 1;
+    transform_matrix.columns[0].y = 2 * (converted_rotation[1] * converted_rotation[2] + converted_rotation[0] * converted_rotation[3]);
+    transform_matrix.columns[0].z = 2 * (converted_rotation[1] * converted_rotation[3] - converted_rotation[0] * converted_rotation[2]);
+    transform_matrix.columns[1].x = 2 * (converted_rotation[1] * converted_rotation[2] - converted_rotation[0] * converted_rotation[3]);
+    transform_matrix.columns[1].y = 2 * (converted_rotation[0] * converted_rotation[0] + converted_rotation[2] * converted_rotation[2]) - 1;
+    transform_matrix.columns[1].z = 2 * (converted_rotation[2] * converted_rotation[3] + converted_rotation[0] * converted_rotation[1]);
+    transform_matrix.columns[2].x = 2 * (converted_rotation[1] * converted_rotation[3] + converted_rotation[0] * converted_rotation[2]);
+    transform_matrix.columns[2].y = 2 * (converted_rotation[2] * converted_rotation[3] - converted_rotation[0] * converted_rotation[1]);
+    transform_matrix.columns[2].z = 2 * (converted_rotation[0] * converted_rotation[0] + converted_rotation[3] * converted_rotation[3]) - 1;
+    // Convert translate into matrix
+    transform_matrix.columns[3].x = position[0];
+    transform_matrix.columns[3].y = position[1];
+    transform_matrix.columns[3].z = -position[2];
+    return transform_matrix;
+}
+
+std::vector<float> TransformToUnityPosition(simd_float4x4 transform_matrix) {
+    std::vector<float> position;
+    position.push_back(transform_matrix.columns[3].x);
+    position.push_back(transform_matrix.columns[3].y);
+    // Unity is left-handed while ARKit is right-handed.
+    position.push_back(-transform_matrix.columns[3].z);
+    return position;
+}
+
+// TODO: I don't know if this will work
+std::vector<float> TransformToUnityRotation(simd_float4x4 transform_matrix) {
+    std::vector<float> rotation;
+    simd_quatf quaternion = simd_quaternion(transform_matrix);
+    rotation.push_back(quaternion.vector.x);
+    rotation.push_back(quaternion.vector.y);
+    rotation.push_back(quaternion.vector.z);
+    rotation.push_back(quaternion.vector.w);
+    return rotation;
+}
