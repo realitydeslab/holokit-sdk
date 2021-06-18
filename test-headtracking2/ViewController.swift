@@ -40,6 +40,7 @@ class ViewController: UIViewController {
     var mcBrowser: MCNearbyServiceBrowser?
     var mcPeerID: MCPeerID?
     var frameCnt: Int = 0
+    var anchorCount: Int = 0
     
     
     override func viewDidLoad() {
@@ -141,7 +142,10 @@ class ViewController: UIViewController {
             let transform = simd_mul(currentFrame.camera.transform, translation)
             
             // Add a new anchor to the session
-            let anchor = ARAnchor(transform: transform)
+            var anchorName = "my position is (100.102, 20.123, 221.111)"
+            anchorCount = anchorCount + 1
+            let anchor = ARAnchor(name: anchorName, transform: transform)
+            
             arSession.add(anchor: anchor)
         }
     }
@@ -240,6 +244,13 @@ extension ViewController: ARSessionDelegate
       //  self.handTracker.processVideoFrame(frame.capturedImage)
         os_signpost(.end, log: logHandler, name: "ar session", "finished ar session for %{public}d", frameCnt)
         
+    }
+    
+    func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+        print("an anchored was added");
+        for anchor in anchors {
+            print(anchor.name)
+        }
     }
     
     
