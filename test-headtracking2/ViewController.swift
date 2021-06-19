@@ -45,6 +45,8 @@ class ViewController: UIViewController {
     var frameRate: Double = 0.0
     var addedPresentedHandler = false
     let logHandler = OSLog(subsystem: "com.holoi.xr.holokit.test-headtracking.test-headtracking2", category: .pointsOfInterest)
+    var anchorCount: Int = 0
+    
     
     override func viewDidLoad() {
         
@@ -162,7 +164,10 @@ class ViewController: UIViewController {
             let transform = simd_mul(currentFrame.camera.transform, translation)
             
             // Add a new anchor to the session
-            let anchor = ARAnchor(transform: transform)
+            var anchorName = "my position is (100.102, 20.123, 221.111)"
+            anchorCount = anchorCount + 1
+            let anchor = ARAnchor(name: anchorName, transform: transform)
+            
             arSession.add(anchor: anchor)
         }
     }
@@ -288,6 +293,13 @@ extension ViewController: ARSessionDelegate
       //  self.handTracker.processVideoFrame(frame.capturedImage)
         os_signpost(.end, log: logHandler, name: "ar session", "begin ar session for frameCnt=%d", frameCnt)
         
+    }
+    
+    func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+        print("an anchored was added");
+        for anchor in anchors {
+            print(anchor.name)
+        }
     }
     
     

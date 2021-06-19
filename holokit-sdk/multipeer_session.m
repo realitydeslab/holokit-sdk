@@ -69,7 +69,7 @@
 #pragma mark - MCSessionDelegate
 
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
-    NSLog(@"did change state %d", state);
+    NSLog(@"did change state to %d", state);
     
 }
 
@@ -91,12 +91,14 @@
 }
 
 #pragma mark - MCNearbyServiceBrowserDelegate
+
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
     NSLog(@"advertise: receive an invitation.");
     invitationHandler(true, self.session);
 }
 
 #pragma mark - MCNearbyServiceAdvertiserDelegate
+
 - (void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary<NSString *,NSString *> *)info {
     NSLog(@"browse: find a peer and invite that device.");
     [browser invitePeer:peerID toSession:self.session withContext:nil timeout:10];

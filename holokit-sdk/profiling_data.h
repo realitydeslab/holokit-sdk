@@ -8,8 +8,8 @@
 #ifndef profiling_data_h
 #define profiling_data_h
 
-static int frame_count;
+int frame_count;
 
-static float last_frame_time;
+float last_frame_time;
 
 #endif /* profiling_data_h */
