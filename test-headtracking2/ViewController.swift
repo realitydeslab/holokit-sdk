@@ -13,6 +13,7 @@ import CoreMotion
 import MultipeerConnectivity
 import NearbyInteraction
 import os.signpost
+import Foundation
 
 extension MTKView : RenderDestinationProvider {
 }
@@ -40,7 +41,10 @@ class ViewController: UIViewController {
     var mcBrowser: MCNearbyServiceBrowser?
     var mcPeerID: MCPeerID?
     var frameCnt: Int = 0
-    
+    var previousPresentedTime: CFTimeInterval = 0.0
+    var frameRate: Double = 0.0
+    var addedPresentedHandler = false
+    let logHandler = OSLog(subsystem: "com.holoi.xr.holokit.test-headtracking.test-headtracking2", category: .pointsOfInterest)
     
     override func viewDidLoad() {
         
@@ -89,6 +93,7 @@ class ViewController: UIViewController {
             renderer = Renderer(session: arSession, metalDevice: view.device!, renderDestination: view)
             
             renderer.drawRectResized(size: view.bounds.size, drawableSize: view.drawableSize)
+            
         }
         
         let anchor = ARAnchor(transform: simd_float4x4())
@@ -96,6 +101,7 @@ class ViewController: UIViewController {
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewController.handleTap(gestureRecognize:)))
         view.addGestureRecognizer(tapGesture)
+        
         
 
     }
@@ -106,13 +112,28 @@ class ViewController: UIViewController {
         // Motion
         motionQueue.qualityOfService = .userInteractive
         motionManager.gyroUpdateInterval = 1 / 100.0
-        motionManager.startGyroUpdates(to: motionQueue) { (data, error) in
+        motionManager.startGyroUpdates(to: motionQueue) { [self] (data, error) in
           //  ARFusion_addGyrMeasurement(data.rotationRate.x, data.rotationRate.y, data.rotationRate.z)
+            
+            
+            os_signpost(.begin, log: logHandler, name: "gyro", "gyro for frameCnt=%d, eventtime=%f, systemtime=%f", self.frameCnt, data?.timestamp ?? 0, ProcessInfo.processInfo.systemUptime )
+           
+            
+            os_signpost(.end, log: logHandler, name: "gyro")
+            
         }
         
         motionManager.accelerometerUpdateInterval = 1 / 100.0
-        motionManager.startAccelerometerUpdates(to: motionQueue) { (data, error) in
+        motionManager.startAccelerometerUpdates(to: motionQueue) { [self]  (data, error) in
            // ARFusion_addAccMeasurement(data.acceleration.x, data.acceleration.y, data.acceleration.z)
+            
+
+            
+            os_signpost(.begin, log: logHandler, name: "accel", "accel for frameCnt=%d, eventtime=%f, systemtime=%f", self.frameCnt, data?.timestamp ?? 0, ProcessInfo.processInfo.systemUptime )
+           
+            
+            os_signpost(.end, log: logHandler, name: "accel")
+            
         }
         
         
@@ -197,20 +218,47 @@ extension ViewController: MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         renderer.drawRectResized(size: size, drawableSize: size)
         
+      
+      
     }
+    
     
     // Called whenever the view needs to render
     func draw(in view: MTKView) {
-        let logHandler = OSLog(subsystem: "com.holoi.xr.holokit.test-headtracking.test-headtracking2", category: .pointsOfInterest)
+       
 
         
-        os_signpost(.begin, log: logHandler, name: "Processing", "begin processing for %{public}d", frameCnt)
+     
+        os_signpost(.begin, log: logHandler, name: "drawcall", "begin processing for frameCnt=%d, systemtime=%f", frameCnt, ProcessInfo.processInfo.systemUptime)
+        
+        
+        if let cd = view.currentDrawable {
+            
+            
+            os_signpost(.begin, log: logHandler, name: "currentDrawable", "before presented frameCnt=%d, cd.drawableID=%d, systemtime=%f", frameCnt, cd.drawableID, ProcessInfo.processInfo.systemUptime)
+            
+            cd.addPresentedHandler({ [weak self] drawable in
+                guard let strongSelf = self else {
+                    return
+                }
+                //let presentationDuration = drawable.presentedTime - strongSelf.previousPresentedTime
+                //strongSelf.frameRate = 1.0/presentationDuration
+                /* ... */
+                strongSelf.previousPresentedTime = drawable.presentedTime
+                
+                os_signpost(.end, log: strongSelf.logHandler, name: "currentDrawable", "presented frameCnt=%d, cd.drawableID=%d, systemtime=%f, presentedTime=%f",strongSelf.frameCnt, cd.drawableID, ProcessInfo.processInfo.systemUptime, drawable.presentedTime)
 
+                
+            })
+        }
+       
+ 
         
         renderer.update()
         
-        os_signpost(.end, log: logHandler, name: "Processing", "finished processing for %{public}d", frameCnt)
+        os_signpost(.end, log: logHandler, name: "drawcall", "finished processing for frameCnt=%d", frameCnt)
 
+        
         
     }
     
@@ -226,7 +274,7 @@ extension ViewController: ARSessionDelegate
         let logHandler = OSLog(subsystem: "com.holoi.xr.holokit.test-headtracking.test-headtracking2", category: .pointsOfInterest)
 
         frameCnt += 1
-        os_signpost(.begin, log: logHandler, name: "ar session", "begin ar session for %{public}d", frameCnt)
+        os_signpost(.begin, log: logHandler, name: "ar session", "begin ar session for frameCnt=%d, frametime=%f, systemtime=%f", frameCnt, frame.timestamp, ProcessInfo.processInfo.systemUptime )
        
         let projection = session.currentFrame!.camera.projectionMatrix
         let yScale = projection[1,1]
@@ -238,7 +286,7 @@ extension ViewController: ARSessionDelegate
        // print(xFovDegrees, yFovDegrees)
 
       //  self.handTracker.processVideoFrame(frame.capturedImage)
-        os_signpost(.end, log: logHandler, name: "ar session", "finished ar session for %{public}d", frameCnt)
+        os_signpost(.end, log: logHandler, name: "ar session", "begin ar session for frameCnt=%d", frameCnt)
         
     }
     

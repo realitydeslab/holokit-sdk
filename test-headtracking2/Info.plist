@@ -26,7 +26,7 @@
 		<string>_aasda._udp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string></string>
+	<string>asda</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>asda</string>
 	<key>NSNearbyInteractionUsageDescription</key>
