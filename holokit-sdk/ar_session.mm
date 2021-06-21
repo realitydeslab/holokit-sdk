@@ -48,12 +48,15 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 
 static const float kLostHandTrackingInterval = 0.5f;
 
-typedef void (*DelegateCallbackFunction)(int number);
-DelegateCallbackFunction delegate = NULL;
-
 typedef void (*AnchorCallbackFunction)(int val, float position_x, float position_y, float position_z,
                                        float rotation_x, float rotation_y, float rotation_z, float rotation_w);
 AnchorCallbackFunction AnchorRevoke = NULL;
+
+typedef void (*UpdatePeerHandPosition)(float x, float y, float z);
+UpdatePeerHandPosition UpdatePeerHandPositionDelegate = NULL;
+
+typedef void (*CollaborationSynchronized)();
+CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 
 @interface ARSessionDelegateController ()
 
@@ -65,6 +68,7 @@ AnchorCallbackFunction AnchorRevoke = NULL;
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
 @property (nonatomic, strong) MultipeerSession *multipeerSession;
+@property (assign) bool collaborationConnected;
 
 @end
 
@@ -103,17 +107,27 @@ AnchorCallbackFunction AnchorRevoke = NULL;
         self.primaryButtonLeft = NO;
         self.primaryButtonRight = NO;
         
-        // Set up multipeer session
+        // handler when receiving data
         void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
             //NSLog(@"receivedDataHandler");
+            // Try to decode the received data as ARCollaboration data.
             ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
             if (collaborationData != NULL) {
                 [self.session updateWithCollaborationData:collaborationData];
                 return;
             }
-            NSLog(@"Failed to receive data.");
+            // Try to decode the received data as peer hand position data.
+            NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
+            if (decodedData != NULL) {
+                //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+                UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+                return;
+            }
+            NSLog(@"[ar_session]: Failed to decode received data from peer.");
         };
+        // Set up multipeer session
         self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
+        self.collaborationConnected = false;
         
         //[self startAccelerometer];
         //[self startGyroscope];
@@ -193,6 +207,20 @@ AnchorCallbackFunction AnchorRevoke = NULL;
         }];
     }
     
+    // Send my hand position to peers
+    if (self.collaborationConnected && self.isLeftHandTracked) {
+        LandmarkPosition *landmarkPosition = self.leftHandLandmarkPositions[0];
+        NSArray* myHandPosition = [NSArray arrayWithObjects:
+                                   [NSNumber numberWithFloat:landmarkPosition.x],
+                                   [NSNumber numberWithFloat:landmarkPosition.y],
+                                   [NSNumber numberWithFloat:landmarkPosition.z], nil];
+        //NSLog(@"raw myHandPosition: {%f, %f, %f}", [myHandPosition[0] floatValue], [myHandPosition[1] floatValue], [myHandPosition[2] floatValue]);
+        NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:myHandPosition requiringSecureCoding:YES error:nil];
+        //NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:encodedData error:nil];
+        //NSLog(@"decoded myHandPosition: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+        [self.multipeerSession sendToAllPeers:encodedData];
+    }
+    
     //os_signpost_interval_end(log, spid, "session_didUpdateFrame");
 }
 
@@ -205,16 +233,23 @@ AnchorCallbackFunction AnchorRevoke = NULL;
         // Check if this anchor is a new peer
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"A new peer is connected into the collaboration session.");
+            CollaborationSynchronizedDelegate();
+            self.collaborationConnected = true;
             [self.session addAnchor:anchor];
             continue;
         }
         if (anchor.name != nil) {
             NSLog(@"[ar_session]: an anchor was added with name %@", anchor.name);
-            LogMatrix4x4(anchor.transform);
+            if ([anchor.name isEqual:@"-1"]) {
+                // This is an origin anchor.
+                NSLog(@"[ar_session]: world origin was set according to the origin anchor.");
+                [session setWorldOrigin:anchor.transform];
+            }
+            // This is a normal VFX anchor.
             std::vector<float> position = TransformToUnityPosition(anchor.transform);
             std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
-            NSLog(@"anchor position: %f, %f, %f", position[0], position[1], position[2]);
-            NSLog(@"anchor rotation: %f, %f, %f, %f", rotation[0], rotation[1], rotation[2], rotation[3]);
+            //NSLog(@"anchor position: %f, %f, %f", position[0], position[1], position[2]);
+            //NSLog(@"anchor rotation: %f, %f, %f, %f", rotation[0], rotation[1], rotation[2], rotation[3]);
             AnchorRevoke([anchor.name intValue], position[0], position[1], position[2],
                          rotation[0], rotation[1], rotation[2], rotation[3]);
         }
@@ -471,12 +506,6 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDelegate(DelegateCallbackFunction callback) {
-    NSLog(@"hi");
-    delegate = callback;
-}
-
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_AddNativeAnchor(int anchorId, float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     
@@ -486,7 +515,17 @@ UnityHoloKit_AddNativeAnchor(int anchorId, float position[3], float rotation[4])
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHolokit_SetAnchorRevoke(AnchorCallbackFunction callback) {
+UnityHoloKit_SetAnchorRevoke(AnchorCallbackFunction callback) {
     NSLog(@"UnityHolokit_SetAnchorRevoke");
     AnchorRevoke = callback;
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetUpdatePeerHandPositionDelegate(UpdatePeerHandPosition callback) {
+    UpdatePeerHandPositionDelegate = callback;
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetCollaborationSynchronizedDelegate(CollaborationSynchronized callback) {
+    CollaborationSynchronizedDelegate = callback;
 }

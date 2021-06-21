@@ -21,11 +21,14 @@ namespace UnityEngine.XR.HoloKit
 
         private Vector3 offset = new Vector3(0f, 0f, 0.7f);
 
-        [DllImport("__Internal")]
-        public static extern void UnityHoloKit_AddNativeAnchor(int anchorId, float[] position, float[] rotation);
+        public Vector3 m_PeerHandPosition;
+
+        public Transform debugSphere;
+
+        public bool m_IsHost = true;
 
         [DllImport("__Internal")]
-        private static extern void UnityHolokit_SetAnchorRevoke(AnchorCallbackFunction callback);
+        public static extern void UnityHoloKit_AddNativeAnchor(int anchorId, float[] position, float[] rotation);
 
         delegate void AnchorCallbackFunction(int val, float positionX, float positionY, float positionZ,
             float rotationX, float rotationY, float rotationZ, float rotationW);
@@ -58,6 +61,44 @@ namespace UnityEngine.XR.HoloKit
             newModel.transform.rotation = new Quaternion(rotationX, rotationY, rotationZ, rotationW);
             newModel.AddComponent<ARAnchor>();
         }
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetAnchorRevoke(AnchorCallbackFunction callback);
+
+        delegate void UpdatePeerHandPosition(float x, float y, float z);
+
+        [AOT.MonoPInvokeCallback(typeof(UpdatePeerHandPosition))]
+        static void OnPeerHandPositionUpdated(float x, float y, float z)
+        {
+            if (x == null)
+            {
+                return;
+            }
+            HoloKitAnchorManager.Instance.m_PeerHandPosition = new Vector3(x, y, -z);
+            //Debug.Log($"[HoloKitAnchorManager]: peer hand position is {HoloKitAnchorManager.Instance.m_PeerHandPosition}");
+        }
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetUpdatePeerHandPositionDelegate(UpdatePeerHandPosition callback);
+
+        delegate void CollaborationSynchronized();
+
+        [AOT.MonoPInvokeCallback(typeof(CollaborationSynchronized))]
+        static void OnCollaborationSynchronized()
+        {
+            if (HoloKitAnchorManager.Instance.m_IsHost == true)
+            {
+                // Add an anchor which is at the coordinate origin.
+                // This anchor will be used by other peers to reset their coordinate origin.
+                float[] originPosition = { 0f, 0f, 0f };
+                float[] originRotation = { 0f, 0f, 0f, 1f };
+                // -1 is a special index, which indicates the origin anchor.
+                UnityHoloKit_AddNativeAnchor(-1, originPosition, originRotation);
+            }
+        }
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetCollaborationSynchronizedDelegate(CollaborationSynchronized callback);
 
         private void Awake()
         {
@@ -99,12 +140,17 @@ namespace UnityEngine.XR.HoloKit
         void Start()
         {
             arCamera = Camera.main.transform;
-            UnityHolokit_SetAnchorRevoke(OnAnchorRevoked);
+            UnityHoloKit_SetAnchorRevoke(OnAnchorRevoked);
+            UnityHoloKit_SetUpdatePeerHandPositionDelegate(OnPeerHandPositionUpdated);
+            UnityHoloKit_SetCollaborationSynchronizedDelegate(OnCollaborationSynchronized);
         }
 
-        void Update()
+        private void Update()
         {
-
+            if (m_PeerHandPosition != null)
+            {
+                debugSphere.position = m_PeerHandPosition;
+            }
         }
     }
 }

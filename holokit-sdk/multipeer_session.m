@@ -51,7 +51,7 @@
 
 - (void)sendToAllPeers: (NSData *)data {
     if (self.session.connectedPeers.count == 0) {
-        NSLog(@"There is zero connected peer.");
+        NSLog(@"[multipeer_session]: There is no connected peer.");
         return;
     }
     bool success = [self.session sendData:data toPeers:self.session.connectedPeers withMode:MCSessionSendDataReliable error:nil];
@@ -70,7 +70,6 @@
 
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
     NSLog(@"did change state to %d", state);
-    
 }
 
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {

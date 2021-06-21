@@ -1,6 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement style="width: 100%; height: 100%; left: 0; top: 0; background-color: rgba(255, 255, 255, 255);">
-        <ui:Label text="HoloKit" display-tooltip-when-elided="true" name="title" style="width: 50%; height: 8%; align-items: auto; justify-content: flex-end; left: 25%; top: 10%; font-size: 30%; color: rgba(6, 0, 0, 255); -unity-font-style: bold; -unity-text-align: middle-center;" />
-        <ui:Button text="Sign in with Apple " display-tooltip-when-elided="true" name="sign-in-button" style="width: 50%; height: 10%; top: 70%; left: 25%; color: rgba(255, 255, 255, 255); background-color: rgba(7, 1, 1, 255); font-size: 28%;" />
-    </ui:VisualElement>
-</ui:UXML>

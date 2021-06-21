@@ -49,7 +49,6 @@
 		4B9304D32625A4AA005D9975 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
 		4B99658F25F715E3006AF9A5 /* hand_tracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */; };
 		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
-		4B9C742725F5B948001935A8 /* LandmarkPosition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C742625F5B948001935A8 /* LandmarkPosition.m */; };
 		4BAD1933262026C3006884F1 /* view_controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BAD1932262026C3006884F1 /* view_controller.m */; };
 		4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* nfc_session.m */; };
 		4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
@@ -61,7 +60,6 @@
 		4BC45AEC262813BD00BA98E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEA262813BD00BA98E4 /* Main.storyboard */; };
 		4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AED262813BE00BA98E4 /* Assets.xcassets */; };
 		4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */; };
-		4BCDE0BD25F5BFEB00C52532 /* LandmarkPosition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C742625F5B948001935A8 /* LandmarkPosition.m */; };
 		4BDFC4E72600A54C0087F728 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4E62600A54C0087F728 /* Main.cpp */; };
 		4BDFC4F52600A5830087F728 /* ExampleDisplayProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */; };
 		4BDFC5022600A59B0087F728 /* ExampleTrackingProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */; };
@@ -781,8 +779,6 @@
 				4B2D6E3125E7CF1200DAAD13 /* test_main.cpp */,
 				4B2D6E3C25E7CF2000DAAD13 /* test_load.h */,
 				4B6615B025F3A0C700CC4E81 /* hand_tracking.h */,
-				4B9C742525F5B909001935A8 /* LandmarkPosition.h */,
-				4B9C742625F5B948001935A8 /* LandmarkPosition.m */,
 				4B06069C25F5C963006DF0B0 /* test_display.cpp */,
 				4B06070C25F5F8F4006DF0B0 /* ProviderContext.h */,
 			);
@@ -852,6 +848,8 @@
 				4B260CA926368C3A0004B771 /* multipeer_session.h */,
 				4B260C9826368C280004B771 /* multipeer_session.m */,
 				4B57A799267B4CC300A1ABAD /* profiling_data.h */,
+				4B9C742525F5B909001935A8 /* LandmarkPosition.h */,
+				4B9C742625F5B948001935A8 /* LandmarkPosition.m */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -1948,7 +1946,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BCDE0BD25F5BFEB00C52532 /* LandmarkPosition.m in Sources */,
 				4B99658F25F715E3006AF9A5 /* hand_tracking.mm in Sources */,
 				4BBDD2F025F397D200070CB4 /* test_input.mm in Sources */,
 				4B66159525F39F9000CC4E81 /* printc.mm in Sources */,
@@ -1960,7 +1957,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B06069D25F5C963006DF0B0 /* test_display.cpp in Sources */,
-				4B9C742725F5B948001935A8 /* LandmarkPosition.m in Sources */,
 				4B4CDC3125F06D36000C2AC7 /* test_input.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
