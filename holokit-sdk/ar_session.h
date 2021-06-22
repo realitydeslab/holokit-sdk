@@ -24,8 +24,8 @@
 @property (assign) bool isRightHandTracked;
 @property (assign) bool primaryButtonLeft;
 @property (assign) bool primaryButtonRight;
-@property (assign) simd_float3 peerHandPosition;
+@property (assign) int handTrackingInterval;
 
-+ (id) sharedARSessionDelegateController;
++ (id)sharedARSessionDelegateController;
 
 @end
