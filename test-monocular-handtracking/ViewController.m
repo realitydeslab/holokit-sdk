@@ -8,6 +8,8 @@
 #import "ViewController.h"
 #import "Renderer.h"
 #import "MathHelper.h"
+#import <CoreML/CoreML.h>
+#import "MyHandPoseClassifier01_1.h"
 
 #define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
@@ -32,6 +34,9 @@
 // for apple hand detection
 @property (nonatomic, strong) AVCaptureSession *cameraFeedSession;
 @property (nonatomic, strong) VNDetectHumanHandPoseRequest *handPoseRequest;
+
+@property (nonatomic, strong) MyHandPoseClassifier01_1 *myClassifier;
+@property (nonatomic, strong) VNCoreMLModel *myModel;
 
 @end
 
@@ -60,6 +65,9 @@
     // apple hand detection
     self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
     self.handPoseRequest.maximumHandCount = 1;
+    
+    self.myClassifier = [[MyHandPoseClassifier01_1 alloc] init];
+    self.myModel = [VNCoreMLModel modelForMLModel:self.myClassifier error:nil];
     
     // Set the view to use the default device
     MTKView *view = (MTKView *)self.view;
@@ -156,6 +164,13 @@
         
         // an array of all landmarks
         NSDictionary<VNRecognizedPointKey, VNRecognizedPoint*>* landmarks = [observation recognizedPointsForGroupKey:VNRecognizedPointGroupKeyAll error:nil];
+        
+        MLMultiArray *keypointsMultiArray = [observation keypointsMultiArrayAndReturnError:nil];
+        MyHandPoseClassifier01_1Output *output = [self.myClassifier predictionFromPoses:keypointsMultiArray error:nil];
+        if (output == nil) {
+            NSLog(@"fuck");
+        }
+        NSLog(@"Output: %@", output.label);
         
         ARDepthData* sceneDepth = _session.currentFrame.sceneDepth;
         if (!sceneDepth){

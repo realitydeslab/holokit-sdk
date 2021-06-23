@@ -24,7 +24,7 @@
 @property (assign) bool isRightHandTracked;
 @property (assign) bool primaryButtonLeft;
 @property (assign) bool primaryButtonRight;
-@property (assign) int handTrackingInterval;
+@property (assign) int handPosePredictionInterval;
 
 + (id)sharedARSessionDelegateController;
 

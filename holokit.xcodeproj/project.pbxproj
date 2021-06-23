@@ -27,6 +27,7 @@
 		4B2B302625E23F5B002AC24F /* HandTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4B38245D25E77F6900B39EEB /* MathHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B38242C25E74B1200B39EEB /* MathHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4B38248225E77F8500B39EEB /* MathHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6AD99B25E34404008F9911 /* MathHelper.h */; };
+		4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */; };
 		4B4CDC3125F06D36000C2AC7 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
 		4B66159525F39F9000CC4E81 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
 		4B6615A225F39FE000CC4E81 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
@@ -333,6 +334,7 @@
 		4B38241825E749AC00B39EEB /* Input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
 		4B38242C25E74B1200B39EEB /* MathHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelpers.h; sourceTree = "<group>"; };
 		4B38244025E757D100B39EEB /* test_input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = test_input.mm; sourceTree = "<group>"; };
+		4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = "MyHandPoseClassifier01 1.mlpackage"; sourceTree = "<group>"; };
 		4B4FFDF42604AA93002FC8D7 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		4B57A799267B4CC300A1ABAD /* profiling_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = profiling_data.h; sourceTree = "<group>"; };
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -751,6 +753,7 @@
 				4B2B2FFF25E23E94002AC24F /* Renderer.m */,
 				4B2B300125E23E94002AC24F /* ViewController.h */,
 				4B2B300225E23E94002AC24F /* ViewController.m */,
+				4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */,
 				4B2B300425E23E94002AC24F /* Main.storyboard */,
 				4B2B300725E23E95002AC24F /* Assets.xcassets */,
 				4B2B300925E23E95002AC24F /* LaunchScreen.storyboard */,
@@ -1936,6 +1939,7 @@
 				4B2B300E25E23E95002AC24F /* main.m in Sources */,
 				4B2B2FFC25E23E94002AC24F /* Shaders.metal in Sources */,
 				4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */,
+				4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */,
 				4B2B300325E23E94002AC24F /* ViewController.m in Sources */,
 				4B2B300025E23E94002AC24F /* Renderer.m in Sources */,
 				4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */,

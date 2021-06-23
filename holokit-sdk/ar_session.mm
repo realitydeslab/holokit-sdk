@@ -67,12 +67,13 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 
 @property (nonatomic, strong) VNDetectHumanHandPoseRequest *handPoseRequest;
 // Used to count the interval.
-@property (assign) int handTrackingCount;
+@property (assign) int frameCount;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
 @property (nonatomic, strong) MultipeerSession *multipeerSession;
 @property (assign) bool collaborationConnected;
+@property (assign) bool isCollaborationHost;
 
 @end
 
@@ -92,11 +93,12 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
         
         // Vision hand tracking
         self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
-        // TODO: This value can be changed.
+        // TODO: This value can be changed to one to save performance.
         self.handPoseRequest.maximumHandCount = 2;
+        //self.handPoseRequest.revision = VNDetectHumanHandPoseRequestRevision1;
         
-        self.handTrackingCount = 0;
-        self.handTrackingInterval = 1;
+        self.frameCount = 0;
+        self.handPosePredictionInterval = 10;
         
         self.leftHandLandmarkPositions = [[NSMutableArray alloc] init];
         self.rightHandLandmarkPositions = [[NSMutableArray alloc] init];
@@ -137,6 +139,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
         // Set up multipeer session
         self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
         self.collaborationConnected = false;
+        self.isCollaborationHost = true;
         
         //[self startAccelerometer];
         //[self startGyroscope];
@@ -211,7 +214,8 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 //    }
     
     // Hand tracking
-    if (self.isHandTrackingEnabled && self.handTrackingCount % self.handTrackingInterval == 0) {
+    self.frameCount++;
+    if (self.isHandTrackingEnabled && self.frameCount % self.handPosePredictionInterval == 0) {
 //        [self.handTrackingQueue addOperationWithBlock:^{
 //            [self.handTracker processVideoFrame: frame.capturedImage];
 //        }];
@@ -239,7 +243,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
-    //NSLog(@"[ar_session]: did add anchor.");
+    NSLog(@"[ar_session]: did add anchors.");
     for (ARAnchor *anchor in anchors) {
         // Check if this anchor is a new peer
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
@@ -251,14 +255,23 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
         }
         if (anchor.name != nil) {
             NSLog(@"[ar_session]: an anchor was added with name %@", anchor.name);
-            if ([anchor.name isEqual:@"-1"]) {
+            std::vector<float> position;
+            std::vector<float> rotation;
+            if ([anchor.name isEqual:@"-1"] && !self.isCollaborationHost) {
                 // This is an origin anchor.
+                // If this is a client, reset the world origin.
                 NSLog(@"[ar_session]: world origin was set according to the origin anchor.");
                 [session setWorldOrigin:anchor.transform];
+                // Indicate the origin anchor transform in the previous coordinate system.
+                position = TransformToUnityPosition(anchor.transform);
+                rotation = TransformToUnityRotation(anchor.transform);
+                AnchorRevoke(-1, position[0], position[1], position[2],
+                             rotation[0], rotation[1], rotation[2], rotation[3]);
+                continue;
             }
             // This is a normal VFX anchor.
-            std::vector<float> position = TransformToUnityPosition(anchor.transform);
-            std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
+            position = TransformToUnityPosition(anchor.transform);
+            rotation = TransformToUnityRotation(anchor.transform);
             //NSLog(@"anchor position: %f, %f, %f", position[0], position[1], position[2]);
             //NSLog(@"anchor rotation: %f, %f, %f, %f", rotation[0], rotation[1], rotation[2], rotation[3]);
             AnchorRevoke([anchor.name intValue], position[0], position[1], position[2],
@@ -442,7 +455,6 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 }
 
 - (void)performHumanHandPoseRequest:(ARFrame *)frame {
-    self.handTrackingCount++;
     VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc]
                                              initWithCVPixelBuffer: frame.capturedImage
                                              orientation:kCGImagePropertyOrientationUp options:[NSMutableDictionary dictionary]];
@@ -748,8 +760,8 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_AddNativeAnchor(int anchorId, float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
-    
     ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithFormat:@"%d", anchorId] transform:transform_matrix];
+    
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_handler.session addAnchor:anchor];
 }
@@ -773,5 +785,11 @@ UnityHoloKit_SetCollaborationSynchronizedDelegate(CollaborationSynchronized call
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetHandTrackingInterval(int val) {
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
-    [ar_session_handler setHandTrackingInterval:val];
+    [ar_session_handler setHandPosePredictionInterval:val];
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetIsCollaborationHost(bool val) {
+    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+    [ar_session_handler setIsCollaborationHost:val];
 }
