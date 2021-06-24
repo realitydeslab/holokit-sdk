@@ -329,8 +329,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1622368181}
   - component: {fileID: 1622368180}
-  - component: {fileID: 1622368179}
-  - component: {fileID: 1622368178}
   - component: {fileID: 1622368182}
   m_Layer: 0
   m_Name: NetworkManager
@@ -339,52 +337,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1622368178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1622368177}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57c3fe0d2bf241e48b7cddeaa1b933af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Port: 7777
-  Address: 127.0.0.1
-  MaxClients: 100
-  Channels: []
-  MessageBufferSize: 5120
-  PingInterval: 500
-  TimeoutLimit: 32
-  TimeoutMinimum: 5000
-  TimeoutMaximum: 30000
---- !u!114 &1622368179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1622368177}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b84c2d8dfe509a34fb59e2b81f8e1319, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MessageBufferSize: 5120
-  MaxConnections: 100
-  MaxSentMessageQueueSize: 128
-  ConnectAddress: 127.0.0.1
-  ConnectPort: 7777
-  ServerListenPort: 7777
-  ServerWebsocketListenPort: 8887
-  SupportWebsocket: 0
-  Channels: []
-  UseMLAPIRelay: 0
-  MLAPIRelayAddress: 184.72.104.138
-  MLAPIRelayPort: 8888
-  MessageSendMode: 0
 --- !u!114 &1622368180
 MonoBehaviour:
   m_ObjectHideFlags: 0
