@@ -1176,7 +1176,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!135 &786293223
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1741,12 +1741,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e83a1f8248a044c69ab82e2aab2e005, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelList:
-  - {fileID: 7247926941262799296, guid: 6e2e311a458204081a6bfe01277e8244, type: 3}
-  - {fileID: 7247621508894121589, guid: 137253decc7b24616885463faea52b30, type: 3}
-  - {fileID: 8342640863278476272, guid: 3e43d5edf20d841119d825c6a264b951, type: 3}
+  m_ModelList: []
+  m_PlacementPositionOffset: {x: 0, y: 0, z: 0}
+  m_PlacementRotationOffset: {x: 0, y: 0, z: 0, w: 0}
   m_PeerHandPosition: {x: 0, y: 0, z: 0}
-  debugSphere: {fileID: 786293226}
+  m_IsPeerHandTracked: 0
+  m_ModelIndex: 0
+  m_ModelPosition: {x: 0, y: 0, z: 0}
+  m_ModelRotation: {x: 0, y: 0, z: 0, w: 0}
+  m_SceneIndex: 0
   m_IsHost: 1
 --- !u!1 &1340683997 stripped
 GameObject:
@@ -2459,7 +2462,7 @@ PrefabInstance:
     - target: {fileID: 7014186050555902013, guid: 23cf20b6f43ff4e48878bcb09ca00519,
         type: 3}
       propertyPath: m_CollaborationEnabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3570850918781862044, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}

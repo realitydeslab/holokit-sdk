@@ -46,11 +46,11 @@ static const float kMaxLandmark1Interval = 0.05f;
 static const float kMaxLandmark2Interval = 0.03f;
 static const float kMaxLandmarkEndInterval = 0.024f;
 
-static const float kLostHandTrackingInterval = 0.5f;
+static const float kLostHandTrackingInterval = 1.5f;
 
 typedef void (*AnchorCallbackFunction)(int val, float position_x, float position_y, float position_z,
                                        float rotation_x, float rotation_y, float rotation_z, float rotation_w);
-AnchorCallbackFunction AnchorRevoke = NULL;
+AnchorCallbackFunction AnchorAdded = NULL;
 
 typedef void (*UpdatePeerHandPosition)(float x, float y, float z);
 UpdatePeerHandPosition UpdatePeerHandPositionDelegate = NULL;
@@ -72,7 +72,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
 @property (nonatomic, strong) MultipeerSession *multipeerSession;
-@property (assign) bool collaborationConnected;
+@property (assign) bool IsCollaborationSynchronized;
 @property (assign) bool isCollaborationHost;
 
 @end
@@ -82,23 +82,23 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 #pragma mark - init
 - (instancetype)init {
     if(self = [super init]) {
-//        self.handTracker = [[HandTracker alloc] init];
-//        self.handTracker.delegate = self;
-//        [self.handTracker startGraph];
-//        self.handTrackingQueue = [[NSOperationQueue alloc] init];
-//        self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-//        self.motionQueue = [[NSOperationQueue alloc] init];
-//        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-//        self.motionManager = [[CMMotionManager alloc] init];
+        self.handTracker = [[HandTracker alloc] init];
+        self.handTracker.delegate = self;
+        [self.handTracker startGraph];
+        self.handTrackingQueue = [[NSOperationQueue alloc] init];
+        self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        self.motionQueue = [[NSOperationQueue alloc] init];
+        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        self.motionManager = [[CMMotionManager alloc] init];
         
         // Vision hand tracking
-        self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
+        //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
         // TODO: This value can be changed to one to save performance.
-        self.handPoseRequest.maximumHandCount = 2;
+        //self.handPoseRequest.maximumHandCount = 2;
         //self.handPoseRequest.revision = VNDetectHumanHandPoseRequestRevision1;
         
         self.frameCount = 0;
-        self.handPosePredictionInterval = 10;
+        self.handPosePredictionInterval = 8;
         
         self.leftHandLandmarkPositions = [[NSMutableArray alloc] init];
         self.rightHandLandmarkPositions = [[NSMutableArray alloc] init];
@@ -138,7 +138,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
         };
         // Set up multipeer session
         self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
-        self.collaborationConnected = false;
+        self.IsCollaborationSynchronized = false;
         self.isCollaborationHost = true;
         
         //[self startAccelerometer];
@@ -204,31 +204,40 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
     
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.
-//    if (self.isLeftHandTracked || self.isRightHandTracked) {
-//        float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];
-//        if((currentTimestamp - self.lastHandTrackingTimestamp) > kLostHandTrackingInterval) {
-//            NSLog(@"[ar_session]: hand tracking lost.");
-//            self.isLeftHandTracked = false;
-//            self.isRightHandTracked = false;
-//        }
-//    }
+    if (self.isLeftHandTracked || self.isRightHandTracked) {
+        float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];
+        if((currentTimestamp - self.lastHandTrackingTimestamp) > kLostHandTrackingInterval) {
+            NSLog(@"[ar_session]: hand tracking lost.");
+            self.isLeftHandTracked = false;
+            self.isRightHandTracked = false;
+        }
+    }
     
     // Hand tracking
     self.frameCount++;
     if (self.isHandTrackingEnabled && self.frameCount % self.handPosePredictionInterval == 0) {
-//        [self.handTrackingQueue addOperationWithBlock:^{
-//            [self.handTracker processVideoFrame: frame.capturedImage];
-//        }];
-        [self performHumanHandPoseRequest:frame];
+        [self.handTrackingQueue addOperationWithBlock:^{
+            [self.handTracker processVideoFrame: frame.capturedImage];
+        }];
+        //[self performHumanHandPoseRequest:frame];
     }
     
     // Send my hand position to peers
-    if (self.collaborationConnected && self.isLeftHandTracked) {
-        LandmarkPosition *landmarkPosition = self.leftHandLandmarkPositions[0];
-        NSArray* myHandPosition = [NSArray arrayWithObjects:
-                                   [NSNumber numberWithFloat:landmarkPosition.x],
-                                   [NSNumber numberWithFloat:landmarkPosition.y],
-                                   [NSNumber numberWithFloat:landmarkPosition.z], nil];
+    if (self.IsCollaborationSynchronized) {
+        NSArray* myHandPosition;
+        if (self.isLeftHandTracked) {
+            LandmarkPosition *landmarkPosition = self.leftHandLandmarkPositions[7];
+            myHandPosition = [NSArray arrayWithObjects:
+                                       [NSNumber numberWithFloat:landmarkPosition.x],
+                                       [NSNumber numberWithFloat:landmarkPosition.y],
+                                       [NSNumber numberWithFloat:landmarkPosition.z], nil];
+        } else {
+            myHandPosition = [NSArray arrayWithObjects:
+                                       [NSNumber numberWithFloat:-101.0f],
+                                       [NSNumber numberWithFloat:-101.0f],
+                                       [NSNumber numberWithFloat:-101.0f], nil];
+        }
+        
         //NSLog(@"raw myHandPosition: {%f, %f, %f}", [myHandPosition[0] floatValue], [myHandPosition[1] floatValue], [myHandPosition[2] floatValue]);
         NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:myHandPosition requiringSecureCoding:YES error:nil];
         //NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:encodedData error:nil];
@@ -243,18 +252,18 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
-    NSLog(@"[ar_session]: did add anchors.");
+    NSLog(@"[ar_session]: didAddAnchors()");
     for (ARAnchor *anchor in anchors) {
+        NSLog(@"[ar_session]: an anchor was added with name %@", anchor.name);
         // Check if this anchor is a new peer
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            NSLog(@"A new peer is connected into the collaboration session.");
+            NSLog(@"[ar_session]: a new peer is connected into the collaboration session.");
             CollaborationSynchronizedDelegate();
-            self.collaborationConnected = true;
-            [self.session addAnchor:anchor];
+            self.IsCollaborationSynchronized = true;
+            //[self.session addAnchor:anchor];
             continue;
         }
         if (anchor.name != nil) {
-            NSLog(@"[ar_session]: an anchor was added with name %@", anchor.name);
             std::vector<float> position;
             std::vector<float> rotation;
             if ([anchor.name isEqual:@"-1"] && !self.isCollaborationHost) {
@@ -265,7 +274,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
                 // Indicate the origin anchor transform in the previous coordinate system.
                 position = TransformToUnityPosition(anchor.transform);
                 rotation = TransformToUnityRotation(anchor.transform);
-                AnchorRevoke(-1, position[0], position[1], position[2],
+                AnchorAdded(-1, position[0], position[1], position[2],
                              rotation[0], rotation[1], rotation[2], rotation[3]);
                 continue;
             }
@@ -274,7 +283,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
             rotation = TransformToUnityRotation(anchor.transform);
             //NSLog(@"anchor position: %f, %f, %f", position[0], position[1], position[2]);
             //NSLog(@"anchor rotation: %f, %f, %f, %f", rotation[0], rotation[1], rotation[2], rotation[3]);
-            AnchorRevoke([anchor.name intValue], position[0], position[1], position[2],
+            AnchorAdded([anchor.name intValue], position[0], position[1], position[2],
                          rotation[0], rotation[1], rotation[2], rotation[3]);
         }
     }
@@ -284,7 +293,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateAnchors:anchors];
     }
-    //NSLog(@"[ar_session]: did update anchor.");
+    //NSLog(@"[ar_session]: didUpdateAnchors()");
 }
 
 - (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
@@ -585,7 +594,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
             int y = (CGFloat)landmark.y * self.session.currentFrame.camera.imageResolution.height;
             CGPoint screenPoint = CGPointMake(x, y);
             
-            NSLog(@"landmark [%f, %f]", landmark.x, landmark.y);
+            //NSLog(@"landmark [%f, %f]", landmark.x, landmark.y);
             size_t depthBufferWidth;
             size_t depthBufferHeight;
             Float32* depthBufferBaseAddress;
@@ -767,9 +776,9 @@ UnityHoloKit_AddNativeAnchor(int anchorId, float position[3], float rotation[4])
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetAnchorRevoke(AnchorCallbackFunction callback) {
+UnityHoloKit_SetAnchorAddedDelegate(AnchorCallbackFunction callback) {
     NSLog(@"UnityHolokit_SetAnchorRevoke");
-    AnchorRevoke = callback;
+    AnchorAdded = callback;
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

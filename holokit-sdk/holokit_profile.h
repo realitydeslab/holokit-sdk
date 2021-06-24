@@ -54,6 +54,7 @@ public:
         iPhone12,
         iPhone12Pro,
         iPhone12ProMax,
+        iPadPro2021,
         UnknownPhoneType
     };
     

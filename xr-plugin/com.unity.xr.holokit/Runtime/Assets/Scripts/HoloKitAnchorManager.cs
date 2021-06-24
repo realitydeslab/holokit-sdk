@@ -21,9 +21,10 @@ namespace UnityEngine.XR.HoloKit
 
         public Quaternion m_PlacementRotationOffset;
 
+        // The position of the peer hand transfered through the network.
         public Vector3 m_PeerHandPosition = Vector3.zero;
 
-        public Transform m_PeerHandSphere;
+        public bool m_IsPeerHandTracked = false;
 
         private bool m_DoesInstantiate = false;
 
@@ -48,7 +49,7 @@ namespace UnityEngine.XR.HoloKit
             float rotationX, float rotationY, float rotationZ, float rotationW);
 
         [AOT.MonoPInvokeCallback(typeof(AnchorCallbackFunction))]
-        static void OnAnchorRevoked(int val, float positionX, float positionY, float positionZ,
+        static void OnAnchorAdded(int val, float positionX, float positionY, float positionZ,
             float rotationX, float rotationY, float rotationZ, float rotationW)
         {
             Debug.Log($"[HoloKitAnchorManager]: OnAnchorRevoked() anchor name {val}");
@@ -77,17 +78,21 @@ namespace UnityEngine.XR.HoloKit
         }
 
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetAnchorRevoke(AnchorCallbackFunction callback);
+        private static extern void UnityHoloKit_SetAnchorAddedDelegate(AnchorCallbackFunction callback);
 
         delegate void UpdatePeerHandPosition(float x, float y, float z);
 
         [AOT.MonoPInvokeCallback(typeof(UpdatePeerHandPosition))]
         static void OnPeerHandPositionUpdated(float x, float y, float z)
         {
-            if (x == null)
+            if (x == -101f && y == -101f && z == -101f)
             {
+                HoloKitAnchorManager.Instance.m_IsPeerHandTracked = false;
+                // TODO: the host's hand lost tracking, disable the local hand.
                 return;
             }
+            Debug.Log($"[HoloKitAnchorManager]: received peer hand position ({x}, {y}, {z}).");
+            HoloKitAnchorManager.Instance.m_IsPeerHandTracked = true;
             HoloKitAnchorManager.Instance.m_PeerHandPosition = new Vector3(x, y, -z);
             //Debug.Log($"[HoloKitAnchorManager]: peer hand position is {HoloKitAnchorManager.Instance.m_PeerHandPosition}");
         }
@@ -151,7 +156,7 @@ namespace UnityEngine.XR.HoloKit
         {
             UnityHoloKit_SetIsCollaborationHost(m_IsHost);
             arCamera = Camera.main.transform;
-            UnityHoloKit_SetAnchorRevoke(OnAnchorRevoked);
+            UnityHoloKit_SetAnchorAddedDelegate(OnAnchorAdded);
             UnityHoloKit_SetUpdatePeerHandPositionDelegate(OnPeerHandPositionUpdated);
             UnityHoloKit_SetCollaborationSynchronizedDelegate(OnCollaborationSynchronized);
 
@@ -160,12 +165,6 @@ namespace UnityEngine.XR.HoloKit
 
         private void Update()
         {
-            //if (m_PeerHandPosition != Vector3.zero)
-            //{
-            //    Debug.Log("fuck");
-            //    m_PeerHandSphere.position = m_PeerHandPosition;
-            //}
-
             if (m_DoesInstantiate)
             {
                 Debug.Log("[HoloKitAnchorManager]: instantiating a new model.");
@@ -173,7 +172,7 @@ namespace UnityEngine.XR.HoloKit
                 newModel.transform.position = m_ModelPosition;
                 newModel.transform.rotation = m_ModelRotation;
                 Debug.Log($"[HoloKitAnchorManager]: before reset origin {m_ModelPosition}, {m_ModelRotation}");
-                newModel.AddComponent<ARAnchor>();      
+                newModel.AddComponent<ARAnchor>();    
 
                 m_SceneModels.Add(newModel);
                 m_DoesInstantiate = false;
