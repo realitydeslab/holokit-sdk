@@ -124,12 +124,14 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
             // Try to decode the received data as ARCollaboration data.
             ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
             if (collaborationData != NULL) {
+                NSLog(@"[ar_session]: did receive ARCollaboration data.");
                 [self.session updateWithCollaborationData:collaborationData];
                 return;
             }
             // Try to decode the received data as peer hand position data.
             NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
             if (decodedData != NULL) {
+                NSLog(@"[ar_session]: did receive peer hand position data.");
                 //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
                 UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
                 return;
@@ -303,6 +305,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 }
 
 - (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data {
+    NSLog(@"[ar_session]: did output ARCollaboration data.");
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
     }

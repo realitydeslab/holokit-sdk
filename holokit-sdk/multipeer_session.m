@@ -50,6 +50,7 @@
 }
 
 - (void)sendToAllPeers: (NSData *)data {
+    //NSLog(@"[ar_session]: send to all peers.");
     if (self.session.connectedPeers.count == 0) {
         NSLog(@"[multipeer_session]: There is no connected peer.");
         return;

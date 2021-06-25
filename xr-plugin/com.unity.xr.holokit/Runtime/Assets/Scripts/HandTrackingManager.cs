@@ -275,7 +275,7 @@ namespace UnityEngine.XR.HoloKit
         public void EnableHandTracking()
         {
             UnityHoloKit_EnableHandTracking(true);
-            m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Best;
+            //m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Best;
             transform.GetChild(0).transform.gameObject.SetActive(true);
             m_HandTrackingEnabled = true;
             Debug.Log("[HandTrackingManager]: hand tracking enabled.");
@@ -284,11 +284,11 @@ namespace UnityEngine.XR.HoloKit
         public void DisableHandTracking()
         {
             UnityHoloKit_EnableHandTracking(false);
-            m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Disabled;
+            //m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Disabled;
             // Enable human segmentation hand tracking
-            m_OcclusionManager.requestedHumanDepthMode = ARSubsystems.HumanSegmentationDepthMode.Fastest;
-            m_OcclusionManager.requestedHumanStencilMode = ARSubsystems.HumanSegmentationStencilMode.Fastest;
-            m_OcclusionManager.requestedOcclusionPreferenceMode = ARSubsystems.OcclusionPreferenceMode.PreferHumanOcclusion;
+            //m_OcclusionManager.requestedHumanDepthMode = ARSubsystems.HumanSegmentationDepthMode.Fastest;
+            //m_OcclusionManager.requestedHumanStencilMode = ARSubsystems.HumanSegmentationStencilMode.Fastest;
+            //m_OcclusionManager.requestedOcclusionPreferenceMode = ARSubsystems.OcclusionPreferenceMode.PreferHumanOcclusion;
             ResetPosition();
             transform.GetChild(0).transform.gameObject.SetActive(false);
             m_HandTrackingEnabled = false;
