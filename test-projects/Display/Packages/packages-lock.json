@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "com.mlapi.contrib.transport.enet": {
-      "version": "https://github.com/Unity-Technologies/mlapi-community-contributions.git?path=/Transports/com.mlapi.contrib.transport.enet",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "e47ee18972b110a689c23d6ffc0e5994d18e9eb2"
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

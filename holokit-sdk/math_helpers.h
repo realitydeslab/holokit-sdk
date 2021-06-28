@@ -4,7 +4,7 @@
 //
 //  Created by Yuchen on 2021/3/29.
 //
-
+#pragma once
 #include <simd/simd.h>
 #include <vector>
 #include "UnityXRTypes.h"

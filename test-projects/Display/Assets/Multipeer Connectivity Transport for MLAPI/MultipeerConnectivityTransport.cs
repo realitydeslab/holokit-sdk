@@ -1,61 +1,160 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using MLAPI.Transports.Tasks;
-using System;
+//using System.Collections;
+//using System.Collections.Generic;
+//using UnityEngine;
+//using MLAPI.Transports.Tasks;
+//using System;
+//using System.Runtime.InteropServices;
 
-namespace MLAPI.Transports.MultipeerConnectivity
-{
-    public class MultipeerConnectivityTransport : NetworkTransport
-    {
-        [SerializeField]
-        private bool m_IsHost;
+//namespace MLAPI.Transports.MultipeerConnectivity
+//{
+//    public class MultipeerConnectivityTransport : NetworkTransport
+//    {
+//        private static MultipeerConnectivityTransport _instance;
 
-        public override SocketTasks StartServer()
-        {
-            throw new System.NotImplementedException();
-        }
+//        public static MultipeerConnectivityTransport Instance { get { return _instance; } }
 
-        public override SocketTasks StartClient()
-        {
-            throw new System.NotImplementedException();
-        }
+//        /// <summary>
+//        /// Is this machine the host in the local network?
+//        /// </summary>
+//        private bool m_IsHost;
 
-        public override NetworkEvent PollEvent(out ulong clientId, out NetworkChannel networkChannel, out ArraySegment<byte> payload, out float receiveTime)
-        {
-            throw new NotImplementedException();
-        }
+//        /// <summary>
+//        /// The client Id of this machine in the local network.
+//        /// </summary>
+//        private ulong m_ClientId;
 
-        public override void Send(ulong clientId, ArraySegment<byte> data, NetworkChannel networkChannel)
-        {
-            throw new NotImplementedException();
-        }
+//        private bool m_IsNewPeerConnected = false;
+//        private ulong m_newPeerId;
 
-        public override void Init()
-        {
-            throw new NotImplementedException();
-        }
+//        /// <summary>
+//        /// The service type for multipeer connectivity.
+//        /// Only devices with the same service type get connected.
+//        /// </summary>
+//        [SerializeField]
+//        private string m_ServiceType = "ar-collab";
 
-        public override void Shutdown()
-        {
-            throw new NotImplementedException();
-        }
+//        /// <summary>
+//        /// This is a list which holds all connected peers' clientIds.
+//        /// </summary>
+//        private List<ulong> m_ConnectedPeers;
 
-        public override ulong ServerClientId => throw new NotImplementedException();
+//        [DllImport("__Internal")]
+//        private static extern void UnityHoloKit_MultipeerInit(string serviceType, string peerID);
 
-        public override void DisconnectLocalClient()
-        {
-            throw new NotImplementedException();
-        }
+//        [DllImport("__Internal")]
+//        private static extern void UnityHoloKit_MultipeerStartBrowsing();
 
-        public override ulong GetCurrentRtt(ulong clientId)
-        {
-            throw new NotImplementedException();
-        }
+//        [DllImport("__Internal")]
+//        private static extern void UnityHoloKit_MultipeerStartAdvertising();
 
-        public override void DisconnectRemoteClient(ulong clientId)
-        {
-            throw new NotImplementedException();
-        }
-    }
-}
+//        /// <summary>
+//        /// Dealing with ARCollaborationSynchronized callback function.
+//        /// </summary>
+//        delegate void MultipeerConnectionStartedForMLAPI(ulong peerId);
+
+//        [AOT.MonoPInvokeCallback(typeof(MultipeerConnectionStartedForMLAPI))]
+//        static void OnMultipeerConnectionStartedForMLAPI(ulong peerId)
+//        {
+//            // This delegate function gets called from Objective-C side when AR collaboration started.
+//            // We start MLAPI connection right after that.
+//            Debug.Log("[MultipeerConnectivityTransport]: multipeer connection started.");
+
+//            MultipeerConnectivityTransport.Instance.m_IsNewPeerConnected = true;
+//            MultipeerConnectivityTransport.Instance.m_newPeerId = peerId;
+//        }
+
+//        [DllImport("__Internal")]
+//        private static extern void UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback);
+
+//        private void Awake()
+//        {
+//            if (_instance != null && _instance != this)
+//            {
+//                Destroy(this.gameObject);
+//            }
+//            else
+//            {
+//                _instance = this;
+//            }
+//        }
+
+//        public override SocketTasks StartServer()
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: StartServer()");
+//            m_IsHost = true;
+//            UnityHoloKit_MultipeerStartBrowsing();
+//            return SocketTask.Done.AsTasks();
+//        }
+
+//        public override SocketTasks StartClient()
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: StartClient()");
+//            m_IsHost = false;
+//            UnityHoloKit_MultipeerStartAdvertising();
+//            throw new System.NotImplementedException();
+//        }
+
+//        public override NetworkEvent PollEvent(out ulong clientId, out NetworkChannel networkChannel, out ArraySegment<byte> payload, out float receiveTime)
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: PollEvent()");
+//            throw new NotImplementedException();
+//        }
+
+//        public override void Send(ulong clientId, ArraySegment<byte> data, NetworkChannel networkChannel)
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: Send()");
+//            throw new NotImplementedException();
+//        }
+
+//        public override void Init()
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: Init()");
+//            // Randomly generate a client Id for this machine.
+//            // The random generator picks a random int between 1 and 1,000,000,
+//            // therefore, it is very unlikely that we get a duplicate client Id.
+//            var randomGenerator = new System.Random((int)(Time.time * 1000));
+//            ulong myClientId = (ulong)randomGenerator.Next(1, 1000000);
+
+//            // Init the multipeer session in objective-c side.
+//            if (m_ServiceType == null)
+//            {
+//                Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because service type is null.");
+//            }
+//            UnityHoloKit_MultipeerInit(m_ServiceType, myClientId.ToString());
+//        }
+
+//        public override void Shutdown()
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: Shutdown()");
+//            throw new NotImplementedException();
+//        }
+
+//        public override ulong ServerClientId => throw new NotImplementedException();
+
+//        public override ulong GetCurrentRtt(ulong clientId)
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: GetCurrentRtt()");
+//            throw new NotImplementedException();
+//        }
+
+//        public override void DisconnectLocalClient()
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: DisconnectLocalClient()");
+//            throw new NotImplementedException();
+//        }
+
+//        public override void DisconnectRemoteClient(ulong clientId)
+//        {
+//            Debug.Log("[MultipeerConnectivityTransport]: DisconnectRemoteClient()");
+//            throw new NotImplementedException();
+//        }
+
+//        private void Update()
+//        {
+//            if (m_IsNewPeerConnected)
+//            {
+//                InvokeOnTransportEvent(NetworkEvent.Connect, m_newPeerId, NetworkChannel.DefaultMessage, default, Time.time);
+//            }
+//        }
+//    }
+//}

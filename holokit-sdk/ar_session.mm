@@ -4,7 +4,6 @@
 //
 //  Created by Yuchen on 2021/3/6.
 //
-#pragma once
 
 #include "ar_session.h"
 #include "UnityXRNativePtrs.h"
@@ -17,7 +16,6 @@
 #import <os/log.h>
 #import <os/signpost.h>
 
-#import "hand_tracking.h"
 #import <vector>
 #import "LandmarkPosition.h"
 
@@ -55,8 +53,8 @@ AnchorCallbackFunction AnchorAdded = NULL;
 typedef void (*UpdatePeerHandPosition)(float x, float y, float z);
 UpdatePeerHandPosition UpdatePeerHandPositionDelegate = NULL;
 
-typedef void (*CollaborationSynchronized)();
-CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
+typedef void (*ARCollaborationStartedForMLAPI)();
+ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
 
 @interface ARSessionDelegateController ()
 
@@ -71,9 +69,10 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
-@property (nonatomic, strong) MultipeerSession *multipeerSession;
+// Properties about AR collaboration
 @property (assign) bool IsCollaborationSynchronized;
 @property (assign) bool isCollaborationHost;
+@property (nonatomic, strong) MultipeerSession *multipeerSession;
 
 @end
 
@@ -118,30 +117,30 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
         self.primaryButtonLeft = NO;
         self.primaryButtonRight = NO;
         
-        // handler when receiving data
+        // Set up multipeer session
         void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
-            //NSLog(@"receivedDataHandler");
             // Try to decode the received data as ARCollaboration data.
             ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
             if (collaborationData != NULL) {
-                NSLog(@"[ar_session]: did receive ARCollaboration data.");
+                //NSLog(@"[ar_session]: did receive ARCollaboration data.");
                 [self.session updateWithCollaborationData:collaborationData];
                 return;
             }
+            // TODO: delete this
             // Try to decode the received data as peer hand position data.
             NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
             if (decodedData != NULL) {
-                NSLog(@"[ar_session]: did receive peer hand position data.");
+                //NSLog(@"[ar_session]: did receive peer hand position data.");
                 //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
                 UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
                 return;
             }
+            // TODO: handle MLAPI data
             NSLog(@"[ar_session]: Failed to decode received data from peer.");
         };
-        // Set up multipeer session
         self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
-        self.IsCollaborationSynchronized = false;
-        self.isCollaborationHost = true;
+//        self.IsCollaborationSynchronized = false;
+//        self.isCollaborationHost = true;
         
         //[self startAccelerometer];
         //[self startGyroscope];
@@ -150,6 +149,35 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
         last_frame_time = 0.0f;
     }
     return self;
+}
+
+- (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID {
+    // TODO: Can I move this into a separate block?
+    void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
+        // Try to decode the received data as ARCollaboration data.
+        ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
+        if (collaborationData != NULL) {
+            //NSLog(@"[ar_session]: did receive ARCollaboration data.");
+            [self.session updateWithCollaborationData:collaborationData];
+            return;
+        }
+        // TODO: delete this
+        // Try to decode the received data as peer hand position data.
+        NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
+        if (decodedData != NULL) {
+            //NSLog(@"[ar_session]: did receive peer hand position data.");
+            //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+            UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+            return;
+        }
+        // TODO: handle MLAPI data
+        NSLog(@"[ar_session]: Failed to decode received data from peer.");
+    };
+    //self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
+    self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
+    // TODO: make these parameters appropriate.
+    //self.IsCollaborationSynchronized = false;
+    //self.isCollaborationHost = true;
 }
 
 - (void)startAccelerometer {
@@ -259,10 +287,7 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
         NSLog(@"[ar_session]: an anchor was added with name %@", anchor.name);
         // Check if this anchor is a new peer
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            NSLog(@"[ar_session]: a new peer is connected into the collaboration session.");
-            CollaborationSynchronizedDelegate();
-            self.IsCollaborationSynchronized = true;
-            //[self.session addAnchor:anchor];
+            NSLog(@"[ar_session]: a new peer is synchronized into the AR collaboration.");
             continue;
         }
         if (anchor.name != nil) {
@@ -281,12 +306,12 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
                 continue;
             }
             // This is a normal VFX anchor.
-            position = TransformToUnityPosition(anchor.transform);
-            rotation = TransformToUnityRotation(anchor.transform);
+//            position = TransformToUnityPosition(anchor.transform);
+//            rotation = TransformToUnityRotation(anchor.transform);
             //NSLog(@"anchor position: %f, %f, %f", position[0], position[1], position[2]);
             //NSLog(@"anchor rotation: %f, %f, %f, %f", rotation[0], rotation[1], rotation[2], rotation[3]);
-            AnchorAdded([anchor.name intValue], position[0], position[1], position[2],
-                         rotation[0], rotation[1], rotation[2], rotation[3]);
+//            AnchorAdded([anchor.name intValue], position[0], position[1], position[2],
+//                         rotation[0], rotation[1], rotation[2], rotation[3]);
         }
     }
 }
@@ -305,14 +330,14 @@ CollaborationSynchronized CollaborationSynchronizedDelegate = NULL;
 }
 
 - (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data {
-    NSLog(@"[ar_session]: did output ARCollaboration data.");
+    //NSLog(@"[ar_session]: did output ARCollaboration data.");
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
     }
     if (self.multipeerSession == nil) {
         return;
     }
-    if ([self.multipeerSession GetConnectedPeers].count == 0) {
+    if ([self.multipeerSession getConnectedPeers].count == 0) {
         //NSLog(@"Deferred sending collaboration to later because there are no peers.");
         return;
     }
@@ -749,19 +774,23 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
 //}
 //#endif
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+#pragma mark - extern "C"
+
+extern "C" {
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
     SetARSession(ar_native_session);
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_EnableHandTracking(bool enabled) {
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     ar_session_handler.isHandTrackingEnabled = enabled;
     NSLog(@"[ar_session]: EnableHandTracking(%d)", enabled);
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     
@@ -769,7 +798,7 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     [ar_session_handler.session setWorldOrigin:(transform_matrix)];
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_AddNativeAnchor(int anchorId, float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithFormat:@"%d", anchorId] transform:transform_matrix];
@@ -778,30 +807,59 @@ UnityHoloKit_AddNativeAnchor(int anchorId, float position[3], float rotation[4])
     [ar_session_handler.session addAnchor:anchor];
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetAnchorAddedDelegate(AnchorCallbackFunction callback) {
     NSLog(@"UnityHolokit_SetAnchorRevoke");
     AnchorAdded = callback;
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetUpdatePeerHandPositionDelegate(UpdatePeerHandPosition callback) {
     UpdatePeerHandPositionDelegate = callback;
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetCollaborationSynchronizedDelegate(CollaborationSynchronized callback) {
-    CollaborationSynchronizedDelegate = callback;
-}
-
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetHandTrackingInterval(int val) {
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_handler setHandPosePredictionInterval:val];
 }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetIsCollaborationHost(bool val) {
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_handler setIsCollaborationHost:val];
 }
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerInit(const char* serviceType, const char* peerID) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    [ar_session_delegate_controller initMultipeerSessionWithServiceType:[NSString stringWithUTF8String:serviceType] peerID:[NSString stringWithUTF8String:peerID]];
+    // TODO: init service type and peer ID
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerStartBrowsing() {
+//    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+//    if (ar_session_delegate_controller.multipeerSession == nil) {
+//        NSLog(@"[ar_session]: multipeer session is not initialized.");
+//        return;
+//    }
+//    [ar_session_delegate_controller.multipeerSession startBrowsing];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerStartAdvertising() {
+//    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+//    if (ar_session_delegate_controller.multipeerSession == nil) {
+//        NSLog(@"[ar_session]: multipeer session is not initialized.");
+//        return;
+//    }
+//    [ar_session_delegate_controller.multipeerSession startAdvertising];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetARCollaborationStartedForMLAPIDelegate(ARCollaborationStartedForMLAPI callback) {
+    ARCollaborationStartedForMLAPIDelegate = callback;
+}
+
+} // extern "C"

@@ -4,54 +4,54 @@ using UnityEngine;
 
 public class InteractiveCube : MonoBehaviour
 {
-    [SerializeField] private GameObject leftHandLandmark;
-    [SerializeField] private GameObject rightHandLandmark;
+    //[SerializeField] private GameObject leftHandLandmark;
+    //[SerializeField] private GameObject rightHandLandmark;
 
-    private float speed = 0.05f;
+    //private float speed = 0.05f;
 
-    private const float kMinDistance = 0.2f;
+    //private const float kMinDistance = 0.2f;
 
-    public enum InteractiveCubeState { idle, telekinesis };
+    //public enum InteractiveCubeState { idle, telekinesis };
 
-    private InteractiveCubeState currentState = InteractiveCubeState.idle;
+    //private InteractiveCubeState currentState = InteractiveCubeState.idle;
 
-    private void OnEnable()
-    {
-        UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToBloom += StartTelekinesis;
-        UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToNone += StopTelekinesis;
-    }
+    //private void OnEnable()
+    //{
+    //    UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToBloom += StartTelekinesis;
+    //    UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToNone += StopTelekinesis;
+    //}
 
-    private void OnDisable()
-    {
-        UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToBloom -= StartTelekinesis;
-        UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToNone -= StopTelekinesis;
-    }
+    //private void OnDisable()
+    //{
+    //    UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToBloom -= StartTelekinesis;
+    //    UnityEngine.XR.HoloKit.HandTrackingManager.OnChangedToNone -= StopTelekinesis;
+    //}
 
-    void StartTelekinesis()
-    {
-        currentState = InteractiveCubeState.telekinesis;
-    }
+    //void StartTelekinesis()
+    //{
+    //    currentState = InteractiveCubeState.telekinesis;
+    //}
 
-    void StopTelekinesis()
-    {
-        currentState = InteractiveCubeState.idle;
-    }
+    //void StopTelekinesis()
+    //{
+    //    currentState = InteractiveCubeState.idle;
+    //}
 
-    private void FixedUpdate()
-    {
-        if (Vector3.Distance(transform.position, leftHandLandmark.transform.position) < kMinDistance)
-        {
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            return;
-        }
-        if (currentState == InteractiveCubeState.telekinesis)
-        {
-            Vector3 direction = (leftHandLandmark.transform.position - transform.position).normalized;
-            GetComponent<Rigidbody>().velocity += direction * speed;
-        }
-        else
-        {
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-        }
-    }
+    //private void FixedUpdate()
+    //{
+    //    if (Vector3.Distance(transform.position, leftHandLandmark.transform.position) < kMinDistance)
+    //    {
+    //        GetComponent<Rigidbody>().velocity = Vector3.zero;
+    //        return;
+    //    }
+    //    if (currentState == InteractiveCubeState.telekinesis)
+    //    {
+    //        Vector3 direction = (leftHandLandmark.transform.position - transform.position).normalized;
+    //        GetComponent<Rigidbody>().velocity += direction * speed;
+    //    }
+    //    else
+    //    {
+    //        GetComponent<Rigidbody>().velocity = Vector3.zero;
+    //    }
+    //}
 }

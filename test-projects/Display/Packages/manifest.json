@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.mlapi.contrib.transport.enet": "https://github.com/Unity-Technologies/mlapi-community-contributions.git?path=/Transports/com.mlapi.contrib.transport.enet",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.analytics": "3.5.3",

@@ -13,7 +13,7 @@
 
 #include "IUnityXRTrace.h"
 #include "IUnityXRDisplay.h"
-#include "UnitySubsystemTypes.h"
+//#include "UnitySubsystemTypes.h"
 #include "load.h"
 #include "math_helpers.h"
 #include "holokit_api.h"
