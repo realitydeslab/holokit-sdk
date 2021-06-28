@@ -26,41 +26,13 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 
 @implementation MultipeerSession
 
-- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler {
-    self = [super init];
-    
-    if (self) {
-        self.serviceType = @"ar-collab";
-        self.myPeerID = [[MCPeerID alloc] initWithDisplayName:[UIDevice currentDevice].name];
-        NSLog(@"%@", self.myPeerID);
-        
-        // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
-        self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
-        self.session.delegate = self;
-        
-        self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
-        self.serviceBrowser.delegate = self;
-        //[self.serviceBrowser startBrowsingForPeers];
-        
-        self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
-        self.serviceAdvertiser.delegate = self;
-        //[self.serviceAdvertiser startAdvertisingPeer];
-        
-        self.receivedDataHandler = receivedDataHandler;
-    }
-    return self;
-}
-
-//- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID {
+//- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler {
 //    self = [super init];
 //    
 //    if (self) {
 //        self.serviceType = @"ar-collab";
 //        self.myPeerID = [[MCPeerID alloc] initWithDisplayName:[UIDevice currentDevice].name];
-//        //NSLog(@"%@", self.myPeerID);
-//        //self.serviceType = serviceType;
-//        //self.myPeerID = [[MCPeerID alloc] initWithDisplayName:peerID];
-//        //NSLog(@"[multipeer_session]: service type is %@ and peerID display name is %@", serviceType, peerID);
+//        NSLog(@"%@", self.myPeerID);
 //        
 //        // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
 //        self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
@@ -76,9 +48,37 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 //        
 //        self.receivedDataHandler = receivedDataHandler;
 //    }
-//    
 //    return self;
 //}
+
+- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID {
+    self = [super init];
+    
+    if (self) {
+        self.serviceType = @"ar-collab";
+        self.myPeerID = [[MCPeerID alloc] initWithDisplayName:[UIDevice currentDevice].name];
+        //NSLog(@"%@", self.myPeerID);
+        //self.serviceType = serviceType;
+        //self.myPeerID = [[MCPeerID alloc] initWithDisplayName:peerID];
+        //NSLog(@"[multipeer_session]: service type is %@ and peerID display name is %@", serviceType, peerID);
+        
+        // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
+        self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
+        self.session.delegate = self;
+        
+        self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
+        self.serviceBrowser.delegate = self;
+        //[self.serviceBrowser startBrowsingForPeers];
+        
+        self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
+        self.serviceAdvertiser.delegate = self;
+        //[self.serviceAdvertiser startAdvertisingPeer];
+        
+        self.receivedDataHandler = receivedDataHandler;
+    }
+    
+    return self;
+}
 
 - (void)sendToAllPeers: (NSData *)data {
     //NSLog(@"[ar_session]: send to all peers.");

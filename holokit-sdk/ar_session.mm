@@ -118,27 +118,7 @@ ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
         self.primaryButtonRight = NO;
         
         // Set up multipeer session
-        void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
-            // Try to decode the received data as ARCollaboration data.
-            ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
-            if (collaborationData != NULL) {
-                //NSLog(@"[ar_session]: did receive ARCollaboration data.");
-                [self.session updateWithCollaborationData:collaborationData];
-                return;
-            }
-            // TODO: delete this
-            // Try to decode the received data as peer hand position data.
-            NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
-            if (decodedData != NULL) {
-                //NSLog(@"[ar_session]: did receive peer hand position data.");
-                //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
-                UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
-                return;
-            }
-            // TODO: handle MLAPI data
-            NSLog(@"[ar_session]: Failed to decode received data from peer.");
-        };
-        self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
+//        self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
 //        self.IsCollaborationSynchronized = false;
 //        self.isCollaborationHost = true;
         
@@ -173,8 +153,8 @@ ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
         // TODO: handle MLAPI data
         NSLog(@"[ar_session]: Failed to decode received data from peer.");
     };
-    //self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
-    self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
+    self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
+    //self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
     // TODO: make these parameters appropriate.
     //self.IsCollaborationSynchronized = false;
     //self.isCollaborationHost = true;
