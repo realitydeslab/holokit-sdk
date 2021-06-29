@@ -4,7 +4,7 @@
 //
 //  Created by Yuchen on 2021/4/25.
 //
-#pragma once
+
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 
 @interface MultipeerSession : NSObject

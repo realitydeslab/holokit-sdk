@@ -6,7 +6,6 @@
 //
 
 #import "multipeer_session.h"
-#include "IUnityInterface.h"
 
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
@@ -26,7 +25,6 @@
 
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler {
     self = [super init];
-    
     if (self) {
         self.serviceType = @"ar-collab";
         self.myPeerID = [[MCPeerID alloc] initWithDisplayName:[UIDevice currentDevice].name];
@@ -113,7 +111,7 @@
     NSLog(@"[multipeer_session]: did change state %d", state);
     if (state == MCSessionStateConnected) {
         NSLog(@"[multipeer_session]: peer %@ has been connected.", peerID.displayName);
-        unsigned long peerId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+        //unsigned long peerId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
         //MultipeerConnectionStartedForMLAPIDelegate(peerId);
         // TODO: a more appropriate way is to notify MLAPI the connection starts right after two devices' AR maps synchronized.
         // TODO: however, I didn't find a way to pass peerID using that way.
