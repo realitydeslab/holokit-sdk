@@ -20,6 +20,7 @@
 #import "LandmarkPosition.h"
 
 //#if TARGET_OS_IPHONE
+#import "hand_tracking.h"
 #import <Foundation/Foundation.h>
 #import <HandTracker/HandTracker.h>
 #import <ARKit/ARKit.h>
@@ -56,9 +57,6 @@ UpdatePeerHandPosition UpdatePeerHandPositionDelegate = NULL;
 typedef void (*ARCollaborationStartedForMLAPI)();
 ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
 
-typedef void (*MultipeerConnectionStartedForMLAPI)(unsigned long peerId);
-MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = NULL;
-
 @interface ARSessionDelegateController ()
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
@@ -72,10 +70,10 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
+@property (nonatomic, strong) MultipeerSession *multipeerSession;
 // Properties about AR collaboration
 @property (assign) bool IsCollaborationSynchronized;
 @property (assign) bool isCollaborationHost;
-@property (nonatomic, strong) MultipeerSession *multipeerSession;
 
 @end
 
@@ -113,35 +111,33 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
         self.isLeftHandTracked = false;
         self.isRightHandTracked = false;
         self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
-        
         // MODIFY HERE
         self.isHandTrackingEnabled = YES;
-        
         self.primaryButtonLeft = NO;
         self.primaryButtonRight = NO;
         
         // Set up multipeer session
-        void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
-            // Try to decode the received data as ARCollaboration data.
-            ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
-            if (collaborationData != NULL) {
-                //NSLog(@"[ar_session]: did receive ARCollaboration data.");
-                [self.session updateWithCollaborationData:collaborationData];
-                return;
-            }
-            // TODO: delete this
-            // Try to decode the received data as peer hand position data.
-            NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
-            if (decodedData != NULL) {
-                //NSLog(@"[ar_session]: did receive peer hand position data.");
-                //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
-                UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
-                return;
-            }
-            // TODO: handle MLAPI data
-            NSLog(@"[ar_session]: Failed to decode received data from peer.");
-        };
-        self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
+//        void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
+//            // Try to decode the received data as ARCollaboration data.
+//            ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
+//            if (collaborationData != NULL) {
+//                //NSLog(@"[ar_session]: did receive ARCollaboration data.");
+//                [self.session updateWithCollaborationData:collaborationData];
+//                return;
+//            }
+//            // TODO: delete this
+//            // Try to decode the received data as peer hand position data.
+//            NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
+//            if (decodedData != NULL) {
+//                //NSLog(@"[ar_session]: did receive peer hand position data.");
+//                //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+//                UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+//                return;
+//            }
+//            // TODO: handle MLAPI data
+//            NSLog(@"[ar_session]: Failed to decode received data from peer.");
+//        };
+//        self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
 //        self.IsCollaborationSynchronized = false;
 //        self.isCollaborationHost = true;
         
@@ -177,10 +173,6 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
         NSLog(@"[ar_session]: Failed to decode received data from peer.");
     };
     self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
-    //self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
-    // TODO: make these parameters appropriate.
-    //self.IsCollaborationSynchronized = false;
-    //self.isCollaborationHost = true;
 }
 
 - (void)startAccelerometer {
@@ -771,12 +763,6 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
     //    session.delegate = controller;
 }
 
-//#else
-//void SetARSession(UnityXRNativeSession* ar_native_session) {
-//    printout("SetARSession on mac");
-//}
-//#endif
-
 #pragma mark - extern "C"
 
 extern "C" {
@@ -862,11 +848,6 @@ UnityHoloKit_MultipeerStartAdvertising() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARCollaborationStartedForMLAPIDelegate(ARCollaborationStartedForMLAPI callback) {
     ARCollaborationStartedForMLAPIDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback) {
-    //MultipeerConnectionStartedForMLAPIDelegate = callback;
 }
 
 } // extern "C"

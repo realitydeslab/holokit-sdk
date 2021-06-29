@@ -61,6 +61,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
             MultipeerConnectivityTransport.Instance.m_IsNewPeerConnected = true;
             MultipeerConnectivityTransport.Instance.m_newPeerId = peerId;
+            Debug.Log($"[MultipeerConnectivityTransport]: connected peerId {peerId}");
         }
 
         [DllImport("__Internal")]
@@ -154,11 +155,18 @@ namespace MLAPI.Transports.MultipeerConnectivity
             throw new NotImplementedException();
         }
 
+        private void Start()
+        {
+            // Register delegates
+            UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(OnMultipeerConnectionStartedForMLAPI);
+        }
+
         private void Update()
         {
             if (m_IsNewPeerConnected)
             {
                 InvokeOnTransportEvent(NetworkEvent.Connect, m_newPeerId, NetworkChannel.DefaultMessage, default, Time.time);
+                m_IsNewPeerConnected = false;
             }
         }
     }

@@ -6,16 +6,18 @@
 //
 
 #import "multipeer_session.h"
+#include "IUnityInterface.h"
+
+typedef void (*MultipeerConnectionStartedForMLAPI)(unsigned long peerId);
+MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = NULL;
 
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
 @property (nonatomic, strong) NSString *serviceType;
 @property (nonatomic, strong) MCPeerID *myPeerID;
-
 @property (nonatomic, strong) MCSession *session;
 @property (nonatomic, strong) MCNearbyServiceAdvertiser *serviceAdvertiser;
 @property (nonatomic, strong) MCNearbyServiceBrowser *serviceBrowser;
-
 // Reference: http://fuckingblocksyntax.com/
 @property (nonatomic, copy, nullable) void (^receivedDataHandler)(NSData *, MCPeerID *);
 
@@ -37,41 +39,39 @@
         self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
         self.serviceAdvertiser.delegate = self;
         [self.serviceAdvertiser startAdvertisingPeer];
-        NSLog(@"[multipeer_session]: startAdvertisingPeer");
         
         self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
         self.serviceBrowser.delegate = self;
         [self.serviceBrowser startBrowsingForPeers];
-        NSLog(@"[multipeer_session]: startBrowsingForPeers");
          
         self.receivedDataHandler = receivedDataHandler;
     }
     return self;
 }
 
+// This constructor is for MLAPI.
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID {
     self = [super init];
-    
     if (self) {
         self.serviceType = serviceType;
         self.myPeerID = [[MCPeerID alloc] initWithDisplayName:peerID];
         NSLog(@"[multipeer_session]: service type is %@ and peerID display name is %@", serviceType, peerID);
-        
+
         // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
         self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
         self.session.delegate = self;
-        
+
         self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
         self.serviceAdvertiser.delegate = self;
-        [self.serviceAdvertiser startAdvertisingPeer];
-        
+        //[self.serviceAdvertiser startAdvertisingPeer];
+
         self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
         self.serviceBrowser.delegate = self;
-        [self.serviceBrowser startBrowsingForPeers];
-        
+        //[self.serviceBrowser startBrowsingForPeers];
+
         self.receivedDataHandler = receivedDataHandler;
     }
-    
+
     return self;
 }
 
@@ -108,18 +108,21 @@
 #pragma mark - MCSessionDelegate
 
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
-    NSLog(@"[multipeer_session]: did change state %d", state);
-    if (state == MCSessionStateConnected) {
-        NSLog(@"[multipeer_session]: peer %@ has been connected.", peerID.displayName);
-        //unsigned long peerId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-        //MultipeerConnectionStartedForMLAPIDelegate(peerId);
+    if (state == MCSessionStateNotConnected) {
+        NSLog(@"[multipeer_session]: not connected.");
+    } else if (state == MCSessionStateConnecting) {
+        NSLog(@"[multipeer_session]: connecting peer %@.", peerID.displayName);
+    } else if (state == MCSessionStateConnected) {
+        NSLog(@"[multipeer_session]: connected peer %@.", peerID.displayName);
+        unsigned long peerId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+        MultipeerConnectionStartedForMLAPIDelegate(peerId);
         // TODO: a more appropriate way is to notify MLAPI the connection starts right after two devices' AR maps synchronized.
         // TODO: however, I didn't find a way to pass peerID using that way.
     }
 }
 
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
-    NSLog(@"[multipeer_session]: did receive data from peer %@", peerID.displayName);
+    //NSLog(@"[multipeer_session]: did receive data from peer %@", peerID.displayName);
     self.receivedDataHandler(data, peerID);
 }
 
@@ -138,21 +141,30 @@
 #pragma mark - MCNearbyServiceAdvertiserDelegate
 
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
-    NSLog(@"[multipeer_session]: did receive an invitation from peer %@", peerID.displayName);
+    NSLog(@"[multipeer_session]: did receive invitation from peer %@.", peerID.displayName);
     invitationHandler(true, self.session);
     // TODO: notify MLAPI
 }
 
+//- (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
+//    NSLog(@"[multipeer_session]: did receive invitation from peer.");
+//}
+
 #pragma mark - MCNearbyServiceBrowserDelegate
 
 - (void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary<NSString *,NSString *> *)info {
-    NSLog(@"[multipeer_session]: did find peer %@", peerID.displayName);
+    NSLog(@"[multipeer_session]: found peer %@.", peerID.displayName);
     // Invite the found peer into my MCSession.
     [browser invitePeer:peerID toSession:self.session withContext:nil timeout:10];
 }
 
 - (void)browser:(nonnull MCNearbyServiceBrowser *)browser lostPeer:(nonnull MCPeerID *)peerID {
-    
+    NSLog(@"[multipeer_session]: lost peer %@.", peerID.displayName);
 }
 
 @end
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback) {
+    MultipeerConnectionStartedForMLAPIDelegate = callback;
+}
