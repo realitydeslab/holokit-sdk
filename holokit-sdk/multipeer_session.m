@@ -6,9 +6,7 @@
 //
 
 #import "multipeer_session.h"
-
-typedef void (*MultipeerConnectionStartedForMLAPI)(unsigned long peerId);
-MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = NULL;
+#include "IUnityInterface.h"
 
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
@@ -26,53 +24,52 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 
 @implementation MultipeerSession
 
-//- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler {
-//    self = [super init];
-//    
-//    if (self) {
-//        self.serviceType = @"ar-collab";
-//        self.myPeerID = [[MCPeerID alloc] initWithDisplayName:[UIDevice currentDevice].name];
-//        NSLog(@"%@", self.myPeerID);
-//        
-//        // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
-//        self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
-//        self.session.delegate = self;
-//        
-//        self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
-//        self.serviceBrowser.delegate = self;
-//        //[self.serviceBrowser startBrowsingForPeers];
-//        
-//        self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
-//        self.serviceAdvertiser.delegate = self;
-//        //[self.serviceAdvertiser startAdvertisingPeer];
-//        
-//        self.receivedDataHandler = receivedDataHandler;
-//    }
-//    return self;
-//}
-
-- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID {
+- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler {
     self = [super init];
     
     if (self) {
         self.serviceType = @"ar-collab";
         self.myPeerID = [[MCPeerID alloc] initWithDisplayName:[UIDevice currentDevice].name];
-        //NSLog(@"%@", self.myPeerID);
-        //self.serviceType = serviceType;
-        //self.myPeerID = [[MCPeerID alloc] initWithDisplayName:peerID];
-        //NSLog(@"[multipeer_session]: service type is %@ and peerID display name is %@", serviceType, peerID);
+        NSLog(@"[multipeer_session]: my peerID %@", self.myPeerID);
         
         // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
         self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
         self.session.delegate = self;
         
+        self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
+        self.serviceAdvertiser.delegate = self;
+        [self.serviceAdvertiser startAdvertisingPeer];
+        NSLog(@"[multipeer_session]: startAdvertisingPeer");
+        
         self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
         self.serviceBrowser.delegate = self;
-        //[self.serviceBrowser startBrowsingForPeers];
+        [self.serviceBrowser startBrowsingForPeers];
+        NSLog(@"[multipeer_session]: startBrowsingForPeers");
+         
+        self.receivedDataHandler = receivedDataHandler;
+    }
+    return self;
+}
+
+- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID {
+    self = [super init];
+    
+    if (self) {
+        self.serviceType = serviceType;
+        self.myPeerID = [[MCPeerID alloc] initWithDisplayName:peerID];
+        NSLog(@"[multipeer_session]: service type is %@ and peerID display name is %@", serviceType, peerID);
+        
+        // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
+        self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
+        self.session.delegate = self;
         
         self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
         self.serviceAdvertiser.delegate = self;
-        //[self.serviceAdvertiser startAdvertisingPeer];
+        [self.serviceAdvertiser startAdvertisingPeer];
+        
+        self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
+        self.serviceBrowser.delegate = self;
+        [self.serviceBrowser startBrowsingForPeers];
         
         self.receivedDataHandler = receivedDataHandler;
     }
@@ -99,11 +96,13 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 }
 
 - (void)startBrowsing {
+    NSLog(@"[multipeer_session]: startBrowsing");
     self.isHost = true;
     [self.serviceBrowser startBrowsingForPeers];
 }
 
 - (void)startAdvertising {
+    NSLog(@"[multipeer_session]: startAdvertising");
     self.isHost = false;
     [self.serviceAdvertiser startAdvertisingPeer];
 }
@@ -111,10 +110,13 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 #pragma mark - MCSessionDelegate
 
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
+    NSLog(@"[multipeer_session]: did change state %d", state);
     if (state == MCSessionStateConnected) {
         NSLog(@"[multipeer_session]: peer %@ has been connected.", peerID.displayName);
         unsigned long peerId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-        MultipeerConnectionStartedForMLAPIDelegate(peerId);
+        //MultipeerConnectionStartedForMLAPIDelegate(peerId);
+        // TODO: a more appropriate way is to notify MLAPI the connection starts right after two devices' AR maps synchronized.
+        // TODO: however, I didn't find a way to pass peerID using that way.
     }
 }
 
@@ -156,8 +158,3 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 }
 
 @end
-
-//extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-//UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback) {
-//    MultipeerConnectionStartedForMLAPIDelegate = callback;
-//}

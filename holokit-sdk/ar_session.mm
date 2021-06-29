@@ -56,6 +56,9 @@ UpdatePeerHandPosition UpdatePeerHandPositionDelegate = NULL;
 typedef void (*ARCollaborationStartedForMLAPI)();
 ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
 
+typedef void (*MultipeerConnectionStartedForMLAPI)(unsigned long peerId);
+MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = NULL;
+
 @interface ARSessionDelegateController ()
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
@@ -118,7 +121,27 @@ ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
         self.primaryButtonRight = NO;
         
         // Set up multipeer session
-//        self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
+        void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
+            // Try to decode the received data as ARCollaboration data.
+            ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
+            if (collaborationData != NULL) {
+                //NSLog(@"[ar_session]: did receive ARCollaboration data.");
+                [self.session updateWithCollaborationData:collaborationData];
+                return;
+            }
+            // TODO: delete this
+            // Try to decode the received data as peer hand position data.
+            NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
+            if (decodedData != NULL) {
+                //NSLog(@"[ar_session]: did receive peer hand position data.");
+                //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+                UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+                return;
+            }
+            // TODO: handle MLAPI data
+            NSLog(@"[ar_session]: Failed to decode received data from peer.");
+        };
+        self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
 //        self.IsCollaborationSynchronized = false;
 //        self.isCollaborationHost = true;
         
@@ -814,32 +837,36 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerInit(const char* serviceType, const char* peerID) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_delegate_controller initMultipeerSessionWithServiceType:[NSString stringWithUTF8String:serviceType] peerID:[NSString stringWithUTF8String:peerID]];
-    // TODO: init service type and peer ID
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerStartBrowsing() {
-//    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-//    if (ar_session_delegate_controller.multipeerSession == nil) {
-//        NSLog(@"[ar_session]: multipeer session is not initialized.");
-//        return;
-//    }
-//    [ar_session_delegate_controller.multipeerSession startBrowsing];
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    if (ar_session_delegate_controller.multipeerSession == nil) {
+        NSLog(@"[ar_session]: multipeer session is not initialized.");
+        return;
+    }
+    [ar_session_delegate_controller.multipeerSession startBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerStartAdvertising() {
-//    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-//    if (ar_session_delegate_controller.multipeerSession == nil) {
-//        NSLog(@"[ar_session]: multipeer session is not initialized.");
-//        return;
-//    }
-//    [ar_session_delegate_controller.multipeerSession startAdvertising];
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    if (ar_session_delegate_controller.multipeerSession == nil) {
+        NSLog(@"[ar_session]: multipeer session is not initialized.");
+        return;
+    }
+    [ar_session_delegate_controller.multipeerSession startAdvertising];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARCollaborationStartedForMLAPIDelegate(ARCollaborationStartedForMLAPI callback) {
     ARCollaborationStartedForMLAPIDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback) {
+    //MultipeerConnectionStartedForMLAPIDelegate = callback;
 }
 
 } // extern "C"
