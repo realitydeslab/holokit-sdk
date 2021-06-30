@@ -7,6 +7,7 @@
 
 #import "multipeer_session.h"
 #include "IUnityInterface.h"
+#include "ar_session.h"
 
 typedef void (*MultipeerConnectionStartedForMLAPI)(unsigned long peerId);
 MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = NULL;
@@ -56,7 +57,7 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
         self.serviceType = serviceType;
         self.myPeerID = [[MCPeerID alloc] initWithDisplayName:peerID];
         NSLog(@"[multipeer_session]: service type is %@ and peerID display name is %@", serviceType, peerID);
-
+        
         // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
         self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
         self.session.delegate = self;
@@ -70,6 +71,8 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
         //[self.serviceBrowser startBrowsingForPeers];
 
         self.receivedDataHandler = receivedDataHandler;
+        
+        self.connectedPeers = [[NSMutableArray alloc] init];
     }
 
     return self;
@@ -89,6 +92,17 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
     }
 }
 
+- (void)sendToPeer: (NSData *)data peer:(MCPeerID *)peerId mode:(MCSessionSendDataMode)mode {
+    //NSLog(@"[multipeer_session]: send to peer %@", peerId.displayName);
+    NSArray *peerArray = @[peerId];
+    bool success = [self.session sendData:data toPeers:peerArray withMode:mode error:nil];
+    if (success) {
+        //NSLog(@"[multipeer_session]: successfully sent data to peer.");
+    } else {
+        NSLog(@"[multipeer_session]: failed to send to peer.");
+    }
+}
+
 - (NSArray<MCPeerID *> *)getConnectedPeers {
     return self.session.connectedPeers;
 }
@@ -105,15 +119,71 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
     [self.serviceAdvertiser startAdvertisingPeer];
 }
 
++ (MCSessionSendDataMode)convertMLAPINetworkChannelToSendDataMode:(int)channel {
+    MCSessionSendDataMode result = MCSessionSendDataReliable;
+    switch(channel) {
+        case(0):
+            // Internal
+            result = MCSessionSendDataReliable;
+            break;
+        case(1):
+            // TimeSync
+            result = MCSessionSendDataReliable;
+            break;
+        case(2):
+            // ReliableRpc
+            result = MCSessionSendDataReliable;
+            break;
+        case(3):
+            // UnreliableRpc
+            result = MCSessionSendDataUnreliable;
+            break;
+        case(4):
+            // SyncChannel
+            result = MCSessionSendDataReliable;
+            break;
+        case(5):
+            // DefaultMessage
+            result = MCSessionSendDataReliable;
+            break;
+        case(6):
+            // PositionUpdate
+            result = MCSessionSendDataReliable;
+            break;
+        case(7):
+            // AnimationUpdate
+            result = MCSessionSendDataReliable;
+            break;
+        case(8):
+            // NavAgentState
+            result = MCSessionSendDataReliable;
+            break;
+        case(9):
+            // NavAgentCorrection
+            result = MCSessionSendDataReliable;
+            break;
+        case(10):
+            // ChannelUnused
+            result = MCSessionSendDataUnreliable;
+            break;
+        default:
+            result = MCSessionSendDataUnreliable;
+            break;
+    }
+    return result;
+}
+
 #pragma mark - MCSessionDelegate
 
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
     if (state == MCSessionStateNotConnected) {
-        NSLog(@"[multipeer_session]: not connected.");
+        NSLog(@"[multipeer_session]: not connected with peer %@.", peerID.displayName);
+        [self.connectedPeers removeObject:peerID];
     } else if (state == MCSessionStateConnecting) {
-        NSLog(@"[multipeer_session]: connecting peer %@.", peerID.displayName);
+        NSLog(@"[multipeer_session]: connecting with peer %@.", peerID.displayName);
     } else if (state == MCSessionStateConnected) {
-        NSLog(@"[multipeer_session]: connected peer %@.", peerID.displayName);
+        NSLog(@"[multipeer_session]: connected  with peer %@.", peerID.displayName);
+        [self.connectedPeers addObject:peerID];
         unsigned long peerId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
         MultipeerConnectionStartedForMLAPIDelegate(peerId);
         // TODO: a more appropriate way is to notify MLAPI the connection starts right after two devices' AR maps synchronized.
@@ -167,4 +237,32 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback) {
     MultipeerConnectionStartedForMLAPIDelegate = callback;
+}
+
+// https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerSend(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    MultipeerSession *session = ar_session_delegate_controller.multipeerSession;
+    for (MCPeerID *peerId in session.connectedPeers) {
+        if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
+            unsigned char niceData[dataArrayLength + 2];
+            // Append the MLAPI NetworkChannel at the beginning of the data
+            niceData[0] = (unsigned char)channel;
+            // Append the length of the data array at the second place
+            niceData[1] = (unsigned char)dataArrayLength;
+            // TODO: is there a better way to do this? I mean copying array
+            for (int i = 2; i < dataArrayLength + 2; i++) {
+                niceData[i] = data[i - 2];
+            }
+            NSLog(@"[multipeer_session]: size of the data before sent %d", sizeof(niceData));
+            NSLog(@"[multipeer_session]: the whole data array is %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d", niceData[0], niceData[1], niceData[2], niceData[3], niceData[4], niceData[5], niceData[6], niceData[7], niceData[8], niceData[9], niceData[10], niceData[11]);
+            // Convert the data to NSData format
+            // https://stackoverflow.com/questions/8354881/convert-unsigned-char-array-to-nsdata-and-back
+            NSData *convertedData = [NSData dataWithBytes:niceData length:sizeof(niceData)];
+            // Send the data
+            [session sendToPeer:convertedData peer:peerId mode:[MultipeerSession convertMLAPINetworkChannelToSendDataMode:channel]];
+            return;
+        }
+    }
 }

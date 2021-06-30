@@ -57,6 +57,9 @@ UpdatePeerHandPosition UpdatePeerHandPositionDelegate = NULL;
 typedef void (*ARCollaborationStartedForMLAPI)();
 ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
 
+typedef void (*PeerDataReceivedForMLAPI)(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel);
+PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
+
 @interface ARSessionDelegateController ()
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
@@ -70,7 +73,6 @@ ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
 
-@property (nonatomic, strong) MultipeerSession *multipeerSession;
 // Properties about AR collaboration
 @property (assign) bool IsCollaborationSynchronized;
 @property (assign) bool isCollaborationHost;
@@ -155,21 +157,28 @@ ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
     void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
         // Try to decode the received data as ARCollaboration data.
         ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
-        if (collaborationData != NULL) {
+        if (collaborationData != nil) {
             //NSLog(@"[ar_session]: did receive ARCollaboration data.");
             [self.session updateWithCollaborationData:collaborationData];
             return;
         }
-        // TODO: delete this
-        // Try to decode the received data as peer hand position data.
-        NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
-        if (decodedData != NULL) {
-            //NSLog(@"[ar_session]: did receive peer hand position data.");
-            //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
-            UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
+        // TODO: handle MLAPI data
+        unsigned char *mlapiData = (unsigned char *) [data bytes];
+        if (mlapiData != nil) {
+            //NSLog(@"[ar_session]: MLAPI data received.");
+            // TODO: decode the received data
+            int channel = (int)mlapiData[0];
+            int dataArrayLength = (int)mlapiData[1];
+            NSLog(@"[ar_session]: channel is %d and dataArrayLength is %d", channel, dataArrayLength);
+            unsigned char niceData[dataArrayLength];
+            for (int i = 0; i < dataArrayLength; i++) {
+                niceData[i] = mlapiData[i + 2];
+            }
+            unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+            // TODO: send this data back to MLAPI
+            PeerDataReceivedForMLAPIDelegate(clientId, niceData, dataArrayLength, channel);
             return;
         }
-        // TODO: handle MLAPI data
         NSLog(@"[ar_session]: Failed to decode received data from peer.");
     };
     self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
@@ -848,6 +857,11 @@ UnityHoloKit_MultipeerStartAdvertising() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARCollaborationStartedForMLAPIDelegate(ARCollaborationStartedForMLAPI callback) {
     ARCollaborationStartedForMLAPIDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback) {
+    PeerDataReceivedForMLAPIDelegate = callback;
 }
 
 } // extern "C"

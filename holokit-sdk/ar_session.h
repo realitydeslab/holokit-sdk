@@ -24,6 +24,7 @@
 @property (assign) bool primaryButtonLeft;
 @property (assign) bool primaryButtonRight;
 @property (assign) int handPosePredictionInterval;
+@property (nonatomic, strong) MultipeerSession *multipeerSession;
 
 + (id)sharedARSessionDelegateController;
 

@@ -10,6 +10,8 @@
 @interface MultipeerSession : NSObject
 
 @property (assign) bool isHost;
+// Storing all connected peers.
+@property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeers;
 
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler;
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID;
@@ -17,5 +19,6 @@
 - (void)sendToAllPeers: (NSData *)data;
 - (void)startBrowsing;
 - (void)startAdvertising;
++ (MCSessionSendDataMode)convertMLAPINetworkChannelToSendDataMode:(int)channel;
 
 @end
