@@ -255,8 +255,7 @@ UnityHoloKit_MultipeerSend(unsigned long clientId, unsigned char *data, int data
             for (int i = 2; i < dataArrayLength + 2; i++) {
                 niceData[i] = data[i - 2];
             }
-            NSLog(@"[multipeer_session]: size of the data before sent %d", sizeof(niceData));
-            NSLog(@"[multipeer_session]: the whole data array is %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d", niceData[0], niceData[1], niceData[2], niceData[3], niceData[4], niceData[5], niceData[6], niceData[7], niceData[8], niceData[9], niceData[10], niceData[11]);
+//            NSLog(@"[multipeer_session]: size of the data before sent %d", sizeof(niceData));
             // Convert the data to NSData format
             // https://stackoverflow.com/questions/8354881/convert-unsigned-char-array-to-nsdata-and-back
             NSData *convertedData = [NSData dataWithBytes:niceData length:sizeof(niceData)];

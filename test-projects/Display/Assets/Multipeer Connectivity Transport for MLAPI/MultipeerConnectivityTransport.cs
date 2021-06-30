@@ -129,7 +129,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // Enqueue this data packet
             PeerDataPacket newPeerDataPacket = new PeerDataPacket() { clientId = clientId, data = data, dataArrayLength = dataArrayLength, channel = channel };
             MultipeerConnectivityTransport.Instance.m_PeerDataPacketQueue.Enqueue(newPeerDataPacket);
-            Debug.Log("[MultipeerConnectivityTransport]: a new peer data packet is enqueued.");
+            Debug.Log($"[MultipeerConnectivityTransport]: received a new peer data packet {clientId}, {(NetworkChannel)channel}");
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback);
@@ -196,12 +196,13 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
             if (m_PeerDataPacketQueue.Count > 0)
             {
-                Debug.Log("[MultipeerConnectivityTransport]: dequeue peer data packet.");
                 PeerDataPacket dataPacket = m_PeerDataPacketQueue.Dequeue();
+                //Debug.Log($"[MultipeerConnectivityTransport]: dequeue peer data packet from {dataPacket.clientId}.");
                 clientId = dataPacket.clientId;
                 networkChannel = (NetworkChannel)dataPacket.channel;
                 payload = new ArraySegment<byte>(dataPacket.data, 0, dataPacket.dataArrayLength);
                 receiveTime = Time.realtimeSinceStartup;
+                // TODO: I don't know if this is correct.
                 return NetworkEvent.Data;
             }
 
@@ -215,7 +216,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public override void Send(ulong clientId, ArraySegment<byte> data, NetworkChannel networkChannel)
         {
             Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId}");
-            Debug.Log($"[MultipeerConnectivityTransport]: data.Array {data.Array}, data.Count {data.Count}, data.Offset {data.Offset}");
+            //Debug.Log($"[MultipeerConnectivityTransport]: data.Array {data.Array}, data.Count {data.Count}, data.Offset {data.Offset}");
             // https://stackoverflow.com/questions/10940883/c-converting-byte-array-to-string-and-printing-out-to-console
             //Debug.Log($"[MultipeerConnectivityTransport]: byte array {System.Text.Encoding.UTF8.GetString(data.Array)}");
 
@@ -226,10 +227,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // https://stackoverflow.com/questions/5756692/arraysegment-returning-the-actual-segment-c-sharp
             byte[] newArray = new byte[data.Count];
             Array.Copy(data.Array, data.Offset, newArray, 0, data.Count);
-            Debug.Log($"[MultipeerConnectivityTransport]: the size of the new array is {newArray.Length}");
-            Debug.Log($"[MultipeerConnectivityTransport]: the whole array is {newArray[0]}, {newArray[1]}, {newArray[2]}, {newArray[3]}, " +
-                $"{newArray[4]}, {newArray[5]}, {newArray[6]}, {newArray[7]}, {newArray[8]}, {newArray[9]}");
-
+            //Debug.Log($"[MultipeerConnectivityTransport]: the size of the new array is {newArray.Length}");
             UnityHoloKit_MultipeerSend(clientId, newArray, data.Count, (int)networkChannel);
         }
 
@@ -242,7 +240,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public override ulong GetCurrentRtt(ulong clientId)
         {
             Debug.Log($"[MultipeerConnectivityTransport]: GetCurrentRtt() {Time.time}");
-            throw new NotImplementedException();
+            return 0;
         }
 
         public override void DisconnectLocalClient()

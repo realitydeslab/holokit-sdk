@@ -169,7 +169,7 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
             // TODO: decode the received data
             int channel = (int)mlapiData[0];
             int dataArrayLength = (int)mlapiData[1];
-            NSLog(@"[ar_session]: channel is %d and dataArrayLength is %d", channel, dataArrayLength);
+            //NSLog(@"[ar_session]: channel is %d and dataArrayLength is %d", channel, dataArrayLength);
             unsigned char niceData[dataArrayLength];
             for (int i = 0; i < dataArrayLength; i++) {
                 niceData[i] = mlapiData[i + 2];
