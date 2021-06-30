@@ -59,6 +59,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // We start MLAPI connection right after that.
             Debug.Log("[MultipeerConnectivityTransport]: multipeer connection started.");
 
+            MultipeerConnectivityTransport.Instance.m_ServerId = peerId;
             MultipeerConnectivityTransport.Instance.m_IsNewPeerConnected = true;
             MultipeerConnectivityTransport.Instance.m_newPeerId = peerId;
             Debug.Log($"[MultipeerConnectivityTransport]: connected peerId {peerId}");
@@ -68,7 +69,9 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback);
 
         // TODO: I don't know what it is
-        public override ulong ServerClientId => 0;
+        public override ulong ServerClientId => m_ServerId;
+
+        private ulong m_ServerId;
 
         private void Awake()
         {
@@ -101,6 +104,17 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public override NetworkEvent PollEvent(out ulong clientId, out NetworkChannel networkChannel, out ArraySegment<byte> payload, out float receiveTime)
         {
             //Debug.Log($"[MultipeerConnectivityTransport]: PollEvent() {Time.time}");
+
+            // Notify MLAPI that a peer is connected.
+            if (m_IsNewPeerConnected)
+            {
+                m_IsNewPeerConnected = false;
+                clientId = m_newPeerId;
+                networkChannel = NetworkChannel.DefaultMessage;
+                receiveTime = Time.realtimeSinceStartup;
+                return NetworkEvent.Connect;
+            }
+
             // We do nothing here.
             clientId = 0;
             networkChannel = NetworkChannel.ChannelUnused;
@@ -110,8 +124,16 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
         public override void Send(ulong clientId, ArraySegment<byte> data, NetworkChannel networkChannel)
         {
-            Debug.Log($"[MultipeerConnectivityTransport]: Send() {Time.time}");
+            Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId} {Time.time}");
+            Debug.Log($"[MultipeerConnectivityTransport]: the raw data is {data.GetType()} {data}");
+
             throw new NotImplementedException();
+
+            // The MLAPI has the data and called this method, we need to send this data
+            // to the right peer through multipeer connectivity.
+            // The first message sent by the client when connected is of the network channel "Internal".
+            
+
         }
 
         public override void Init()
@@ -163,11 +185,12 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
         private void Update()
         {
-            if (m_IsNewPeerConnected)
-            {
-                InvokeOnTransportEvent(NetworkEvent.Connect, m_newPeerId, NetworkChannel.DefaultMessage, default, Time.time);
-                m_IsNewPeerConnected = false;
-            }
+            //if (m_IsNewPeerConnected)
+            //{
+            //    //InvokeOnTransportEvent(NetworkEvent.Connect, m_newPeerId, NetworkChannel.DefaultMessage, default, Time.time);
+    
+            //    m_IsNewPeerConnected = false;
+            //}
         }
     }
 }
