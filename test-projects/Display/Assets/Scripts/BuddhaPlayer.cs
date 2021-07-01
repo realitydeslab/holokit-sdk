@@ -5,19 +5,20 @@ using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 using UnityEngine.XR.HoloKit;
+using UnityEngine.VFX;
 
 public class BuddhaPlayer : NetworkBehaviour
 {
 
-    [SerializeField] private GameObject m_HostHandSpherePrefab;
-
     private NetworkVariableVector3 HostHandCenterNetworkVariable = new NetworkVariableVector3();
 
-    private GameObject m_HostHandSphere;
+    [SerializeField] private List<GameObject> m_VFXs = new List<GameObject>();
+
+    private List<GameObject> m_CurrentVFXs = new List<GameObject>();
 
     public override void NetworkStart()
     {
-        //SpawnHostHandSphere();
+        SpawnVFXs();
     }
 
     private void Start()
@@ -69,23 +70,32 @@ public class BuddhaPlayer : NetworkBehaviour
             GameObject.Find("HandSphere").transform.position = HostHandCenterNetworkVariable.Value;
             //Debug.Log($"[BuddhaPlayer]: host hand sphere position {m_HostHandSphere.transform.position}");
         }
-        
+
+        foreach(GameObject vfx in m_CurrentVFXs)
+        {
+            vfx.GetComponent<VisualEffect>().SetVector3("HandCenter", GameObject.Find("HandSphere").transform.position);
+        }
     }
 
-    public void SpawnHostHandSphere()
+    public void SpawnVFXs()
     {
-        SpawnHostHandSphereServerRpc();
+        SpawnVFXsServerRpc();
     }
 
     [ServerRpc]
-    private void SpawnHostHandSphereServerRpc()
+    private void SpawnVFXsServerRpc()
     {
-        SpawnHostHandSphereClientRpc();
+        SpawnVFXsClientRpc();
     }
 
     [ClientRpc]
-    private void SpawnHostHandSphereClientRpc()
+    private void SpawnVFXsClientRpc()
     {
-        m_HostHandSphere = Instantiate(m_HostHandSpherePrefab, new Vector3(0f, 0f, 1f), new Quaternion(0f, 0f, 0f, 1f));
+        foreach (GameObject vfx in m_VFXs)
+        {
+            var newVfx = Instantiate(vfx);
+            m_CurrentVFXs.Add(newVfx);
+            //newVfx.GetComponent<HandBinder>().target = GameObject.Find("HandSphere").transform;
+        }
     }
 }

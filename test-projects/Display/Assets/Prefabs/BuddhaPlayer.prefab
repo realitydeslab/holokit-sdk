@@ -62,5 +62,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd05d0f56b72f405fb14a7970ce1a985, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HostHandSpherePrefab: {fileID: 7157597730910899865, guid: a8881e200a2bd4927acd0036d77a24c5,
-    type: 3}
+  m_VFXs:
+  - {fileID: 9025556257065596040, guid: b47f0be61b74649cba5ccd0c3e393db4, type: 3}
+  - {fileID: 7100620754851673520, guid: 240632a7daf5f400ead6575042a85760, type: 3}
+  - {fileID: 5735325585271876577, guid: 5de09d33fa55b4349846857a48982f33, type: 3}
+  - {fileID: 691496063633902058, guid: 1d8e06e19d22c4ce38b9ab7e2b2d0609, type: 3}
