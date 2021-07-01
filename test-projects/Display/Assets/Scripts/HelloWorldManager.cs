@@ -1,4 +1,3 @@
-
 using MLAPI;
 using UnityEngine;
 
@@ -51,6 +50,17 @@ namespace HelloWorld
                     if (player)
                     {
                         player.Move();
+                    }
+                }
+            }
+            if (GUILayout.Button("Spawn VFX"))
+            {
+                if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+                {
+                    var player = networkClient.PlayerObject.GetComponent<HelloWorldPlayer>();
+                    if (player)
+                    {
+                        player.SpawnVfx();
                     }
                 }
             }

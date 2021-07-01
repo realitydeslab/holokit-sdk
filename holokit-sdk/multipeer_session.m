@@ -241,7 +241,7 @@ UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionSt
 
 // https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerSend(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
+UnityHoloKit_MultipeerSendForMLAPI(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     MultipeerSession *session = ar_session_delegate_controller.multipeerSession;
     for (MCPeerID *peerId in session.connectedPeers) {

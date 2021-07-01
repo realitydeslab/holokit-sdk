@@ -1,13 +1,17 @@
-
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace HelloWorld
 {
     public class HelloWorldPlayer : NetworkBehaviour
     {
+
+        [SerializeField]
+        private GameObject vfx;
+
         public NetworkVariableVector3 Position = new NetworkVariableVector3(new NetworkVariableSettings
         {
             WritePermission = NetworkVariablePermission.ServerOnly,
@@ -21,6 +25,7 @@ namespace HelloWorld
 
         public void Move()
         {
+            Debug.Log("[HelloWorldPlayer]: Move()");
             if (NetworkManager.Singleton.IsServer)
             {
                 var randomPosition = GetRandomPositionOnPlane();
@@ -31,6 +36,11 @@ namespace HelloWorld
             {
                 SubmitPositionRequestServerRpc();
             }
+        }
+
+        public void SpawnVfx()
+        {
+            SpawnVfxServerRpc();
         }
 
         [ServerRpc]
@@ -47,6 +57,18 @@ namespace HelloWorld
         void Update()
         {
             transform.position = Position.Value;
+        }
+
+        [ServerRpc]
+        private void SpawnVfxServerRpc()
+        {
+            SpawnVfxClientRpc();
+        }
+
+        [ClientRpc]
+        private void SpawnVfxClientRpc()
+        {
+            Instantiate(vfx, transform.position, transform.rotation);
         }
     }
 }

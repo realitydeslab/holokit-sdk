@@ -83,10 +83,19 @@ namespace holokit {
                 phone_model.screenHeight = 0.07113f;
                 phone_model.screenBottom = 0.00347f;
                 phone_model.centerLineOffset = 0.0f;
-                //phone_model.cameraOffset = simd_make_float3(0.066945f, -0.061695f, 0.0091f);
                 phone_model.cameraOffset = simd_make_float3(0.0495f, -0.061695f, 0.0091f);
                 phone_model.screenResolutionWidth = 2778;
                 phone_model.screenResolutionHeight = 1284;
+                break;
+            case(iPadPro2020):
+                NSLog(@"Profile::iPadPro2020");
+                phone_model.screenWidth = 0.0;
+                phone_model.screenHeight = 0.0f;
+                phone_model.screenBottom = 0.0;
+                phone_model.centerLineOffset = 0.0f;
+                phone_model.cameraOffset = simd_make_float3(0.0f, 0.0f, 0.0f);
+                phone_model.screenResolutionWidth = 2388;
+                phone_model.screenResolutionHeight = 1668;
                 break;
             case(iPadPro2021):
                 NSLog(@"Profile::iPadPro2021");
@@ -94,10 +103,10 @@ namespace holokit {
                 phone_model.screenHeight = 0.0f;
                 phone_model.screenBottom = 0.0;
                 phone_model.centerLineOffset = 0.0f;
-                //phone_model.cameraOffset = simd_make_float3(0.066945f, -0.061695f, 0.0091f);
                 phone_model.cameraOffset = simd_make_float3(0.0f, 0.0f, 0.0f);
                 phone_model.screenResolutionWidth = 2732;
                 phone_model.screenResolutionHeight = 2048;
+                break;
             default:
                 break;
         }
@@ -157,6 +166,10 @@ namespace holokit {
             }
             CASE (@"iPhone13,4") {
                 phone_type = iPhone12ProMax;
+                break;
+            }
+            CASE (@"iPad8,9") {
+                phone_type = iPadPro2020;
                 break;
             }
             CASE (@"iPad13,8") {

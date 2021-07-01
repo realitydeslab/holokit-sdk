@@ -20,6 +20,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
     
     public class MultipeerConnectivityTransport : NetworkTransport
     {
+        // This class is a singleton.
         private static MultipeerConnectivityTransport _instance;
 
         public static MultipeerConnectivityTransport Instance { get { return _instance; } }
@@ -34,14 +35,14 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// </summary>
         private ulong m_MyServerClientId;
 
-        private ulong m_ServerId;
+        private ulong m_ServerId = 0;
 
         // TODO: I don't know what it is
         public override ulong ServerClientId => m_ServerId;
 
         private bool m_IsNewPeerConnected = false;
 
-        private ulong m_newPeerId;
+        private ulong m_NewPeerId;
 
         /// <summary>
         /// The queue storing all peer data packets received through the network so that
@@ -83,7 +84,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
             if (MultipeerConnectivityTransport.Instance.m_IsHost)
             {
-                MultipeerConnectivityTransport.Instance.m_ServerId = MultipeerConnectivityTransport.Instance.m_MyServerClientId;
+                MultipeerConnectivityTransport.Instance.m_ServerId = 0;
             }
             else
             {
@@ -91,8 +92,8 @@ namespace MLAPI.Transports.MultipeerConnectivity
             }
             
             MultipeerConnectivityTransport.Instance.m_IsNewPeerConnected = true;
-            MultipeerConnectivityTransport.Instance.m_newPeerId = peerId;
-            Debug.Log($"[MultipeerConnectivityTransport]: connected peerId {peerId}");
+            MultipeerConnectivityTransport.Instance.m_NewPeerId = peerId;
+            Debug.Log($"[MultipeerConnectivityTransport]: connected with a peer {peerId}");
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback);
@@ -105,7 +106,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// <param name="dataArrayLength">The length of the data array</param>
         /// <param name="channel">MLAPI NetworkChannel</param>
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerSend(ulong clientId, byte[] data, int dataArrayLength, int channel);
+        private static extern void UnityHoloKit_MultipeerSendForMLAPI(ulong clientId, byte[] data, int dataArrayLength, int channel);
 
         /// <summary>
         /// The delegate called when peer data is received through multipeer connectivity network.
@@ -144,6 +145,13 @@ namespace MLAPI.Transports.MultipeerConnectivity
             {
                 _instance = this;
             }
+        }
+
+        private void OnEnable()
+        {
+            // Register delegates
+            UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(OnMultipeerConnectionStartedForMLAPI);
+            UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(OnPeerDataReceivedForMLAPI);
         }
 
         public override void Init()
@@ -185,10 +193,10 @@ namespace MLAPI.Transports.MultipeerConnectivity
             //Debug.Log($"[MultipeerConnectivityTransport]: PollEvent() {Time.time}");
 
             // Notify MLAPI that a peer is connected.
-            if (m_IsNewPeerConnected)
+            if (!m_IsHost && m_IsNewPeerConnected)
             {
                 m_IsNewPeerConnected = false;
-                clientId = m_newPeerId;
+                clientId = m_NewPeerId;
                 networkChannel = NetworkChannel.DefaultMessage;
                 receiveTime = Time.realtimeSinceStartup;
                 return NetworkEvent.Connect;
@@ -228,7 +236,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
             byte[] newArray = new byte[data.Count];
             Array.Copy(data.Array, data.Offset, newArray, 0, data.Count);
             //Debug.Log($"[MultipeerConnectivityTransport]: the size of the new array is {newArray.Length}");
-            UnityHoloKit_MultipeerSend(clientId, newArray, data.Count, (int)networkChannel);
+            UnityHoloKit_MultipeerSendForMLAPI(clientId, newArray, data.Count, (int)networkChannel);
         }
 
         public override void Shutdown()
@@ -253,23 +261,6 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             Debug.Log($"[MultipeerConnectivityTransport]: DisconnectRemoteClient() {Time.time}");
             throw new NotImplementedException();
-        }
-
-        private void Start()
-        {
-            // Register delegates
-            UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(OnMultipeerConnectionStartedForMLAPI);
-            UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(OnPeerDataReceivedForMLAPI);
-        }
-
-        private void Update()
-        {
-            //if (m_IsNewPeerConnected)
-            //{
-            //    //InvokeOnTransportEvent(NetworkEvent.Connect, m_newPeerId, NetworkChannel.DefaultMessage, default, Time.time);
-    
-            //    m_IsNewPeerConnected = false;
-            //}
         }
     }
 }
