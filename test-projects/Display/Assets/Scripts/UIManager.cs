@@ -14,6 +14,12 @@ public class UIManager : MonoBehaviour
 
     private Button m_SpawnVfxButton;
 
+    private Text m_ServerClientIndicator;
+
+    private Text m_NetworkVariable;
+
+    private Button m_StartMoving;
+
     void Start()
     {
         m_StartHostButton = transform.GetChild(0).GetComponent<Button>();
@@ -27,22 +33,48 @@ public class UIManager : MonoBehaviour
 
         m_SpawnVfxButton = transform.GetChild(3).GetComponent<Button>();
         m_SpawnVfxButton.onClick.AddListener(SpawnVfx);
+
+        m_ServerClientIndicator = transform.GetChild(4).GetComponent<Text>();
+
+        m_NetworkVariable = transform.GetChild(5).GetComponent<Text>();
+
+        m_StartMoving = transform.GetChild(6).GetComponent<Button>();
+        m_StartMoving.onClick.AddListener(StartMoving);
+    }
+
+    void Update()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkedClient))
+        {
+            var player = networkedClient.PlayerObject.GetComponent<NetworkVariableTest>();
+            if (player)
+            {
+                //m_NetworkVariable.text = $"server: {player.GetServerNetworkVariableValue()}, client: {player.GetClientNetworkVariableValue()} ";
+                //m_NetworkVariable.text = $"server: {player.GetServerNetworkVariableValue()}";
+            }
+        }
     }
 
     private void StartHost()
     {
         NetworkManager.Singleton.StartHost();
+        m_ServerClientIndicator.text = "Host";
     }
 
     private void StartClient()
     {
         NetworkManager.Singleton.StartClient();
+        m_ServerClientIndicator.text = "Client";
     }
 
     private void Move()
     {
-        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId,
-                    out var networkedClient))
+        Debug.Log("[UIManager]: connected clients are");
+        foreach (ulong key in NetworkManager.Singleton.ConnectedClients.Keys)
+        {
+            Debug.Log(key);
+        }
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkedClient))
         {
             var player = networkedClient.PlayerObject.GetComponent<HelloWorld.HelloWorldPlayer>();
             if (player)
@@ -60,6 +92,18 @@ public class UIManager : MonoBehaviour
             if (player)
             {
                 player.SpawnVfx();
+            }
+        }
+    }
+
+    private void StartMoving()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<HelloWorld.HelloWorldPlayer>();
+            if (player)
+            {
+                player.StartMoving();
             }
         }
     }

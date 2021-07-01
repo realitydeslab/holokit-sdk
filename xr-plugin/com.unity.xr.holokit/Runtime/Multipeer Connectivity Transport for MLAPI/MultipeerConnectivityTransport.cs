@@ -4,6 +4,7 @@ using UnityEngine;
 using MLAPI.Transports.Tasks;
 using System;
 using System.Runtime.InteropServices;
+using UnityEngine.XR.HoloKit;
 
 namespace MLAPI.Transports.MultipeerConnectivity
 {
@@ -28,7 +29,8 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// <summary>
         /// Is this machine the host in the local network?
         /// </summary>
-        private bool m_IsHost;
+        [HideInInspector]
+        public bool m_IsHost = true;
 
         /// <summary>
         /// The client Id of this machine in the local network.
@@ -84,7 +86,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
             if (MultipeerConnectivityTransport.Instance.m_IsHost)
             {
-                MultipeerConnectivityTransport.Instance.m_ServerId = 0;
+                //MultipeerConnectivityTransport.Instance.m_ServerId = 0;
             }
             else
             {
@@ -161,21 +163,22 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // The random generator picks a random int between 1 and 1,000,000,
             // therefore, it is very unlikely that we get a duplicate client Id.
             var randomGenerator = new System.Random((int)(Time.time * 1000));
-            ulong myClientId = (ulong)randomGenerator.Next(1, 1000000);
-            m_MyServerClientId = myClientId;
+            ulong newClientId = (ulong)randomGenerator.Next(1, 1000000);
+            m_MyServerClientId = newClientId;
 
             // Init the multipeer session in objective-c side.
             if (m_ServiceType == null)
             {
                 Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because service type is null.");
             }
-            UnityHoloKit_MultipeerInit(m_ServiceType, myClientId.ToString());
+            UnityHoloKit_MultipeerInit(m_ServiceType, newClientId.ToString());
         }
 
         public override SocketTasks StartServer()
         {
             Debug.Log($"[MultipeerConnectivityTransport]: StartServer() {Time.time}");
             m_IsHost = true;
+            m_ServerId = m_MyServerClientId;
             UnityHoloKit_MultipeerStartBrowsing();
             return SocketTask.Done.AsTasks();
         }

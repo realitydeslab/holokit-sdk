@@ -27,6 +27,16 @@ public class NetworkVariableTest : NetworkBehaviour
         }
     }
 
+    public float GetServerNetworkVariableValue()
+    {
+        return ServerNetworkVariable.Value;
+    }
+
+    public float GetClientNetworkVariableValue()
+    {
+        return ClientNetworkVariable.Value;
+    }
+
     private void Update()
     {
         var t_now = Time.time;

@@ -1,3 +1,4 @@
+using System;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
@@ -12,6 +13,8 @@ namespace HelloWorld
         [SerializeField]
         private GameObject vfx;
 
+        private bool isMoving = false;
+
         public NetworkVariableVector3 Position = new NetworkVariableVector3(new NetworkVariableSettings
         {
             WritePermission = NetworkVariablePermission.ServerOnly,
@@ -23,9 +26,24 @@ namespace HelloWorld
             Move();
         }
 
+        private void Start()
+        {
+
+        }
+
+        void Update()
+        {
+            transform.position = Position.Value;
+
+            if (isMoving)
+            {
+                float theta = Time.frameCount / 10.0f;
+                transform.position = new Vector3((float)Math.Cos(theta), 0.0f, (float)Math.Sin(theta));
+            }
+        }
+
         public void Move()
         {
-            Debug.Log("[HelloWorldPlayer]: Move()");
             if (NetworkManager.Singleton.IsServer)
             {
                 var randomPosition = GetRandomPositionOnPlane();
@@ -43,6 +61,11 @@ namespace HelloWorld
             SpawnVfxServerRpc();
         }
 
+        public void StartMoving()
+        {
+            isMoving = !isMoving;
+        }
+
         [ServerRpc]
         void SubmitPositionRequestServerRpc(ServerRpcParams rpcParams = default)
         {
@@ -51,12 +74,7 @@ namespace HelloWorld
 
         static Vector3 GetRandomPositionOnPlane()
         {
-            return new Vector3(Random.Range(-3f, 3f), 1f, Random.Range(-3f, 3f));
-        }
-
-        void Update()
-        {
-            transform.position = Position.Value;
+            return new Vector3(UnityEngine.Random.Range(-3f, 3f), 1f, UnityEngine.Random.Range(-3f, 3f));
         }
 
         [ServerRpc]

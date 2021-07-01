@@ -47,12 +47,11 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 
 static const float kLostHandTrackingInterval = 1.5f;
 
-typedef void (*AnchorCallbackFunction)(int val, float position_x, float position_y, float position_z,
-                                       float rotation_x, float rotation_y, float rotation_z, float rotation_w);
-AnchorCallbackFunction AnchorAdded = NULL;
+typedef void (*ARCollaborationStarted)();
+ARCollaborationStarted ARCollaborationStartedDelegate = NULL;
 
-typedef void (*UpdatePeerHandPosition)(float x, float y, float z);
-UpdatePeerHandPosition UpdatePeerHandPositionDelegate = NULL;
+typedef void (*OriginAnchorReceived)(float* position, float* rotation);
+OriginAnchorReceived OriginAnchorReceivedDelegate = NULL;
 
 typedef void (*ARCollaborationStartedForMLAPI)();
 ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
@@ -72,10 +71,6 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
 @property (assign) int frameCount;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
-
-// Properties about AR collaboration
-@property (assign) bool IsCollaborationSynchronized;
-@property (assign) bool isCollaborationHost;
 
 @end
 
@@ -255,30 +250,6 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
         }];
         //[self performHumanHandPoseRequest:frame];
     }
-    
-    // Send my hand position to peers
-    if (self.IsCollaborationSynchronized) {
-        NSArray* myHandPosition;
-        if (self.isLeftHandTracked) {
-            LandmarkPosition *landmarkPosition = self.leftHandLandmarkPositions[7];
-            myHandPosition = [NSArray arrayWithObjects:
-                                       [NSNumber numberWithFloat:landmarkPosition.x],
-                                       [NSNumber numberWithFloat:landmarkPosition.y],
-                                       [NSNumber numberWithFloat:landmarkPosition.z], nil];
-        } else {
-            myHandPosition = [NSArray arrayWithObjects:
-                                       [NSNumber numberWithFloat:-101.0f],
-                                       [NSNumber numberWithFloat:-101.0f],
-                                       [NSNumber numberWithFloat:-101.0f], nil];
-        }
-        
-        //NSLog(@"raw myHandPosition: {%f, %f, %f}", [myHandPosition[0] floatValue], [myHandPosition[1] floatValue], [myHandPosition[2] floatValue]);
-        NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:myHandPosition requiringSecureCoding:YES error:nil];
-        //NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:encodedData error:nil];
-        //NSLog(@"decoded myHandPosition: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
-        [self.multipeerSession sendToAllPeers:encodedData];
-    }
-    
     //os_signpost_interval_end(log, spid, "session_didUpdateFrame");
 }
 
@@ -286,36 +257,28 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
-    NSLog(@"[ar_session]: didAddAnchors()");
     for (ARAnchor *anchor in anchors) {
-        NSLog(@"[ar_session]: an anchor was added with name %@", anchor.name);
         // Check if this anchor is a new peer
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            NSLog(@"[ar_session]: a new peer is synchronized into the AR collaboration.");
+            NSLog(@"[ar_session]: a new peer is connected into the AR collaboration.");
+            // TODO: Let the ARWorldOriginManager know that AR collaboration session has started.
+            ARCollaborationStartedDelegate();
             continue;
         }
         if (anchor.name != nil) {
-            std::vector<float> position;
-            std::vector<float> rotation;
-            if ([anchor.name isEqual:@"-1"] && !self.isCollaborationHost) {
+            if (!self.multipeerSession.isHost && [anchor.name isEqual:@"origin"]) {
                 // This is an origin anchor.
                 // If this is a client, reset the world origin.
-                NSLog(@"[ar_session]: world origin was set according to the origin anchor.");
-                [session setWorldOrigin:anchor.transform];
+                NSLog(@"[ar_session]: received an origin anchor.");
                 // Indicate the origin anchor transform in the previous coordinate system.
-                position = TransformToUnityPosition(anchor.transform);
-                rotation = TransformToUnityRotation(anchor.transform);
-                AnchorAdded(-1, position[0], position[1], position[2],
-                             rotation[0], rotation[1], rotation[2], rotation[3]);
+                std::vector<float> position = TransformToUnityPosition(anchor.transform);
+                std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
+                float positionArray[3] = { position[0], position[1], position[2] };
+                float rotationArray[4] = { rotation[0], rotation[1], rotation[2], rotation[3] };
+                OriginAnchorReceivedDelegate(positionArray, rotationArray);
+                [session setWorldOrigin:anchor.transform];
                 continue;
             }
-            // This is a normal VFX anchor.
-//            position = TransformToUnityPosition(anchor.transform);
-//            rotation = TransformToUnityRotation(anchor.transform);
-            //NSLog(@"anchor position: %f, %f, %f", position[0], position[1], position[2]);
-            //NSLog(@"anchor rotation: %f, %f, %f, %f", rotation[0], rotation[1], rotation[2], rotation[3]);
-//            AnchorAdded([anchor.name intValue], position[0], position[1], position[2],
-//                         rotation[0], rotation[1], rotation[2], rotation[3]);
         }
     }
 }
@@ -797,35 +760,23 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_AddNativeAnchor(int anchorId, float position[3], float rotation[4]) {
+UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
-    ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithFormat:@"%d", anchorId] transform:transform_matrix];
+    ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithUTF8String:anchorName] transform:transform_matrix];
     
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_handler.session addAnchor:anchor];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetAnchorAddedDelegate(AnchorCallbackFunction callback) {
-    NSLog(@"UnityHolokit_SetAnchorRevoke");
-    AnchorAdded = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetUpdatePeerHandPositionDelegate(UpdatePeerHandPosition callback) {
-    UpdatePeerHandPositionDelegate = callback;
+UnityHoloKit_SetOriginAnchorReceivedDelegate(OriginAnchorReceived callback){
+    OriginAnchorReceivedDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetHandTrackingInterval(int val) {
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_handler setHandPosePredictionInterval:val];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetIsCollaborationHost(bool val) {
-    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
-    [ar_session_handler setIsCollaborationHost:val];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -852,6 +803,11 @@ UnityHoloKit_MultipeerStartAdvertising() {
         return;
     }
     [ar_session_delegate_controller.multipeerSession startAdvertising];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetARCollaborationStartedDelegate(ARCollaborationStarted callback) {
+    ARCollaborationStartedDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
