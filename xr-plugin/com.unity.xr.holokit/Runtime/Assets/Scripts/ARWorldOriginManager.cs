@@ -47,6 +47,7 @@ namespace UnityEngine.XR.HoloKit
         [AOT.MonoPInvokeCallback(typeof(ARCollaborationStarted))]
         static void OnARCollaborationStarted()
         {
+            Debug.Log("[ARWorldOriginManager]: AR collaboration session started.");
             ARWorldOriginManager.Instance.m_IsARCollaborationStarted = true;
         }
         [DllImport("__Internal")]
@@ -65,7 +66,8 @@ namespace UnityEngine.XR.HoloKit
             float[] rotation = new float[4];
             Marshal.Copy(rotationPtr, rotation, 0, 4);
 
-            Debug.Log($"[ARWorldOriginManager]: AR world origin has been reset to position {position} and rotation {rotation}.");
+            Debug.Log($"[ARWorldOriginManager]: AR world origin has been reset to position [{position[0]}, {position[1]}, {position[2]}, {position[3]}] " +
+                $"and rotation [{rotation[0]}, {rotation[1]}, {rotation[2]}, {rotation[3]}].");
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetOriginAnchorReceivedDelegate(OriginAnchorReceived callback);
@@ -86,7 +88,7 @@ namespace UnityEngine.XR.HoloKit
         {
             // Register delegates
             UnityHoloKit_SetARCollaborationStartedDelegate(OnARCollaborationStarted);
-            UnityHoloKit_SetOriginAnchorReceivedDelegate(OnOriginAnchorReceived);
+            //UnityHoloKit_SetOriginAnchorReceivedDelegate(OnOriginAnchorReceived);
         }
 
         public void Update()
@@ -98,7 +100,7 @@ namespace UnityEngine.XR.HoloKit
                 // Add origin anchor
                 float[] position = { 0f, 0f, 0f };
                 float[] rotation = { 0f, 0f, 0f, 1f };
-                UnityHoloKit_AddNativeAnchor("origin", position, rotation);
+                UnityHoloKit_AddNativeAnchor("-1", position, rotation);
                 Debug.Log("[ARWorldOriginManager]: added an origin anchor.");
                 m_LastResettingTime = Time.time;
             }

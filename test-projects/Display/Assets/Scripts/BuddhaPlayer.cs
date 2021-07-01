@@ -56,12 +56,16 @@ public class BuddhaPlayer : NetworkBehaviour
     {
         if (IsServer)
         {
-            //Debug.Log($"[BuddhaPlayer]: Server side - Update host hand center {m_HostHandSphere.transform.position}.");
-            HostHandCenterNetworkVariable.Value = GameObject.Find("HandSphere").transform.position;
+            var handCenter = GameObject.Find("HandSphere");
+            if (handCenter != null)
+            {
+                //Debug.Log($"[BuddhaPlayer]: Server side - Update host hand center {handCenter.transform.position}.");
+                HostHandCenterNetworkVariable.Value = handCenter.transform.position;
+            }
         }
         else if (IsClient)
         {
-            Debug.Log($"[BuddhaPlayer]: Client side - Log the host hand position {HostHandCenterNetworkVariable.Value}.");
+            //Debug.Log($"[BuddhaPlayer]: Client side - Log the host hand position {HostHandCenterNetworkVariable.Value}.");
             GameObject.Find("HandSphere").transform.position = HostHandCenterNetworkVariable.Value;
             //Debug.Log($"[BuddhaPlayer]: host hand sphere position {m_HostHandSphere.transform.position}");
         }

@@ -259,6 +259,7 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
     }
     for (ARAnchor *anchor in anchors) {
         // Check if this anchor is a new peer
+        NSLog(@"[ar_session]: received an anchor with name %@", anchor.name);
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"[ar_session]: a new peer is connected into the AR collaboration.");
             // Let the ARWorldOriginManager know that AR collaboration session has started.
@@ -266,16 +267,16 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
             continue;
         }
         if (anchor.name != nil) {
-            if (!self.multipeerSession.isHost && [anchor.name isEqual:@"origin"]) {
+            if (!self.multipeerSession.isHost && [anchor.name isEqual:@"-1"]) {
                 // This is an origin anchor.
                 // If this is a client, reset the world origin.
                 NSLog(@"[ar_session]: received an origin anchor.");
                 // Indicate the origin anchor transform in the previous coordinate system.
-                std::vector<float> position = TransformToUnityPosition(anchor.transform);
-                std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
-                float positionArray[3] = { position[0], position[1], position[2] };
-                float rotationArray[4] = { rotation[0], rotation[1], rotation[2], rotation[3] };
-                OriginAnchorReceivedDelegate(positionArray, rotationArray);
+//                std::vector<float> position = TransformToUnityPosition(anchor.transform);
+//                std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
+//                float positionArray[3] = { position[0], position[1], position[2] };
+//                float rotationArray[4] = { rotation[0], rotation[1], rotation[2], rotation[3] };
+//                OriginAnchorReceivedDelegate(positionArray, rotationArray);
                 [session setWorldOrigin:anchor.transform];
                 continue;
             }

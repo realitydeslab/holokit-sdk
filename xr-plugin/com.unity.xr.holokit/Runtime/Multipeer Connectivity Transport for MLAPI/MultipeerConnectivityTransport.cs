@@ -131,7 +131,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // Enqueue this data packet
             PeerDataPacket newPeerDataPacket = new PeerDataPacket() { clientId = clientId, data = data, dataArrayLength = dataArrayLength, channel = channel };
             MultipeerConnectivityTransport.Instance.m_PeerDataPacketQueue.Enqueue(newPeerDataPacket);
-            Debug.Log($"[MultipeerConnectivityTransport]: received a new peer data packet {clientId}, {(NetworkChannel)channel}");
+            //Debug.Log($"[MultipeerConnectivityTransport]: received a new peer data packet {clientId}, {(NetworkChannel)channel}");
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback);
@@ -225,7 +225,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
         public override void Send(ulong clientId, ArraySegment<byte> data, NetworkChannel networkChannel)
         {
-            Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId}");
+            //Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId}");
             //Debug.Log($"[MultipeerConnectivityTransport]: data.Array {data.Array}, data.Count {data.Count}, data.Offset {data.Offset}");
             // https://stackoverflow.com/questions/10940883/c-converting-byte-array-to-string-and-printing-out-to-console
             //Debug.Log($"[MultipeerConnectivityTransport]: byte array {System.Text.Encoding.UTF8.GetString(data.Array)}");
