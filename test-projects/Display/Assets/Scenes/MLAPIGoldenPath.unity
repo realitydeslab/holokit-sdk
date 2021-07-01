@@ -1068,6 +1068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0808c8492ecd74f15b882254f4132869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_IsHost: 0
   m_ServiceType: ar-collab
 --- !u!1 &1180935231
 GameObject:

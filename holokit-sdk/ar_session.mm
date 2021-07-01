@@ -261,7 +261,7 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
         // Check if this anchor is a new peer
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"[ar_session]: a new peer is connected into the AR collaboration.");
-            // TODO: Let the ARWorldOriginManager know that AR collaboration session has started.
+            // Let the ARWorldOriginManager know that AR collaboration session has started.
             ARCollaborationStartedDelegate();
             continue;
         }

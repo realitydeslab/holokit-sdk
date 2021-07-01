@@ -86,6 +86,7 @@ namespace UnityEngine.XR.HoloKit
         {
             // Register delegates
             UnityHoloKit_SetARCollaborationStartedDelegate(OnARCollaborationStarted);
+            UnityHoloKit_SetOriginAnchorReceivedDelegate(OnOriginAnchorReceived);
         }
 
         public void Update()
@@ -98,7 +99,8 @@ namespace UnityEngine.XR.HoloKit
                 float[] position = { 0f, 0f, 0f };
                 float[] rotation = { 0f, 0f, 0f, 1f };
                 UnityHoloKit_AddNativeAnchor("origin", position, rotation);
-                Debug.Log("[ARWorldOriginManager]: an origin anchor was added.");
+                Debug.Log("[ARWorldOriginManager]: added an origin anchor.");
+                m_LastResettingTime = Time.time;
             }
         }
     }

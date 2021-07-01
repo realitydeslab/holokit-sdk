@@ -4,7 +4,6 @@ using UnityEngine;
 using MLAPI.Transports.Tasks;
 using System;
 using System.Runtime.InteropServices;
-using UnityEngine.XR.HoloKit;
 
 namespace MLAPI.Transports.MultipeerConnectivity
 {
