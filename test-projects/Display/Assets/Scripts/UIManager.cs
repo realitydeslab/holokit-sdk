@@ -18,7 +18,11 @@ public class UIManager : MonoBehaviour
 
     private Text m_NetworkVariable;
 
-    private Button m_StartMoving;
+    private Button m_SpawnFlyingCubeButton;
+
+    private Button m_MoveLeftButton;
+
+    private Button m_MoveRightButton;
 
     void Start()
     {
@@ -38,8 +42,14 @@ public class UIManager : MonoBehaviour
 
         m_NetworkVariable = transform.GetChild(5).GetComponent<Text>();
 
-        m_StartMoving = transform.GetChild(6).GetComponent<Button>();
-        m_StartMoving.onClick.AddListener(StartMoving);
+        m_SpawnFlyingCubeButton = transform.GetChild(6).GetComponent<Button>();
+        m_SpawnFlyingCubeButton.onClick.AddListener(SpawnFlyingCube);
+
+        m_MoveLeftButton = transform.GetChild(7).GetComponent<Button>();
+        m_MoveLeftButton.onClick.AddListener(MoveLeft);
+
+        m_MoveRightButton = transform.GetChild(8).GetComponent<Button>();
+        m_MoveRightButton.onClick.AddListener(MoveRight);
     }
 
     void Update()
@@ -69,11 +79,11 @@ public class UIManager : MonoBehaviour
 
     private void Move()
     {
-        Debug.Log("[UIManager]: connected clients are");
-        foreach (ulong key in NetworkManager.Singleton.ConnectedClients.Keys)
-        {
-            Debug.Log(key);
-        }
+        //Debug.Log("[UIManager]: connected clients are");
+        //foreach (ulong key in NetworkManager.Singleton.ConnectedClients.Keys)
+        //{
+        //    Debug.Log(key);
+        //}
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkedClient))
         {
             var player = networkedClient.PlayerObject.GetComponent<HelloWorld.HelloWorldPlayer>();
@@ -96,14 +106,42 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void StartMoving()
+    private void SpawnFlyingCube()
     {
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
         {
             var player = networkClient.PlayerObject.GetComponent<HelloWorld.HelloWorldPlayer>();
             if (player)
             {
-                player.StartMoving();
+                player.SpawnFlyingCubeServerRpc();
+            }
+        }
+    }
+
+    private void MoveLeft()
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<HelloWorld.HelloWorldPlayer>();
+            if (player)
+            {
+                Vector3 direction = new Vector3(-1f, 0f, 0f);
+                float magnitude = 100f;
+                player.AddForce(direction.normalized, magnitude);
+            }
+        }
+    }
+
+    private void MoveRight()
+    {
+        if(NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkClient))
+        {
+            var player = networkClient.PlayerObject.GetComponent<HelloWorld.HelloWorldPlayer>();
+            if (player)
+            {
+                Vector3 direction = new Vector3(1f, 0f, 0f);
+                float magnitude = 100f;
+                player.AddForce(direction.normalized, magnitude);
             }
         }
     }

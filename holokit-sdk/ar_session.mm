@@ -259,7 +259,7 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
     }
     for (ARAnchor *anchor in anchors) {
         // Check if this anchor is a new peer
-        NSLog(@"[ar_session]: received an anchor with name %@", anchor.name);
+        //NSLog(@"[ar_session]: received an anchor with name %@", anchor.name);
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"[ar_session]: a new peer is connected into the AR collaboration.");
             // Let the ARWorldOriginManager know that AR collaboration session has started.

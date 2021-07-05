@@ -160,36 +160,39 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
 
 } // namespace
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+extern "C" {
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetRenderingMode(int val) {
     holokit::HoloKitApi::GetInstance()->SetRenderingMode((holokit::RenderingMode)val);
 }
 
-extern "C" int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetRenderingMode() {
     return holokit::HoloKitApi::GetInstance()->GetRenderingMode();
 }
 
-extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetCameraToCenterEyeOffsetX() {
+float* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetCameraToCenterEyeOffsetPtr() {
     simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
-    return offset.x;
+    float* result = new float[3];
+    result[0] = offset.x;
+    result[1] = offset.y;
+    result[2] = offset.z;
+    return result;
 }
 
-extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetCameraToCenterEyeOffsetY() {
-    simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
-    return offset.y;
+int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(float* ptr) {
+    // https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
+    delete[] ptr;
+    return 0;
 }
 
-extern "C" float UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetCameraToCenterEyeOffsetZ() {
-    simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
-    return offset.z;
-}
-
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_StartNfcVerification() {
     NSLog(@"[holokit_api]: StartNfcVerification()");
     holokit::HoloKitApi::GetInstance()->StartNfcVerification();
 }
+
+} // extern "C"

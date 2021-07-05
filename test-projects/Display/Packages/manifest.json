@@ -3,11 +3,13 @@
     {
       "name": "Keijiro",
       "url": "https://registry.npmjs.com",
-      "scopes": [ "jp.keijiro" ]
+      "scopes": [
+        "jp.keijiro"
+      ]
     }
   ],
   "dependencies": {
-    "jp.keijiro.pcx": "1.0.1",
+    "com.mlapi.contrib.extensions": "https://github.com/Unity-Technologies/mlapi-community-contributions.git?path=/com.mlapi.contrib.extensions",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.analytics": "3.5.3",
@@ -28,6 +30,7 @@
     "com.unity.xr.arkit": "4.2.0-pre.4",
     "com.unity.xr.holokit": "file:../../../xr-plugin/com.unity.xr.holokit",
     "com.unity.xr.oculus": "1.9.1",
+    "jp.keijiro.pcx": "1.0.1",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

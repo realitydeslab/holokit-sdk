@@ -10,10 +10,11 @@ namespace HelloWorld
     public class HelloWorldPlayer : NetworkBehaviour
     {
 
-        [SerializeField]
-        private GameObject vfx;
+        [SerializeField] private GameObject m_VfxPrefab;
 
-        private bool isMoving = false;
+        [SerializeField] private NetworkObject m_FlyingCubePrefab;
+
+        private int m_FrameCount;
 
         public NetworkVariableVector3 Position = new NetworkVariableVector3(new NetworkVariableSettings
         {
@@ -33,22 +34,22 @@ namespace HelloWorld
 
         void Update()
         {
-            transform.position = Position.Value;
-
-            if (isMoving)
+            if (m_FrameCount < 60)
             {
-                float theta = Time.frameCount / 10.0f;
-                transform.position = new Vector3((float)Math.Cos(theta), 0.0f, (float)Math.Sin(theta));
+                transform.position = Position.Value;
             }
+            m_FrameCount++;
         }
 
         public void Move()
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                var randomPosition = GetRandomPositionOnPlane();
-                transform.position = randomPosition;
-                Position.Value = randomPosition;
+                //var randomPosition = GetRandomPositionOnPlane();
+                //transform.position = randomPosition;
+                //Position.Value = randomPosition;
+
+                Position.Value = GetRandomPositionOnPlane();
             }
             else
             {
@@ -61,11 +62,6 @@ namespace HelloWorld
             SpawnVfxServerRpc();
         }
 
-        public void StartMoving()
-        {
-            isMoving = !isMoving;
-        }
-
         [ServerRpc]
         void SubmitPositionRequestServerRpc(ServerRpcParams rpcParams = default)
         {
@@ -74,7 +70,7 @@ namespace HelloWorld
 
         static Vector3 GetRandomPositionOnPlane()
         {
-            return new Vector3(UnityEngine.Random.Range(-3f, 3f), 1f, UnityEngine.Random.Range(-3f, 3f));
+            return new Vector3(UnityEngine.Random.Range(-3f, 3f), 2.0f, UnityEngine.Random.Range(-3f, 3f));
         }
 
         [ServerRpc]
@@ -86,7 +82,20 @@ namespace HelloWorld
         [ClientRpc]
         private void SpawnVfxClientRpc()
         {
-            Instantiate(vfx, transform.position, transform.rotation);
+            Instantiate(m_VfxPrefab, transform.position, transform.rotation);
+        }
+
+        [ServerRpc]
+        public void SpawnFlyingCubeServerRpc()
+        {
+            var newFlyingCube = Instantiate(m_FlyingCubePrefab, transform.position, Quaternion.identity);
+            newFlyingCube.SpawnWithOwnership(OwnerClientId);
+        }
+
+        public void AddForce(Vector3 direction, float magnitude)
+        {
+            Debug.Log("[HelloWorldPlayer]: AddForce()");
+            GetComponent<Rigidbody>().AddForce(direction * magnitude);
         }
     }
 }

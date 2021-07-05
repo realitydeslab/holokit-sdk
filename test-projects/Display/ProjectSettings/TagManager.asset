@@ -6,8 +6,8 @@ TagManager:
   tags:
   - LandmarkLeft
   - LandmarkRight
-  - qrcode
-  - HandInteractable
+  - Meshing
+  - HandSphere
   layers:
   - Default
   - TransparentFX

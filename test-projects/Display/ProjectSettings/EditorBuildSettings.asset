@@ -26,9 +26,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/MLAPIGoldenPath.unity
     guid: 3b6f8831646ff4dcdafef2d1952af8cf
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/PhantomBuddhas.unity
     guid: fe9fa73f6de7d46dabf0c74a025983aa
+  - enabled: 1
+    path: Assets/Scenes/FloatingBall.unity
+    guid: ff17a4e8737554eef95470350e432c26
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 5a3ca412859ff477aa1381b715c095aa,
       type: 2}
