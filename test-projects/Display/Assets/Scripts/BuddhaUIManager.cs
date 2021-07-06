@@ -44,7 +44,7 @@ public class BuddhaUIManager : MonoBehaviour
 
     private void Update()
     {
-        if (UnityEngine.XR.HoloKit.ARWorldOriginManager.Instance.m_IsARCollaborationStarted)
+        if (UnityEngine.XR.HoloKit.ARWorldOriginManager.Instance.m_IsARWorldMapSynced)
         {
             m_IsSynced.text = "Synced";
         }

@@ -20,6 +20,8 @@ public class FloatingBallUIManager : MonoBehaviour
 
     private Button m_SpawnFloatingBallButton;
 
+    private Text m_ClientId;
+
     [SerializeField] private GameObject m_Volume;
 
     [DllImport("__Internal")]
@@ -44,13 +46,16 @@ public class FloatingBallUIManager : MonoBehaviour
         m_SpawnFloatingBallButton = transform.GetChild(5).GetComponent<Button>();
         m_SpawnFloatingBallButton.onClick.AddListener(SpawnFloatingBall);
 
+        m_ClientId = transform.GetChild(6).GetComponent<Text>();
+
         DisableRenderingButtons();
         m_SpawnFloatingBallButton.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (UnityEngine.XR.HoloKit.ARWorldOriginManager.Instance.m_IsARCollaborationStarted)
+        m_ClientId.text = NetworkManager.Singleton.LocalClientId.ToString();
+        if (UnityEngine.XR.HoloKit.ARWorldOriginManager.Instance.m_IsARWorldMapSynced)
         {
             m_IsSynced.text = "Synced";
         }
@@ -105,6 +110,11 @@ public class FloatingBallUIManager : MonoBehaviour
 
     private void SpawnFloatingBall()
     {
+        Debug.Log("[FloatingBallUIManager]: currenty connected clients are:");
+        foreach(ulong key in NetworkManager.Singleton.ConnectedClients.Keys)
+        {
+            Debug.Log(key);
+        }
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkedClient))
         {
             var player = networkedClient.PlayerObject.GetComponent<FloatingBallPlayer>();

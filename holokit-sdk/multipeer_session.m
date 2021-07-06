@@ -9,8 +9,8 @@
 #include "IUnityInterface.h"
 #include "ar_session.h"
 
-typedef void (*MultipeerConnectionStartedForMLAPI)(unsigned long peerId);
-MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = NULL;
+typedef void (*MultipeerSendConnectionRequestForMLAPI)(unsigned long peerId);
+MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDelegate = NULL;
 
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
@@ -177,17 +177,18 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
     if (state == MCSessionStateNotConnected) {
-        NSLog(@"[multipeer_session]: not connected with peer %@.", peerID.displayName);
+        NSLog(@"[multipeer_session]: disconnected with peer %@.", peerID.displayName);
         [self.connectedPeers removeObject:peerID];
+        // TODO: disconnect
     } else if (state == MCSessionStateConnecting) {
         NSLog(@"[multipeer_session]: connecting with peer %@.", peerID.displayName);
     } else if (state == MCSessionStateConnected) {
-        NSLog(@"[multipeer_session]: connected  with peer %@.", peerID.displayName);
+        NSLog(@"[multipeer_session]: connected with peer %@.", peerID.displayName);
         [self.connectedPeers addObject:peerID];
-        unsigned long peerId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-        MultipeerConnectionStartedForMLAPIDelegate(peerId);
-        // TODO: a more appropriate way is to notify MLAPI the connection starts right after two devices' AR maps synchronized.
-        // TODO: however, I didn't find a way to pass peerID using that way.
+        if (!self.isHost) {
+            unsigned long serverId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+            MultipeerSendConnectionRequestForMLAPIDelegate(serverId);
+        }
     }
 }
 
@@ -235,13 +236,13 @@ MultipeerConnectionStartedForMLAPI MultipeerConnectionStartedForMLAPIDelegate = 
 @end
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetMultipeerConnectionStartedForMLAPIDelegate(MultipeerConnectionStartedForMLAPI callback) {
-    MultipeerConnectionStartedForMLAPIDelegate = callback;
+UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(MultipeerSendConnectionRequestForMLAPI callback) {
+    MultipeerSendConnectionRequestForMLAPIDelegate = callback;
 }
 
 // https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerSendForMLAPI(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
+UnityHoloKit_MultipeerSendDataForMLAPI(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     MultipeerSession *session = ar_session_delegate_controller.multipeerSession;
     for (MCPeerID *peerId in session.connectedPeers) {

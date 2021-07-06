@@ -47,14 +47,8 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 
 static const float kLostHandTrackingInterval = 1.5f;
 
-typedef void (*ARCollaborationStarted)();
-ARCollaborationStarted ARCollaborationStartedDelegate = NULL;
-
-typedef void (*OriginAnchorReceived)(float* position, float* rotation);
-OriginAnchorReceived OriginAnchorReceivedDelegate = NULL;
-
-typedef void (*ARCollaborationStartedForMLAPI)();
-ARCollaborationStartedForMLAPI ARCollaborationStartedForMLAPIDelegate = NULL;
+typedef void (*ARWorldMapSynced)();
+ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 
 typedef void (*PeerDataReceivedForMLAPI)(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel);
 PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
@@ -71,6 +65,8 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
 @property (assign) int frameCount;
 
 @property (nonatomic, strong) CMMotionManager* motionManager;
+
+@property (assign) bool isARWorldMapSynced;
 
 @end
 
@@ -113,34 +109,6 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
         self.primaryButtonLeft = NO;
         self.primaryButtonRight = NO;
         
-        // Set up multipeer session
-//        void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
-//            // Try to decode the received data as ARCollaboration data.
-//            ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
-//            if (collaborationData != NULL) {
-//                //NSLog(@"[ar_session]: did receive ARCollaboration data.");
-//                [self.session updateWithCollaborationData:collaborationData];
-//                return;
-//            }
-//            // TODO: delete this
-//            // Try to decode the received data as peer hand position data.
-//            NSArray* decodedData = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSNumber class] fromData:data error:nil];
-//            if (decodedData != NULL) {
-//                //NSLog(@"[ar_session]: did receive peer hand position data.");
-//                //NSLog(@"[ar_session]: peer hand position received: {%f, %f, %f}", [decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
-//                UpdatePeerHandPositionDelegate([decodedData[0] floatValue], [decodedData[1] floatValue], [decodedData[2] floatValue]);
-//                return;
-//            }
-//            // TODO: handle MLAPI data
-//            NSLog(@"[ar_session]: Failed to decode received data from peer.");
-//        };
-//        self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler];
-//        self.IsCollaborationSynchronized = false;
-//        self.isCollaborationHost = true;
-        
-        //[self startAccelerometer];
-        //[self startGyroscope];
-        
         frame_count = 0;
         last_frame_time = 0.0f;
     }
@@ -177,6 +145,7 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
         NSLog(@"[ar_session]: Failed to decode received data from peer.");
     };
     self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
+    self.isARWorldMapSynced = false;
 }
 
 - (void)startAccelerometer {
@@ -263,7 +232,10 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"[ar_session]: a new peer is connected into the AR collaboration.");
             // Let the ARWorldOriginManager know that AR collaboration session has started.
-            ARCollaborationStartedDelegate();
+            if (!self.isARWorldMapSynced) {
+                self.isARWorldMapSynced = true;
+                ARWorldMapSyncedDelegate();
+            }
             continue;
         }
         if (anchor.name != nil) {
@@ -770,11 +742,6 @@ UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float r
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetOriginAnchorReceivedDelegate(OriginAnchorReceived callback){
-    OriginAnchorReceivedDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetHandTrackingInterval(int val) {
     ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_handler setHandPosePredictionInterval:val];
@@ -807,13 +774,8 @@ UnityHoloKit_MultipeerStartAdvertising() {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetARCollaborationStartedDelegate(ARCollaborationStarted callback) {
-    ARCollaborationStartedDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetARCollaborationStartedForMLAPIDelegate(ARCollaborationStartedForMLAPI callback) {
-    ARCollaborationStartedForMLAPIDelegate = callback;
+UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
+    ARWorldMapSyncedDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
