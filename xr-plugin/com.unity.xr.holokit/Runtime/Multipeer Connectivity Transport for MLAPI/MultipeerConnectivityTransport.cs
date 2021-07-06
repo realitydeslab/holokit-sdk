@@ -28,7 +28,9 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// <summary>
         /// The client Id of this machine in the local network.
         /// </summary>
-        private ulong m_MyClientId;
+        private ulong m_ClientId;
+
+        public ulong ClientId => m_ClientId;
 
         private ulong m_ServerId = 0;
 
@@ -144,7 +146,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // therefore, it is very unlikely that we get a duplicate client Id.
             var randomGenerator = new System.Random((int)(Time.time * 1000));
             ulong newClientId = (ulong)randomGenerator.Next(1, 1000000);
-            m_MyClientId = newClientId;
+            m_ClientId = newClientId;
 
             // Init the multipeer session on objective-c++ side.
             if (m_ServiceType == null)
@@ -157,7 +159,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public override SocketTasks StartServer()
         {
             Debug.Log($"[MultipeerConnectivityTransport]: StartServer() {Time.time}");
-            m_ServerId = m_MyClientId;
+            m_ServerId = m_ClientId;
             UnityHoloKit_MultipeerStartBrowsing();
             return SocketTask.Done.AsTasks();
         }

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using MLAPI;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
+using MLAPI.Transports.MultipeerConnectivity;
 
 public class FloatingBallUIManager : MonoBehaviour
 {
@@ -54,7 +55,7 @@ public class FloatingBallUIManager : MonoBehaviour
 
     private void Update()
     {
-        m_ClientId.text = NetworkManager.Singleton.LocalClientId.ToString();
+        m_ClientId.text = MultipeerConnectivityTransport.Instance.ClientId.ToString();
         if (UnityEngine.XR.HoloKit.ARWorldOriginManager.Instance.m_IsARWorldMapSynced)
         {
             m_IsSynced.text = "Synced";
