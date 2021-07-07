@@ -75,14 +75,14 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
 #pragma mark - init
 - (instancetype)init {
     if(self = [super init]) {
-        self.handTracker = [[HandTracker alloc] init];
-        self.handTracker.delegate = self;
-        [self.handTracker startGraph];
-        self.handTrackingQueue = [[NSOperationQueue alloc] init];
-        self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        self.motionQueue = [[NSOperationQueue alloc] init];
-        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        self.motionManager = [[CMMotionManager alloc] init];
+//        self.handTracker = [[HandTracker alloc] init];
+//        self.handTracker.delegate = self;
+//        [self.handTracker startGraph];
+//        self.handTrackingQueue = [[NSOperationQueue alloc] init];
+//        self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+//        self.motionQueue = [[NSOperationQueue alloc] init];
+//        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+//        self.motionManager = [[CMMotionManager alloc] init];
         
         // Vision hand tracking
         //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
@@ -202,22 +202,24 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
     
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.
-    if (self.isLeftHandTracked || self.isRightHandTracked) {
-        float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];
-        if((currentTimestamp - self.lastHandTrackingTimestamp) > kLostHandTrackingInterval) {
-            NSLog(@"[ar_session]: hand tracking lost.");
-            self.isLeftHandTracked = false;
-            self.isRightHandTracked = false;
-        }
-    }
+//    if (self.isLeftHandTracked || self.isRightHandTracked) {
+//        float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];
+//        if((currentTimestamp - self.lastHandTrackingTimestamp) > kLostHandTrackingInterval) {
+//            NSLog(@"[ar_session]: hand tracking lost.");
+//            self.isLeftHandTracked = false;
+//            self.isRightHandTracked = false;
+//        }
+//    }
     
     // Hand tracking
     self.frameCount++;
     if (self.isHandTrackingEnabled && self.frameCount % self.handPosePredictionInterval == 0) {
-        [self.handTrackingQueue addOperationWithBlock:^{
-            [self.handTracker processVideoFrame: frame.capturedImage];
-        }];
-        //[self performHumanHandPoseRequest:frame];
+        
+//        [self.handTrackingQueue addOperationWithBlock:^{
+//            [self.handTracker processVideoFrame: frame.capturedImage];
+//        }];
+        
+        [self performHumanHandPoseRequest:frame];
     }
     //os_signpost_interval_end(log, spid, "session_didUpdateFrame");
 }

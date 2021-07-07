@@ -64,3 +64,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_FloatingBallPrefab: {fileID: 619927323934644623, guid: aa027a2d36e884666930ff8ced55f244,
     type: 3}
+  m_HandSpherePrefab: {fileID: 8698949825217913386, guid: a8881e200a2bd4927acd0036d77a24c5,
+    type: 3}
+  m_SpawningOffset: {x: 0, y: 0.2, z: 1}

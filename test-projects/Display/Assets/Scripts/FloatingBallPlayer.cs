@@ -2,13 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
+using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
 using System.Runtime.InteropServices;
 using System;
+using MLAPI.Transports.MultipeerConnectivity;
 
 public class FloatingBallPlayer : NetworkBehaviour
 {
 
     [SerializeField] private NetworkObject m_FloatingBallPrefab;
+
+    [SerializeField] private NetworkObject m_HandSpherePrefab;
 
     [SerializeField] private Vector3 m_SpawningOffset = new Vector3(0f, 0.2f, 1f);
 
@@ -37,7 +42,12 @@ public class FloatingBallPlayer : NetworkBehaviour
 
     public override void NetworkStart()
     {
+        SpawnHandSphereServerRpc();
+    }
 
+    private void Update()
+    {
+    
     }
 
     public void SpawnFloatingBall()
@@ -52,4 +62,11 @@ public class FloatingBallPlayer : NetworkBehaviour
         floatingBall.Spawn();
     }
 
+    [ServerRpc]
+    private void SpawnHandSphereServerRpc()
+    {
+        Debug.Log("SpawnHandSphereServerRpc");
+        var handSphereInstance = Instantiate(m_HandSpherePrefab, Vector3.zero, Quaternion.identity);
+        handSphereInstance.SpawnWithOwnership(OwnerClientId);
+    }
 }

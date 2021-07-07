@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
 using System.Linq;
+using MLAPI;
 
 namespace UnityEngine.XR.HoloKit
 {

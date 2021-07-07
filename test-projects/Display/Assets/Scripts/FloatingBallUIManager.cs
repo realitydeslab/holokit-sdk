@@ -56,7 +56,7 @@ public class FloatingBallUIManager : MonoBehaviour
     private void Update()
     {
         m_ClientId.text = MultipeerConnectivityTransport.Instance.ClientId.ToString();
-        if (UnityEngine.XR.HoloKit.ARWorldOriginManager.Instance.m_IsARWorldMapSynced)
+        if (UnityEngine.XR.HoloKit.ARWorldOriginManager.Instance.IsARWorldMapSynced)
         {
             m_IsSynced.text = "Synced";
         }

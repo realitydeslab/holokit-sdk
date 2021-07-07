@@ -127,7 +127,8 @@ public class UIManager : MonoBehaviour
             {
                 Vector3 direction = new Vector3(-1f, 0f, 0f);
                 float magnitude = 100f;
-                player.AddForce(direction.normalized, magnitude);
+                //player.AddForce(direction.normalized, magnitude);
+                player.transform.position += direction * magnitude * 0.01f;
             }
         }
     }

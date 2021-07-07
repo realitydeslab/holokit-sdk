@@ -18,8 +18,9 @@ namespace UnityEngine.XR.HoloKit
         /// Has my AR world map been synced with others in the network?
         /// This variable is set to true when the local AR collaboration sessino begins.
         /// </summary>
-        [HideInInspector]
-        public bool m_IsARWorldMapSynced = false;
+        private bool m_IsARWorldMapSynced = false;
+
+        public bool IsARWorldMapSynced => m_IsARWorldMapSynced;
 
         /// <summary>
         /// The time interval between two AR world origin resettings.
