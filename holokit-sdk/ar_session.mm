@@ -118,6 +118,9 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
 - (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID {
     // TODO: Can I move this into a separate block?
     void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
+        if ([self.multipeerSession.connectedPeers containsObject:peerID] == NO) {
+            return;
+        }
         // Try to decode the received data as ARCollaboration data.
         ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
         if (collaborationData != nil) {
@@ -125,11 +128,11 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
             [self.session updateWithCollaborationData:collaborationData];
             return;
         }
-        // TODO: handle MLAPI data
+        // Handle MLAPI data
         unsigned char *mlapiData = (unsigned char *) [data bytes];
         if (mlapiData != nil) {
             //NSLog(@"[ar_session]: MLAPI data received.");
-            // TODO: decode the received data
+            // Decode the received data
             int channel = (int)mlapiData[0];
             int dataArrayLength = (int)mlapiData[1];
             //NSLog(@"[ar_session]: channel is %d and dataArrayLength is %d", channel, dataArrayLength);
@@ -138,7 +141,7 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
                 niceData[i] = mlapiData[i + 2];
             }
             unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-            // TODO: send this data back to MLAPI
+            // Send this data back to MLAPI
             PeerDataReceivedForMLAPIDelegate(clientId, niceData, dataArrayLength, channel);
             return;
         }
@@ -232,7 +235,7 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
         // Check if this anchor is a new peer
         //NSLog(@"[ar_session]: received an anchor with name %@", anchor.name);
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            NSLog(@"[ar_session]: a new peer is connected into the AR collaboration.");
+            NSLog(@"[ar_session]: a new peer is connected to the AR collaboration session.");
             // Let the ARWorldOriginManager know that AR collaboration session has started.
             if (!self.isARWorldMapSynced) {
                 self.isARWorldMapSynced = true;
@@ -244,13 +247,12 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
             if (!self.multipeerSession.isHost && [anchor.name isEqual:@"-1"]) {
                 // This is an origin anchor.
                 // If this is a client, reset the world origin.
-                NSLog(@"[ar_session]: received an origin anchor.");
+                NSLog(@"[ar_session]: did receive an origin anchor, resetting world origin.");
                 // Indicate the origin anchor transform in the previous coordinate system.
-//                std::vector<float> position = TransformToUnityPosition(anchor.transform);
-//                std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
-//                float positionArray[3] = { position[0], position[1], position[2] };
-//                float rotationArray[4] = { rotation[0], rotation[1], rotation[2], rotation[3] };
-//                OriginAnchorReceivedDelegate(positionArray, rotationArray);
+                std::vector<float> position = TransformToUnityPosition(anchor.transform);
+                std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
+                NSLog(@"[ar_session]: the position of new world origin [%f, %f, %f]", position[0], position[1], position[2]);
+                NSLog(@"[ar_session]: the rotation of new world origin [%f, %f, %f, %f]", rotation[0], rotation[1], rotation[2], rotation[3]);
                 [session setWorldOrigin:anchor.transform];
                 continue;
             }

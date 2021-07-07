@@ -30,19 +30,33 @@ public class FloatingBallPlayer : NetworkBehaviour
 
     private void OnEnable()
     {
-        // https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
-        IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
-        float[] offset = new float[3];
-        Marshal.Copy(offsetPtr, offset, 0, 3);
-        Debug.Log($"[FloatingBallPlayer]: camera to center eye offset [{offset[0]}, {offset[1]}, {offset[2]}]");
-        CameraToCenterEyeOffset = new Vector3(offset[0], offset[1], offset[2]);
+        //if (!IsServer || CameraToCenterEyeOffset != null) { return; }
 
-        UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(offsetPtr);
+        //// https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
+        //IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
+        //float[] offset = new float[3];
+        //Marshal.Copy(offsetPtr, offset, 0, 3);
+        //Debug.Log($"[FloatingBallPlayer]: camera to center eye offset [{offset[0]}, {offset[1]}, {offset[2]}]");
+        //CameraToCenterEyeOffset = new Vector3(offset[0], offset[1], offset[2]);
+
+        //UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(offsetPtr);
     }
 
     public override void NetworkStart()
     {
-        SpawnHandSphereServerRpc();
+        if (IsOwner)
+        {
+            //SpawnHandSphereServerRpc();
+        }
+    }
+
+    private void Start()
+    {
+        if (IsOwner)
+        {
+            Debug.Log($"[FloatingBallPlayer]: Owner {OwnerClientId} started.");
+            SpawnHandSphereServerRpc();
+        }
     }
 
     private void Update()
@@ -56,7 +70,7 @@ public class FloatingBallPlayer : NetworkBehaviour
         Camera arCamera = Camera.main;
         Vector3 spawningPosition = arCamera.transform.position + arCamera.transform.TransformVector(m_SpawningOffset);
         if (UnityHoloKit_GetRenderingMode() == 2) {
-            spawningPosition += arCamera.transform.TransformVector(CameraToCenterEyeOffset);
+            //spawningPosition += arCamera.transform.TransformVector(CameraToCenterEyeOffset);
         }
         var floatingBall = Instantiate(m_FloatingBallPrefab, spawningPosition, new Quaternion(0f, 0f, 0f, 1f));
         floatingBall.Spawn();
@@ -68,5 +82,6 @@ public class FloatingBallPlayer : NetworkBehaviour
         Debug.Log("SpawnHandSphereServerRpc");
         var handSphereInstance = Instantiate(m_HandSpherePrefab, Vector3.zero, Quaternion.identity);
         handSphereInstance.SpawnWithOwnership(OwnerClientId);
+        Debug.Log($"[FloatingBallPlayer]: spawn a new hand sphere with ownership {OwnerClientId}");
     }
 }

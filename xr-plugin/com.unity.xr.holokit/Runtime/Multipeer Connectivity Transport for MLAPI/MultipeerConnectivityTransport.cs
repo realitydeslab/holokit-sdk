@@ -74,7 +74,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             // This delegate function gets called from Objective-C side when AR collaboration started.
             // We start MLAPI connection right after that.
-            Debug.Log("[MultipeerConnectivityTransport]: request multipeer connection request.");
+            Debug.Log("[MultipeerConnectivityTransport]: send multipeer connection request.");
 
             MultipeerConnectivityTransport.Instance.m_ServerId = serverId;
             MultipeerConnectivityTransport.Instance.m_SendingConnectionRequest = true;
@@ -114,7 +114,12 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // Enqueue this data packet
             PeerDataPacket newPeerDataPacket = new PeerDataPacket() { clientId = clientId, data = data, dataArrayLength = dataArrayLength, channel = channel };
             MultipeerConnectivityTransport.Instance.m_PeerDataPacketQueue.Enqueue(newPeerDataPacket);
-            //Debug.Log($"[MultipeerConnectivityTransport]: received a new peer data packet {clientId}, {(NetworkChannel)channel}");
+            //Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
+
+            if ((NetworkChannel)channel == NetworkChannel.Internal || (NetworkChannel)channel == NetworkChannel.SyncChannel)
+            {
+                Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
+            }
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback);
@@ -188,7 +193,6 @@ namespace MLAPI.Transports.MultipeerConnectivity
             if (m_PeerDataPacketQueue.Count > 0)
             {
                 PeerDataPacket dataPacket = m_PeerDataPacketQueue.Dequeue();
-                //Debug.Log($"[MultipeerConnectivityTransport]: dequeue peer data packet from {dataPacket.clientId}.");
                 clientId = dataPacket.clientId;
                 networkChannel = (NetworkChannel)dataPacket.channel;
                 payload = new ArraySegment<byte>(dataPacket.data, 0, dataPacket.dataArrayLength);

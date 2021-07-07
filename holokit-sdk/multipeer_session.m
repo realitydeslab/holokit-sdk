@@ -84,6 +84,7 @@ MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDel
         NSLog(@"[multipeer_session]: There is no connected peer.");
         return;
     }
+    // TODO: Client only sends data to the server.
     bool success = [self.session sendData:data toPeers:self.session.connectedPeers withMode:MCSessionSendDataReliable error:nil];
     if (success) {
         //NSLog(@"Send to all peers successfully.");
@@ -184,10 +185,17 @@ MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDel
         NSLog(@"[multipeer_session]: connecting with peer %@.", peerID.displayName);
     } else if (state == MCSessionStateConnected) {
         NSLog(@"[multipeer_session]: connected with peer %@.", peerID.displayName);
-        [self.connectedPeers addObject:peerID];
-        if (!self.isHost) {
-            unsigned long serverId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-            MultipeerSendConnectionRequestForMLAPIDelegate(serverId);
+        if (self.isHost) {
+            [self.connectedPeers addObject:peerID];
+        } else {
+            // As a client, we only need to connect to the server.
+            if (self.connectedPeers.count == 0) {
+                [self.connectedPeers addObject:peerID];
+                
+                unsigned long serverId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+                NSLog(@"[multipeer_session]: send connection request to server %lu", serverId);
+                MultipeerSendConnectionRequestForMLAPIDelegate(serverId);
+            }
         }
     }
 }
