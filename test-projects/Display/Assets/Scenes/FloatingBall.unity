@@ -342,6 +342,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3404720833842750756, guid: 23cf20b6f43ff4e48878bcb09ca00519,
+        type: 3}
+      propertyPath: m_ResettingInverval
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 3570850918954108875, guid: 23cf20b6f43ff4e48878bcb09ca00519,
         type: 3}
       propertyPath: m_EnvironmentDepthMode
