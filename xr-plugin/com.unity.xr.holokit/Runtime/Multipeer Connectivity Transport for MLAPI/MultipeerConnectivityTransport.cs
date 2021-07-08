@@ -36,7 +36,11 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
         public override ulong ServerClientId => m_ServerId;
 
-        private bool m_SendingConnectionRequest = false;
+        private bool m_SentConnectionRequest = false;
+
+        private bool m_ReceivedDisconnectionMessage = false;
+
+        private ulong m_LastDisconnectedClientId;
 
         /// <summary>
         /// The queue storing all peer data packets received through the network so that
@@ -66,7 +70,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_MultipeerStartAdvertising();
 
         /// <summary>
-        /// This delegate function is only called on the non-server side.
+        /// This delegate function is only called by a client.
         /// </summary>
         delegate void MultipeerSendConnectionRequestForMLAPI(ulong serverId);
         [AOT.MonoPInvokeCallback(typeof(MultipeerSendConnectionRequestForMLAPI))]
@@ -74,13 +78,30 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             // This delegate function gets called from Objective-C side when AR collaboration started.
             // We start MLAPI connection right after that.
-            Debug.Log("[MultipeerConnectivityTransport]: send multipeer connection request.");
+            Debug.Log("[MultipeerConnectivityTransport]: send multipeer connection request to MLAPI.");
 
             MultipeerConnectivityTransport.Instance.m_ServerId = serverId;
-            MultipeerConnectivityTransport.Instance.m_SendingConnectionRequest = true;
+            MultipeerConnectivityTransport.Instance.m_SentConnectionRequest = true;
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(MultipeerSendConnectionRequestForMLAPI callback);
+
+        /// <summary>
+        /// This delegate function is only called by the server.
+        /// This function gets called when the server notices that a client is
+        /// disconnected through multipeer connectivity network.
+        /// </summary>
+        delegate void MultipeerDisconnectionMessageReceivedForMLAPI(ulong clientId);
+        [AOT.MonoPInvokeCallback(typeof(MultipeerDisconnectionMessageReceivedForMLAPI))]
+        static void OnMultipeerDisconnectionMessageReceivedForMLAPI(ulong clientId)
+        {
+            Debug.Log($"[MultipeerConnectivityTransport]: received a disconnection message from client {clientId}.");
+
+            MultipeerConnectivityTransport.Instance.m_ReceivedDisconnectionMessage = true;
+            MultipeerConnectivityTransport.Instance.m_LastDisconnectedClientId = clientId;
+        }
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetMultipeerDisconnectionMessageReceivedForMLAPIDelegate(MultipeerDisconnectionMessageReceivedForMLAPI callback);
 
         /// <summary>
         /// Send MLAPI data to a peer through multipeer connectivity.
@@ -116,10 +137,10 @@ namespace MLAPI.Transports.MultipeerConnectivity
             MultipeerConnectivityTransport.Instance.m_PeerDataPacketQueue.Enqueue(newPeerDataPacket);
             //Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
 
-            if ((NetworkChannel)channel == NetworkChannel.Internal || (NetworkChannel)channel == NetworkChannel.SyncChannel)
-            {
-                Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
-            }
+            //if ((NetworkChannel)channel == NetworkChannel.Internal || (NetworkChannel)channel == NetworkChannel.SyncChannel)
+            //{
+            //    Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
+            //}
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback);
@@ -140,6 +161,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             // Register delegates
             UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(OnMultipeerConnectionRequestSentForMLAPI);
+            UnityHoloKit_SetMultipeerDisconnectionMessageReceivedForMLAPIDelegate(OnMultipeerDisconnectionMessageReceivedForMLAPI);
             UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(OnPeerDataReceivedForMLAPI);
         }
 
@@ -180,16 +202,27 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             //Debug.Log($"[MultipeerConnectivityTransport]: PollEvent() {Time.time}");
 
-            // Notify MLAPI that a peer is connected.
-            if (!NetworkManager.Singleton.IsServer && m_SendingConnectionRequest)
+            // Send a connection request to the server as a client.
+            if (m_SentConnectionRequest && !NetworkManager.Singleton.IsServer)
             {
-                m_SendingConnectionRequest = false;
+                m_SentConnectionRequest = false;
                 clientId = m_ServerId;
                 networkChannel = NetworkChannel.DefaultMessage;
                 receiveTime = Time.realtimeSinceStartup;
                 return NetworkEvent.Connect;
             }
 
+            // Send a disconnection message to the server as a client.
+            if (m_ReceivedDisconnectionMessage && NetworkManager.Singleton.IsServer)
+            {
+                m_ReceivedDisconnectionMessage = false;
+                clientId = m_LastDisconnectedClientId;
+                networkChannel = NetworkChannel.DefaultMessage;
+                receiveTime = Time.realtimeSinceStartup;
+                return NetworkEvent.Disconnect;
+            }
+
+            // Handle the incoming messages.
             if (m_PeerDataPacketQueue.Count > 0)
             {
                 PeerDataPacket dataPacket = m_PeerDataPacketQueue.Dequeue();
@@ -200,8 +233,6 @@ namespace MLAPI.Transports.MultipeerConnectivity
                 // TODO: I don't know if this is correct.
                 return NetworkEvent.Data;
             }
-
-            // TODO: dealing with disconnection
 
             // We do nothing here if nothing happens.
             clientId = 0;
@@ -228,12 +259,6 @@ namespace MLAPI.Transports.MultipeerConnectivity
             UnityHoloKit_MultipeerSendDataForMLAPI(clientId, newArray, data.Count, (int)networkChannel);
         }
 
-        public override void Shutdown()
-        {
-            Debug.Log($"[MultipeerConnectivityTransport]: Shutdown() {Time.time}");
-            throw new NotImplementedException();
-        }
-
         public override ulong GetCurrentRtt(ulong clientId)
         {
             Debug.Log($"[MultipeerConnectivityTransport]: GetCurrentRtt() {Time.time}");
@@ -249,6 +274,12 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public override void DisconnectRemoteClient(ulong clientId)
         {
             Debug.Log($"[MultipeerConnectivityTransport]: DisconnectRemoteClient() {Time.time}");
+            throw new NotImplementedException();
+        }
+
+        public override void Shutdown()
+        {
+            Debug.Log($"[MultipeerConnectivityTransport]: Shutdown() {Time.time}");
             throw new NotImplementedException();
         }
     }

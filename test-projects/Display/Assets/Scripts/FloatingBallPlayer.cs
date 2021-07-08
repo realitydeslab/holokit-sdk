@@ -42,6 +42,10 @@ public class FloatingBallPlayer : NetworkBehaviour
         //UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(offsetPtr);
     }
 
+    private void OnDisable()
+    {
+    }
+
     public override void NetworkStart()
     {
         if (IsOwner)

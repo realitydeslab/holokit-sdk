@@ -14,13 +14,39 @@ public class FloatingBall : NetworkBehaviour
     [SerializeField] private AudioClip m_HitPlaneAudioClip;
 
     [SerializeField] private AudioClip m_HitHandAudioClip;
-    
+
+    private void OnEnable()
+    {
+        if (IsOwner)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (IsOwner)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
+    }
+
     void Start()
     {
         // (0.00, -9.81, 0.00) as default
         Physics.gravity = new Vector3(0f, -2f, 0f);
 
         m_AudioSource = GetComponent<AudioSource>();
+    }
+
+    private void Update()
+    {
+        // If the ball falling off the ground, we destroy it
+        if (!IsOwner) { return; }
+        if (transform.position.y < -3f)
+        {
+            DestroyBallServerRpc();
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -91,4 +117,15 @@ public class FloatingBall : NetworkBehaviour
         }
     }
 
+    [ServerRpc]
+    private void DestroyBallServerRpc()
+    {
+        Debug.Log("[FloatingBall]: a ball is destroyed on the server side.");
+        Destroy(gameObject);
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        Destroy(gameObject);
+    }
 }

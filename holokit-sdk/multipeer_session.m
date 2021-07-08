@@ -12,6 +12,9 @@
 typedef void (*MultipeerSendConnectionRequestForMLAPI)(unsigned long peerId);
 MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDelegate = NULL;
 
+typedef void (*MultipeerDisconnectionMessageReceivedForMLAPI)(unsigned long clientId);
+MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageReceivedForMLAPIDelegate = NULL;
+
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
 @property (nonatomic, strong) NSString *serviceType;
@@ -180,13 +183,19 @@ MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDel
     if (state == MCSessionStateNotConnected) {
         NSLog(@"[multipeer_session]: disconnected with peer %@.", peerID.displayName);
         [self.connectedPeers removeObject:peerID];
-        // TODO: disconnect
+        // TODO: Notify MLAPI that a client is disconnected.
+        if (self.isHost) {
+            unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+            MultipeerDisconnectionMessageReceivedForMLAPIDelegate(clientId);
+        }
     } else if (state == MCSessionStateConnecting) {
         NSLog(@"[multipeer_session]: connecting with peer %@.", peerID.displayName);
     } else if (state == MCSessionStateConnected) {
         NSLog(@"[multipeer_session]: connected with peer %@.", peerID.displayName);
         if (self.isHost) {
             [self.connectedPeers addObject:peerID];
+            // Notify the host that there is a new peer joining the session.
+            
         } else {
             // As a client, we only need to connect to the server.
             if (self.connectedPeers.count == 0) {
@@ -246,6 +255,11 @@ MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDel
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(MultipeerSendConnectionRequestForMLAPI callback) {
     MultipeerSendConnectionRequestForMLAPIDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetMultipeerDisconnectionMessageReceivedForMLAPIDelegate(MultipeerDisconnectionMessageReceivedForMLAPI callback) {
+    MultipeerDisconnectionMessageReceivedForMLAPIDelegate = callback;
 }
 
 // https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c

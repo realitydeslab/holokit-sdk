@@ -111,8 +111,8 @@ public class FloatingBallUIManager : MonoBehaviour
 
     private void SpawnFloatingBall()
     {
-        Debug.Log("[FloatingBallUIManager]: currenty connected clients are:");
-        foreach(ulong key in NetworkManager.Singleton.ConnectedClients.Keys)
+        Debug.Log("[FloatingBallUIManager]: currently connected clients are:");
+        foreach (ulong key in NetworkManager.Singleton.ConnectedClients.Keys)
         {
             Debug.Log(key);
         }
