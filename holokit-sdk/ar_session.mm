@@ -118,9 +118,10 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
 - (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID {
     // TODO: Can I move this into a separate block?
     void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
-        if ([self.multipeerSession.connectedPeers containsObject:peerID] == NO) {
+        if ([self.multipeerSession.connectedPeersForMLAPI containsObject:peerID] == NO) {
             return;
         }
+        
         // Try to decode the received data as ARCollaboration data.
         ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
         if (collaborationData != nil) {
@@ -128,24 +129,35 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
             [self.session updateWithCollaborationData:collaborationData];
             return;
         }
-        // Handle MLAPI data
-        unsigned char *mlapiData = (unsigned char *) [data bytes];
-        if (mlapiData != nil) {
-            //NSLog(@"[ar_session]: MLAPI data received.");
-            // Decode the received data
-            int channel = (int)mlapiData[0];
-            int dataArrayLength = (int)mlapiData[1];
-            //NSLog(@"[ar_session]: channel is %d and dataArrayLength is %d", channel, dataArrayLength);
-            unsigned char niceData[dataArrayLength];
-            for (int i = 0; i < dataArrayLength; i++) {
-                niceData[i] = mlapiData[i + 2];
-            }
-            unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-            // Send this data back to MLAPI
-            PeerDataReceivedForMLAPIDelegate(clientId, niceData, dataArrayLength, channel);
+        
+        unsigned char *decodedData = (unsigned char *) [data bytes];
+        if (decodedData == nil) {
+            NSLog(@"[ar_session]: Failed to decode received data from peer.");
             return;
         }
-        NSLog(@"[ar_session]: Failed to decode received data from peer.");
+        switch ((int)decodedData[0]) {
+            case 0: {
+                int channel = (int)decodedData[1];
+                int dataArrayLength = (int)decodedData[2];
+                unsigned char mlapiData[dataArrayLength];
+                for (int i = 0; i < dataArrayLength; i++) {
+                    mlapiData[i] = decodedData[i + 3];
+                }
+                unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+                // Send this data back to MLAPI
+                PeerDataReceivedForMLAPIDelegate(clientId, mlapiData, dataArrayLength, channel);
+                break;
+            }
+            case 1: {
+                NSLog(@"[ar_session]: did receive the disconnection message.");
+                [self.multipeerSession disconnect];
+                break;
+            }
+            default: {
+                NSLog(@"[ar_session]: Failed to decode received data from peer.");
+                break;
+            }
+        }
     };
     self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
     self.isARWorldMapSynced = false;
@@ -752,6 +764,11 @@ UnityHoloKit_SetHandTrackingInterval(int val) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
+    ARWorldMapSyncedDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerInit(const char* serviceType, const char* peerID) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_delegate_controller initMultipeerSessionWithServiceType:[NSString stringWithUTF8String:serviceType] peerID:[NSString stringWithUTF8String:peerID]];
@@ -775,11 +792,6 @@ UnityHoloKit_MultipeerStartAdvertising() {
         return;
     }
     [ar_session_delegate_controller.multipeerSession startAdvertising];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
-    ARWorldMapSyncedDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

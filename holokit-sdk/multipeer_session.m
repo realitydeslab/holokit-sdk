@@ -15,6 +15,8 @@ MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDel
 typedef void (*MultipeerDisconnectionMessageReceivedForMLAPI)(unsigned long clientId);
 MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageReceivedForMLAPIDelegate = NULL;
 
+
+
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
 @property (nonatomic, strong) NSString *serviceType;
@@ -75,7 +77,7 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 
         self.receivedDataHandler = receivedDataHandler;
         
-        self.connectedPeers = [[NSMutableArray alloc] init];
+        self.connectedPeersForMLAPI = [[NSMutableArray alloc] init];
     }
 
     return self;
@@ -83,12 +85,12 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 
 - (void)sendToAllPeers: (NSData *)data {
     //NSLog(@"[ar_session]: send to all peers.");
-    if (self.session.connectedPeers.count == 0) {
+    if (self.connectedPeersForMLAPI.count == 0) {
         NSLog(@"[multipeer_session]: There is no connected peer.");
         return;
     }
-    // TODO: Client only sends data to the server.
-    bool success = [self.session sendData:data toPeers:self.session.connectedPeers withMode:MCSessionSendDataReliable error:nil];
+    // Client only sends data to the server.
+    bool success = [self.session sendData:data toPeers:self.connectedPeersForMLAPI withMode:MCSessionSendDataReliable error:nil];
     if (success) {
         //NSLog(@"Send to all peers successfully.");
     } else {
@@ -121,6 +123,10 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
     NSLog(@"[multipeer_session]: startAdvertising");
     self.isHost = false;
     [self.serviceAdvertiser startAdvertisingPeer];
+}
+
+- (void)disconnect {
+    [self.session disconnect];
 }
 
 + (MCSessionSendDataMode)convertMLAPINetworkChannelToSendDataMode:(int)channel {
@@ -182,7 +188,7 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
     if (state == MCSessionStateNotConnected) {
         NSLog(@"[multipeer_session]: disconnected with peer %@.", peerID.displayName);
-        [self.connectedPeers removeObject:peerID];
+        [self.connectedPeersForMLAPI removeObject:peerID];
         // TODO: Notify MLAPI that a client is disconnected.
         if (self.isHost) {
             unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
@@ -193,13 +199,13 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
     } else if (state == MCSessionStateConnected) {
         NSLog(@"[multipeer_session]: connected with peer %@.", peerID.displayName);
         if (self.isHost) {
-            [self.connectedPeers addObject:peerID];
-            // Notify the host that there is a new peer joining the session.
+            [self.connectedPeersForMLAPI addObject:peerID];
+            // TODO: Notify the host that there is a new peer joining the session.
             
         } else {
             // As a client, we only need to connect to the server.
-            if (self.connectedPeers.count == 0) {
-                [self.connectedPeers addObject:peerID];
+            if (self.connectedPeersForMLAPI.count == 0) {
+                [self.connectedPeersForMLAPI addObject:peerID];
                 
                 unsigned long serverId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
                 NSLog(@"[multipeer_session]: send connection request to server %lu", serverId);
@@ -267,24 +273,42 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerSendDataForMLAPI(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     MultipeerSession *session = ar_session_delegate_controller.multipeerSession;
-    for (MCPeerID *peerId in session.connectedPeers) {
+    for (MCPeerID *peerId in session.connectedPeersForMLAPI) {
         if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
-            unsigned char niceData[dataArrayLength + 2];
-            // Append the MLAPI NetworkChannel at the beginning of the data
-            niceData[0] = (unsigned char)channel;
-            // Append the length of the data array at the second place
-            niceData[1] = (unsigned char)dataArrayLength;
+            unsigned char structuredData[dataArrayLength + 3];
+            // Append the data type at the beginning of the data array
+            structuredData[0] = (unsigned char)0;
+            // Append the MLAPI NetworkChannel at the second place
+            structuredData[1] = (unsigned char)channel;
+            // Append the length of the data array at the third place
+            structuredData[2] = (unsigned char)dataArrayLength;
             // TODO: is there a better way to do this? I mean copying array
-            for (int i = 2; i < dataArrayLength + 2; i++) {
-                niceData[i] = data[i - 2];
+            for (int i = 3; i < dataArrayLength + 3; i++) {
+                structuredData[i] = data[i - 3];
             }
 //            NSLog(@"[multipeer_session]: size of the data before sent %d", sizeof(niceData));
             // Convert the data to NSData format
             // https://stackoverflow.com/questions/8354881/convert-unsigned-char-array-to-nsdata-and-back
-            NSData *convertedData = [NSData dataWithBytes:niceData length:sizeof(niceData)];
+            NSData *dataReadyToBeSent = [NSData dataWithBytes:structuredData length:sizeof(structuredData)];
             // Send the data
-            [session sendToPeer:convertedData peer:peerId mode:[MultipeerSession convertMLAPINetworkChannelToSendDataMode:channel]];
+            [session sendToPeer:dataReadyToBeSent peer:peerId mode:[MultipeerSession convertMLAPINetworkChannelToSendDataMode:channel]];
             return;
         }
     }
 }
+
+// https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI() {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    MultipeerSession *session = ar_session_delegate_controller.multipeerSession;
+    
+    // Prepare the disconnection message
+    unsigned char disconnectionData[1];
+    disconnectionData[0] = (unsigned char)1;
+    
+    NSData *dataReadyToBeSent = [NSData dataWithBytes:disconnectionData length:sizeof(disconnectionData)];
+    [session sendToAllPeers:dataReadyToBeSent];
+}
+
+

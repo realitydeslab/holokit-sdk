@@ -11,7 +11,7 @@
 
 @property (assign) bool isHost;
 // Storing all connected peers.
-@property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeers;
+@property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeersForMLAPI;
 
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler;
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID;
@@ -19,6 +19,7 @@
 - (void)sendToAllPeers: (NSData *)data;
 - (void)startBrowsing;
 - (void)startAdvertising;
+- (void)disconnect;
 + (MCSessionSendDataMode)convertMLAPINetworkChannelToSendDataMode:(int)channel;
 
 @end
