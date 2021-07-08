@@ -177,6 +177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HandBouncingFactor: 1
   m_HitPlaneAudioClip: {fileID: 8300000, guid: 3b48bebecfa8740ecbc87a094e5e8aa8, type: 3}
+  m_HitHandAudioClip: {fileID: 8300000, guid: 71d3a35224c544e2ea50d13a1bde65ef, type: 3}
 --- !u!82 &569868107364408868
 AudioSource:
   m_ObjectHideFlags: 0
@@ -294,6 +295,6 @@ MonoBehaviour:
   gainDb: 0
   nearFieldEffectEnabled: 0
   nearFieldEffectGain: 1
-  occlusionEnabled: 0
+  occlusionEnabled: 1
   occlusionIntensity: 1
   quality: 2

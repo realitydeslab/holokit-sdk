@@ -12,6 +12,8 @@ public class FloatingBall : NetworkBehaviour
     private AudioSource m_AudioSource;
 
     [SerializeField] private AudioClip m_HitPlaneAudioClip;
+
+    [SerializeField] private AudioClip m_HitHandAudioClip;
     
     void Start()
     {
@@ -31,12 +33,18 @@ public class FloatingBall : NetworkBehaviour
         }
         if (collision.gameObject.tag.Equals("HandSphere"))
         {
-            Debug.Log("Collided with hand sphere.");
-            //Vector3 handSpherePosition = collision.transform.position;
-            //Vector3 direction = (transform.position - handSpherePosition).normalized;
-            Vector3 direction = collision.transform.forward;
-            GetComponent<Rigidbody>().AddForce(direction * m_HandBouncingFactor);
-            return;
+            //Debug.Log("Collided with hand sphere.");
+            if (IsServer)
+            {
+                Vector3 direction = collision.transform.forward;
+                GetComponent<Rigidbody>().AddForce(direction * m_HandBouncingFactor);
+
+                // Play audio effect
+                m_AudioSource.clip = m_HitHandAudioClip;
+                m_AudioSource.Play();
+                PlayAudioEffectHitHandServerRpc();
+                return;
+            }
         }
         if (collision.gameObject.tag.Equals("Plane"))
         {
@@ -46,6 +54,7 @@ public class FloatingBall : NetworkBehaviour
                 m_AudioSource.clip = m_HitPlaneAudioClip;
                 m_AudioSource.Play();
                 PlayAudioEffectHitPlaneServerRpc();
+                return;
             }
         }
     }
@@ -62,6 +71,22 @@ public class FloatingBall : NetworkBehaviour
         if (!IsServer)
         {
             m_AudioSource.clip = m_HitPlaneAudioClip;
+            m_AudioSource.Play();
+        }
+    }
+
+    [ServerRpc]
+    private void PlayAudioEffectHitHandServerRpc()
+    {
+        PlayAudioEffectHitHandClientRpc();
+    }
+
+    [ClientRpc]
+    private void PlayAudioEffectHitHandClientRpc()
+    {
+        if (!IsServer)
+        {
+            m_AudioSource.clip = m_HitHandAudioClip;
             m_AudioSource.Play();
         }
     }
