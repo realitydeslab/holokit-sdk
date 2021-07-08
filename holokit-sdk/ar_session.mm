@@ -132,11 +132,12 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
         
         unsigned char *decodedData = (unsigned char *) [data bytes];
         if (decodedData == nil) {
-            NSLog(@"[ar_session]: Failed to decode received data from peer.");
+            NSLog(@"[ar_session]: Failed to decode the received data.");
             return;
         }
         switch ((int)decodedData[0]) {
             case 0: {
+                //NSLog(@"[ar_session]: did receive MLAPI data.");
                 int channel = (int)decodedData[1];
                 int dataArrayLength = (int)decodedData[2];
                 unsigned char mlapiData[dataArrayLength];
@@ -149,12 +150,12 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
                 break;
             }
             case 1: {
-                NSLog(@"[ar_session]: did receive the disconnection message.");
+                NSLog(@"[ar_session]: did receive a disconnection message.");
                 [self.multipeerSession disconnect];
                 break;
             }
             default: {
-                NSLog(@"[ar_session]: Failed to decode received data from peer.");
+                NSLog(@"[ar_session]: Failed to decode the received data.");
                 break;
             }
         }
@@ -772,6 +773,12 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerInit(const char* serviceType, const char* peerID) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session_delegate_controller initMultipeerSessionWithServiceType:[NSString stringWithUTF8String:serviceType] peerID:[NSString stringWithUTF8String:peerID]];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerShutdown() {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    ar_session_delegate_controller.multipeerSession = nil;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

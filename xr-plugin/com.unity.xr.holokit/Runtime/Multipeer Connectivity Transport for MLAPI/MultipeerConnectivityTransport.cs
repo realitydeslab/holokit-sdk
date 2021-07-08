@@ -64,6 +64,9 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_MultipeerInit(string serviceType, string peerID);
 
         [DllImport("__Internal")]
+        private static extern void UnityHoloKit_MultipeerShutdown();
+
+        [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerStartBrowsing();
 
         [DllImport("__Internal")]
@@ -80,8 +83,8 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // We start MLAPI connection right after that.
             Debug.Log("[MultipeerConnectivityTransport]: send multipeer connection request to MLAPI.");
 
-            MultipeerConnectivityTransport.Instance.m_ServerId = serverId;
-            MultipeerConnectivityTransport.Instance.m_SentConnectionRequest = true;
+            Instance.m_ServerId = serverId;
+            Instance.m_SentConnectionRequest = true;
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(MultipeerSendConnectionRequestForMLAPI callback);
@@ -97,8 +100,8 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             Debug.Log($"[MultipeerConnectivityTransport]: received a disconnection message from client {clientId}.");
 
-            MultipeerConnectivityTransport.Instance.m_ReceivedDisconnectionMessage = true;
-            MultipeerConnectivityTransport.Instance.m_LastDisconnectedClientId = clientId;
+            Instance.m_ReceivedDisconnectionMessage = true;
+            Instance.m_LastDisconnectedClientId = clientId;
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetMultipeerDisconnectionMessageReceivedForMLAPIDelegate(MultipeerDisconnectionMessageReceivedForMLAPI callback);
@@ -124,33 +127,31 @@ namespace MLAPI.Transports.MultipeerConnectivity
         [AOT.MonoPInvokeCallback(typeof(PeerDataReceivedForMLAPI))]
         static void OnPeerDataReceivedForMLAPI(ulong clientId, IntPtr dataPtr, int dataArrayLength, int channel)
         {
+            //Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
             // https://stackoverflow.com/questions/25572221/callback-byte-from-native-c-to-c-sharp
             byte[] data = new byte[dataArrayLength];
             Marshal.Copy(dataPtr, data, 0, dataArrayLength);
 
-            //Debug.Log($"[MultipeerConnectivityTransport]: MLAPI data received from the Unity side with dataArrayLength {dataArrayLength} and channel {(NetworkChannel)channel}");
-            //Debug.Log($"[MultipeerConnectivityTransport]: data array length {data.Length} and the whole data array is {data[0]}, {data[1]}, {data[2]}, {data[3]}, {data[4]}, " +
-            //    $"{data[5]}, {data[6]}, {data[7]}, {data[8]}, {data[9]}");
-
             // Enqueue this data packet
             PeerDataPacket newPeerDataPacket = new PeerDataPacket() { clientId = clientId, data = data, dataArrayLength = dataArrayLength, channel = channel };
-            MultipeerConnectivityTransport.Instance.m_PeerDataPacketQueue.Enqueue(newPeerDataPacket);
-            //Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
-
-            //if ((NetworkChannel)channel == NetworkChannel.Internal || (NetworkChannel)channel == NetworkChannel.SyncChannel)
-            //{
-            //    Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
-            //}
+            Instance.m_PeerDataPacketQueue.Enqueue(newPeerDataPacket);
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback);
 
         /// <summary>
-        /// Tell all peers connected through multipeer connectivity network to disconnect.
+        /// Tell all peers connected through the multipeer connectivity network to disconnect.
         /// This function should only be called on the server side.
         /// </summary>
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI();
+
+        /// <summary>
+        /// Disconnect from the multipeer connectivity network.
+        /// This function should only be called by a client.
+        /// </summary>
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_MultipeerDisconnectForMLAPI();
 
         private void Awake()
         {
@@ -251,31 +252,27 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public override void Send(ulong clientId, ArraySegment<byte> data, NetworkChannel networkChannel)
         {
             //Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId}");
-            //Debug.Log($"[MultipeerConnectivityTransport]: data.Array {data.Array}, data.Count {data.Count}, data.Offset {data.Offset}");
-            // https://stackoverflow.com/questions/10940883/c-converting-byte-array-to-string-and-printing-out-to-console
-            //Debug.Log($"[MultipeerConnectivityTransport]: byte array {System.Text.Encoding.UTF8.GetString(data.Array)}");
 
-            // The MLAPI has the data and called this method, we need to send this data
-            // to the right peer through multipeer connectivity.
-            // The first message sent by the client when connected is of the network channel "Internal".
             // Convert ArraySegment to Array
             // https://stackoverflow.com/questions/5756692/arraysegment-returning-the-actual-segment-c-sharp
             byte[] newArray = new byte[data.Count];
             Array.Copy(data.Array, data.Offset, newArray, 0, data.Count);
-            //Debug.Log($"[MultipeerConnectivityTransport]: the size of the new array is {newArray.Length}");
             UnityHoloKit_MultipeerSendDataForMLAPI(clientId, newArray, data.Count, (int)networkChannel);
         }
 
         public override ulong GetCurrentRtt(ulong clientId)
         {
             Debug.Log($"[MultipeerConnectivityTransport]: GetCurrentRtt() {Time.time}");
+            // TODO: Implement this.
             return 0;
         }
 
         public override void DisconnectLocalClient()
         {
             Debug.Log($"[MultipeerConnectivityTransport]: DisconnectLocalClient() {Time.time}");
-            throw new NotImplementedException();
+
+            // TODO: To be tested.
+            UnityHoloKit_MultipeerDisconnectForMLAPI();
         }
 
         public override void DisconnectRemoteClient(ulong clientId)
@@ -289,7 +286,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public override void Shutdown()
         {
             Debug.Log($"[MultipeerConnectivityTransport]: Shutdown() {Time.time}");
-            throw new NotImplementedException();
+            UnityHoloKit_MultipeerShutdown();
         }
     }
 }

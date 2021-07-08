@@ -9,7 +9,7 @@
 #include "IUnityInterface.h"
 #include "ar_session.h"
 
-typedef void (*MultipeerSendConnectionRequestForMLAPI)(unsigned long peerId);
+typedef void (*MultipeerSendConnectionRequestForMLAPI)(unsigned long serverId);
 MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDelegate = NULL;
 
 typedef void (*MultipeerDisconnectionMessageReceivedForMLAPI)(unsigned long clientId);
@@ -299,7 +299,7 @@ UnityHoloKit_MultipeerSendDataForMLAPI(unsigned long clientId, unsigned char *da
 
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI() {
+UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI(void) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     MultipeerSession *session = ar_session_delegate_controller.multipeerSession;
     
@@ -309,6 +309,14 @@ UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI() {
     
     NSData *dataReadyToBeSent = [NSData dataWithBytes:disconnectionData length:sizeof(disconnectionData)];
     [session sendToAllPeers:dataReadyToBeSent];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerDisconnectForMLAPI(void) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    MultipeerSession *session = ar_session_delegate_controller.multipeerSession;
+    
+    [session.session disconnect];
 }
 
 
