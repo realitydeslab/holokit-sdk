@@ -20,31 +20,7 @@ public class FloatingBallPlayer : NetworkBehaviour
     public static Vector3 CameraToCenterEyeOffset;
 
     [DllImport("__Internal")]
-    public static extern IntPtr UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
-
-    [DllImport("__Internal")]
-    public static extern int UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(IntPtr ptr);
-
-    [DllImport("__Internal")]
     public static extern int UnityHoloKit_GetRenderingMode();
-
-    private void OnEnable()
-    {
-        //if (!IsServer || CameraToCenterEyeOffset != null) { return; }
-
-        //// https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
-        //IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
-        //float[] offset = new float[3];
-        //Marshal.Copy(offsetPtr, offset, 0, 3);
-        //Debug.Log($"[FloatingBallPlayer]: camera to center eye offset [{offset[0]}, {offset[1]}, {offset[2]}]");
-        //CameraToCenterEyeOffset = new Vector3(offset[0], offset[1], offset[2]);
-
-        //UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(offsetPtr);
-    }
-
-    private void OnDisable()
-    {
-    }
 
     public override void NetworkStart()
     {

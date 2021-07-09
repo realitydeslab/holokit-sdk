@@ -6,6 +6,7 @@ using MLAPI;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
 using MLAPI.Transports.MultipeerConnectivity;
+using UnityEngine.XR.HoloKit;
 
 public class FloatingBallUIManager : MonoBehaviour
 {
@@ -65,6 +66,7 @@ public class FloatingBallUIManager : MonoBehaviour
     private void StartHost()
     {
         NetworkManager.Singleton.StartHost();
+        HoloKitSettings.Instance.EnablePlaneDetection(true);
         DisableNetworkButtons();
         EnableRenderingButtons();
         m_SpawnFloatingBallButton.gameObject.SetActive(true);

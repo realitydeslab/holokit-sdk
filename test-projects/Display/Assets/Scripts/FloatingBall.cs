@@ -64,6 +64,7 @@ public class FloatingBall : NetworkBehaviour
             {
                 Vector3 inDirection = GetComponent<Rigidbody>().velocity.normalized;
                 Vector3 normal = collision.transform.forward.normalized;
+                // https://docs.unity3d.com/ScriptReference/Vector3.Reflect.html
                 Vector3 direction = Vector3.Reflect(inDirection, normal);
                 GetComponent<Rigidbody>().AddForce(direction * m_HandBouncingFactor);
 
