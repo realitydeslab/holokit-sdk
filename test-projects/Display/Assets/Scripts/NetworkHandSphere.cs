@@ -11,7 +11,7 @@ public class NetworkHandSphere : NetworkBehaviour
         //Debug.Log($"[NetworkHandSphere]: the owner of this object is {OwnerClientId}");
         if (IsOwner)
         {
-            transform.LookAt(Camera.main.transform.forward);
+            transform.LookAt(Camera.main.transform.position + 100f * Camera.main.transform.forward);
             transform.position = GameObject.Find("HandSphere").transform.position;
         }
         

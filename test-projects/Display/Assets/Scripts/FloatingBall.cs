@@ -7,7 +7,7 @@ using MLAPI.Messaging;
 public class FloatingBall : NetworkBehaviour
 {
 
-    [SerializeField] private float m_HandBouncingFactor = 0.2f;
+    private float m_HandBouncingFactor = 1.5f;
 
     private AudioSource m_AudioSource;
 
@@ -62,7 +62,9 @@ public class FloatingBall : NetworkBehaviour
             //Debug.Log("Collided with hand sphere.");
             if (IsServer)
             {
-                Vector3 direction = collision.transform.forward;
+                Vector3 inDirection = GetComponent<Rigidbody>().velocity.normalized;
+                Vector3 normal = collision.transform.forward.normalized;
+                Vector3 direction = Vector3.Reflect(inDirection, normal);
                 GetComponent<Rigidbody>().AddForce(direction * m_HandBouncingFactor);
 
                 // Play audio effect

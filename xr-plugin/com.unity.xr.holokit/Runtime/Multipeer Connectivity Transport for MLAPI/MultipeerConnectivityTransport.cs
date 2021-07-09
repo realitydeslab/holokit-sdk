@@ -32,14 +32,28 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
         public ulong ClientId => m_ClientId;
 
+        /// <summary>
+        /// The server Id. For the host, the server id and the client id are the same.
+        /// </summary>
         private ulong m_ServerId = 0;
 
         public override ulong ServerClientId => m_ServerId;
 
+        /// <summary>
+        /// Is there a new connection request to be sent?
+        /// This variable is only used by clients.
+        /// </summary>
         private bool m_SentConnectionRequest = false;
 
+        /// <summary>
+        /// Is there is new disconnection message to be handled?
+        /// This variable is only used by the server.
+        /// </summary>
         private bool m_ReceivedDisconnectionMessage = false;
 
+        /// <summary>
+        /// The client Id of the pending disconnection mesasge.
+        /// </summary>
         private ulong m_LastDisconnectedClientId;
 
         /// <summary>
@@ -56,19 +70,28 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private string m_ServiceType = "ar-collab";
 
         /// <summary>
-        /// This is a list which holds all connected peers' clientIds.
+        /// Initialize the MultipeerSession instance on Objective-C side.
         /// </summary>
-        private List<ulong> m_ConnectedPeers;
-
+        /// <param name="serviceType"></param>
+        /// <param name="peerID"></param>
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerInit(string serviceType, string peerID);
 
+        /// <summary>
+        /// Release the MultipeerSession instance on Objective-C side.
+        /// </summary>
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerShutdown();
 
+        /// <summary>
+        /// Start to browse other peers through the multipeer connectivity network.
+        /// </summary>
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerStartBrowsing();
 
+        /// <summary>
+        /// Expose the device to other browsers in the multipeer connectivity network.
+        /// </summary>
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerStartAdvertising();
 
