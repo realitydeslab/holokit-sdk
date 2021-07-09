@@ -7,7 +7,7 @@ using MLAPI.Messaging;
 public class FloatingBall : NetworkBehaviour
 {
 
-    private float m_HandBouncingFactor = 1.5f;
+    private float m_HandBouncingFactor = 3f;
 
     private AudioSource m_AudioSource;
 
@@ -51,15 +51,13 @@ public class FloatingBall : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {   
-        if (collision.gameObject.tag.Equals("Meshing"))
-        {
-            //Debug.Log("Hit meshing");
-            HittingRippleRoom.Instance.SetHitPoint(collision.contacts[0].point);
-            return;
-        }
         if (collision.gameObject.tag.Equals("HandSphere"))
         {
-            //Debug.Log("Collided with hand sphere.");
+            Debug.Log("Collided with hand sphere.");
+            var script = GetComponent<BallSelfController>();
+            script.hitPosition = collision.contacts[0].point;
+            script.Amp = 1f;
+
             if (IsServer)
             {
                 Vector3 inDirection = GetComponent<Rigidbody>().velocity.normalized;
@@ -74,6 +72,20 @@ public class FloatingBall : NetworkBehaviour
                 PlayAudioEffectHitHandServerRpc();
                 return;
             }
+        }
+        if (collision.gameObject.tag.Equals("Meshing"))
+        {
+            //Debug.Log("Hit meshing");
+            HittingRippleRoom.Instance.SetHitPoint(collision.contacts[0].point);
+            // Play audio effect
+            if (IsServer)
+            {
+                m_AudioSource.clip = m_HitPlaneAudioClip;
+                m_AudioSource.Play();
+                PlayAudioEffectHitPlaneServerRpc();
+                return;
+            }
+            return;
         }
         if (collision.gameObject.tag.Equals("Plane"))
         {

@@ -121,13 +121,15 @@ namespace UnityEngine.XR.HoloKit
                 else
                 {
                     //m_HandCenter.SetActive(false);
-                    m_HandCenter.transform.position = new Vector3(0f, 100f, 0f);
+                    //m_HandCenter.transform.position = new Vector3(0f, 100f, 0f);
+                    m_HandCenter.transform.position = m_ARCamera.transform.position;
                 }
             }
             else
             {
                 //m_HandCenter.SetActive(false);
-                m_HandCenter.transform.position = new Vector3(0f, 100f, 0f);
+                //m_HandCenter.transform.position = new Vector3(0f, 100f, 0f);
+                m_HandCenter.transform.position = m_ARCamera.transform.position;
                 m_IsHandValid = false;
             }
         }

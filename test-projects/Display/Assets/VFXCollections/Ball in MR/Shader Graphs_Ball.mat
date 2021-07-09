@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Shader Graphs_Ball
+  m_Shader: {fileID: -6465566751694194690, guid: 8ae1be77f260fe041a071c948707c395,
+    type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _SampleTexture2D_246e740913d24c498fafb3b8dad5eeb1_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 48064e1c33f2d6d4e8ed3da7aaea1c2d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_759e29d28923434595897759e4d3b2c1_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 28628b24520bd5c40adb2fbc9df68c7e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_a7efa1a930fb4cdeaebe26fcc911a547_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 537c9f2f0a016f44bad8275a2751b769, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_fd87cea1de8f48878168a392fde4d008_Texture_1:
+        m_Texture: {fileID: 2800000, guid: b6a273672304fb64994382651506f555, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - Amp: 0.395
+    - Fade_Distance: 0.64
+    - Metallic: 0.75
+    - Ripple_Speed: -9.97
+    - Smoothness: 0.89
+    - _Amp: 0
+    m_Colors:
+    - Position: {r: 0.52, g: 0, b: 0, a: 0}
+    - Ripple_Color: {r: 0, g: 23.968628, b: 8.156863, a: 0}
+    - _Position: {r: 0.5, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []

@@ -24,5 +24,6 @@ Material:
     - _seperateMaxRadius: 1
     - _seperateSpeed: 1
     m_Colors:
-    - _rippleColor: {r: 1, g: 0, b: 0, a: 0}
+    - _baseColor: {r: 0, g: 1, b: 0, a: 0.011764706}
+    - _rippleColor: {r: 0, g: 0.92146564, b: 7.999997, a: 0}
   m_BuildTextureStacks: []

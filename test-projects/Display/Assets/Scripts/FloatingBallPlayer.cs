@@ -32,11 +32,11 @@ public class FloatingBallPlayer : NetworkBehaviour
 
     private void Start()
     {
-        if (IsOwner)
-        {
-            Debug.Log($"[FloatingBallPlayer]: Owner {OwnerClientId} started.");
-            SpawnHandSphereServerRpc();
-        }
+        //if (IsOwner)
+        //{
+        //    Debug.Log($"[FloatingBallPlayer]: Owner {OwnerClientId} started.");
+        //    SpawnHandSphereServerRpc();
+        //}
     }
 
     private void Update()
@@ -59,9 +59,14 @@ public class FloatingBallPlayer : NetworkBehaviour
     [ServerRpc]
     private void SpawnHandSphereServerRpc()
     {
-        Debug.Log("SpawnHandSphereServerRpc");
         var handSphereInstance = Instantiate(m_HandSpherePrefab, Vector3.zero, Quaternion.identity);
         handSphereInstance.SpawnWithOwnership(OwnerClientId);
-        Debug.Log($"[FloatingBallPlayer]: spawn a new hand sphere with ownership {OwnerClientId}");
+        Debug.Log($"[FloatingBallPlayer]: spawn a network new hand sphere with ownership {OwnerClientId}");
+    }
+
+    public void SpawnHandSphere()
+    {
+        Debug.Log($"[FloatingBallPlayer]: client {OwnerClientId} spawned the hand sphere.");
+        SpawnHandSphereServerRpc();
     }
 }

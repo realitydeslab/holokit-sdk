@@ -24,6 +24,8 @@ public class FloatingBallUIManager : MonoBehaviour
 
     private Text m_ClientId;
 
+    private Button m_GameStartButton;
+
     [SerializeField] private GameObject m_Volume;
 
     [DllImport("__Internal")]
@@ -50,8 +52,12 @@ public class FloatingBallUIManager : MonoBehaviour
 
         m_ClientId = transform.GetChild(6).GetComponent<Text>();
 
+        m_GameStartButton = transform.GetChild(7).GetComponent<Button>();
+        m_GameStartButton.onClick.AddListener(GameStart);
+
         DisableRenderingButtons();
         m_SpawnFloatingBallButton.gameObject.SetActive(false);
+        m_GameStartButton.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -66,10 +72,12 @@ public class FloatingBallUIManager : MonoBehaviour
     private void StartHost()
     {
         NetworkManager.Singleton.StartHost();
-        HoloKitSettings.Instance.EnablePlaneDetection(true);
+        //HoloKitSettings.Instance.EnablePlaneDetection(true);
+        HoloKitSettings.Instance.EnableMeshing(true);
         DisableNetworkButtons();
         EnableRenderingButtons();
-        m_SpawnFloatingBallButton.gameObject.SetActive(true);
+        //m_SpawnFloatingBallButton.gameObject.SetActive(true);
+        m_GameStartButton.gameObject.SetActive(true);
     }
 
     private void StartClient()
@@ -77,6 +85,7 @@ public class FloatingBallUIManager : MonoBehaviour
         NetworkManager.Singleton.StartClient();
         DisableNetworkButtons();
         EnableRenderingButtons();
+        m_GameStartButton.gameObject.SetActive(true);
     }
 
     private void StartXrMode()
@@ -126,6 +135,22 @@ public class FloatingBallUIManager : MonoBehaviour
                 player.SpawnFloatingBall();
             }
         }
-        //m_SpawnFloatingBallButton.gameObject.SetActive(false);
+    }
+
+    private void GameStart()
+    {
+        m_GameStartButton.gameObject.SetActive(false);
+        if (NetworkManager.Singleton.IsHost)
+        {
+            m_SpawnFloatingBallButton.gameObject.SetActive(true);
+        }
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(NetworkManager.Singleton.LocalClientId, out var networkedClient))
+        {
+            var player = networkedClient.PlayerObject.GetComponent<FloatingBallPlayer>();
+            if (player)
+            {
+                player.SpawnHandSphere();
+            }
+        }
     }
 }
