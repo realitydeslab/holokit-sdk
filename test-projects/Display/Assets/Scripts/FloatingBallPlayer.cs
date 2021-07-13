@@ -15,7 +15,7 @@ public class FloatingBallPlayer : NetworkBehaviour
 
     [SerializeField] private NetworkObject m_HandSpherePrefab;
 
-    [SerializeField] private Vector3 m_SpawningOffset = new Vector3(0f, 0.2f, 1f);
+    [SerializeField] private Vector3 m_SpawningOffset = new Vector3(0f, 0.5f, 1.3f);
 
     public static Vector3 CameraToCenterEyeOffset;
 
@@ -24,10 +24,7 @@ public class FloatingBallPlayer : NetworkBehaviour
 
     public override void NetworkStart()
     {
-        if (IsOwner)
-        {
-            //SpawnHandSphereServerRpc();
-        }
+        
     }
 
     private void Start()

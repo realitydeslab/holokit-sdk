@@ -69,7 +69,6 @@ public class HittingRippleRoom : MonoBehaviour
 
     public void SetHitPoint(Vector3 point)
     {
-        Debug.Log("fucking1231241233");
         hitPoint = point;
         HitOnTheMesh();
     }
