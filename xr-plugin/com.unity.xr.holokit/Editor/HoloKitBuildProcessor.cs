@@ -91,7 +91,7 @@ namespace UnityEditor.XR.HoloKit
                 ChangeXcodePlist(report.summary.outputPath);
                 AddXcodeCapabilities(report.summary.outputPath);
                 AddDynamicFramework(report.summary.outputPath);
-                AppleWatchSetup(report.summary.outputPath);
+                //AppleWatchSetup(report.summary.outputPath);
             }
 
             static void ChangeXcodePlist(string path) 
@@ -219,7 +219,8 @@ namespace UnityEditor.XR.HoloKit
                     "Watch Extension/Assets.xcassets",
                     "Watch Extension/ExtensionDelegate.swift",
                     "Watch Extension/InterfaceController.swift",
-                    "Watch Extension/NotificationController.swift"
+                    "Watch Extension/NotificationController.swift",
+                    "Watch Extension/ComplicationController.swift",
                 };
 
                 foreach (var path in filesToBuild)

@@ -96,21 +96,27 @@ public class HadoController : MonoBehaviour
         switch ((AppleWatchMessageType)messageIndex)
         {
             case (AppleWatchMessageType.StartGame):
+                Debug.Log("[HadoController]: start game");
                 Instance.isGameStarted = true;
                 break;
             case (AppleWatchMessageType.Fire):
+                Debug.Log("[HadoController]: fire");
                 Instance.nextControllerAction = HadoControllerAction.Fire;
                 break;
             case (AppleWatchMessageType.CastShield):
+                Debug.Log("[HadoController]: cast shield");
                 Instance.nextControllerAction = HadoControllerAction.CastShield;
                 break;
             case (AppleWatchMessageType.StateChangedToNothing):
+                Debug.Log("[HadoController]: state changed to nothing");
                 Instance.currentControllerState = HadoControllerState.Nothing;
                 break;
             case (AppleWatchMessageType.StateChangedToUp):
+                Debug.Log("[HadoController]: state changed to up");
                 Instance.currentControllerState = HadoControllerState.Up;
                 break;
             case (AppleWatchMessageType.StateChangedToDown):
+                Debug.Log("[HadoController]: state changed to down");
                 Instance.currentControllerState = HadoControllerState.Down;
                 break;
             default:
