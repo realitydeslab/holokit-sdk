@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.XR.HoloKit;
 using MLAPI;
 using MLAPI.Messaging;
 
@@ -14,17 +15,27 @@ public class HadoPlayer : NetworkBehaviour
     /// <summary>
     /// The offset from the center eye position to the spawn position of a new bullet.
     /// </summary>
-    private Vector3 m_BulletSpawnOffset = new Vector3(0.3f, 0f, 0f);
+    private Vector3 m_BulletSpawnOffset = new Vector3(0.0f, 0f, 0f);
 
     /// <summary>
     /// The offset from the center eye position to the spawn position of the grant shield.
     /// </summary>
-    private Vector3 m_GrantShieldOffset = new Vector3(0, -1f, 0.7f);
+    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1f, 0.7f);
 
     /// <summary>
     /// Has this player's petal shield already been spawned?
     /// </summary>
     private bool m_IsPetalShieldSpawned = false;
+
+    private Transform m_ARCamera;
+
+    // TODO: Adjust this value.
+    private float m_BulletSpeed = 1f;
+
+    private void Start()
+    {
+        m_ARCamera = Camera.main.transform;
+    }
 
     private void Update()
     {
@@ -40,13 +51,20 @@ public class HadoPlayer : NetworkBehaviour
 
         if (HadoController.Instance.nextControllerAction == HadoControllerAction.Fire)
         {
-            // TODO: Fire
-
+            // Fire
+            Debug.Log("[HadoPlayer]: to be fired");
+            Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
+            Vector3 bulletSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(new Vector3(0f, 0f, 1f));
+            FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
+            
             HadoController.Instance.nextControllerAction = HadoControllerAction.Nothing;
         }
         else if (HadoController.Instance.nextControllerAction == HadoControllerAction.CastShield)
         {
             // TODO: Cast shield
+            Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
+            Vector3 shieldSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_GrantShieldSpawnOffset);
+            CastShieldServerRpc(shieldSpawnPosition, m_ARCamera.rotation);
 
             HadoController.Instance.nextControllerAction = HadoControllerAction.Nothing;
         }
@@ -59,12 +77,18 @@ public class HadoPlayer : NetworkBehaviour
         petalShieldInstance.SpawnWithOwnership(OwnerClientId);
     }
 
-    private void Fire()
+    [ServerRpc]
+    private void FireServerRpc(Vector3 position, Vector3 direction)
     {
+        var bulletInstance = Instantiate(m_BulletPrefab, position, Quaternion.identity);
+        bulletInstance.SpawnWithOwnership(OwnerClientId);
+        Debug.Log("fuck");
 
+        //bulletInstance.GetComponent<Rigidbody>().AddForce(direction * m_BulletSpeed);
     }
 
-    private void CastShield()
+    [ServerRpc]
+    private void CastShieldServerRpc(Vector3 position, Quaternion rotation)
     {
 
     }

@@ -76,8 +76,8 @@ namespace UnityEngine.XR.HoloKit
             IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
             float[] offset = new float[3];
             Marshal.Copy(offsetPtr, offset, 0, 3);
-            Debug.Log($"[HoloKitSettings]: camera to center eye offset [{offset[0]}, {offset[1]}, {offset[2]}]");
-            CameraToCenterEyeOffset = new Vector3(offset[0], offset[1], offset[2]);
+            Debug.Log($"[HoloKitSettings]: camera to center eye offset [{offset[0]}, {offset[1]}, {-offset[2]}]");
+            CameraToCenterEyeOffset = new Vector3(offset[0], offset[1], -offset[2]);
             UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(offsetPtr);
         }
 

@@ -56,6 +56,9 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
 typedef void (*AppleWatchMessageReceived)(int messageIndex);
 AppleWatchMessageReceived AppleWatchMessageReceivedDelegate = NULL;
 
+typedef void (*AppleWatchReachabilityDidChange)(bool isReachable);
+AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
+
 @interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
@@ -708,10 +711,15 @@ AppleWatchMessageReceived AppleWatchMessageReceivedDelegate = NULL;
 }
 
 - (void)sessionReachabilityDidChange:(WCSession *)session {
+    if (self.session == nil) {
+        return;
+    }
     NSLog(@"[wc_session]: session reachability did change");
     if (session.isReachable) {
+        AppleWatchReachabilityDidChangeDelegate(true);
         NSLog(@"[wc_session]: is reachable");
     } else {
+        AppleWatchReachabilityDidChangeDelegate(false);
         NSLog(@"[wc_session]: is not reachable");
     }
 }
@@ -844,6 +852,11 @@ UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callba
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetAppleWatchMessageReceivedDelegate(AppleWatchMessageReceived callback) {
     AppleWatchMessageReceivedDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetAppleWatchReachabilityDidChangeDelegate(AppleWatchReachabilityDidChange callback) {
+    AppleWatchReachabilityDidChangeDelegate = callback;
 }
 
 } // extern "C"
