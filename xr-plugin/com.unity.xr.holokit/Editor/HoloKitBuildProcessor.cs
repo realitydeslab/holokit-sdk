@@ -91,6 +91,7 @@ namespace UnityEditor.XR.HoloKit
                 ChangeXcodePlist(report.summary.outputPath);
                 AddXcodeCapabilities(report.summary.outputPath);
                 AddDynamicFramework(report.summary.outputPath);
+                AppleWatchSetup(report.summary.outputPath);
             }
 
             static void ChangeXcodePlist(string path) 
@@ -176,6 +177,66 @@ namespace UnityEditor.XR.HoloKit
                 array.values.Add(new PlistElementString("TAG"));
 
                 return entitlementDoc;
+            }
+
+            // https://github.com/Manurocker95/IronRuby-Test/blob/57f8b66e88d7df2e9bd7936e83777a79427f8e13/Assets/VirtualPhenix/Scripts/Editor/AppleWatch/VP_SetupWatchExtension.cs
+            private static void AppleWatchSetup(string buildPath)
+            {
+                PBXProject project = new PBXProject();
+                string projectPath = PBXProject.GetPBXProjectPath(buildPath);
+                project.ReadFromFile(projectPath);
+                string targetGuid = project.GetUnityFrameworkTargetGuid();
+                string watchExtensionTargetGuid = PBXProjectExtensions.AddWatchExtension(project, targetGuid,
+                    "Watch Extension",
+                    "com.HoloInteractive.HoloKitHado.watchkitapp.watchkitextension",
+                    "Watch Extension/Info.plist");
+                string watchAppTargetGuid = PBXProjectExtensions.AddWatchApp(project, targetGuid, watchExtensionTargetGuid,
+                    "Watch",
+                    "com.HoloInteractive.HoloKitHado.watchkitapp",
+                    "Watch/Info.plist");
+
+                FileUtil.CopyFileOrDirectory("Assets/Plugins/AppleWatchAsController/Watch", Path.Combine(buildPath, "Watch"));
+                FileUtil.CopyFileOrDirectory("Assets/Plugins/AppleWatchAsController/Watch Extension", Path.Combine(buildPath, "Watch Extension"));
+
+                var filesToBuild = new List<string>
+                {
+                    "Watch/Interface.storyboard",
+                    "Watch/Assets.xcassets"
+                };
+
+                foreach(var path in filesToBuild)
+                {
+                    var fileGuid = project.AddFile(path, path);
+                    project.AddFileToBuild(watchAppTargetGuid, fileGuid);
+                }
+
+                filesToBuild = new List<string>
+                {
+                    "Watch Extension/Assets.xcassets",
+                    "Watch Extension/ExtensionDelegate.swift",
+                    "Watch Extension/InterfaceController.swift",
+                    "Watch Extension/NotificationController.swift"
+                };
+
+                foreach (var path in filesToBuild)
+                {
+                    var fileGuid = project.AddFile(path, path);
+                    project.AddFileToBuild(watchExtensionTargetGuid, fileGuid);
+                }
+
+                var filesToAdd = new List<string>
+                {
+                    "Watch/Info.plist",
+                    "Watch Extension/Info.plist",
+                    "Watch Extension/PushNotificationPayload.apns"
+                };
+
+                foreach (var path in filesToAdd)
+                {
+                    project.AddFile(path, path);
+                }
+
+                project.WriteToFile(projectPath);
             }
         }
 
