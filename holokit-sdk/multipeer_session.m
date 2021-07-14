@@ -31,30 +31,6 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 
 @implementation MultipeerSession
 
-- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler {
-    self = [super init];
-    if (self) {
-        self.serviceType = @"ar-collab";
-        self.myPeerID = [[MCPeerID alloc] initWithDisplayName:[UIDevice currentDevice].name];
-        NSLog(@"[multipeer_session]: my peerID %@", self.myPeerID);
-        
-        // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
-        self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
-        self.session.delegate = self;
-        
-        self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
-        self.serviceAdvertiser.delegate = self;
-        [self.serviceAdvertiser startAdvertisingPeer];
-        
-        self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
-        self.serviceBrowser.delegate = self;
-        [self.serviceBrowser startBrowsingForPeers];
-         
-        self.receivedDataHandler = receivedDataHandler;
-    }
-    return self;
-}
-
 // This constructor is for MLAPI.
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID {
     self = [super init];

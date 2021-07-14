@@ -53,20 +53,21 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 typedef void (*PeerDataReceivedForMLAPI)(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel);
 PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
 
-@interface ARSessionDelegateController ()
+typedef void (*AppleWatchMessageReceived)(int messageIndex);
+AppleWatchMessageReceived AppleWatchMessageReceivedDelegate = NULL;
+
+@interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
 @property (nonatomic, strong) NSOperationQueue* motionQueue;
 @property (nonatomic, strong) HandTracker* handTracker;
 @property (assign) double lastHandTrackingTimestamp;
-
 @property (nonatomic, strong) VNDetectHumanHandPoseRequest *handPoseRequest;
 // Used to count the interval.
 @property (assign) int frameCount;
-
 @property (nonatomic, strong) CMMotionManager* motionManager;
-
 @property (assign) bool isARWorldMapSynced;
+@property (nonatomic, strong) WCSession *wcSession;
 
 @end
 
@@ -108,6 +109,13 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
         self.isHandTrackingEnabled = YES;
         self.primaryButtonLeft = NO;
         self.primaryButtonRight = NO;
+        
+        // Watch Connectivity session
+        if ([WCSession isSupported]) {
+            self.wcSession = [WCSession defaultSession];
+            self.wcSession.delegate = self;
+            [self.wcSession activateSession];
+        }
         
         frame_count = 0;
         last_frame_time = 0.0f;
@@ -687,6 +695,33 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
     return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
 }
 
+#pragma mark - WCSessionDelegate
+
+- (void)session:(WCSession *)session activationDidCompleteWithState:(WCSessionActivationState)activationState error:(NSError *)error {
+    if (activationState == WCSessionActivationStateActivated) {
+        NSLog(@"[wc_session]: activation did compelete with state activated.");
+    } else if (activationState == WCSessionActivationStateInactive) {
+        NSLog(@"[wc_session]: activation did compelete with state inactive.");
+    } else if (activationState == WCSessionActivationStateNotActivated) {
+        NSLog(@"[wc_session]: activation did compelete with state not activated.");
+    }
+}
+
+- (void)sessionReachabilityDidChange:(WCSession *)session {
+    NSLog(@"[wc_session]: session reachability did change");
+    if (session.isReachable) {
+        NSLog(@"[wc_session]: is reachable");
+    } else {
+        NSLog(@"[wc_session]: is not reachable");
+    }
+}
+
+- (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *,id> *)message {
+    NSInteger messageIndex = [[message objectForKey:@"watch"] integerValue];
+    // Receive a message from Apple Watch side and pass the message to Unity.
+    AppleWatchMessageReceivedDelegate((int)messageIndex);
+}
+
 @end
 
 #pragma mark - SetARSession
@@ -804,6 +839,11 @@ UnityHoloKit_MultipeerStartAdvertising() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback) {
     PeerDataReceivedForMLAPIDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetAppleWatchMessageReceivedDelegate(AppleWatchMessageReceived callback) {
+    AppleWatchMessageReceivedDelegate = callback;
 }
 
 } // extern "C"

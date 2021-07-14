@@ -11,8 +11,9 @@
 #import <CoreMotion/CoreMotion.h>
 #import "LandmarkPosition.h"
 #import "multipeer_session.h"
+#import <WatchConnectivity/WatchConnectivity.h>
 
-@interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
+@interface ARSessionDelegateController : NSObject
 
 @property (nonatomic, strong, nullable) ARSession* session;
 @property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;

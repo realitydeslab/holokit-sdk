@@ -19,7 +19,7 @@ namespace UnityEngine.XR.HoloKit
 
         [SerializeField] private bool m_CollaborationEnabled = false;
 
-        private Camera arCamera;
+        private Camera m_ARCamera;
 
         public static Vector3 CameraToCenterEyeOffset;
 
@@ -46,18 +46,18 @@ namespace UnityEngine.XR.HoloKit
 
         void OnEnable()
         {
-            arCamera = Camera.main;
+            m_ARCamera = Camera.main;
 
             // Set the rendering mode.
             if (m_XrModeEnabled)
             {
                 UnityHoloKit_SetRenderingMode(2);
-                arCamera.GetComponent<ARCameraBackground>().enabled = false;
+                m_ARCamera.GetComponent<ARCameraBackground>().enabled = false;
             }
             else
             {
                 UnityHoloKit_SetRenderingMode(1);
-                arCamera.GetComponent<ARCameraBackground>().enabled = true;
+                m_ARCamera.GetComponent<ARCameraBackground>().enabled = true;
             }
 
             // Set up the collaboration setting.
@@ -71,7 +71,7 @@ namespace UnityEngine.XR.HoloKit
             // Set the screen brightness to the maximum.
             Screen.brightness = 1.0f;
 
-            // Calculate camera to center eye offset.
+            // Retrive camera to center eye offset from objective-c side.
             // https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
             IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
             float[] offset = new float[3];

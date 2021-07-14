@@ -13,7 +13,6 @@
 // Storing all connected peers.
 @property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeersForMLAPI;
 
-- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler;
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID;
 - (NSArray<MCPeerID *> *)getConnectedPeers;
 - (void)sendToAllPeers: (NSData *)data;

@@ -33,6 +33,7 @@ public class HadoPlayer : NetworkBehaviour
 
         if (HadoController.Instance.isGameStarted && !m_IsPetalShieldSpawned)
         {
+            Debug.Log("[HadoPlayer]: game started!");
             SpawnPetalShieldServerRpc();
             m_IsPetalShieldSpawned = true;
         }

@@ -57,9 +57,9 @@ public class HadoController : MonoBehaviour
 
     private const float k_AttackRechargeUnit = 1f;
 
-    private const float k_AttackRechargeSpeed = 0.16f;
+    private const float k_AttackRechargeSpeed = 0.016f;
 
-    private const float k_AttackRechargeMaximum = 5f;
+    private const float k_MaxAttackRecharge = 5f;
 
     /// <summary>
     /// The current remaining number of attacks which can be used.
@@ -71,11 +71,11 @@ public class HadoController : MonoBehaviour
 
     private float m_CurrentShieldRecharge = 0f;
 
-    private const float k_ShieldRechargeUnit = 5f;
+    private const float k_ShieldRechargeUnit = 3f;
 
-    private const float k_ShieldRechargeSpeed = 0.16f;
+    private const float k_ShieldRechargeSpeed = 0.016f;
 
-    private const float k_ShieldRechargeMaximum = 5f;
+    private const float k_MaxShieldRecharge = 6f;
 
     /// <summary>
     /// The current remaining number of giant shields which can be used.
@@ -149,9 +149,9 @@ public class HadoController : MonoBehaviour
         if (m_CurrentControllerState == HadoControllerState.Up)
         {
             m_CurrentAttackRecharge += k_AttackRechargeSpeed;
-            if (m_CurrentAttackRecharge > k_AttackRechargeMaximum)
+            if (m_CurrentAttackRecharge > k_MaxAttackRecharge)
             {
-                m_CurrentAttackRecharge = k_AttackRechargeMaximum;
+                m_CurrentAttackRecharge = k_MaxAttackRecharge;
             }
             return;
         }
@@ -159,9 +159,9 @@ public class HadoController : MonoBehaviour
         if (m_CurrentControllerState == HadoControllerState.Down)
         {
             m_CurrentShieldRecharge += k_ShieldRechargeSpeed;
-            if (m_CurrentShieldRecharge > k_ShieldRechargeMaximum)
+            if (m_CurrentShieldRecharge > k_MaxShieldRecharge)
             {
-                m_CurrentShieldRecharge = k_ShieldRechargeMaximum;
+                m_CurrentShieldRecharge = k_MaxShieldRecharge;
             }
             return;
         }

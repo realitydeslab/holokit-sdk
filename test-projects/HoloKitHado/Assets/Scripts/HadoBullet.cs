@@ -10,7 +10,7 @@ public class HadoBullet : NetworkBehaviour
 
     [SerializeField] private AudioClip m_HitGrantShieldAudioClip;
 
-    [SerializeField] private NetworkObject m_BulletExplosionPrefab;
+    [SerializeField] private NetworkObject m_ExplosivePrefab;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -30,11 +30,11 @@ public class HadoBullet : NetworkBehaviour
             PlayHitGrantShieldAudioServerRpc();
         }
         
-        if (m_BulletExplosionPrefab != null)
+        if (m_ExplosivePrefab != null)
         {
-            // Spawn the explosion vfx through the network.
-            var explosionInstance = Instantiate(m_BulletExplosionPrefab, this.transform.position, Quaternion.identity);
-            explosionInstance.Spawn();
+            // Spawn the explosive vfx through the network.
+            var explosiveInstance = Instantiate(m_ExplosivePrefab, this.transform.position, Quaternion.identity);
+            explosiveInstance.Spawn();
         }
     }
 
