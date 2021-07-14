@@ -186,13 +186,17 @@ namespace UnityEditor.XR.HoloKit
                 string projectPath = PBXProject.GetPBXProjectPath(buildPath);
                 project.ReadFromFile(projectPath);
                 string targetGuid = project.GetUnityFrameworkTargetGuid();
+
+                string packageName = UnityEngine.Application.identifier;
+
                 string watchExtensionTargetGuid = PBXProjectExtensions.AddWatchExtension(project, targetGuid,
                     "Watch Extension",
-                    "com.HoloInteractive.HoloKitHado.watchkitapp.watchkitextension",
+                    $"{packageName}.watchkitapp.watchkitextension",
                     "Watch Extension/Info.plist");
+
                 string watchAppTargetGuid = PBXProjectExtensions.AddWatchApp(project, targetGuid, watchExtensionTargetGuid,
                     "Watch",
-                    "com.HoloInteractive.HoloKitHado.watchkitapp",
+                    $"{packageName}.watchkitapp",
                     "Watch/Info.plist");
 
                 FileUtil.CopyFileOrDirectory("Assets/Plugins/AppleWatchAsController/Watch", Path.Combine(buildPath, "Watch"));
@@ -234,6 +238,24 @@ namespace UnityEditor.XR.HoloKit
                 foreach (var path in filesToAdd)
                 {
                     project.AddFile(path, path);
+                }
+
+                project.SetBuildProperty(watchAppTargetGuid, "SWIFT_VERSION", "5.0");
+                project.SetBuildProperty(watchExtensionTargetGuid, "SWIFT_VERSION", "5.0");
+
+                foreach (var configName in project.BuildConfigNames())
+                {
+                    var configGuid = project.BuildConfigByName(watchAppTargetGuid, configName);
+
+                    project.SetBuildPropertyForConfig(configGuid, "WATCHOS_DEPLOYMENT_TARGET", "8.0");
+                }
+
+
+                foreach (var configName in project.BuildConfigNames())
+                {
+                    var configGuid = project.BuildConfigByName(watchExtensionTargetGuid, configName);
+
+                    project.SetBuildPropertyForConfig(configGuid, "WATCHOS_DEPLOYMENT_TARGET", "8.0");
                 }
 
                 project.WriteToFile(projectPath);
