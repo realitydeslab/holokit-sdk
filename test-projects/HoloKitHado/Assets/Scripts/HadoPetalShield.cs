@@ -10,13 +10,11 @@ public class HadoPetalShield : NetworkBehaviour
 {
     private Transform m_ARCamera;
 
-    private VisualEffect m_Vfx;
-
     private AudioSource m_AudioSource;
 
     [SerializeField] private AudioClip m_HitPetalShieldAudioClip;
 
-    private float m_PetalShieldYOffset = -0.2f;
+    private float m_PetalShieldYOffset = -0.25f;
 
     private float m_PetalShieldZOffset = 0.4f;
 
@@ -38,7 +36,6 @@ public class HadoPetalShield : NetworkBehaviour
         if (!IsOwner) { return; }
         Debug.Log("[HadoPetalShield]: petal shield spawned");
         m_ARCamera = Camera.main.transform;
-        m_Vfx = GetComponent<VisualEffect>();
         m_CurrentHealth = k_MaxHeath;
         m_AudioSource = GetComponent<AudioSource>();
     }
@@ -76,9 +73,8 @@ public class HadoPetalShield : NetworkBehaviour
         if (other.tag.Equals("Bullet"))
         {
             m_LastHitTime = Time.time;
-            // Modify the VFX parameter
-            transform.GetChild(0).GetComponent<PetalSelfControl>().OnExplode();
 
+            transform.GetChild(0).GetComponent<PetalSelfControl>().OnExplode();
             m_AudioSource.clip = m_HitPetalShieldAudioClip;
             m_AudioSource.Play();
             OnPetalShieldHitServerRpc();
@@ -111,8 +107,10 @@ public class HadoPetalShield : NetworkBehaviour
     private void OnPetalShieldHitClientRpc()
     {
         if (IsOwner) { return; }
-        // Modify the VFX parameter
+
         transform.GetChild(0).GetComponent<PetalSelfControl>().OnExplode();
+        m_AudioSource.clip = m_HitPetalShieldAudioClip;
+        m_AudioSource.Play();
     }
 
     [ServerRpc]
@@ -152,7 +150,7 @@ public class HadoPetalShield : NetworkBehaviour
 
     IEnumerator WaitForDestroy()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1.2f);
         Destroy(gameObject);
     }
 

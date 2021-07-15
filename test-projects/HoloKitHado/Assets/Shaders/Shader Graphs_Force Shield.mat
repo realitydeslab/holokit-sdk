@@ -37,8 +37,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Disslove_width: 0.02
-    - Field_Height: 0.65
+    - Disslove_width: 0.03
+    - Field_Height: 4
     - Lerp: 1
     - _Lerp: 0
     m_Colors:

@@ -33,7 +33,7 @@ Transform:
   m_GameObject: {fileID: 5034302601284621400}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 23.587366, y: 23.587366, z: 23.587366}
+  m_LocalScale: {x: 0.56107, y: 0.56107, z: 0.56107}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -68,7 +68,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c05deff997cf40e59a7dc9c8b742100, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HitGrantShieldAudioClip: {fileID: 8300000, guid: 05f0dc0ace0614158bb2f540afcd91bc, type: 3}
+  m_HitGrantShieldAudioClip: {fileID: 8300000, guid: 8c108499250294fa0a314bf408991fa1, type: 3}
+  m_CastShieldAudioClip: {fileID: 8300000, guid: ef8944ec8da834b209e75e4ddf06d590, type: 3}
 --- !u!33 &6965008213269959979
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -130,8 +131,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.99999994, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 2.0948658, y: 3.3283255, z: 0.37634122}
+  m_Center: {x: 0.006929423, y: 1.66309, z: -0.0069295364}
 --- !u!54 &1216143178318666108
 Rigidbody:
   m_ObjectHideFlags: 0

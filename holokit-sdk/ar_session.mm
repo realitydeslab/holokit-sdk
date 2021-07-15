@@ -113,13 +113,6 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
         self.primaryButtonLeft = NO;
         self.primaryButtonRight = NO;
         
-        // Watch Connectivity session
-        if ([WCSession isSupported]) {
-            self.wcSession = [WCSession defaultSession];
-            self.wcSession.delegate = self;
-            [self.wcSession activateSession];
-        }
-        
         frame_count = 0;
         last_frame_time = 0.0f;
     }
@@ -857,6 +850,17 @@ UnityHoloKit_SetAppleWatchMessageReceivedDelegate(AppleWatchMessageReceived call
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetAppleWatchReachabilityDidChangeDelegate(AppleWatchReachabilityDidChange callback) {
     AppleWatchReachabilityDidChangeDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_ActivateWatchConnectivitySession() {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    // Watch Connectivity session
+    if ([WCSession isSupported]) {
+        ar_session_delegate_controller.wcSession = [WCSession defaultSession];
+        ar_session_delegate_controller.wcSession.delegate = ar_session_delegate_controller;
+        [ar_session_delegate_controller.wcSession activateSession];
+    }
 }
 
 } // extern "C"
