@@ -36,6 +36,9 @@ public class HadoBullet : NetworkBehaviour
             var explosiveInstance = Instantiate(m_ExplosivePrefab, this.transform.position, Quaternion.identity);
             explosiveInstance.Spawn();
         }
+
+        // Destroy the bullet when gets hit.
+        Destroy(gameObject);
     }
 
     [ServerRpc]

@@ -12,6 +12,8 @@ public class HadoPlayer : NetworkBehaviour
 
     [SerializeField] private NetworkObject m_GrantShieldPrefab;
 
+    [SerializeField] private GameObject m_DefeatPrefab;
+
     /// <summary>
     /// The offset from the center eye position to the spawn position of a new bullet.
     /// </summary>
@@ -32,6 +34,8 @@ public class HadoPlayer : NetworkBehaviour
     // TODO: Adjust this value.
     private float m_BulletSpeed = 80f;
 
+    private bool m_IsAlive = true;
+
     private void Start()
     {
         m_ARCamera = Camera.main.transform;
@@ -42,29 +46,38 @@ public class HadoPlayer : NetworkBehaviour
         // Each device can only control the player instance of their own.
         if (!IsOwner) { return; }
 
-        if (HadoController.Instance.isGameStarted && !m_IsPetalShieldSpawned)
+        if (!m_IsPetalShieldSpawned && HadoController.Instance.isGameStarted)
         {
             Debug.Log("[HadoPlayer]: game started!");
             SpawnPetalShieldServerRpc();
             m_IsPetalShieldSpawned = true;
         }
 
+        // The player can do nothing when died.
+        if (!m_IsAlive) { return; }
+
         if (HadoController.Instance.nextControllerAction == HadoControllerAction.Fire)
         {
             // Fire
-            Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
-            Vector3 bulletSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_BulletSpawnOffset);
-            FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
-            
+            if (HadoController.Instance.currentAttackNum > 0)
+            {
+                Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
+                Vector3 bulletSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_BulletSpawnOffset);
+                FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
+                HadoController.Instance.AfterAttack();
+            }
             HadoController.Instance.nextControllerAction = HadoControllerAction.Nothing;
         }
         else if (HadoController.Instance.nextControllerAction == HadoControllerAction.CastShield)
         {
-            // TODO: Cast shield
-            Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
-            Vector3 shieldSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_GrantShieldSpawnOffset);
-            CastShieldServerRpc(shieldSpawnPosition, m_ARCamera.rotation);
-
+            // Cast shield
+            if (HadoController.Instance.currentShieldNum > 0)
+            {
+                Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
+                Vector3 shieldSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_GrantShieldSpawnOffset);
+                CastShieldServerRpc(shieldSpawnPosition, m_ARCamera.rotation);
+                HadoController.Instance.AfterCastShield();
+            }
             HadoController.Instance.nextControllerAction = HadoControllerAction.Nothing;
         }
     }
@@ -88,11 +101,15 @@ public class HadoPlayer : NetworkBehaviour
     [ServerRpc]
     private void CastShieldServerRpc(Vector3 position, Quaternion rotation)
     {
-
+        var shieldInstance = Instantiate(m_GrantShieldPrefab, position, rotation);
+        shieldInstance.SpawnWithOwnership(OwnerClientId);
     }
 
-    private void OnPetalShieldBroken()
+    public void OnPetalShieldBroken()
     {
+        Debug.Log("[HadoPlayer]: my petal shield has been broken.");
+        m_IsAlive = false;
+        // TODO: Give a visual notification to the player.
 
     }
 }

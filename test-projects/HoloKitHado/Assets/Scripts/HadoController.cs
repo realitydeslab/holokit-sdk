@@ -176,7 +176,7 @@ public class HadoController : MonoBehaviour
     /// <summary>
     /// This method should be called every time the player takes an attack action.
     /// </summary>
-    public void OnAttack()
+    public void AfterAttack()
     {
         m_CurrentAttackRecharge -= k_AttackRechargeUnit;
     }
@@ -184,7 +184,7 @@ public class HadoController : MonoBehaviour
     /// <summary>
     /// This method should be called every time the players takes an cast shield action.
     /// </summary>
-    public void OnCastShield()
+    public void AfterCastShield()
     {
         m_CurrentShieldRecharge -= k_ShieldRechargeUnit;
     }

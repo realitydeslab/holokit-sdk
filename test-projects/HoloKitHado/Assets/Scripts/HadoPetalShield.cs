@@ -1,11 +1,16 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.HoloKit;
+using UnityEngine.VFX;
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.Connection;
 
 public class HadoPetalShield : NetworkBehaviour
 {
     private Transform m_ARCamera;
+
+    private VisualEffect m_Vfx;
 
     private float m_PetalShieldYOffset = -0.2f;
 
@@ -13,25 +18,24 @@ public class HadoPetalShield : NetworkBehaviour
 
     private int m_CurrentHealth;
 
-    /// <summary>
-    /// The current remaining health of the petal shield.
-    /// </summary>
-    public int currentHealth
-    {
-        get => m_CurrentHealth;
-    }
-
     private int k_MaxHeath = 4;
 
     private float m_LastHitTime = 0f;
 
     private const float k_RecoveryTime = 3f;
 
+    /// <summary>
+    /// If the petal shield is still alive?
+    /// </summary>
+    private bool m_IsPresent = true;
+
     private void Start()
     {
         if (!IsOwner) { return; }
         Debug.Log("[HadoPetalShield]: petal shield spawned");
         m_ARCamera = Camera.main.transform;
+        m_Vfx = GetComponent<VisualEffect>();
+        m_CurrentHealth = k_MaxHeath;
     }
 
     private void Update()
@@ -45,41 +49,50 @@ public class HadoPetalShield : NetworkBehaviour
 
         Vector3 cameraEuler = m_ARCamera.rotation.eulerAngles;
         transform.rotation = Quaternion.Euler(new Vector3(0f, cameraEuler.y, 0f));
-    }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        // We handle collisions only on the server side.
-        if (!IsServer) { return; }
-
-        if (other.tag.Equals("Bullet"))
-        {
-            m_LastHitTime = Time.time;
-            OnPetalShieldHitServerRpc();
-
-            m_CurrentHealth--;
-            if (m_CurrentHealth < 0)
-            {
-                m_CurrentHealth = 0;
-                OnPetalShieldBrokenServerRpc();
-            }
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (!IsServer) { return; }
-
-        if (Time.time - m_LastHitTime > k_RecoveryTime)
+        // Shield's health recovers if not gets hit.
+        if (m_IsPresent && Time.time - m_LastHitTime > k_RecoveryTime)
         {
             if (m_CurrentHealth != k_MaxHeath)
             {
                 m_CurrentHealth++;
+                // TODO: Modify the VFX parameter
+
                 OnPetalShieldRecoveredServerRpc();
             }
         }
     }
-   
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Each petal shield is handled by its owner.
+        if (!IsOwner) { return; }
+
+        if (other.tag.Equals("Bullet"))
+        {
+            m_LastHitTime = Time.time;
+            // TODO: Modify the VFX parameter
+
+            OnPetalShieldHitServerRpc();
+
+            m_CurrentHealth--;
+            if (m_CurrentHealth == 0)
+            {
+                m_IsPresent = false;
+                // TODO: Play the shield broken animation
+
+                OnPetalShieldBrokenServerRpc();
+
+                // Notify the player object that the petal shiled has been broken
+                var playerScript = GetLocalPlayerScript();
+                if (playerScript != null)
+                {
+                    playerScript.OnPetalShieldBroken();
+                }
+            }
+        }
+    }
+
     [ServerRpc]
     private void OnPetalShieldHitServerRpc()
     {
@@ -89,6 +102,8 @@ public class HadoPetalShield : NetworkBehaviour
     [ClientRpc]
     private void OnPetalShieldHitClientRpc()
     {
+        if (IsOwner) { return; }
+        // TODO: Modify the VFX parameter
 
     }
 
@@ -101,6 +116,8 @@ public class HadoPetalShield : NetworkBehaviour
     [ClientRpc]
     private void OnPetalShieldRecoveredClientRpc()
     {
+        if (IsOwner) { return; }
+        // TODO: Modify the VFX parameter
 
     }
 
@@ -113,6 +130,36 @@ public class HadoPetalShield : NetworkBehaviour
     [ClientRpc]
     private void OnPetalShieldBrokenClientRpc()
     {
+        if (!IsOwner)
+        {
+            // TODO: play shield broken animation
 
+        }
+
+        if (IsServer)
+        {
+            WaitForDestroy();
+        }
+    }
+
+    IEnumerator WaitForDestroy()
+    {
+        yield return new WaitForSeconds(3);
+        Destroy(gameObject);
+    }
+
+    private HadoPlayer GetLocalPlayerScript()
+    {
+        ulong localClientId = NetworkManager.Singleton.LocalClientId;
+        if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(localClientId, out NetworkClient networkClient))
+        {
+            return null;
+        }
+
+        if (!networkClient.PlayerObject.TryGetComponent<HadoPlayer>(out HadoPlayer script))
+        {
+            return null;
+        }
+        return script;
     }
 }
