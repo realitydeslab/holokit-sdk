@@ -7,10 +7,9 @@ public class HadoPetalShield : NetworkBehaviour
 {
     private Transform m_ARCamera;
 
-    /// <summary>
-    /// The offset from the center eye position to the petal shield.
-    /// </summary>
-    private Vector3 m_PetalShieldOffset = new Vector3(0, -0.2f, -0.5f);
+    private float m_PetalShieldYOffset = -0.2f;
+
+    private float m_PetalShieldZOffset = 0.4f;
 
     private int m_CurrentHealth;
 
@@ -31,7 +30,7 @@ public class HadoPetalShield : NetworkBehaviour
     private void Start()
     {
         if (!IsOwner) { return; }
-
+        Debug.Log("[HadoPetalShield]: petal shield spawned");
         m_ARCamera = Camera.main.transform;
     }
 
@@ -41,9 +40,11 @@ public class HadoPetalShield : NetworkBehaviour
 
         // Update the petal shield's position and rotation according to the player's movement.
         Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
-        Vector3 lookAtPosition = centerEyePosition + m_ARCamera.forward * 100f;
-        transform.LookAt(lookAtPosition);
-        transform.position = centerEyePosition + m_ARCamera.TransformVector(m_PetalShieldOffset);
+        Vector3 frontVector = Vector3.ProjectOnPlane(m_ARCamera.forward, new Vector3(0f, 1f, 0f)).normalized;
+        transform.position = centerEyePosition + frontVector * m_PetalShieldZOffset + new Vector3(0f, m_PetalShieldYOffset, 0f);
+
+        Vector3 cameraEuler = m_ARCamera.rotation.eulerAngles;
+        transform.rotation = Quaternion.Euler(new Vector3(0f, cameraEuler.y, 0f));
     }
 
     private void OnTriggerEnter(Collider other)
