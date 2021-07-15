@@ -40,12 +40,12 @@ public class PetalSelfControl : MonoBehaviour
         }
         this.transform.parent = null;
 
-        WaitAndKill(3);
+        //WaitAndKill(1.2f);
     }
 
-    IEnumerator WaitAndKill(float t )
+    IEnumerator WaitAndKill(float t)
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(t);
         Destroy(this.transform.gameObject);
     }
 }

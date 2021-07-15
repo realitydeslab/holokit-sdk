@@ -62,9 +62,6 @@ public class HadoPlayer : NetworkBehaviour
             m_IsPetalShieldSpawned = true;
         }
 
-        // The player can do nothing when died.
-        if (!m_IsAlive) { return; }
-
         if (HadoController.Instance.nextControllerAction == HadoControllerAction.Fire)
         {
             // Fire
