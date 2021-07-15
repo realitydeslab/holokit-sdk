@@ -182,6 +182,8 @@ MonoBehaviour:
       PlayerPrefab: 1
     - Prefab: {fileID: 9162929649202537259, guid: 1d5ffb0e61c53419ebe5c1802585cdde, type: 3}
       PlayerPrefab: 1
+    - Prefab: {fileID: 5034302601284621400, guid: fbe60f3144835460b975eecddb6ceeee, type: 3}
+      PlayerPrefab: 1
     PlayerPrefabHash:
       rid: 356237672928247808
     CreatePlayerPrefab: 1
@@ -238,6 +240,7 @@ GameObject:
   m_Component:
   - component: {fileID: 133917424}
   - component: {fileID: 133917423}
+  - component: {fileID: 133917425}
   m_Layer: 0
   m_Name: HadoController
   m_TagString: Untagged
@@ -257,6 +260,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c8eead83187141d0b0c8dda01dd95e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_BulletRechargedAudioClip: {fileID: 8300000, guid: e70ae735f3e4948f4822e8ad4158ab9f, type: 3}
+  m_ShieldRechargedAudioClip: {fileID: 8300000, guid: ff028835c478e4c38a82835c8d66bed0, type: 3}
 --- !u!4 &133917424
 Transform:
   m_ObjectHideFlags: 0
@@ -272,6 +277,102 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &133917425
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133917422}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &164696657
 GameObject:
   m_ObjectHideFlags: 0
@@ -1056,8 +1157,12 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3570850918954108875, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
-      propertyPath: m_EnvironmentDepthMode
+      propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3570850918954108875, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
+      propertyPath: m_EnvironmentDepthMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3570850918954108879, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
       propertyPath: m_Enabled
@@ -1285,6 +1390,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1578130229}
   m_CullTransparentMesh: 1
+--- !u!1 &1768819419 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3570850918954108864, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
+  m_PrefabInstance: {fileID: 1370739967}
+  m_PrefabAsset: {fileID: 0}
+--- !u!81 &1768819422
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1768819419}
+  m_Enabled: 1
 --- !u!1 &1833444740
 GameObject:
   m_ObjectHideFlags: 0

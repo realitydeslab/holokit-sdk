@@ -8,6 +8,10 @@ public class HadoGrantShield : NetworkBehaviour
 {
     private VisualEffect m_Vfx;
 
+    private AudioSource m_AudioSource;
+
+    [SerializeField] private AudioClip m_HitGrantShieldAudioClip;
+
     private int m_CurrentHealth;
 
     private int k_MaxHealth = 3;
@@ -15,6 +19,7 @@ public class HadoGrantShield : NetworkBehaviour
     private void Start()
     {
         m_Vfx = GetComponent<VisualEffect>();
+        m_AudioSource = GetComponent<AudioSource>();
         m_CurrentHealth = k_MaxHealth;
     }
 
@@ -26,6 +31,9 @@ public class HadoGrantShield : NetworkBehaviour
         {
             // TODO: Trigger the hit animation
 
+            // Play hit sound effect
+            m_AudioSource.clip = m_HitGrantShieldAudioClip;
+            m_AudioSource.Play();
             OnGrantShieldHitServerRpc();
 
             m_CurrentHealth--;
@@ -51,6 +59,10 @@ public class HadoGrantShield : NetworkBehaviour
     {
         if (IsOwner) { return; }
         // TODO: Trigger the hit animation
+
+        // Play hit sound effect
+        m_AudioSource.clip = m_HitGrantShieldAudioClip;
+        m_AudioSource.Play();
     }
 
     [ServerRpc]

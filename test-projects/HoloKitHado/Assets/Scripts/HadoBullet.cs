@@ -6,70 +6,35 @@ public class HadoBullet : NetworkBehaviour
 {
     private AudioSource m_AudioSource;
 
-    [SerializeField] private AudioClip m_HitPetalShieldAudioClip;
+    [SerializeField] private AudioClip m_FireAudioClip;
 
-    [SerializeField] private AudioClip m_HitGrantShieldAudioClip;
+    private void Start()
+    {
+        m_AudioSource = GetComponent<AudioSource>();
+        m_AudioSource.clip = m_FireAudioClip;
+        m_AudioSource.Play();
+    }
 
-    [SerializeField] private NetworkObject m_ExplosivePrefab;
+    private void Update()
+    {
+        if (IsServer)
+        {
+            if (Vector3.Distance(transform.position, Vector3.zero) > 30f)
+            {
+                // Detroy the bullet which is too far away from the battle field.
+                Destroy(gameObject);
+            }
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        // We handle collision only on the server side.
-        if (!IsServer) { return; }
-
-        if (other.tag.Equals("Petal Shield"))
+        if (IsServer)
         {
-            m_AudioSource.clip = m_HitPetalShieldAudioClip;
-            m_AudioSource.Play();
-            PlayHitPetalShieldAudioServerRpc();
-        }
-        else if (other.tag.Equals("Grant Shield"))
-        {
-            m_AudioSource.clip = m_HitGrantShieldAudioClip;
-            m_AudioSource.Play();
-            PlayHitGrantShieldAudioServerRpc();
-        }
-        
-        if (m_ExplosivePrefab != null)
-        {
-            // Spawn the explosive vfx through the network.
-            var explosiveInstance = Instantiate(m_ExplosivePrefab, this.transform.position, Quaternion.identity);
-            explosiveInstance.Spawn();
-        }
-
-        // Destroy the bullet when gets hit.
-        Destroy(gameObject);
-    }
-
-    [ServerRpc]
-    private void PlayHitPetalShieldAudioServerRpc()
-    {
-        PlayHitPetalShieldAudioClientRpc();
-    }
-
-    [ClientRpc]
-    private void PlayHitPetalShieldAudioClientRpc()
-    {
-        if (!IsServer)
-        {
-            m_AudioSource.clip = m_HitPetalShieldAudioClip;
-            m_AudioSource.Play();
-        }
-    }
-
-    [ServerRpc]
-    private void PlayHitGrantShieldAudioServerRpc()
-    {
-        PlayHitGrantShieldAudioClientRpc();
-    }
-
-    [ClientRpc]
-    private void PlayHitGrantShieldAudioClientRpc()
-    {
-        if (!IsServer)
-        {
-            m_AudioSource.clip = m_HitGrantShieldAudioClip;
-            m_AudioSource.Play();
+            if (other.tag.Equals("Shield"))
+            {
+                Destroy(gameObject);
+            }            
         }
     }
 }

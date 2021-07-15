@@ -22,7 +22,7 @@ public class HadoPlayer : NetworkBehaviour
     /// <summary>
     /// The offset from the center eye position to the spawn position of the grant shield.
     /// </summary>
-    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1f, 0.8f);
+    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -0.6f, 0.8f);
 
     /// <summary>
     /// Has this player's petal shield already been spawned?
@@ -66,6 +66,10 @@ public class HadoPlayer : NetworkBehaviour
                 FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
                 HadoController.Instance.AfterAttack();
             }
+            else
+            {
+                Debug.Log("[HadoPlayer]: bullet not charged");
+            }
             HadoController.Instance.nextControllerAction = HadoControllerAction.Nothing;
         }
         else if (HadoController.Instance.nextControllerAction == HadoControllerAction.CastShield)
@@ -77,6 +81,10 @@ public class HadoPlayer : NetworkBehaviour
                 Vector3 shieldSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_GrantShieldSpawnOffset);
                 CastShieldServerRpc(shieldSpawnPosition, m_ARCamera.rotation);
                 HadoController.Instance.AfterCastShield();
+            }
+            else
+            {
+                Debug.Log("[HadoPlayer]: shield not charged");
             }
             HadoController.Instance.nextControllerAction = HadoControllerAction.Nothing;
         }

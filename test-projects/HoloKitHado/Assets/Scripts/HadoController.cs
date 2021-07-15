@@ -61,12 +61,14 @@ public class HadoController : MonoBehaviour
 
     private const float k_MaxAttackRecharge = 5f;
 
+    private int m_CurrentAttackNum = 0;
+
     /// <summary>
     /// The current remaining number of attacks which can be used.
     /// </summary>
     public int currentAttackNum
     {
-        get => (int)Math.Floor(m_CurrentAttackRecharge / k_AttackRechargeUnit);
+        get => m_CurrentAttackNum;
     }
 
     private float m_CurrentShieldRecharge = 0f;
@@ -77,13 +79,21 @@ public class HadoController : MonoBehaviour
 
     private const float k_MaxShieldRecharge = 6f;
 
+    private int m_CurrentShieldNum = 0;
+
     /// <summary>
     /// The current remaining number of giant shields which can be used.
     /// </summary>
     public int currentShieldNum
     {
-        get => (int)Math.Floor(m_CurrentShieldRecharge / k_ShieldRechargeUnit);
+        get => m_CurrentShieldNum;
     }
+
+    private AudioSource m_AudioSource;
+
+    [SerializeField] private AudioClip m_BulletRechargedAudioClip;
+
+    [SerializeField] private AudioClip m_ShieldRechargedAudioClip;
 
     /// <summary>
     /// This delegate function is called when a new message from Apple Watch is received.
@@ -144,6 +154,11 @@ public class HadoController : MonoBehaviour
         UnityHoloKit_SetAppleWatchMessageReceivedDelegate(OnAppleWatchMessageReceived);
     }
 
+    private void Start()
+    {
+        m_AudioSource = GetComponent<AudioSource>();
+    }
+
     private void FixedUpdate()
     {
         if (m_CurrentControllerState == HadoControllerState.Nothing)
@@ -159,6 +174,13 @@ public class HadoController : MonoBehaviour
             {
                 m_CurrentAttackRecharge = k_MaxAttackRecharge;
             }
+
+            if (m_CurrentAttackNum < (int)Math.Floor(m_CurrentAttackRecharge / k_AttackRechargeUnit))
+            {
+                m_AudioSource.clip = m_BulletRechargedAudioClip;
+                m_AudioSource.Play();
+                m_CurrentAttackNum++;
+            }
             return;
         }
         
@@ -169,7 +191,20 @@ public class HadoController : MonoBehaviour
             {
                 m_CurrentShieldRecharge = k_MaxShieldRecharge;
             }
+
+            if (m_CurrentShieldNum < (int)Math.Floor(m_CurrentShieldRecharge / k_ShieldRechargeUnit))
+            {
+                m_AudioSource.clip = m_ShieldRechargedAudioClip;
+                m_AudioSource.Play();
+                m_CurrentShieldNum++;
+            }
             return;
+        }
+
+        if (m_CurrentControllerState == HadoControllerState.Nothing)
+        {
+            m_CurrentAttackRecharge = m_CurrentAttackNum * k_AttackRechargeUnit;
+            m_CurrentShieldRecharge = m_CurrentShieldNum * k_ShieldRechargeUnit;
         }
     }
 
@@ -179,6 +214,7 @@ public class HadoController : MonoBehaviour
     public void AfterAttack()
     {
         m_CurrentAttackRecharge -= k_AttackRechargeUnit;
+        m_CurrentAttackNum--;
     }
 
     /// <summary>
@@ -187,5 +223,6 @@ public class HadoController : MonoBehaviour
     public void AfterCastShield()
     {
         m_CurrentShieldRecharge -= k_ShieldRechargeUnit;
+        m_CurrentAttackNum--;
     }
 }

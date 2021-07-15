@@ -12,6 +12,10 @@ public class HadoPetalShield : NetworkBehaviour
 
     private VisualEffect m_Vfx;
 
+    private AudioSource m_AudioSource;
+
+    [SerializeField] private AudioClip m_HitPetalShieldAudioClip;
+
     private float m_PetalShieldYOffset = -0.2f;
 
     private float m_PetalShieldZOffset = 0.4f;
@@ -36,6 +40,7 @@ public class HadoPetalShield : NetworkBehaviour
         m_ARCamera = Camera.main.transform;
         m_Vfx = GetComponent<VisualEffect>();
         m_CurrentHealth = k_MaxHeath;
+        m_AudioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -73,6 +78,8 @@ public class HadoPetalShield : NetworkBehaviour
             m_LastHitTime = Time.time;
             // TODO: Modify the VFX parameter
 
+            m_AudioSource.clip = m_HitPetalShieldAudioClip;
+            m_AudioSource.Play();
             OnPetalShieldHitServerRpc();
 
             m_CurrentHealth--;
