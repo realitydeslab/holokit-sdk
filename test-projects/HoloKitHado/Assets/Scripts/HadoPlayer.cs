@@ -31,6 +31,10 @@ public class HadoPlayer : NetworkBehaviour
 
     private Transform m_ARCamera;
 
+    private AudioSource m_AudioSource;
+
+    [SerializeField] private AudioClip m_GameStartAudioClip;
+
     // TODO: Adjust this value.
     private float m_BulletSpeed = 80f;
 
@@ -39,6 +43,7 @@ public class HadoPlayer : NetworkBehaviour
     private void Start()
     {
         m_ARCamera = Camera.main.transform;
+        m_AudioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -49,6 +54,8 @@ public class HadoPlayer : NetworkBehaviour
         if (!m_IsPetalShieldSpawned && HadoController.Instance.isGameStarted)
         {
             Debug.Log("[HadoPlayer]: game started!");
+            m_AudioSource.clip = m_GameStartAudioClip;
+            m_AudioSource.Play();
             SpawnPetalShieldServerRpc();
             m_IsPetalShieldSpawned = true;
         }
