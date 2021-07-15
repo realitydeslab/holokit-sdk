@@ -76,7 +76,8 @@ public class HadoPetalShield : NetworkBehaviour
         if (other.tag.Equals("Bullet"))
         {
             m_LastHitTime = Time.time;
-            // TODO: Modify the VFX parameter
+            // Modify the VFX parameter
+            transform.GetChild(0).GetComponent<PetalSelfControl>().OnExplode();
 
             m_AudioSource.clip = m_HitPetalShieldAudioClip;
             m_AudioSource.Play();
@@ -87,7 +88,7 @@ public class HadoPetalShield : NetworkBehaviour
             {
                 m_IsPresent = false;
                 // TODO: Play the shield broken animation
-
+                
                 OnPetalShieldBrokenServerRpc();
 
                 // Notify the player object that the petal shiled has been broken
@@ -110,8 +111,8 @@ public class HadoPetalShield : NetworkBehaviour
     private void OnPetalShieldHitClientRpc()
     {
         if (IsOwner) { return; }
-        // TODO: Modify the VFX parameter
-
+        // Modify the VFX parameter
+        transform.GetChild(0).GetComponent<PetalSelfControl>().OnExplode();
     }
 
     [ServerRpc]

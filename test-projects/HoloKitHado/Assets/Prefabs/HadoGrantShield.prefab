@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8559924033037729137}
   - component: {fileID: 1216143178318666108}
   - component: {fileID: 4110463516944306429}
+  - component: {fileID: 1748151057423541628}
   m_Layer: 0
   m_Name: HadoGrantShield
   m_TagString: Shield
@@ -32,8 +33,8 @@ Transform:
   m_GameObject: {fileID: 5034302601284621400}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 1.8, z: 0.1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 23.587366, y: 23.587366, z: 23.587366}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -75,7 +76,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5034302601284621400}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: -5495902117074765545, guid: c197c69aa5e88cc46bb8d573950c9f82, type: 3}
 --- !u!23 &4103525420164911567
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -96,7 +97,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: ead889c5ec82dfa429e99d76ccda03b2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -165,7 +166,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 120
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
@@ -243,3 +244,17 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1748151057423541628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5034302601284621400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d858edb1b09f3604bb81fc94362a0ac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLerp: 0
+  m_Speed: 2

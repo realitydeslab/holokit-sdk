@@ -1,13 +1,10 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.VFX;
 using MLAPI;
 using MLAPI.Messaging;
 
 public class HadoGrantShield : NetworkBehaviour
 {
-    private VisualEffect m_Vfx;
-
     private AudioSource m_AudioSource;
 
     [SerializeField] private AudioClip m_HitGrantShieldAudioClip;
@@ -18,9 +15,9 @@ public class HadoGrantShield : NetworkBehaviour
 
     private void Start()
     {
-        m_Vfx = GetComponent<VisualEffect>();
         m_AudioSource = GetComponent<AudioSource>();
         m_CurrentHealth = k_MaxHealth;
+        GetComponent<ShieldAnimation>().targetLerp = 1f;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -29,14 +26,14 @@ public class HadoGrantShield : NetworkBehaviour
 
         if (other.tag.Equals("Bullet"))
         {
-            // TODO: Trigger the hit animation
-
+            m_CurrentHealth--;
+            // Trigger the hit animation
+            HitAnimation();
             // Play hit sound effect
             m_AudioSource.clip = m_HitGrantShieldAudioClip;
             m_AudioSource.Play();
             OnGrantShieldHitServerRpc();
-
-            m_CurrentHealth--;
+            
             if (m_CurrentHealth == 0)
             {
                 // TODO: Play broken animation
@@ -46,6 +43,23 @@ public class HadoGrantShield : NetworkBehaviour
                 OnGrantShieldBrokenServerRpc();
             }
         }
+    }
+    private void HitAnimation()
+    {
+        float targetLerp = 1f;
+        switch(m_CurrentHealth)
+        {
+            case 2:
+                targetLerp = 0.6f;
+                break;
+            case 1:
+                targetLerp = 0.3f;
+                break;
+            case 0:
+                targetLerp = 0f;
+                break;
+        }
+        GetComponent<ShieldAnimation>().targetLerp = targetLerp;
     }
 
     [ServerRpc]
@@ -58,8 +72,8 @@ public class HadoGrantShield : NetworkBehaviour
     private void OnGrantShieldHitClientRpc()
     {
         if (IsOwner) { return; }
-        // TODO: Trigger the hit animation
-
+        // Trigger the hit animation
+        HitAnimation();
         // Play hit sound effect
         m_AudioSource.clip = m_HitGrantShieldAudioClip;
         m_AudioSource.Play();
