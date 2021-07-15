@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class ShieldAnimation : MonoBehaviour
 {
+    [Range(0,1)]
     public float targetLerp;
     private float lerp;
     [SerializeField]
-    private float m_Speed = 1f;
+    private float m_Speed = .1f;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,9 +26,15 @@ public class ShieldAnimation : MonoBehaviour
             lerp += m_Speed * Time.deltaTime;
             if (lerp > 1) lerp = 1;
         }
-        else{
+        else if(t<0){
             lerp -= m_Speed * Time.deltaTime;
             if (lerp < 0) lerp = 0;
         }
+        else
+        {
+
+        }
+
+       GetComponent<MeshRenderer>().material.SetFloat("_Lerp", lerp);
     }
 }
