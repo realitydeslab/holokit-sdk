@@ -95,6 +95,9 @@ public class HadoController : MonoBehaviour
 
     [SerializeField] private AudioClip m_ShieldRechargedAudioClip;
 
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_ActivateWatchConnectivitySession();
+
     /// <summary>
     /// This delegate function is called when a new message from Apple Watch is received.
     /// </summary>
@@ -106,27 +109,27 @@ public class HadoController : MonoBehaviour
         switch ((AppleWatchMessageType)messageIndex)
         {
             case (AppleWatchMessageType.StartGame):
-                Debug.Log("[HadoController]: start game");
+                //Debug.Log("[HadoController]: start game");
                 Instance.isGameStarted = true;
                 break;
             case (AppleWatchMessageType.Fire):
-                Debug.Log("[HadoController]: fire");
+                //Debug.Log("[HadoController]: fire");
                 Instance.nextControllerAction = HadoControllerAction.Fire;
                 break;
             case (AppleWatchMessageType.CastShield):
-                Debug.Log("[HadoController]: cast shield");
+                //Debug.Log("[HadoController]: cast shield");
                 Instance.nextControllerAction = HadoControllerAction.CastShield;
                 break;
             case (AppleWatchMessageType.StateChangedToNothing):
-                Debug.Log("[HadoController]: state changed to nothing");
+                //Debug.Log("[HadoController]: state changed to nothing");
                 Instance.currentControllerState = HadoControllerState.Nothing;
                 break;
             case (AppleWatchMessageType.StateChangedToUp):
-                Debug.Log("[HadoController]: state changed to up");
+                //Debug.Log("[HadoController]: state changed to up");
                 Instance.currentControllerState = HadoControllerState.Up;
                 break;
             case (AppleWatchMessageType.StateChangedToDown):
-                Debug.Log("[HadoController]: state changed to down");
+                //Debug.Log("[HadoController]: state changed to down");
                 Instance.currentControllerState = HadoControllerState.Down;
                 break;
             default:
@@ -156,6 +159,7 @@ public class HadoController : MonoBehaviour
 
     private void Start()
     {
+        UnityHoloKit_ActivateWatchConnectivitySession();
         m_AudioSource = GetComponent<AudioSource>();
     }
 
@@ -194,6 +198,7 @@ public class HadoController : MonoBehaviour
 
             if (m_CurrentShieldNum < (int)Math.Floor(m_CurrentShieldRecharge / k_ShieldRechargeUnit))
             {
+                Debug.Log("[HadoController]: shield recharged");
                 m_AudioSource.clip = m_ShieldRechargedAudioClip;
                 m_AudioSource.Play();
                 m_CurrentShieldNum++;
@@ -223,6 +228,6 @@ public class HadoController : MonoBehaviour
     public void AfterCastShield()
     {
         m_CurrentShieldRecharge -= k_ShieldRechargeUnit;
-        m_CurrentAttackNum--;
+        m_CurrentShieldNum--;
     }
 }

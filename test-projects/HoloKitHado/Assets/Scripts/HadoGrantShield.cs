@@ -9,15 +9,36 @@ public class HadoGrantShield : NetworkBehaviour
 
     [SerializeField] private AudioClip m_HitGrantShieldAudioClip;
 
+    [SerializeField] private AudioClip m_CastShieldAudioClip;
+
     private int m_CurrentHealth;
 
     private int k_MaxHealth = 3;
 
+    private float m_SpawnTime;
+
+    private const float k_LifeTime = 6f;
+
     private void Start()
     {
         m_AudioSource = GetComponent<AudioSource>();
-        m_CurrentHealth = k_MaxHealth;
+        m_AudioSource.clip = m_CastShieldAudioClip;
+        m_AudioSource.Play();
         GetComponent<ShieldAnimation>().targetLerp = 1f;
+        //GetComponent<MeshRenderer>().material.SetFloat("_Lerp", 1f);
+
+        m_SpawnTime = Time.time;
+        m_CurrentHealth = k_MaxHealth;
+    }
+
+    private void Update()
+    {
+        if (!IsOwner) { return; }
+        if (Time.time - m_SpawnTime > k_LifeTime)
+        {
+            // Destroy the shield
+            DestroyGrantShieldServerRpc();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -40,7 +61,7 @@ public class HadoGrantShield : NetworkBehaviour
 
                 // TODO: Make the original model invisible
 
-                OnGrantShieldBrokenServerRpc();
+                DestroyGrantShieldServerRpc();
             }
         }
     }
@@ -80,32 +101,14 @@ public class HadoGrantShield : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void OnGrantShieldBrokenServerRpc()
+    private void DestroyGrantShieldServerRpc()
     {
-        OnGrantShieldBrokenClientRpc();
-    }
-
-    [ClientRpc]
-    private void OnGrantShieldBrokenClientRpc()
-    {
-        if (!IsOwner)
-        {
-            // TODO: Play broken down animation
-
-            // TODO: Make the original model invisible
-
-        }
-
-        // Destroy this instance on the server side.
-        if (IsServer)
-        {
-            StartCoroutine(WaitForDestroy());
-        }
+        StartCoroutine(WaitForDestroy());
     }
 
     IEnumerator WaitForDestroy()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1.2f);
         Destroy(gameObject);
     }
 }

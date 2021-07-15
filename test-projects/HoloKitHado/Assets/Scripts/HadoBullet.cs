@@ -8,15 +8,28 @@ public class HadoBullet : NetworkBehaviour
 
     [SerializeField] private AudioClip m_FireAudioClip;
 
+    private SphereCollider m_Collider;
+
+    private int m_FrameCount = 0;
+
+    private int k_FrameToOpenCollider = 20;
+
     private void Start()
     {
         m_AudioSource = GetComponent<AudioSource>();
         m_AudioSource.clip = m_FireAudioClip;
         m_AudioSource.Play();
+        m_Collider = GetComponent<SphereCollider>();
+        m_Collider.enabled = false;
     }
 
     private void Update()
     {
+        if (++m_FrameCount == k_FrameToOpenCollider)
+        {
+            m_Collider.enabled = true;
+        }
+
         if (IsServer)
         {
             if (Vector3.Distance(transform.position, Vector3.zero) > 30f)

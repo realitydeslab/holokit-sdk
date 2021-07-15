@@ -12,8 +12,6 @@ public class HadoPlayer : NetworkBehaviour
 
     [SerializeField] private NetworkObject m_GrantShieldPrefab;
 
-    [SerializeField] private GameObject m_DefeatPrefab;
-
     /// <summary>
     /// The offset from the center eye position to the spawn position of a new bullet.
     /// </summary>
@@ -22,7 +20,7 @@ public class HadoPlayer : NetworkBehaviour
     /// <summary>
     /// The offset from the center eye position to the spawn position of the grant shield.
     /// </summary>
-    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -0.6f, 0.8f);
+    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1.4f, 1.2f);
 
     /// <summary>
     /// Has this player's petal shield already been spawned?
@@ -34,6 +32,10 @@ public class HadoPlayer : NetworkBehaviour
     private AudioSource m_AudioSource;
 
     [SerializeField] private AudioClip m_GameStartAudioClip;
+
+    [SerializeField] private AudioClip m_DefeatAudioClip;
+
+    [SerializeField] private AudioClip m_VictoryAudioClip;
 
     // TODO: Adjust this value.
     private float m_BulletSpeed = 80f;
@@ -84,9 +86,15 @@ public class HadoPlayer : NetworkBehaviour
             // Cast shield
             if (HadoController.Instance.currentShieldNum > 0)
             {
+                Debug.Log("[HadoPlayer]: cast shield");
                 Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
-                Vector3 shieldSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_GrantShieldSpawnOffset);
-                CastShieldServerRpc(shieldSpawnPosition, m_ARCamera.rotation);
+                Vector3 shieldPosition = centerEyePosition + m_ARCamera.TransformVector(m_GrantShieldSpawnOffset);
+
+                Vector3 frontVector = Vector3.ProjectOnPlane(m_ARCamera.forward, new Vector3(0f, 1f, 0f)).normalized;
+                Vector3 cameraEuler = m_ARCamera.rotation.eulerAngles;
+                Quaternion shieldRotation = Quaternion.Euler(new Vector3(0f, cameraEuler.y, 0f));
+
+                CastShieldServerRpc(shieldPosition, shieldRotation);
                 HadoController.Instance.AfterCastShield();
             }
             else
@@ -108,7 +116,8 @@ public class HadoPlayer : NetworkBehaviour
     private void FireServerRpc(Vector3 position, Vector3 direction)
     {
         var bulletInstance = Instantiate(m_BulletPrefab, position, Quaternion.identity);
-        bulletInstance.SpawnWithOwnership(OwnerClientId);
+        // Only the owner of the NetworkObject can add force to it.
+        bulletInstance.Spawn();
 
         bulletInstance.GetComponent<Rigidbody>().AddForce(direction * m_BulletSpeed);
     }
@@ -124,7 +133,26 @@ public class HadoPlayer : NetworkBehaviour
     {
         Debug.Log("[HadoPlayer]: my petal shield has been broken.");
         m_IsAlive = false;
-        // TODO: Give a visual notification to the player.
+        // TODO: Give a notification to the player.
+        m_AudioSource.clip = m_DefeatAudioClip;
+        m_AudioSource.Play();
+        // Notify the other player
+        OnVictoryServerRpc();
+    }
 
+    [ServerRpc]
+    private void OnVictoryServerRpc()
+    {
+        OnVictoryClientRpc();
+    }
+
+    [ClientRpc]
+    private void OnVictoryClientRpc()
+    {
+        if(!IsOwner)
+        {
+            m_AudioSource.clip = m_VictoryAudioClip;
+            m_AudioSource.Play();
+        }
     }
 }
