@@ -1,6 +1,6 @@
+using System.Collections;
 using UnityEngine;
 using MLAPI;
-using MLAPI.Messaging;
 
 public class HadoBullet : NetworkBehaviour
 {
@@ -46,8 +46,14 @@ public class HadoBullet : NetworkBehaviour
         {
             if (other.tag.Equals("Shield"))
             {
-                Destroy(gameObject);
+                StartCoroutine(WaitForDestroy());
             }            
         }
+    }
+
+    IEnumerator WaitForDestroy()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Destroy(gameObject);
     }
 }

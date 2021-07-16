@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.XR.HoloKit;
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
+using MLAPI.Connection;
 
 public class HadoPlayer : NetworkBehaviour
 {
@@ -20,12 +22,17 @@ public class HadoPlayer : NetworkBehaviour
     /// <summary>
     /// The offset from the center eye position to the spawn position of the grant shield.
     /// </summary>
-    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1.4f, 1.2f);
+    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1.2f, 1.6f);
 
-    /// <summary>
-    /// Has this player's petal shield already been spawned?
-    /// </summary>
-    private bool m_IsPetalShieldSpawned = false;
+    private NetworkVariableBool isReady = new NetworkVariableBool(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.OwnerOnly,
+        ReadPermission = NetworkVariablePermission.ServerOnly
+    }, false);
+
+    private bool m_IsRoundStarted = false;
+
+    private bool m_IsStartRitualDone = false;
 
     private Transform m_ARCamera;
 
@@ -38,9 +45,7 @@ public class HadoPlayer : NetworkBehaviour
     [SerializeField] private AudioClip m_VictoryAudioClip;
 
     // TODO: Adjust this value.
-    private float m_BulletSpeed = 200f;
-
-    private bool m_IsAlive = true;
+    private float m_BulletSpeed = 600f;
 
     private void Start()
     {
@@ -58,17 +63,41 @@ public class HadoPlayer : NetworkBehaviour
         // Each device can only control the player instance of their own.
         if (!IsOwner) { return; }
 
-        if (!m_IsPetalShieldSpawned && HadoController.Instance.isGameStarted)
+        // Am I ready?
+        if (!isReady.Value && HadoController.Instance.isReady)
         {
-            Debug.Log("[HadoPlayer]: game started!");
+            isReady.Value = true;
+        }
+
+        if (!m_IsRoundStarted)
+        {
+            // On the server side, check if everyone is ready.
             if (IsServer)
             {
-                HadoPetalShield.IsGameOver.Value = false;
+                foreach (NetworkClient networkClient in NetworkManager.Singleton.ConnectedClients.Values)
+                {
+                    if (networkClient.PlayerObject.TryGetComponent<HadoPlayer>(out HadoPlayer script))
+                    {
+                        if (!script.isReady.Value)
+                        {
+                            return;
+                        }
+                    }
+                }
+                StartRoundServerRpc();
             }
+            return;
+        }
+
+        if (!m_IsStartRitualDone)
+        {
+            Debug.Log("[HadoPlayer]: Round started!");
             m_AudioSource.clip = m_GameStartAudioClip;
             m_AudioSource.Play();
             SpawnPetalShieldServerRpc();
-            m_IsPetalShieldSpawned = true;
+            HadoController.Instance.isControllerActive = true;
+
+            m_IsStartRitualDone = true;
         }
 
         if (HadoController.Instance.nextControllerAction == HadoControllerAction.Fire)
@@ -78,7 +107,12 @@ public class HadoPlayer : NetworkBehaviour
             {
                 Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
                 Vector3 bulletSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_BulletSpawnOffset);
-                FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
+                Debug.Log($"bullet spawn position {bulletSpawnPosition} and direction {m_ARCamera.forward}");
+
+                var bulletInstance = Instantiate(m_BulletPrefab, bulletSpawnPosition, Quaternion.identity);
+                bulletInstance.transform.position = bulletSpawnPosition;
+                //bulletInstance.GetComponent<Rigidbody>().AddForce(m_ARCamera.forward * m_BulletSpeed);
+                //FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
                 HadoController.Instance.AfterAttack();
             }
             else
@@ -96,7 +130,7 @@ public class HadoPlayer : NetworkBehaviour
                 Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
                 Vector3 shieldPosition = centerEyePosition + m_ARCamera.TransformVector(m_GrantShieldSpawnOffset);
 
-                Vector3 frontVector = Vector3.ProjectOnPlane(m_ARCamera.forward, new Vector3(0f, 1f, 0f)).normalized;
+                //Vector3 frontVector = Vector3.ProjectOnPlane(m_ARCamera.forward, new Vector3(0f, 1f, 0f)).normalized;
                 Vector3 cameraEuler = m_ARCamera.rotation.eulerAngles;
                 Quaternion shieldRotation = Quaternion.Euler(new Vector3(0f, cameraEuler.y, 0f));
 
@@ -135,36 +169,60 @@ public class HadoPlayer : NetworkBehaviour
         shieldInstance.SpawnWithOwnership(OwnerClientId);
     }
 
-    public void OnPetalShieldBroken()
-    {
-        Debug.Log("[HadoPlayer]: my petal shield has been broken.");
-        m_IsAlive = false;
-        // TODO: Give a notification to the player.
-        m_AudioSource.clip = m_DefeatAudioClip;
-        m_AudioSource.Play();
-        // Notify the other player
-        OnVictoryServerRpc();
-    }
-
     [ServerRpc]
-    private void OnVictoryServerRpc()
+    private void StartRoundServerRpc()
     {
-        // TODO: Destory everyone's petal shield and clear all energy recharge
-        HadoPetalShield.IsGameOver.Value = true;
-
-        OnVictoryClientRpc();
+        foreach (NetworkClient networkClient in NetworkManager.Singleton.ConnectedClients.Values)
+        {
+            if (networkClient.PlayerObject.TryGetComponent<HadoPlayer>(out HadoPlayer script))
+            {
+                script.StartRoundClientRpc();
+            }
+        }
+        HadoPetalShield.ShouldDestroyAllInstances.Value = false;
     }
 
     [ClientRpc]
-    private void OnVictoryClientRpc()
-    { 
-        if(!IsOwner)
+    private void StartRoundClientRpc()
+    {
+        if (!IsOwner) { return; }
+
+        m_IsRoundStarted = true;
+    }
+
+    [ServerRpc]
+    public void RoundOverServerRpc(ulong loserId)
+    {
+        foreach (NetworkClient networkClient in NetworkManager.Singleton.ConnectedClients.Values)
+        {
+            if (networkClient.PlayerObject.TryGetComponent<HadoPlayer>(out HadoPlayer script))
+            {
+                script.RoundOverClientRpc(loserId);
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void RoundOverClientRpc(ulong loserId)
+    {
+        if (!IsOwner) { return; }
+
+        isReady.Value = false;
+        m_IsRoundStarted = false;
+        m_IsStartRitualDone = false;
+
+        if (NetworkManager.Singleton.LocalClientId == loserId)
+        {
+            m_AudioSource.clip = m_DefeatAudioClip;
+            m_AudioSource.Play();
+        }
+        else
         {
             m_AudioSource.clip = m_VictoryAudioClip;
             m_AudioSource.Play();
         }
-        HadoController.Instance.ClearEnergy();
-        HadoController.Instance.isGameStarted = false;
-        m_IsPetalShieldSpawned = false;
+        HadoController.Instance.isControllerActive = false;
+        HadoController.Instance.isReady = false;
+        HadoController.Instance.ReleaseAllEnergy();
     }
 }

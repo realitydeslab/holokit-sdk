@@ -17,7 +17,7 @@ public class HadoGrantShield : NetworkBehaviour
 
     private float m_SpawnTime;
 
-    private const float k_LifeTime = 6f;
+    private const float k_LifeTime = 10f;
 
     private void Start()
     {
@@ -25,61 +25,44 @@ public class HadoGrantShield : NetworkBehaviour
         m_AudioSource.clip = m_CastShieldAudioClip;
         m_AudioSource.Play();
         GetComponent<ForceShieldControl>().targetLerp = 1f;
-        //GetComponent<MeshRenderer>().material.SetFloat("_Lerp", 1f);
 
-        m_SpawnTime = Time.time;
-        m_CurrentHealth = k_MaxHealth;
+        if (IsServer)
+        {
+            m_SpawnTime = Time.time;
+            m_CurrentHealth = k_MaxHealth;
+        }
     }
 
     private void Update()
     {
-        if (!IsOwner) { return; }
+        if (!IsServer) { return; }
         if (Time.time - m_SpawnTime > k_LifeTime)
         {
             // Destroy the shield
-            DestroyGrantShieldServerRpc();
+            DestroyGrantShield();
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!IsOwner) { return; }
+        if (!IsServer) { return; }
 
         if (other.tag.Equals("Bullet"))
         {
             m_CurrentHealth--;
 
-            // Play hit sound effect
-            m_AudioSource.clip = m_HitGrantShieldAudioClip;
-            m_AudioSource.Play();
-            var script = GetComponent<ForceShieldControl>();
-            script.hitPosition = other.transform.position;
-            script.hitAmp = 1;
-            OnGrantShieldHitServerRpc(other.transform.position);
+            OnGrantShieldHitClientRpc(other.transform.position);
             
             if (m_CurrentHealth == 0)
             {
-                // TODO: Play broken animation
-
-                // TODO: Make the original model invisible
-
-                script.targetLerp = 0f;
-                DestroyGrantShieldServerRpc();
+                DestroyGrantShield();
             }
         }
-    }
-
-    [ServerRpc]
-    private void OnGrantShieldHitServerRpc(Vector3 hitPosition)
-    {
-        OnGrantShieldHitClientRpc(hitPosition);
     }
 
     [ClientRpc]
     private void OnGrantShieldHitClientRpc(Vector3 hitPosition)
     {
-        if (IsOwner) { return; }
-
         // Play hit sound effect
         m_AudioSource.clip = m_HitGrantShieldAudioClip;
         m_AudioSource.Play();
@@ -88,8 +71,7 @@ public class HadoGrantShield : NetworkBehaviour
         script.hitAmp = 1;
     }
 
-    [ServerRpc]
-    private void DestroyGrantShieldServerRpc()
+    private void DestroyGrantShield()
     {
         DestroyGrantShieldClientRpc();
         StartCoroutine(WaitForDestroy());
@@ -104,7 +86,7 @@ public class HadoGrantShield : NetworkBehaviour
 
     IEnumerator WaitForDestroy()
     {
-        yield return new WaitForSeconds(1.1f);
+        yield return new WaitForSeconds(1.05f);
         Destroy(gameObject);
     }
 }

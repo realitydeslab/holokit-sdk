@@ -258,4 +258,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLerp: 0
-  m_Speed: 2
+  m_BirthSpeed: 1
+  hitPosition: {x: 0, y: 0, z: 0}
+  hitAmp: 0
