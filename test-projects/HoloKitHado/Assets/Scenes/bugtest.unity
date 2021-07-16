@@ -245,9 +245,9 @@ Material:
     m_Ints: []
     m_Floats:
     - Disslove_width: 0.02
-    - Field_Height: 0.65
+    - Field_Height: 4
     - Lerp: 1
-    - _Lerp: 0.486
+    - _Lerp: 1
     m_Colors:
     - Base_Color: {r: 0, g: 2.7667444, b: 3.9999995, a: 0}
     - Disslove_Color: {r: 47.937256, g: 10.935684, b: 0, a: 0}

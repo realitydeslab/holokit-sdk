@@ -24,7 +24,7 @@ public class HadoGrantShield : NetworkBehaviour
         m_AudioSource = GetComponent<AudioSource>();
         m_AudioSource.clip = m_CastShieldAudioClip;
         m_AudioSource.Play();
-        GetComponent<ShieldAnimation>().targetLerp = 1f;
+        GetComponent<ForceShieldControl>().targetLerp = 1f;
         //GetComponent<MeshRenderer>().material.SetFloat("_Lerp", 1f);
 
         m_SpawnTime = Time.time;
@@ -80,7 +80,7 @@ public class HadoGrantShield : NetworkBehaviour
                 targetLerp = 0f;
                 break;
         }
-        GetComponent<ShieldAnimation>().targetLerp = targetLerp;
+        GetComponent<ForceShieldControl>().targetLerp = targetLerp;
     }
 
     [ServerRpc]
