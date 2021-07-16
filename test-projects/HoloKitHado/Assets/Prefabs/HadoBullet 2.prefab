@@ -69,7 +69,7 @@ VisualEffect:
       - m_Value: {x: 0, y: 0, z: 0}
         m_Name: Target_position
         m_Overridden: 1
-      - m_Value: {x: 1, y: 1, z: 1}
+      - m_Value: {x: 0.6, y: 0.6, z: 0.6}
         m_Name: Target_scale
         m_Overridden: 1
     m_Vector4f:
@@ -202,7 +202,7 @@ Transform:
   m_GameObject: {fileID: 5330260697919111220}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3950114452599016462}
@@ -277,8 +277,8 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.02
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.30339196
+  m_Center: {x: 0.0034954895, y: 0, z: 0}
 --- !u!54 &3466617076984266492
 Rigidbody:
   m_ObjectHideFlags: 0

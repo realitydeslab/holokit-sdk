@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.HoloKit;
+using UnityEngine.VFX;
 
 public class HolokitMRMenuMovementController : MonoBehaviour
 {
@@ -18,23 +20,27 @@ public class HolokitMRMenuMovementController : MonoBehaviour
 
     private Vector3 newPosition = Vector3.zero;
 
+    private Transform arCamera;
+
+    private VisualEffect vfx;
+
     void Start()
     {
-        if (EyeCenter == null && GameObject.Find("EyeCenterSample") != null)
-        {
-            EyeCenter = GameObject.Find("EyeCenterSample").transform;
-            Debug.Log($"am i find {EyeCenter}");
-        }
-        else
-        {
-            Debug.Log("not find EyeCenterSample!!!");
-        }
+        arCamera = Camera.main.transform;
 
         newPosition = transform.position;
+
+        GameObject emptyGameObject = new GameObject();
+        EyeCenter = emptyGameObject.transform;
+
+        vfx = GetComponent<VisualEffect>();
     }
 
     void FixedUpdate()
     {
+        EyeCenter.position = arCamera.position + arCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
+        EyeCenter.rotation = arCamera.rotation;
+        Debug.Log("fuck0");
         Vector3 targetPosition;
         if (isEnterButton)
         {
@@ -44,9 +50,18 @@ public class HolokitMRMenuMovementController : MonoBehaviour
         {
             targetPosition = BackMenuTargetCaculate(EyeCenter, offset);
         }
+        Debug.Log("fuck1");
         newPosition = AnimatedMove(transform.position, targetPosition, maxSpeed, maxForce, distanceThreshlod);
+        Debug.Log("fuck2");
         transform.position = newPosition;
         transform.LookAt(EyeCenter);
+        Debug.Log("fuck3");
+        Debug.Log(HadoController.Instance.currentAttackRechargePercent);
+        vfx.SetFloat("Bullet Load", HadoController.Instance.currentAttackRechargePercent);
+        Debug.Log("fuck4");
+        Debug.Log(HadoController.Instance.currentShieldRechargePercent);
+        vfx.SetFloat("Shield Load", HadoController.Instance.currentShieldRechargePercent);
+        Debug.Log("fuck5");
     }
 
     float map(float x, float minIn, float maxIn, float minOut, float maxOut)

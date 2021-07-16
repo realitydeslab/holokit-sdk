@@ -71,6 +71,11 @@ public class HadoController : MonoBehaviour
         get => m_CurrentAttackNum;
     }
 
+    public float currentAttackRechargePercent
+    {
+        get => m_CurrentAttackRecharge / k_MaxAttackRecharge;
+    }
+
     private float m_CurrentShieldRecharge = 0f;
 
     private const float k_ShieldRechargeUnit = 3f;
@@ -87,6 +92,11 @@ public class HadoController : MonoBehaviour
     public int currentShieldNum
     {
         get => m_CurrentShieldNum;
+    }
+
+    public float currentShieldRechargePercent
+    {
+        get => m_CurrentShieldRecharge / k_MaxShieldRecharge;
     }
 
     private AudioSource m_AudioSource;

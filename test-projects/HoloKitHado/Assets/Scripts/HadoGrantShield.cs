@@ -48,12 +48,14 @@ public class HadoGrantShield : NetworkBehaviour
         if (other.tag.Equals("Bullet"))
         {
             m_CurrentHealth--;
-            // Trigger the hit animation
-            HitAnimation();
+
             // Play hit sound effect
             m_AudioSource.clip = m_HitGrantShieldAudioClip;
             m_AudioSource.Play();
-            OnGrantShieldHitServerRpc();
+            var script = GetComponent<ForceShieldControl>();
+            script.hitPosition = other.transform.position;
+            script.hitAmp = 1;
+            OnGrantShieldHitServerRpc(other.transform.position);
             
             if (m_CurrentHealth == 0)
             {
@@ -61,54 +63,48 @@ public class HadoGrantShield : NetworkBehaviour
 
                 // TODO: Make the original model invisible
 
+                script.targetLerp = 0f;
                 DestroyGrantShieldServerRpc();
             }
         }
     }
-    private void HitAnimation()
-    {
-        float targetLerp = 1f;
-        switch(m_CurrentHealth)
-        {
-            case 2:
-                targetLerp = 0.6f;
-                break;
-            case 1:
-                targetLerp = 0.3f;
-                break;
-            case 0:
-                targetLerp = 0f;
-                break;
-        }
-        GetComponent<ForceShieldControl>().targetLerp = targetLerp;
-    }
 
     [ServerRpc]
-    private void OnGrantShieldHitServerRpc()
+    private void OnGrantShieldHitServerRpc(Vector3 hitPosition)
     {
-        OnGrantShieldHitClientRpc();
+        OnGrantShieldHitClientRpc(hitPosition);
     }
 
     [ClientRpc]
-    private void OnGrantShieldHitClientRpc()
+    private void OnGrantShieldHitClientRpc(Vector3 hitPosition)
     {
         if (IsOwner) { return; }
-        // Trigger the hit animation
-        HitAnimation();
+
         // Play hit sound effect
         m_AudioSource.clip = m_HitGrantShieldAudioClip;
         m_AudioSource.Play();
+        var script = GetComponent<ForceShieldControl>();
+        script.hitPosition = hitPosition;
+        script.hitAmp = 1;
     }
 
     [ServerRpc]
     private void DestroyGrantShieldServerRpc()
     {
+        DestroyGrantShieldClientRpc();
         StartCoroutine(WaitForDestroy());
+    }
+
+    [ClientRpc]
+    private void DestroyGrantShieldClientRpc()
+    {
+        var script = GetComponent<ForceShieldControl>();
+        script.targetLerp = 0f;
     }
 
     IEnumerator WaitForDestroy()
     {
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(1.1f);
         Destroy(gameObject);
     }
 }

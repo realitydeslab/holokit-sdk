@@ -232,8 +232,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: -1547
     y: -3064
-    width: 16085
-    height: 7963
+    width: 16084
+    height: 7944
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -428,8 +428,8 @@ MonoBehaviour:
     max: 1
     enumValues: []
     descendantCount: 0
-  - name: Shiled Load
-    path: Shiled Load
+  - name: Shield Load
+    path: Shield Load
     tooltip: 
     sheetType: m_Float
     realType: Single
@@ -473,7 +473,7 @@ MonoBehaviour:
   m_ImportDependencies: []
   m_GraphVersion: 7
   m_ResourceVersion: 1
-  m_saved: 0
+  m_saved: 1
   m_SubgraphDependencies: []
   m_CategoryPath: 
 --- !u!2058629511 &8926484042661614527
@@ -31271,7 +31271,7 @@ MonoBehaviour:
   m_InputSlots: []
   m_OutputSlots:
   - {fileID: 8926484042661617423}
-  m_ExposedName: Shiled Load
+  m_ExposedName: Shield Load
   m_Exposed: 1
   m_Order: 2
   m_Category: 
