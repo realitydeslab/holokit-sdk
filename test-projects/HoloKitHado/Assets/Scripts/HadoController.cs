@@ -177,7 +177,16 @@ public class HadoController : MonoBehaviour
     {
         if (m_CurrentControllerState == HadoControllerState.Nothing)
         {
-            // The energy doesn't decrease when not charging.
+            if (m_CurrentAttackRecharge > m_CurrentAttackNum * k_AttackRechargeUnit)
+            {
+                m_CurrentAttackRecharge -= k_AttackRechargeUnit;
+            }
+
+            if (m_CurrentShieldRecharge > m_CurrentShieldNum * k_ShieldRechargeUnit)
+            {
+                m_CurrentShieldRecharge -= k_ShieldRechargeUnit;
+            }
+
             return;
         }
 
@@ -215,12 +224,6 @@ public class HadoController : MonoBehaviour
             }
             return;
         }
-
-        if (m_CurrentControllerState == HadoControllerState.Nothing)
-        {
-            m_CurrentAttackRecharge = m_CurrentAttackNum * k_AttackRechargeUnit;
-            m_CurrentShieldRecharge = m_CurrentShieldNum * k_ShieldRechargeUnit;
-        }
     }
 
     /// <summary>
@@ -239,5 +242,11 @@ public class HadoController : MonoBehaviour
     {
         m_CurrentShieldRecharge -= k_ShieldRechargeUnit;
         m_CurrentShieldNum--;
+    }
+
+    public void ClearEnergy()
+    {
+        m_CurrentAttackRecharge = 0f;
+        m_CurrentShieldRecharge = 0f;
     }
 }

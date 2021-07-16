@@ -38,7 +38,7 @@ public class HadoPlayer : NetworkBehaviour
     [SerializeField] private AudioClip m_VictoryAudioClip;
 
     // TODO: Adjust this value.
-    private float m_BulletSpeed = 140f;
+    private float m_BulletSpeed = 200f;
 
     private bool m_IsAlive = true;
 
@@ -61,6 +61,10 @@ public class HadoPlayer : NetworkBehaviour
         if (!m_IsPetalShieldSpawned && HadoController.Instance.isGameStarted)
         {
             Debug.Log("[HadoPlayer]: game started!");
+            if (IsServer)
+            {
+                HadoPetalShield.IsGameOver.Value = false;
+            }
             m_AudioSource.clip = m_GameStartAudioClip;
             m_AudioSource.Play();
             SpawnPetalShieldServerRpc();
@@ -145,16 +149,22 @@ public class HadoPlayer : NetworkBehaviour
     [ServerRpc]
     private void OnVictoryServerRpc()
     {
+        // TODO: Destory everyone's petal shield and clear all energy recharge
+        HadoPetalShield.IsGameOver.Value = true;
+
         OnVictoryClientRpc();
     }
 
     [ClientRpc]
     private void OnVictoryClientRpc()
-    {
+    { 
         if(!IsOwner)
         {
             m_AudioSource.clip = m_VictoryAudioClip;
             m_AudioSource.Play();
         }
+        HadoController.Instance.ClearEnergy();
+        HadoController.Instance.isGameStarted = false;
+        m_IsPetalShieldSpawned = false;
     }
 }

@@ -1,10 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.HoloKit;
-using UnityEngine.VFX;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Connection;
+using MLAPI.NetworkVariable;
 
 public class HadoPetalShield : NetworkBehaviour
 {
@@ -30,6 +30,12 @@ public class HadoPetalShield : NetworkBehaviour
     /// If the petal shield is still alive?
     /// </summary>
     private bool m_IsPresent = true;
+
+    public static NetworkVariableBool IsGameOver = new NetworkVariableBool(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.ServerOnly,
+        ReadPermission = NetworkVariablePermission.Everyone
+    }, false);
 
     private void Start()
     {
@@ -63,6 +69,11 @@ public class HadoPetalShield : NetworkBehaviour
         //        OnPetalShieldRecoveredServerRpc();
         //    }
         //}
+
+        if (IsGameOver.Value)
+        {
+            DestroyPetalShieldServerRpc();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -143,7 +154,7 @@ public class HadoPetalShield : NetworkBehaviour
 
     IEnumerator WaitForDestroy()
     {
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(0.5f);
         Destroy(gameObject);
     }
 
