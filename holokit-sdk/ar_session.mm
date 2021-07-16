@@ -113,6 +113,12 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
         self.primaryButtonLeft = NO;
         self.primaryButtonRight = NO;
         
+        if ([WCSession isSupported]) {
+            self.wcSession = [WCSession defaultSession];
+            self.wcSession.delegate = self;
+            //[self.wcSession activateSession];
+        }
+        
         frame_count = 0;
         last_frame_time = 0.0f;
     }
@@ -216,7 +222,7 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
     }
     
     if(self.session == NULL) {
-        NSLog(@"[ar_session]: got ar session reference.");
+        NSLog(@"[ar_session]: AR session started.");
         self.session = session;
     }
     
@@ -857,9 +863,14 @@ UnityHoloKit_ActivateWatchConnectivitySession() {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     // Watch Connectivity session
     if ([WCSession isSupported]) {
-        ar_session_delegate_controller.wcSession = [WCSession defaultSession];
-        ar_session_delegate_controller.wcSession.delegate = ar_session_delegate_controller;
+//        ar_session_delegate_controller.wcSession = [WCSession defaultSession];
+//        ar_session_delegate_controller.wcSession.delegate = ar_session_delegate_controller;
         [ar_session_delegate_controller.wcSession activateSession];
+    }
+    if (ar_session_delegate_controller.wcSession.paired) {
+        NSLog(@"[wc_session]: send the refresh message to Apple Watch.");
+        NSDictionary<NSString *, id> *message = [[NSDictionary alloc] initWithObjects:@[(id)0] forKeys:@[@"iPhone"]];
+        [ar_session_delegate_controller.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
     }
 }
 

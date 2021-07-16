@@ -96,7 +96,7 @@ public class HadoController : MonoBehaviour
     [SerializeField] private AudioClip m_ShieldRechargedAudioClip;
 
     [DllImport("__Internal")]
-    private static extern void UnityHoloKit_ActivateWatchConnectivitySession();
+    public static extern void UnityHoloKit_ActivateWatchConnectivitySession();
 
     /// <summary>
     /// This delegate function is called when a new message from Apple Watch is received.
@@ -159,7 +159,7 @@ public class HadoController : MonoBehaviour
 
     private void Start()
     {
-        UnityHoloKit_ActivateWatchConnectivitySession();
+        //UnityHoloKit_ActivateWatchConnectivitySession();
         m_AudioSource = GetComponent<AudioSource>();
     }
 

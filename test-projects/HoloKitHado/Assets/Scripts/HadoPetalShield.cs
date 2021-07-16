@@ -14,7 +14,7 @@ public class HadoPetalShield : NetworkBehaviour
 
     [SerializeField] private AudioClip m_HitPetalShieldAudioClip;
 
-    private float m_PetalShieldYOffset = -0.25f;
+    private float m_PetalShieldYOffset = -0.6f;
 
     private float m_PetalShieldZOffset = 0.4f;
 

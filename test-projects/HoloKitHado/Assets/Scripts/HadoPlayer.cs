@@ -38,14 +38,19 @@ public class HadoPlayer : NetworkBehaviour
     [SerializeField] private AudioClip m_VictoryAudioClip;
 
     // TODO: Adjust this value.
-    private float m_BulletSpeed = 80f;
+    private float m_BulletSpeed = 140f;
 
     private bool m_IsAlive = true;
 
     private void Start()
     {
-        m_ARCamera = Camera.main.transform;
         m_AudioSource = GetComponent<AudioSource>();
+
+        if (IsOwner)
+        {
+            m_ARCamera = Camera.main.transform;
+            HadoController.UnityHoloKit_ActivateWatchConnectivitySession();
+        }
     }
 
     private void Update()

@@ -21,14 +21,14 @@ public class HadoUIManager : MonoBehaviour
 
     private Text m_Sync;
 
-    private Text m_WatchReachability;
+    private Text m_AppleWatchReachability;
 
-    public Text WatchReachability
+    public Text AppleWatchReachability
     {
-        get => m_WatchReachability;
+        get => m_AppleWatchReachability;
         set
         {
-            m_WatchReachability = value;
+            m_AppleWatchReachability = value;
         }
     }
 
@@ -53,11 +53,11 @@ public class HadoUIManager : MonoBehaviour
     {
         if (isReachable)
         {
-            Instance.WatchReachability.text = "Reachable";
+            Instance.AppleWatchReachability.text = "Reachable";
         }
         else
         {
-            Instance.WatchReachability.text = "Not Reachable";
+            Instance.AppleWatchReachability.text = "Not Reachable";
         }
     }
     [DllImport("__Internal")]
@@ -93,7 +93,7 @@ public class HadoUIManager : MonoBehaviour
 
         m_Connection = transform.GetChild(3).GetComponent<Text>();
         m_Sync = transform.GetChild(4).GetComponent<Text>();
-        m_WatchReachability = transform.GetChild(5).GetComponent<Text>();
+        m_AppleWatchReachability = transform.GetChild(5).GetComponent<Text>();
     }
 
     private void Update()
