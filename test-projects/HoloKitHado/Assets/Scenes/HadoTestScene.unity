@@ -178,9 +178,9 @@ MonoBehaviour:
     NetworkPrefabs:
     - Prefab: {fileID: 7829153114380616042, guid: cf01e1ba1994a4e7c96b7b6218010fc4, type: 3}
       PlayerPrefab: 1
-    - Prefab: {fileID: 1915761544789216089, guid: 7727168ba2b8644a7b9a1a6156f7fd7f, type: 3}
+    - Prefab: {fileID: 9162929649202537259, guid: 4831f74da2daf4e4393560965c703844, type: 3}
       PlayerPrefab: 1
-    - Prefab: {fileID: 5330260697919111220, guid: cf449f13dd5e558469bfa1a9fd9dd916, type: 3}
+    - Prefab: {fileID: 1915761544789216089, guid: 7727168ba2b8644a7b9a1a6156f7fd7f, type: 3}
       PlayerPrefab: 1
     - Prefab: {fileID: 5034302601284621400, guid: fbe60f3144835460b975eecddb6ceeee, type: 3}
       PlayerPrefab: 1

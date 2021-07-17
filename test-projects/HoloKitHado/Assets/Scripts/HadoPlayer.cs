@@ -50,7 +50,7 @@ public class HadoPlayer : NetworkBehaviour
     private void Start()
     {
         m_AudioSource = GetComponent<AudioSource>();
-
+        
         if (IsOwner)
         {
             m_ARCamera = Camera.main.transform;
@@ -107,12 +107,7 @@ public class HadoPlayer : NetworkBehaviour
             {
                 Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
                 Vector3 bulletSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_BulletSpawnOffset);
-                Debug.Log($"bullet spawn position {bulletSpawnPosition} and direction {m_ARCamera.forward}");
-
-                var bulletInstance = Instantiate(m_BulletPrefab, bulletSpawnPosition, Quaternion.identity);
-                bulletInstance.transform.position = bulletSpawnPosition;
-                //bulletInstance.GetComponent<Rigidbody>().AddForce(m_ARCamera.forward * m_BulletSpeed);
-                //FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
+                FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
                 HadoController.Instance.AfterAttack();
             }
             else
