@@ -56,6 +56,9 @@ PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
 typedef void (*AppleWatchMessageReceived)(int messageIndex);
 AppleWatchMessageReceived AppleWatchMessageReceivedDelegate = NULL;
 
+typedef void (*DoctorStrangeMessageReceived)(int circleNum);
+DoctorStrangeMessageReceived DoctorStrangeMessageReceivedDelegate = NULL;
+
 typedef void (*AppleWatchReachabilityDidChange)(bool isReachable);
 AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
 
@@ -724,9 +727,14 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
 }
 
 - (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *,id> *)message {
-    NSInteger messageIndex = [[message objectForKey:@"watch"] integerValue];
-    // Receive a message from Apple Watch side and pass the message to Unity.
-    AppleWatchMessageReceivedDelegate((int)messageIndex);
+    if (id value = [message objectForKey:@"watch"]) {
+        NSInteger messageIndex = [value integerValue];
+        // Receive a message from Apple Watch side and pass the message to Unity.
+        AppleWatchMessageReceivedDelegate((int)messageIndex);
+    } else if (id value = [message objectForKey:@"strange"]) {
+        NSInteger circleNum = [value integerValue];
+        DoctorStrangeMessageReceivedDelegate((int)circleNum);
+    }
 }
 
 @end
@@ -851,6 +859,11 @@ UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callba
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetAppleWatchMessageReceivedDelegate(AppleWatchMessageReceived callback) {
     AppleWatchMessageReceivedDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDoctorStrangeMessageReceivedDelegate(DoctorStrangeMessageReceived callback) {
+    DoctorStrangeMessageReceivedDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

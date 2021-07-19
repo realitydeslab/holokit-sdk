@@ -14,6 +14,8 @@ public class HadoPlayer : NetworkBehaviour
 
     [SerializeField] private NetworkObject m_GrantShieldPrefab;
 
+    [SerializeField] private NetworkObject m_DoctorStrangeCirclePrefab;
+
     /// <summary>
     /// The offset from the center eye position to the spawn position of a new bullet.
     /// </summary>
@@ -23,6 +25,8 @@ public class HadoPlayer : NetworkBehaviour
     /// The offset from the center eye position to the spawn position of the grant shield.
     /// </summary>
     private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1.2f, 1.3f);
+
+    private Vector3 m_DoctorStrangeCircleSpawnOffset = new Vector3(0f, -0.2f, 1.4f);
 
     private NetworkVariableBool isReady = new NetworkVariableBool(new NetworkVariableSettings
     {
@@ -145,6 +149,19 @@ public class HadoPlayer : NetworkBehaviour
             }
             HadoController.Instance.nextControllerAction = HadoControllerAction.Nothing;
         }
+        else if (HadoController.Instance.nextControllerAction == HadoControllerAction.CastDoctorStrangeCircle)
+        {
+            // Cast Doctor Strange circle
+            Debug.Log("[HadoPlayer]: cast Doctor Strange circle");
+            Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
+            Vector3 circlePosition = centerEyePosition + m_ARCamera.TransformVector(m_DoctorStrangeCircleSpawnOffset);
+
+            Vector3 cameraEuler = m_ARCamera.rotation.eulerAngles;
+            Quaternion circleRotation = Quaternion.Euler(new Vector3(0f, cameraEuler.y, 0f));
+            CastDoctorStrangeCircleServerRpc(circlePosition, circleRotation);
+
+            HadoController.Instance.nextControllerAction = HadoControllerAction.Nothing;
+        }
     }
 
     [ServerRpc]
@@ -169,6 +186,13 @@ public class HadoPlayer : NetworkBehaviour
     {
         var shieldInstance = Instantiate(m_GrantShieldPrefab, position, rotation);
         shieldInstance.SpawnWithOwnership(OwnerClientId);
+    }
+
+    [ServerRpc]
+    private void CastDoctorStrangeCircleServerRpc(Vector3 position, Quaternion rotation)
+    {
+        var circleInstance = Instantiate(m_DoctorStrangeCirclePrefab, position, rotation);
+        circleInstance.SpawnWithOwnership(OwnerClientId);
     }
 
     [ServerRpc]

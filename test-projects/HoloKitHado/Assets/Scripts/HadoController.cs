@@ -116,6 +116,13 @@ public class HadoController : MonoBehaviour
 
     [SerializeField] private AudioClip m_ShieldRechargedAudioClip;
 
+    private int m_DoctorStrangeCircleNum = 0;
+
+    public int DoctorStrangeCircleNum
+    {
+        get => m_DoctorStrangeCircleNum;
+    }
+
     [DllImport("__Internal")]
     public static extern void UnityHoloKit_ActivateWatchConnectivitySession();
 
@@ -163,6 +170,21 @@ public class HadoController : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void UnityHoloKit_SetAppleWatchMessageReceivedDelegate(AppleWatchMessageReceived callback);
 
+    /// <summary>
+    /// This delegate function is called when the circle number on the Apple Watch is updated.
+    /// </summary>
+    /// <param name="circleNum"></param>
+    delegate void DoctorStrangeMessageReceived(int circleNum);
+    [AOT.MonoPInvokeCallback(typeof(DoctorStrangeMessageReceived))]
+    static void OnDoctorStrangeMessageReceived(int circleNum)
+    {
+        Debug.Log($"[HadoController]: Doctor Strange circle number {circleNum}");
+        Instance.nextControllerAction = HadoControllerAction.CastDoctorStrangeCircle;
+        Instance.m_DoctorStrangeCircleNum = circleNum;
+    }
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_SetDoctorStrangeMessageReceivedDelegate(DoctorStrangeMessageReceived callback);
+
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -179,6 +201,7 @@ public class HadoController : MonoBehaviour
     {
         // Register delegates
         UnityHoloKit_SetAppleWatchMessageReceivedDelegate(OnAppleWatchMessageReceived);
+        UnityHoloKit_SetDoctorStrangeMessageReceivedDelegate(OnDoctorStrangeMessageReceived);
     }
 
     private void Start()
