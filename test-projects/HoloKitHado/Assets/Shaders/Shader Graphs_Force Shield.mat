@@ -46,7 +46,7 @@ Material:
     - Hit_Amp: 0
     - Lerp: 1
     - Ripple_Speed: 12
-    - _Lerp: 1
+    - _Lerp: 0
     m_Colors:
     - Base_Color: {r: 0, g: 21.04431, b: 42.722507, a: 0}
     - Disslove_Color: {r: 383.49805, g: 78.11748, b: 0, a: 0}

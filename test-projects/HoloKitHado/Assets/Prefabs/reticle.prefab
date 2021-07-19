@@ -143,7 +143,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EyeCenter: {fileID: 0}
   isEnterButton: 1
-  offset: {x: 0, y: 0, z: 0.4}
-  maxSpeed: 0.3
-  maxForce: 0.3
-  distanceThreshlod: 0.01
+  m_offset: {x: 0, y: 0, z: 0.5}
+  m_maxSpeed: 0.1
+  m_lerpSpeed: 10
+  m_maxForce: 0.1
+  m_distanceThreshlod: 0.1
