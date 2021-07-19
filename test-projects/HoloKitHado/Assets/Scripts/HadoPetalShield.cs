@@ -1,10 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.HoloKit;
-using UnityEngine.VFX;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Connection;
+using MLAPI.NetworkVariable;
 
 public class HadoPetalShield : NetworkBehaviour
 {
@@ -31,26 +31,35 @@ public class HadoPetalShield : NetworkBehaviour
     /// </summary>
     private bool m_IsPresent = true;
 
+    public static NetworkVariableBool ShouldDestroyAllInstances = new NetworkVariableBool(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.ServerOnly,
+        ReadPermission = NetworkVariablePermission.Everyone
+    }, false);
+
     private void Start()
     {
         m_AudioSource = GetComponent<AudioSource>();
-        if (!IsOwner) { return; }
-        Debug.Log("[HadoPetalShield]: petal shield spawned");
-        m_ARCamera = Camera.main.transform;
-        m_CurrentHealth = k_MaxHeath;
+        if (IsOwner) {
+            m_ARCamera = Camera.main.transform;
+        }
+        if (IsServer)
+        {
+            m_CurrentHealth = k_MaxHeath;
+        }
     }
 
     private void Update()
     {
-        if (!IsOwner) { return; }
+        if (IsOwner)
+        {
+            Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
+            Vector3 frontVector = Vector3.ProjectOnPlane(m_ARCamera.forward, new Vector3(0f, 1f, 0f)).normalized;
+            transform.position = centerEyePosition + frontVector * m_PetalShieldZOffset + new Vector3(0f, m_PetalShieldYOffset, 0f);
 
-        // Update the petal shield's position and rotation according to the player's movement.
-        Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
-        Vector3 frontVector = Vector3.ProjectOnPlane(m_ARCamera.forward, new Vector3(0f, 1f, 0f)).normalized;
-        transform.position = centerEyePosition + frontVector * m_PetalShieldZOffset + new Vector3(0f, m_PetalShieldYOffset, 0f);
-
-        Vector3 cameraEuler = m_ARCamera.rotation.eulerAngles;
-        transform.rotation = Quaternion.Euler(new Vector3(0f, cameraEuler.y, 0f));
+            Vector3 cameraEuler = m_ARCamera.rotation.eulerAngles;
+            transform.rotation = Quaternion.Euler(new Vector3(0f, cameraEuler.y, 0f));
+        }
 
         // Shield's health recovers if not gets hit.
         //if (m_IsPresent && Time.time - m_LastHitTime > k_RecoveryTime)
@@ -63,91 +72,66 @@ public class HadoPetalShield : NetworkBehaviour
         //        OnPetalShieldRecoveredServerRpc();
         //    }
         //}
+
+        if (IsServer)
+        {
+            if (ShouldDestroyAllInstances.Value)
+            {
+                StartCoroutine(WaitForDestroy(2.0f));
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         // Each petal shield is handled by its owner.
-        if (!IsOwner)
+        if (!IsServer)
         {
-            Debug.Log("[HadoPetalShield]: not owner OnTriggerEnter()");
             return;
         }
 
-        Debug.Log("[HadoPetalShield]: OnTriggerEnter()");
         if (other.tag.Equals("Bullet"))
         {
             m_LastHitTime = Time.time;
             m_CurrentHealth--;
 
-            transform.GetChild(0).GetComponent<PetalSelfControl>().OnExplode();
-            m_AudioSource.clip = m_HitPetalShieldAudioClip;
-            m_AudioSource.Play();
-            OnPetalShieldHitServerRpc();
-            
+            // We are not the owner of this network object, we cannot call a server rpc here.
+            // But we can call a client rpc.
+            OnPetalShieldHitClientRpc();
+
             if (m_CurrentHealth == 0)
             {
                 m_IsPresent = false;
                 // TODO: Play the shield broken animation
-                
-                DestroyPetalShieldServerRpc();
 
-                // Notify the player object that the petal shiled has been broken
-                var playerScript = GetLocalPlayerScript();
+                StartCoroutine(WaitForDestroy(0.3f));
+                ShouldDestroyAllInstances.Value = true;
+
+                // The owner of this shield loses.
+                var playerScript = GetPlayerScript();
                 if (playerScript != null)
                 {
-                    playerScript.OnPetalShieldBroken();
+                    playerScript.RoundOverServerRpc(OwnerClientId);
                 }
             }
         }
     }
 
-    [ServerRpc]
-    private void OnPetalShieldHitServerRpc()
-    {
-        Debug.Log("[HadoPetalShield]: OnPetalShieldHitServerRpc()");
-        OnPetalShieldHitClientRpc();
-    }
-
     [ClientRpc]
     private void OnPetalShieldHitClientRpc()
     {
-        Debug.Log("[HadoPetalShield]: OnPetalShieldHitClientRpc()");
-        if (IsOwner) { return; }
-        //Debug.Log("[HadoPetalShield]: i am the fucking owner");
-        
         transform.GetChild(0).GetComponent<PetalSelfControl>().OnExplode();
         m_AudioSource.clip = m_HitPetalShieldAudioClip;
         m_AudioSource.Play();
     }
 
-    [ServerRpc]
-    private void OnPetalShieldRecoveredServerRpc()
+    IEnumerator WaitForDestroy(float time)
     {
-        OnPetalShieldRecoveredClientRpc();
-    }
-
-    [ClientRpc]
-    private void OnPetalShieldRecoveredClientRpc()
-    {
-        if (IsOwner) { return; }
-        // TODO: Modify the VFX parameter
-
-    }
-
-    [ServerRpc]
-    private void DestroyPetalShieldServerRpc()
-    {
-        StartCoroutine(WaitForDestroy());
-    }
-
-    IEnumerator WaitForDestroy()
-    {
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(time);
         Destroy(gameObject);
     }
 
-    private HadoPlayer GetLocalPlayerScript()
+    private HadoPlayer GetPlayerScript()
     {
         ulong localClientId = NetworkManager.Singleton.LocalClientId;
         if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(localClientId, out NetworkClient networkClient))

@@ -9,19 +9,30 @@ public class HadoController : MonoBehaviour
 
     public static HadoController Instance { get { return _instance; } }
 
-    private bool m_IsGameStarted = false;
+    private bool m_IsReady = false;
 
     /// <summary>
     /// If the player has tapped the start game button?
     /// After the game starts, the system will spawn the petal shield and the player can shoot bullets.
     /// The reticle will also be visible.
     /// </summary>
-    public bool isGameStarted
+    public bool isReady
     {
-        get => m_IsGameStarted;
+        get => m_IsReady;
         set
         {
-            m_IsGameStarted = value;
+            m_IsReady = value;
+        }
+    }
+
+    private bool m_IsControllerActive = false;
+
+    public bool isControllerActive
+    {
+        get => m_IsControllerActive;
+        set
+        {
+            m_IsControllerActive = value;
         }
     }
 
@@ -80,7 +91,7 @@ public class HadoController : MonoBehaviour
 
     private const float k_ShieldRechargeUnit = 3f;
 
-    private const float k_ShieldRechargeSpeed = 0.016f;
+    private const float k_ShieldRechargeSpeed = 0.032f;
 
     private const float k_MaxShieldRecharge = 6f;
 
@@ -120,7 +131,7 @@ public class HadoController : MonoBehaviour
         {
             case (AppleWatchMessageType.StartGame):
                 //Debug.Log("[HadoController]: start game");
-                Instance.isGameStarted = true;
+                Instance.isReady = true;
                 break;
             case (AppleWatchMessageType.Fire):
                 //Debug.Log("[HadoController]: fire");
@@ -175,9 +186,28 @@ public class HadoController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!m_IsControllerActive) { return; }
+
         if (m_CurrentControllerState == HadoControllerState.Nothing)
         {
-            // The energy doesn't decrease when not charging.
+            if (m_CurrentAttackRecharge > m_CurrentAttackNum * k_AttackRechargeUnit)
+            {
+                m_CurrentAttackRecharge -= k_AttackRechargeSpeed;
+                if (m_CurrentAttackRecharge < 0)
+                {
+                    m_CurrentAttackRecharge = 0f;
+                }
+            }
+
+            if (m_CurrentShieldRecharge > m_CurrentShieldNum * k_ShieldRechargeUnit)
+            {
+                m_CurrentShieldRecharge -= k_ShieldRechargeSpeed;
+                if (m_CurrentShieldRecharge < 0)
+                {
+                    m_CurrentShieldRecharge = 0f;
+                }
+            }
+
             return;
         }
 
@@ -215,12 +245,6 @@ public class HadoController : MonoBehaviour
             }
             return;
         }
-
-        if (m_CurrentControllerState == HadoControllerState.Nothing)
-        {
-            m_CurrentAttackRecharge = m_CurrentAttackNum * k_AttackRechargeUnit;
-            m_CurrentShieldRecharge = m_CurrentShieldNum * k_ShieldRechargeUnit;
-        }
     }
 
     /// <summary>
@@ -239,5 +263,13 @@ public class HadoController : MonoBehaviour
     {
         m_CurrentShieldRecharge -= k_ShieldRechargeUnit;
         m_CurrentShieldNum--;
+    }
+
+    public void ReleaseAllEnergy()
+    {
+        m_CurrentAttackRecharge = 0f;
+        m_CurrentAttackNum = 0;
+        m_CurrentShieldRecharge = 0f;
+        m_CurrentShieldNum = 0;
     }
 }

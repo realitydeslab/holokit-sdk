@@ -23,18 +23,13 @@ public class HadoUIManager : MonoBehaviour
 
     private Text m_AppleWatchReachability;
 
-    public Text AppleWatchReachability
-    {
-        get => m_AppleWatchReachability;
-        set
-        {
-            m_AppleWatchReachability = value;
-        }
-    }
-
     private bool m_IsConnected;
 
     private bool m_IsSynced;
+
+    [SerializeField] private GameObject m_Volume;
+
+    [SerializeField] private GameObject m_Reticle;
 
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_GetRenderingMode();
@@ -53,11 +48,11 @@ public class HadoUIManager : MonoBehaviour
     {
         if (isReachable)
         {
-            Instance.AppleWatchReachability.text = "Reachable";
+            Debug.Log("[HadoUIManager]: Apple Watch reachability changed to reachable");
         }
         else
         {
-            Instance.AppleWatchReachability.text = "Not Reachable";
+            Debug.Log("[HadoUIManager]: Apple Watch reachability changed to not reachable");
         }
     }
     [DllImport("__Internal")]
@@ -154,6 +149,8 @@ public class HadoUIManager : MonoBehaviour
             UnityHoloKit_SetRenderingMode(2);
             Camera.main.GetComponent<ARCameraBackground>().enabled = false;
             m_SwitchRenderingModeButton.transform.GetChild(0).GetComponent<Text>().text = "AR";
+            m_Volume.SetActive(true);
+            m_Reticle.SetActive(true);
         }
         else
         {
@@ -161,6 +158,8 @@ public class HadoUIManager : MonoBehaviour
             UnityHoloKit_SetRenderingMode(1);
             Camera.main.GetComponent<ARCameraBackground>().enabled = true;
             m_SwitchRenderingModeButton.transform.GetChild(0).GetComponent<Text>().text = "XR";
+            m_Volume.SetActive(false);
+            m_Reticle.SetActive(false);
         }
     }
 }
