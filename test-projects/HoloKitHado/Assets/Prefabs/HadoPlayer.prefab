@@ -66,6 +66,7 @@ MonoBehaviour:
   m_BulletPrefab: {fileID: 7153235707511637825, guid: 4831f74da2daf4e4393560965c703844, type: 3}
   m_PetalShieldPrefab: {fileID: 3318521963525512639, guid: 7727168ba2b8644a7b9a1a6156f7fd7f, type: 3}
   m_GrantShieldPrefab: {fileID: 1458776434713595003, guid: fbe60f3144835460b975eecddb6ceeee, type: 3}
+  m_DoctorStrangeCirclePrefab: {fileID: 8369470735683357632, guid: 3e28bc590691c42a09a3928b2a1ad9b1, type: 3}
   m_GameStartAudioClip: {fileID: 8300000, guid: 9e5b86a26f260435bb07cc8f37ceed64, type: 3}
   m_DefeatAudioClip: {fileID: 8300000, guid: 99fd8683fdbbd476aa6a921a1d4886a7, type: 3}
   m_VictoryAudioClip: {fileID: 8300000, guid: cd789b99527754967871dd041f21431d, type: 3}

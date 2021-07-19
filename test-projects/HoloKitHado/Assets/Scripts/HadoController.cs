@@ -179,8 +179,11 @@ public class HadoController : MonoBehaviour
     static void OnDoctorStrangeMessageReceived(int circleNum)
     {
         Debug.Log($"[HadoController]: Doctor Strange circle number {circleNum}");
-        Instance.nextControllerAction = HadoControllerAction.CastDoctorStrangeCircle;
         Instance.m_DoctorStrangeCircleNum = circleNum;
+        if (circleNum == 1)
+        {
+            Instance.nextControllerAction = HadoControllerAction.CastDoctorStrangeCircle;
+        }
     }
     [DllImport("__Internal")]
     private static extern void UnityHoloKit_SetDoctorStrangeMessageReceivedDelegate(DoctorStrangeMessageReceived callback);
