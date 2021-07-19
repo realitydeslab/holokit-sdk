@@ -863,12 +863,15 @@ UnityHoloKit_ActivateWatchConnectivitySession() {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
     // Watch Connectivity session
     if ([WCSession isSupported]) {
-//        ar_session_delegate_controller.wcSession = [WCSession defaultSession];
-//        ar_session_delegate_controller.wcSession.delegate = ar_session_delegate_controller;
         [ar_session_delegate_controller.wcSession activateSession];
     }
-    if (ar_session_delegate_controller.wcSession.paired) {
-        NSLog(@"[wc_session]: send the refresh message to Apple Watch.");
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SendMessageToAppleWatch(int messageIndex) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    if (ar_session_delegate_controller.wcSession.isReachable) {
+        NSLog(@"[wc_session]: send message to Apple Watch.");
         NSDictionary<NSString *, id> *message = [[NSDictionary alloc] initWithObjects:@[(id)0] forKeys:@[@"iPhone"]];
         [ar_session_delegate_controller.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
     }

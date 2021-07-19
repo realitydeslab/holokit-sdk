@@ -22,7 +22,7 @@ public class HadoPlayer : NetworkBehaviour
     /// <summary>
     /// The offset from the center eye position to the spawn position of the grant shield.
     /// </summary>
-    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1.2f, 1.6f);
+    private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1.2f, 1.3f);
 
     private NetworkVariableBool isReady = new NetworkVariableBool(new NetworkVariableSettings
     {
@@ -45,7 +45,7 @@ public class HadoPlayer : NetworkBehaviour
     [SerializeField] private AudioClip m_VictoryAudioClip;
 
     // TODO: Adjust this value.
-    private float m_BulletSpeed = 600f;
+    private float m_BulletSpeed = 400f;
 
     private void Start()
     {
@@ -55,6 +55,11 @@ public class HadoPlayer : NetworkBehaviour
         {
             m_ARCamera = Camera.main.transform;
             HadoController.UnityHoloKit_ActivateWatchConnectivitySession();
+            HadoController.UnityHoloKit_SendMessageToAppleWatch(0);
+            if (HadoUIManager.Instance.IsSpectator)
+            {
+                isReady.Value = true;
+            }
         }
     }
 
@@ -62,6 +67,8 @@ public class HadoPlayer : NetworkBehaviour
     {
         // Each device can only control the player instance of their own.
         if (!IsOwner) { return; }
+
+        if (HadoUIManager.Instance.IsSpectator) { return; }
 
         // Am I ready?
         if (!isReady.Value && HadoController.Instance.isReady)
@@ -202,7 +209,10 @@ public class HadoPlayer : NetworkBehaviour
     {
         if (!IsOwner) { return; }
 
-        isReady.Value = false;
+        if (!HadoUIManager.Instance.IsSpectator)
+        {
+            isReady.Value = false;
+        }
         m_IsRoundStarted = false;
         m_IsStartRitualDone = false;
 

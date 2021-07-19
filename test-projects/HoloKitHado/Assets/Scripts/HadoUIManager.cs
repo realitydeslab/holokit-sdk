@@ -15,6 +15,8 @@ public class HadoUIManager : MonoBehaviour
 
     private Button m_StartClientButton;
 
+    private Button m_StartSpectatorButton;
+
     private Button m_SwitchRenderingModeButton;
 
     private Text m_Connection;
@@ -26,6 +28,13 @@ public class HadoUIManager : MonoBehaviour
     private bool m_IsConnected;
 
     private bool m_IsSynced;
+
+    private bool m_IsSpectator = false;
+
+    public bool IsSpectator
+    {
+        get => m_IsSpectator;
+    }
 
     [SerializeField] private GameObject m_Volume;
 
@@ -83,12 +92,15 @@ public class HadoUIManager : MonoBehaviour
         m_StartClientButton = transform.GetChild(1).GetComponent<Button>();
         m_StartClientButton.onClick.AddListener(StartClient);
 
-        m_SwitchRenderingModeButton = transform.GetChild(2).GetComponent<Button>();
+        m_StartSpectatorButton = transform.GetChild(2).GetComponent<Button>();
+        m_StartSpectatorButton.onClick.AddListener(StartSpectator);
+
+        m_SwitchRenderingModeButton = transform.GetChild(3).GetComponent<Button>();
         m_SwitchRenderingModeButton.onClick.AddListener(SwitchRenderingMode);
 
-        m_Connection = transform.GetChild(3).GetComponent<Text>();
-        m_Sync = transform.GetChild(4).GetComponent<Text>();
-        m_AppleWatchReachability = transform.GetChild(5).GetComponent<Text>();
+        m_Connection = transform.GetChild(4).GetComponent<Text>();
+        m_Sync = transform.GetChild(5).GetComponent<Text>();
+        m_AppleWatchReachability = transform.GetChild(6).GetComponent<Text>();
     }
 
     private void Update()
@@ -135,10 +147,18 @@ public class HadoUIManager : MonoBehaviour
         DisableHostClientButtons();
     }
 
+    private void StartSpectator()
+    {
+        NetworkManager.Singleton.StartClient();
+        DisableHostClientButtons();
+        m_IsSpectator = true;
+    }
+
     private void DisableHostClientButtons()
     {
         m_StartHostButton.gameObject.SetActive(false);
         m_StartClientButton.gameObject.SetActive(false);
+        m_StartSpectatorButton.gameObject.SetActive(false);
     }
 
     private void SwitchRenderingMode()

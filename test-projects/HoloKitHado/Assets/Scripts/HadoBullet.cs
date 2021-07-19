@@ -12,7 +12,7 @@ public class HadoBullet : NetworkBehaviour
 
     private int m_FrameCount = 0;
 
-    private int k_FrameToOpenCollider = 20;
+    private int k_FrameToOpenCollider = 5;
 
     private void Start()
     {

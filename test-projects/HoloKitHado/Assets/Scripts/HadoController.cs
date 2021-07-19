@@ -119,6 +119,9 @@ public class HadoController : MonoBehaviour
     [DllImport("__Internal")]
     public static extern void UnityHoloKit_ActivateWatchConnectivitySession();
 
+    [DllImport("__Internal")]
+    public static extern void UnityHoloKit_SendMessageToAppleWatch(int messageIndex);
+
     /// <summary>
     /// This delegate function is called when a new message from Apple Watch is received.
     /// </summary>
