@@ -137,34 +137,41 @@ public class HadoController : MonoBehaviour
     [AOT.MonoPInvokeCallback(typeof(AppleWatchMessageReceived))]
     static void OnAppleWatchMessageReceived(int messageIndex)
     {
-        switch ((AppleWatchMessageType)messageIndex)
+        if ((AppleWatchMessageType)messageIndex == AppleWatchMessageType.StartGame)
         {
-            case (AppleWatchMessageType.StartGame):
-                //Debug.Log("[HadoController]: start game");
-                Instance.isReady = true;
-                break;
-            case (AppleWatchMessageType.Fire):
-                //Debug.Log("[HadoController]: fire");
-                Instance.nextControllerAction = HadoControllerAction.Fire;
-                break;
-            case (AppleWatchMessageType.CastShield):
-                //Debug.Log("[HadoController]: cast shield");
-                Instance.nextControllerAction = HadoControllerAction.CastShield;
-                break;
-            case (AppleWatchMessageType.StateChangedToNothing):
-                //Debug.Log("[HadoController]: state changed to nothing");
-                Instance.currentControllerState = HadoControllerState.Nothing;
-                break;
-            case (AppleWatchMessageType.StateChangedToUp):
-                //Debug.Log("[HadoController]: state changed to up");
-                Instance.currentControllerState = HadoControllerState.Up;
-                break;
-            case (AppleWatchMessageType.StateChangedToDown):
-                //Debug.Log("[HadoController]: state changed to down");
-                Instance.currentControllerState = HadoControllerState.Down;
-                break;
-            default:
-                break;
+            Instance.isReady = true;
+            return;
+        }
+        else
+        {
+            if (Instance.m_IsControllerActive)
+            {
+                switch ((AppleWatchMessageType)messageIndex)
+                {
+                    case (AppleWatchMessageType.Fire):
+                        //Debug.Log("[HadoController]: fire");
+                        Instance.nextControllerAction = HadoControllerAction.Fire;
+                        break;
+                    case (AppleWatchMessageType.CastShield):
+                        //Debug.Log("[HadoController]: cast shield");
+                        Instance.nextControllerAction = HadoControllerAction.CastShield;
+                        break;
+                    case (AppleWatchMessageType.StateChangedToNothing):
+                        //Debug.Log("[HadoController]: state changed to nothing");
+                        Instance.currentControllerState = HadoControllerState.Nothing;
+                        break;
+                    case (AppleWatchMessageType.StateChangedToUp):
+                        //Debug.Log("[HadoController]: state changed to up");
+                        Instance.currentControllerState = HadoControllerState.Up;
+                        break;
+                    case (AppleWatchMessageType.StateChangedToDown):
+                        //Debug.Log("[HadoController]: state changed to down");
+                        Instance.currentControllerState = HadoControllerState.Down;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
     [DllImport("__Internal")]
@@ -178,11 +185,14 @@ public class HadoController : MonoBehaviour
     [AOT.MonoPInvokeCallback(typeof(DoctorStrangeMessageReceived))]
     static void OnDoctorStrangeMessageReceived(int circleNum)
     {
-        Debug.Log($"[HadoController]: Doctor Strange circle number {circleNum}");
-        Instance.m_DoctorStrangeCircleNum = circleNum;
-        if (circleNum == 1)
+        if (Instance.m_IsControllerActive)
         {
-            Instance.nextControllerAction = HadoControllerAction.CastDoctorStrangeCircle;
+            Debug.Log($"[HadoController]: Doctor Strange circle number {circleNum}");
+            Instance.m_DoctorStrangeCircleNum = circleNum;
+            if (circleNum == 1)
+            {
+                Instance.nextControllerAction = HadoControllerAction.CastDoctorStrangeCircle;
+            }
         }
     }
     [DllImport("__Internal")]
@@ -300,5 +310,8 @@ public class HadoController : MonoBehaviour
         m_CurrentAttackNum = 0;
         m_CurrentShieldRecharge = 0f;
         m_CurrentShieldNum = 0;
+        m_CurrentControllerState = HadoControllerState.Nothing;
+        m_NextControllerAction = HadoControllerAction.Nothing;
+        m_DoctorStrangeCircleNum = 0;
     }
 }

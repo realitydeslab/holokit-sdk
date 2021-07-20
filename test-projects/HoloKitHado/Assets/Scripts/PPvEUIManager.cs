@@ -1,24 +1,31 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.HoloKit;
 using MLAPI;
 using MLAPI.Connection;
 using System.Runtime.InteropServices;
 
-public class HadoUIManager : MonoBehaviour
+public class PPvEUIManager : MonoBehaviour
 {
     // This class is a singleton.
-    private static HadoUIManager _instance;
+    private static PPvEUIManager _instance;
 
-    public static HadoUIManager Instance { get { return _instance; } }
+    public static PPvEUIManager Instance { get { return _instance; } }
 
-    private Button m_StartHostButton;
+    private Button m_StartAsBossButton;
 
-    private Button m_StartClientButton;
+    private Button m_StartAsPlayerButton;
 
-    private Button m_StartSpectatorButton;
+    private Button m_StartAsSpectatorButton;
 
     private Button m_SwitchRenderingModeButton;
+
+    private Button m_StartSpawnBossButton;
+
+    private Button m_SpawnBossButton;
+
+    private Button m_CancelSpawnBossButton;
 
     private Text m_Connection;
 
@@ -31,6 +38,10 @@ public class HadoUIManager : MonoBehaviour
     [SerializeField] private GameObject m_Volume;
 
     [SerializeField] private GameObject m_Reticle;
+
+    [SerializeField] private GameObject m_BossController;
+
+    [SerializeField] private GameObject m_PlacementIndicator;
 
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_GetRenderingMode();
@@ -78,20 +89,33 @@ public class HadoUIManager : MonoBehaviour
 
     private void Start()
     {
-        m_StartHostButton = transform.GetChild(0).GetComponent<Button>();
-        m_StartHostButton.onClick.AddListener(StartHost);
+        m_StartAsBossButton = transform.GetChild(0).GetComponent<Button>();
+        m_StartAsBossButton.onClick.AddListener(StartAsBoss);
 
-        m_StartClientButton = transform.GetChild(1).GetComponent<Button>();
-        m_StartClientButton.onClick.AddListener(StartClient);
+        m_StartAsPlayerButton = transform.GetChild(1).GetComponent<Button>();
+        m_StartAsPlayerButton.onClick.AddListener(StartAsPlayer);
 
-        m_StartSpectatorButton = transform.GetChild(2).GetComponent<Button>();
-        m_StartSpectatorButton.onClick.AddListener(StartSpectator);
+        m_StartAsSpectatorButton = transform.GetChild(2).GetComponent<Button>();
+        m_StartAsSpectatorButton.onClick.AddListener(StartAsSpectator);
 
         m_SwitchRenderingModeButton = transform.GetChild(3).GetComponent<Button>();
         m_SwitchRenderingModeButton.onClick.AddListener(SwitchRenderingMode);
 
         m_Connection = transform.GetChild(4).GetComponent<Text>();
         m_Sync = transform.GetChild(5).GetComponent<Text>();
+
+        m_StartSpawnBossButton = transform.GetChild(6).GetComponent<Button>();
+        m_StartSpawnBossButton.onClick.AddListener(StartSpawnBoss);
+
+        m_SpawnBossButton = transform.GetChild(7).GetComponent<Button>();
+        m_SpawnBossButton.onClick.AddListener(SpawnBoss);
+
+        m_CancelSpawnBossButton = transform.GetChild(8).GetComponent<Button>();
+        m_CancelSpawnBossButton.onClick.AddListener(CancelSpawnBoss);
+
+        m_StartSpawnBossButton.gameObject.SetActive(false);
+        m_SpawnBossButton.gameObject.SetActive(false);
+        m_CancelSpawnBossButton.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -126,21 +150,22 @@ public class HadoUIManager : MonoBehaviour
         }
     }
 
-    private void StartHost()
+    private void StartAsBoss()
     {
         NetworkManager.Singleton.StartHost();
         DisableHostClientButtons();
-        GetLocalPlayer().IsSpectator = false;
+        m_StartSpawnBossButton.gameObject.SetActive(true);
+        HoloKitSettings.Instance.EnablePlaneDetection(true);
     }
 
-    private void StartClient()
+    private void StartAsPlayer()
     {
         NetworkManager.Singleton.StartClient();
         DisableHostClientButtons();
         GetLocalPlayer().IsSpectator = false;
     }
 
-    private void StartSpectator()
+    private void StartAsSpectator()
     {
         NetworkManager.Singleton.StartClient();
         DisableHostClientButtons();
@@ -148,9 +173,9 @@ public class HadoUIManager : MonoBehaviour
 
     private void DisableHostClientButtons()
     {
-        m_StartHostButton.gameObject.SetActive(false);
-        m_StartClientButton.gameObject.SetActive(false);
-        m_StartSpectatorButton.gameObject.SetActive(false);
+        m_StartAsBossButton.gameObject.SetActive(false);
+        m_StartAsPlayerButton.gameObject.SetActive(false);
+        m_StartAsSpectatorButton.gameObject.SetActive(false);
     }
 
     private void SwitchRenderingMode()
@@ -173,6 +198,31 @@ public class HadoUIManager : MonoBehaviour
             m_Volume.SetActive(false);
             m_Reticle.SetActive(false);
         }
+    }
+
+    private void StartSpawnBoss()
+    {
+        m_SpawnBossButton.gameObject.SetActive(true);
+        m_CancelSpawnBossButton.gameObject.SetActive(true);
+        // TODO: Open the ray caster
+        m_PlacementIndicator.gameObject.SetActive(true);
+    }
+
+    private void SpawnBoss()
+    {
+        m_SpawnBossButton.gameObject.SetActive(false);
+        m_CancelSpawnBossButton.gameObject.SetActive(false);
+        // TODO: Spawn the boss
+
+    }
+
+    private void CancelSpawnBoss()
+    {
+        m_SpawnBossButton.gameObject.SetActive(false);
+        m_CancelSpawnBossButton.gameObject.SetActive(false);
+        m_StartSpawnBossButton.gameObject.SetActive(true);
+        // TODO: Disable the ray caster
+        m_PlacementIndicator.gameObject.SetActive(false);
     }
 
     private HadoPlayer GetLocalPlayer()

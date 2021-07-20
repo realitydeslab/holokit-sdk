@@ -16,6 +16,8 @@ public class HadoPlayer : NetworkBehaviour
 
     [SerializeField] private NetworkObject m_DoctorStrangeCirclePrefab;
 
+    [SerializeField] private NetworkObject m_BossPrefab;
+
     /// <summary>
     /// The offset from the center eye position to the spawn position of a new bullet.
     /// </summary>
@@ -37,6 +39,16 @@ public class HadoPlayer : NetworkBehaviour
     private bool m_IsRoundStarted = false;
 
     private bool m_IsStartRitualDone = false;
+
+    private bool m_IsSpectator = true;
+
+    public bool IsSpectator
+    {
+        set
+        {
+            m_IsSpectator = value;
+        }
+    }
 
     private Transform m_ARCamera;
 
@@ -60,10 +72,6 @@ public class HadoPlayer : NetworkBehaviour
             m_ARCamera = Camera.main.transform;
             HadoController.UnityHoloKit_ActivateWatchConnectivitySession();
             HadoController.UnityHoloKit_SendMessageToAppleWatch(0);
-            if (HadoUIManager.Instance.IsSpectator)
-            {
-                isReady.Value = true;
-            }
         }
     }
 
@@ -72,7 +80,14 @@ public class HadoPlayer : NetworkBehaviour
         // Each device can only control the player instance of their own.
         if (!IsOwner) { return; }
 
-        if (HadoUIManager.Instance.IsSpectator) { return; }
+        if (m_IsSpectator)
+        {
+            if (!isReady.Value)
+            {
+                isReady.Value = true;
+            }
+            return;
+        }
 
         // Am I ready?
         if (!isReady.Value && HadoController.Instance.isReady)
@@ -233,7 +248,7 @@ public class HadoPlayer : NetworkBehaviour
     {
         if (!IsOwner) { return; }
 
-        if (!HadoUIManager.Instance.IsSpectator)
+        if (!m_IsSpectator)
         {
             isReady.Value = false;
         }
@@ -253,5 +268,15 @@ public class HadoPlayer : NetworkBehaviour
         HadoController.Instance.isControllerActive = false;
         HadoController.Instance.isReady = false;
         HadoController.Instance.ReleaseAllEnergy();
+    }
+
+    [ServerRpc]
+    public void SpawnBossServerRpc(Vector3 position, Quaternion rotation)
+    {
+        if (m_BossPrefab != null)
+        {
+            var bossInstance = Instantiate(m_BossPrefab, position, rotation);
+            bossInstance.Spawn();
+        }
     }
 }

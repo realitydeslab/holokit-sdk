@@ -302,7 +302,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             Debug.Log($"[MultipeerConnectivityTransport]: DisconnectRemoteClient() {Time.time}");
 
-            // TODO: To be tested.
+            // TODO: This is not correct, we should disconnect one client at a time.
             UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI();
         }
 
