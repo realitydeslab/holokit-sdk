@@ -122,8 +122,8 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
             //[self.wcSession activateSession];
         }
         
-        frame_count = 0;
-        last_frame_time = 0.0f;
+//        frame_count = 0;
+//        last_frame_time = 0.0f;
     }
     return self;
 }

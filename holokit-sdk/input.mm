@@ -85,8 +85,8 @@ public:
         HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
-        input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandLeft);
-        input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandRight);
+        //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandLeft);
+        //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandRight);
         
         //ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
         
@@ -97,8 +97,8 @@ public:
         HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Stop()", GetCurrentTime());
         
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
-        input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandLeft);
-        input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandRight);
+        //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandLeft);
+        //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandRight);
     }
     
     UnitySubsystemErrorCode Tick() {
@@ -215,8 +215,6 @@ public:
     }
     
 #pragma mark - UpdateDeviceState()
-    
-    
     
     UnitySubsystemErrorCode UpdateDeviceState(
         UnityXRInternalInputDeviceId device_id, UnityXRInputUpdateType update_type, UnityXRInputDeviceState* state) {
