@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR.HoloKit;
 using MLAPI;
 using MLAPI.Messaging;
@@ -40,16 +41,6 @@ public class HadoPlayer : NetworkBehaviour
 
     private bool m_IsStartRitualDone = false;
 
-    private bool m_IsSpectator = true;
-
-    public bool IsSpectator
-    {
-        set
-        {
-            m_IsSpectator = value;
-        }
-    }
-
     private Transform m_ARCamera;
 
     private AudioSource m_AudioSource;
@@ -59,6 +50,8 @@ public class HadoPlayer : NetworkBehaviour
     [SerializeField] private AudioClip m_DefeatAudioClip;
 
     [SerializeField] private AudioClip m_VictoryAudioClip;
+
+    private bool m_IsSpectator;
 
     // TODO: Adjust this value.
     private float m_BulletSpeed = 400f;
@@ -72,6 +65,15 @@ public class HadoPlayer : NetworkBehaviour
             m_ARCamera = Camera.main.transform;
             HadoController.UnityHoloKit_ActivateWatchConnectivitySession();
             HadoController.UnityHoloKit_SendMessageToAppleWatch(0);
+
+            if (SceneManager.GetActiveScene().name.Equals("HadoTestScene"))
+            {
+                m_IsSpectator = HadoUIManager.Instance.IsSpectator;
+            }
+            else if (SceneManager.GetActiveScene().name.Equals("PPvE"))
+            {
+                m_IsSpectator = PPvEUIManager.Instance.IsSpectator;
+            }
         }
     }
 
@@ -277,6 +279,7 @@ public class HadoPlayer : NetworkBehaviour
         {
             var bossInstance = Instantiate(m_BossPrefab, position, rotation);
             bossInstance.Spawn();
+            isReady.Value = true;
         }
     }
 }

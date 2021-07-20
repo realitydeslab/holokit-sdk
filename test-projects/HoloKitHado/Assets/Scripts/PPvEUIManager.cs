@@ -39,9 +39,14 @@ public class PPvEUIManager : MonoBehaviour
 
     [SerializeField] private GameObject m_Reticle;
 
-    [SerializeField] private GameObject m_BossController;
+    [SerializeField] private GameObject m_PlacementIndicator;
 
-    [SerializeField] private PlacementIndicator m_PlacementIndicator;
+    private bool m_IsSpectator = false;
+
+    public bool IsSpectator
+    {
+        get => m_IsSpectator;
+    }
 
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_GetRenderingMode();
@@ -152,6 +157,7 @@ public class PPvEUIManager : MonoBehaviour
 
     private void StartAsBoss()
     {
+        m_IsSpectator = false;
         NetworkManager.Singleton.StartHost();
         DisableHostClientButtons();
         m_StartSpawnBossButton.gameObject.SetActive(true);
@@ -160,13 +166,14 @@ public class PPvEUIManager : MonoBehaviour
 
     private void StartAsPlayer()
     {
+        m_IsSpectator = false;
         NetworkManager.Singleton.StartClient();
         DisableHostClientButtons();
-        GetLocalPlayer().IsSpectator = false;
     }
 
     private void StartAsSpectator()
     {
+        m_IsSpectator = true;
         NetworkManager.Singleton.StartClient();
         DisableHostClientButtons();
     }
@@ -202,6 +209,7 @@ public class PPvEUIManager : MonoBehaviour
 
     private void StartSpawnBoss()
     {
+        m_StartSpawnBossButton.gameObject.SetActive(false);
         m_SpawnBossButton.gameObject.SetActive(true);
         m_CancelSpawnBossButton.gameObject.SetActive(true);
         // TODO: Open the ray caster
@@ -210,14 +218,15 @@ public class PPvEUIManager : MonoBehaviour
 
     private void SpawnBoss()
     {
-        if (!m_PlacementIndicator.IsPlacementPoseValid) { return; }
+        if (!m_PlacementIndicator.GetComponent<PlacementIndicator>().IsPlacementPoseValid) { return; }
 
         m_SpawnBossButton.gameObject.SetActive(false);
         m_CancelSpawnBossButton.gameObject.SetActive(false);
-        m_BossController.gameObject.SetActive(true);
+        m_StartSpawnBossButton.gameObject.SetActive(true);
         // TODO: Spawn the boss
-        Pose bossSpawnPose = m_PlacementIndicator.PlacementPose;
+        Pose bossSpawnPose = m_PlacementIndicator.GetComponent<PlacementIndicator>().PlacementPose;
         GetLocalPlayer().SpawnBossServerRpc(bossSpawnPose.position + new Vector3(0f, 0.3f, 0f), bossSpawnPose.rotation);
+        m_PlacementIndicator.gameObject.SetActive(false);
     }
 
     private void CancelSpawnBoss()

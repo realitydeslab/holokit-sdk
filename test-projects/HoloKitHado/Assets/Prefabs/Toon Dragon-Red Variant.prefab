@@ -1,5 +1,34 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!54 &288099613704730937
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2730936680610697532}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &1367576504914639019
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2730936680610697532}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.7073289, y: 3.024422, z: 3.1097047}
+  m_Center: {x: -0.024390418, y: 1.5244136, z: 0.46900737}
 --- !u!114 &525352213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12,8 +41,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a29a40a84ea4b7c4fb0bd76844df2f8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_rotateSpeed: 100
-  m_walkSpeed: 3
+  m_rotateSpeed: 60
+  m_walkSpeed: 1
 --- !u!114 &525352214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26,7 +55,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FixedSendsPerSecond: 20
+  FixedSendsPerSecond: 60
   AssumeSyncedSends: 1
   InterpolatePosition: 1
   SnapDistance: 10
@@ -86,14 +115,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2730936680610697532}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SendRate: 0.1
   m_Animator: {fileID: 2730936680603285826}
-  m_TrackedParamFlags: 4194303
+  m_TrackedParamFlags: 3670016
 --- !u!1001 &2730936680610757902
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -108,6 +137,18 @@ PrefabInstance:
     - target: {fileID: 412146, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 412146, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 412146, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 412146, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 412146, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -148,6 +189,10 @@ PrefabInstance:
     - target: {fileID: 412146, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 412146, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}

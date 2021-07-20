@@ -8,6 +8,8 @@ TagManager:
   - LandmarkRight
   - Bullet
   - Shield
+  - Plane
+  - Enemy
   layers:
   - Default
   - TransparentFX

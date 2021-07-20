@@ -32,6 +32,13 @@ public class HadoUIManager : MonoBehaviour
 
     [SerializeField] private GameObject m_Reticle;
 
+    private bool m_IsSpectator = false;
+
+    public bool IsSpectator
+    {
+        get => m_IsSpectator;
+    }
+
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_GetRenderingMode();
 
@@ -128,20 +135,21 @@ public class HadoUIManager : MonoBehaviour
 
     private void StartHost()
     {
+        m_IsSpectator = false;
         NetworkManager.Singleton.StartHost();
         DisableHostClientButtons();
-        GetLocalPlayer().IsSpectator = false;
     }
 
     private void StartClient()
     {
+        m_IsSpectator = false;
         NetworkManager.Singleton.StartClient();
         DisableHostClientButtons();
-        GetLocalPlayer().IsSpectator = false;
     }
 
     private void StartSpectator()
     {
+        m_IsSpectator = true;
         NetworkManager.Singleton.StartClient();
         DisableHostClientButtons();
     }

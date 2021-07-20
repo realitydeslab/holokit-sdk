@@ -44,7 +44,7 @@ public class HadoBullet : NetworkBehaviour
     {
         if (IsServer)
         {
-            if (other.tag.Equals("Shield"))
+            if (other.tag.Equals("Shield") || other.tag.Equals("Enemy"))
             {
                 StartCoroutine(WaitForDestroy());
             }            

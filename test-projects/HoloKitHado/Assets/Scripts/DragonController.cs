@@ -16,13 +16,15 @@ public class DragonController : NetworkBehaviour
 
     private void Awake()
     {
-        //if (!IsOwner) { return; }
-        m_animator = GetComponent<Animator>();
+        if (IsOwner)
+        {
+            m_animator = GetComponent<Animator>();
+        }
     }
 
     private void Update()
     {
-        //if (!IsOwner) { return; }
+        if (!IsOwner) { return; }
 
         Movement();
     }
@@ -81,5 +83,10 @@ public class DragonController : NetworkBehaviour
         {
 
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!IsServer) { return; }
     }
 }
