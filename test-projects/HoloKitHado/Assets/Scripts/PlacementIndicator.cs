@@ -11,8 +11,16 @@ public class PlacementIndicator : MonoBehaviour
     private Camera m_ARCamera;
 
     private Pose m_PlacementPose;
+    public Pose PlacementPose
+    {
+        get => m_PlacementPose;
+    }
 
     private bool m_IsPlacementPoseValid = false;
+    public bool IsPlacementPoseValid
+    {
+        get => m_IsPlacementPoseValid;
+    }
 
     private void Start()
     {

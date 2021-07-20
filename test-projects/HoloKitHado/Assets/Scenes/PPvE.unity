@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -140,7 +140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1370447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,6 +186,8 @@ MonoBehaviour:
     - Prefab: {fileID: 5034302601284621400, guid: fbe60f3144835460b975eecddb6ceeee, type: 3}
       PlayerPrefab: 1
     - Prefab: {fileID: 2562388930272273525, guid: 3e28bc590691c42a09a3928b2a1ad9b1, type: 3}
+      PlayerPrefab: 1
+    - Prefab: {fileID: 2730936680610697532, guid: 9985176a4c8e9c941954f1a419b2f23b, type: 3}
       PlayerPrefab: 1
     PlayerPrefabHash:
       rid: 356237672928247808
@@ -250,7 +252,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &133917423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -736,7 +738,7 @@ Transform:
   m_Children:
   - {fileID: 1838199273}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &462282273
 GameObject:
@@ -1171,7 +1173,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4792107450263945564, guid: 0643d132ca78349c1a6e6be64b4e3cc7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0643d132ca78349c1a6e6be64b4e3cc7, type: 3}
@@ -1192,7 +1194,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &619367923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1419,7 +1421,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &782628376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1907,7 +1909,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3570850919120543371, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3570850919165092328, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
       propertyPath: m_IsActive
@@ -2129,50 +2131,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1456135031}
   m_CullTransparentMesh: 1
---- !u!1 &1459587477
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1459587479}
-  - component: {fileID: 1459587478}
-  m_Layer: 0
-  m_Name: HadoBossController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1459587478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459587477}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94854628776c048c0bf71d104d8118c5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1459587479
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459587477}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 9
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1559648301
 GameObject:
   m_ObjectHideFlags: 0
@@ -2634,7 +2592,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1941837441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2739,8 +2697,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Volume: {fileID: 1792789290}
   m_Reticle: {fileID: 223974227}
-  m_BossController: {fileID: 1459587477}
-  m_PlacementIndicator: {fileID: 373128385}
+  m_BossController: {fileID: 0}
+  m_PlacementIndicator: {fileID: 0}
 --- !u!1 &2066138522
 GameObject:
   m_ObjectHideFlags: 0

@@ -41,7 +41,7 @@ public class PPvEUIManager : MonoBehaviour
 
     [SerializeField] private GameObject m_BossController;
 
-    [SerializeField] private GameObject m_PlacementIndicator;
+    [SerializeField] private PlacementIndicator m_PlacementIndicator;
 
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_GetRenderingMode();
@@ -210,11 +210,14 @@ public class PPvEUIManager : MonoBehaviour
 
     private void SpawnBoss()
     {
+        if (!m_PlacementIndicator.IsPlacementPoseValid) { return; }
+
         m_SpawnBossButton.gameObject.SetActive(false);
         m_CancelSpawnBossButton.gameObject.SetActive(false);
         m_BossController.gameObject.SetActive(true);
         // TODO: Spawn the boss
-
+        Pose bossSpawnPose = m_PlacementIndicator.PlacementPose;
+        GetLocalPlayer().SpawnBossServerRpc(bossSpawnPose.position + new Vector3(0f, 0.3f, 0f), bossSpawnPose.rotation);
     }
 
     private void CancelSpawnBoss()
