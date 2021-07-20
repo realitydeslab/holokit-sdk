@@ -34,6 +34,7 @@ public class PortalController : MonoBehaviour
         }
 
         if(m_lerp == countMax)
+
         {
             MagicComplete();
         }
