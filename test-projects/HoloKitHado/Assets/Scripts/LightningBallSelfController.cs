@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class LightningBallSelfController : MonoBehaviour
 {
-    public Vector3 SpawnPosition = Vector3.zero;
 
     // Start is called before the first frame update
     void Start()
@@ -15,6 +14,6 @@ public class LightningBallSelfController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        this.transform.position = SpawnPosition;
+        this.transform.position = Vector3.zero;
     }
 }

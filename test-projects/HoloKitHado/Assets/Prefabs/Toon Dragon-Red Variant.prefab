@@ -43,6 +43,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_rotateSpeed: 60
   m_walkSpeed: 1
+  m_OnHitAudioClip: {fileID: 0}
+  m_DragonBulletPrefab: {fileID: 6166771300442465374, guid: 37f8aa141f371664d99c55bc6a9b289f, type: 3}
 --- !u!114 &525352214
 MonoBehaviour:
   m_ObjectHideFlags: 0
