@@ -212,6 +212,7 @@ public class PPvEUIManager : MonoBehaviour
     {
         m_SpawnBossButton.gameObject.SetActive(false);
         m_CancelSpawnBossButton.gameObject.SetActive(false);
+        m_BossController.gameObject.SetActive(true);
         // TODO: Spawn the boss
 
     }
