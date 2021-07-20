@@ -19,19 +19,22 @@ public class HadoBullet : NetworkBehaviour
         m_AudioSource = GetComponent<AudioSource>();
         m_AudioSource.clip = m_FireAudioClip;
         m_AudioSource.Play();
-        m_Collider = GetComponent<SphereCollider>();
-        m_Collider.enabled = false;
+        if (IsServer)
+        {
+            m_Collider = GetComponent<SphereCollider>();
+            m_Collider.enabled = false;
+        } 
     }
 
     private void Update()
     {
-        if (++m_FrameCount == k_FrameToOpenCollider)
-        {
-            m_Collider.enabled = true;
-        }
-
         if (IsServer)
         {
+            if (++m_FrameCount == k_FrameToOpenCollider)
+            {
+                m_Collider.enabled = true;
+            }
+
             if (Vector3.Distance(transform.position, Vector3.zero) > 30f)
             {
                 // Detroy the bullet which is too far away from the battle field.
@@ -46,7 +49,7 @@ public class HadoBullet : NetworkBehaviour
         {
             if (other.tag.Equals("Shield") || other.tag.Equals("Enemy"))
             {
-                StartCoroutine(WaitForDestroy());
+                Destroy(gameObject);
             }            
         }
     }

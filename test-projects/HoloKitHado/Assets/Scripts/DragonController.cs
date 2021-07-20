@@ -19,24 +19,25 @@ public class DragonController : NetworkBehaviour
     Animator m_animator;
 
     private AudioSource m_AudioSource;
+
+    [SerializeField] private AudioClip m_AttackAudioClip;
+
     [SerializeField] private AudioClip m_OnHitAudioClip;
+
+    [SerializeField] private AudioClip m_WingsAudioClip;
+
+    [SerializeField] private AudioClip m_DeathAudioClip;
 
     [SerializeField] private NetworkObject m_DragonBulletPrefab;
 
-    private Vector3 m_DragonBulletSpawnOffset = new Vector3(0f, 0.5f, 0.5f);
+    private Vector3 m_DragonBulletSpawnOffset = new Vector3(0f, 1.6f, 1.0f);
 
     private float m_DragonBulletSpeed = 200f;
 
-    private void Awake()
-    {
-        if (IsOwner)
-        {
-            m_animator = GetComponent<Animator>();
-        }
-    }
     private void Start()
     {
         m_AudioSource = GetComponent<AudioSource>();
+        m_animator = GetComponent<Animator>();
         if (IsServer)
         {
             m_CurrentHeath = k_MaxHeath;
@@ -93,10 +94,11 @@ public class DragonController : NetworkBehaviour
 
         }
 
-        if (gamepad.aButton.isPressed)
+        if (gamepad.aButton.wasReleasedThisFrame)
         {
             AttackClientRpc();
-            var bulletInstance = Instantiate(m_DragonBulletPrefab, m_DragonBulletSpawnOffset, Quaternion.identity);
+            Vector3 dragonBulletSpawnPosition = transform.position + transform.TransformVector(m_DragonBulletSpawnOffset);
+            var bulletInstance = Instantiate(m_DragonBulletPrefab, dragonBulletSpawnPosition, Quaternion.identity);
             bulletInstance.Spawn();
 
             bulletInstance.GetComponent<Rigidbody>().AddForce(transform.forward * m_DragonBulletSpeed);
@@ -107,23 +109,22 @@ public class DragonController : NetworkBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
         if (!IsServer) { return; }
 
-        if (collision.transform.tag.Equals("Bullet"))
+        if (other.tag.Equals("Bullet"))
         {
             m_CurrentHeath--;
             if (m_CurrentHeath == 0)
             {
-                WaitAndDestroy(2f);
+                StartCoroutine(WaitAndDestroy(1.667f));
                 OnDeathClientRpc();
             }
             else
             {
                 OnHitClientRpc();
             }
-            
         }
     }
 
@@ -139,12 +140,17 @@ public class DragonController : NetworkBehaviour
     private void OnDeathClientRpc()
     {
         m_animator.SetTrigger("Fly Die");
+        m_AudioSource.clip = m_DeathAudioClip;
+        m_AudioSource.Play();
     }
 
     [ClientRpc]
     private void AttackClientRpc()
     {
+        Debug.Log("AttackClientRpc");
         m_animator.SetTrigger("Fly Projectile Attack");
+        m_AudioSource.clip = m_AttackAudioClip;
+        m_AudioSource.Play();
     }
 
     IEnumerator WaitAndDestroy(float time)

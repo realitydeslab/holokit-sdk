@@ -47,7 +47,7 @@ public class HadoGrantShield : NetworkBehaviour
     {
         if (!IsServer) { return; }
 
-        if (other.tag.Equals("Bullet"))
+        if (other.tag.Equals("Bullet") || other.tag.Equals("DragonBullet"))
         {
             m_CurrentHealth--;
 

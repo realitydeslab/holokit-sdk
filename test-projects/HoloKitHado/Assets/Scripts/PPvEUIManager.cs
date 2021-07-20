@@ -161,7 +161,7 @@ public class PPvEUIManager : MonoBehaviour
         NetworkManager.Singleton.StartHost();
         DisableHostClientButtons();
         m_StartSpawnBossButton.gameObject.SetActive(true);
-        HoloKitSettings.Instance.EnablePlaneDetection(true);
+        //HoloKitSettings.Instance.EnablePlaneDetection(true);
     }
 
     private void StartAsPlayer()

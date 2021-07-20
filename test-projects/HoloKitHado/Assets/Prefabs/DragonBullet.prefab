@@ -281,9 +281,10 @@ GameObject:
   - component: {fileID: 4450044804814435228}
   - component: {fileID: 1335522845514222167}
   - component: {fileID: 3466617076984266492}
+  - component: {fileID: 5578006835505114230}
   m_Layer: 0
   m_Name: DragonBullet
-  m_TagString: Bullet
+  m_TagString: DragonBullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -318,8 +319,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NetworkInstanceId: 0
-  PrefabHash: 4445844786776488259
-  PrefabHashGenerator: HadoBullet
+  PrefabHash: 2317649514816841304
+  PrefabHashGenerator: DragonBullet
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
 --- !u!114 &4450044804814435228
@@ -378,3 +379,15 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5578006835505114230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5330260697919111220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a06cb0480f05b4828b8bd507fc702538, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
