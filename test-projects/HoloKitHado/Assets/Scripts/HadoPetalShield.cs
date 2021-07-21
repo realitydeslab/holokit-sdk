@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR.HoloKit;
 using MLAPI;
 using MLAPI.Messaging;
@@ -102,16 +103,28 @@ public class HadoPetalShield : NetworkBehaviour
             if (m_CurrentHealth == 0)
             {
                 m_IsPresent = false;
-                // TODO: Play the shield broken animation
 
                 StartCoroutine(WaitForDestroy(0.3f));
-                ShouldDestroyAllInstances.Value = true;
 
-                // The owner of this shield loses.
-                var playerScript = GetPlayerScript();
-                if (playerScript != null)
+                
+                if (SceneManager.GetActiveScene().name.Equals("HadoTestScene"))
                 {
-                    playerScript.RoundOverServerRpc(OwnerClientId);
+                    // We only destroy other players' shield in PvP
+                    ShouldDestroyAllInstances.Value = true;
+                    // The owner of this shield loses.
+                    var playerScript = GetPlayerScript(NetworkManager.Singleton.LocalClientId);
+                    if (playerScript != null)
+                    {
+                        playerScript.RoundOverServerRpc(OwnerClientId);
+                    }
+                }
+                else if (SceneManager.GetActiveScene().name.Equals("PPvE"))
+                {
+                    var playerScript = GetPlayerScript(OwnerClientId);
+                    if (playerScript != null)
+                    {
+                        playerScript.ReviveClientRpc();
+                    }
                 }
             }
         }
@@ -131,10 +144,9 @@ public class HadoPetalShield : NetworkBehaviour
         Destroy(gameObject);
     }
 
-    private HadoPlayer GetPlayerScript()
+    private HadoPlayer GetPlayerScript(ulong clientId)
     {
-        ulong localClientId = NetworkManager.Singleton.LocalClientId;
-        if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(localClientId, out NetworkClient networkClient))
+        if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out NetworkClient networkClient))
         {
             return null;
         }

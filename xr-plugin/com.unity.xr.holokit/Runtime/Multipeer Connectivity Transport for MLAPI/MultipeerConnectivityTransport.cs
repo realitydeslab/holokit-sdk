@@ -1,9 +1,8 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using MLAPI.Transports.Tasks;
-using System;
-using System.Runtime.InteropServices;
 
 namespace MLAPI.Transports.MultipeerConnectivity
 {

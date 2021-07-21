@@ -153,6 +153,9 @@ VisualEffect:
       - m_Value: 1
         m_Name: Spawn Rate
         m_Overridden: 1
+      - m_Value: 1.2
+        m_Name: Scale
+        m_Overridden: 1
     m_Vector2f:
       m_Array: []
     m_Vector3f:
@@ -361,8 +364,8 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.16
-  m_Center: {x: 0.0034954895, y: 0, z: 0}
+  m_Radius: 0.64
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3466617076984266492
 Rigidbody:
   m_ObjectHideFlags: 0

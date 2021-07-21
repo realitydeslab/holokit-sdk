@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.HoloKit;
@@ -281,5 +282,22 @@ public class HadoPlayer : NetworkBehaviour
             bossInstance.Spawn();
             isReady.Value = true;
         }
+    }
+
+    [ClientRpc]
+    public void ReviveClientRpc()
+    {
+        if (IsOwner)
+        {
+            HadoController.Instance.isControllerActive = false;
+            HadoController.Instance.ReleaseAllEnergy();
+            StartCoroutine(WaitAndRevive(5f));
+        }
+    }
+
+    IEnumerator WaitAndRevive(float time)
+    {
+        yield return new WaitForSeconds(time);
+        m_IsStartRitualDone = false;
     }
 }

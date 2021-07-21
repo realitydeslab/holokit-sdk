@@ -41,6 +41,16 @@ public class DoctorStrangeCircle : NetworkBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!IsServer) { return; }
+
+        if (other.tag.Equals("DragonBullet"))
+        {
+            // TODO: Teleport 
+        }
+    }
+
     [ServerRpc]
     private void CircleNumUpdateServerRpc(int circleNum)
     {

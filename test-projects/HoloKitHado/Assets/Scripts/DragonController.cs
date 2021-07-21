@@ -30,9 +30,9 @@ public class DragonController : NetworkBehaviour
 
     [SerializeField] private NetworkObject m_DragonBulletPrefab;
 
-    private Vector3 m_DragonBulletSpawnOffset = new Vector3(0f, 1.6f, 1.0f);
+    [SerializeField] private Transform m_DragonMouse;
 
-    private float m_DragonBulletSpeed = 200f;
+    private float m_DragonBulletSpeed = 160f;
 
     private void Start()
     {
@@ -51,7 +51,6 @@ public class DragonController : NetworkBehaviour
         Movement();
     }
 
-
     void Movement()
     {
         m_rotation = transform.rotation.eulerAngles;
@@ -69,43 +68,43 @@ public class DragonController : NetworkBehaviour
 
         transform.position += transform.forward * move1.y * Time.deltaTime * m_walkSpeed + transform.right * move1.x * Time.deltaTime * m_walkSpeed;
 
-        //if (gamepad.leftStick.IsPressed())
-        //{
-        //    m_animator.SetBool("isMoving", true);
-        //    m_animator.SetFloat("F", move1.y);
-        //    m_animator.SetFloat("R", move1.x);
-        //}
-        //else
-        //{
-        //    m_animator.SetBool("isMoving", false);
-        //}
-
         if (gamepad.rightStick.IsPressed())
         {
 
         }
 
-        if (gamepad.yButton.isPressed)
+        if (gamepad.yButton.wasReleasedThisFrame)
         {
-
+            ScaleDragonClientRpc(1.1f);
         }
-        if (gamepad.xButton.isPressed)
-        {
 
+        if (gamepad.xButton.wasReleasedThisFrame)
+        {
+            ScaleDragonClientRpc(0.9f);
         }
 
         if (gamepad.aButton.wasReleasedThisFrame)
         {
             AttackClientRpc();
-            Vector3 dragonBulletSpawnPosition = transform.position + transform.TransformVector(m_DragonBulletSpawnOffset);
-            var bulletInstance = Instantiate(m_DragonBulletPrefab, dragonBulletSpawnPosition, Quaternion.identity);
+            var bulletInstance = Instantiate(m_DragonBulletPrefab, m_DragonMouse.position, Quaternion.identity);
             bulletInstance.Spawn();
 
             bulletInstance.GetComponent<Rigidbody>().AddForce(transform.forward * m_DragonBulletSpeed);
         }
+
         if (gamepad.bButton.isPressed)
         {
 
+        }
+
+        if (gamepad.leftTrigger.IsPressed())
+        {
+            transform.position -= new Vector3(0, 0.01f, 0);
+        }
+
+        if (gamepad.rightTrigger.IsPressed())
+        {
+            transform.position += new Vector3(0, 0.01f, 0);
         }
     }
 
@@ -157,5 +156,11 @@ public class DragonController : NetworkBehaviour
     {
         yield return new WaitForSeconds(time);
         Destroy(gameObject);
+    }
+
+    [ClientRpc]
+    private void ScaleDragonClientRpc(float value)
+    {
+        transform.localScale *= value;
     }
 }

@@ -130,23 +130,24 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
             break;
         case(5):
             // DefaultMessage
-            result = MCSessionSendDataReliable;
+            // TODO: Check again
+            result = MCSessionSendDataUnreliable;
             break;
         case(6):
             // PositionUpdate
-            result = MCSessionSendDataReliable;
+            result = MCSessionSendDataUnreliable;
             break;
         case(7):
             // AnimationUpdate
-            result = MCSessionSendDataReliable;
+            result = MCSessionSendDataUnreliable;
             break;
         case(8):
             // NavAgentState
-            result = MCSessionSendDataReliable;
+            result = MCSessionSendDataUnreliable;
             break;
         case(9):
             // NavAgentCorrection
-            result = MCSessionSendDataReliable;
+            result = MCSessionSendDataUnreliable;
             break;
         case(10):
             // ChannelUnused

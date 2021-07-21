@@ -24,7 +24,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2730936680610697532}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1.7073289, y: 3.024422, z: 3.1097047}
@@ -144,6 +144,7 @@ MonoBehaviour:
   m_WingsAudioClip: {fileID: 8300000, guid: ff006bc4a34df42a6ab45e29e52c7711, type: 3}
   m_DeathAudioClip: {fileID: 8300000, guid: f5cf60cc2a59f4503a5a10543b5cc5ce, type: 3}
   m_DragonBulletPrefab: {fileID: 6166771300442465374, guid: 37f8aa141f371664d99c55bc6a9b289f, type: 3}
+  m_DragonMouse: {fileID: 2730936680610815746}
 --- !u!114 &525352214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -289,5 +290,10 @@ PrefabInstance:
 --- !u!1 &2730936680610697532 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 126002, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
+  m_PrefabInstance: {fileID: 2730936680610757902}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2730936680610815746 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 467468, guid: 07d421e6f47c0424f97198e7ee8ce30c, type: 3}
   m_PrefabInstance: {fileID: 2730936680610757902}
   m_PrefabAsset: {fileID: 0}
