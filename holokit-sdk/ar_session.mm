@@ -174,8 +174,8 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
                 break;
             }
             case 2: {
-                //NSLog(@"Ping data");
-                // TODO: Did receive a Ping data
+                NSLog(@"Ping data");
+                // Did receive a Ping data
                 // Send a Pong message back
                 unsigned char pongMessageData[1];
                 pongMessageData[0] = (unsigned char)3;
@@ -184,8 +184,9 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
                 break;
             }
             case 3: {
-                //NSLog(@"Pong data");
-                // TODO: Did receive a Pong message
+                NSLog(@"Pong data");
+                // Did receive a Pong message
+                NSLog(@"[mc_session]: curernt rtt is %f", [[NSProcessInfo processInfo] systemUptime] - self.multipeerSession.lastPingTime);
                 unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
                 MultipeerPongMessageReceivedDelegate(clientId);
                 break;

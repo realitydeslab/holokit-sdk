@@ -77,6 +77,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// The lastest round trip time to the server as a client.
         /// This variable is not used on the server side.
         /// </summary>
+        [HideInInspector]
         public float CurrentRtt = 0f;
 
         /// <summary>
@@ -93,6 +94,11 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// The time interval for sending Ping messages.
         /// </summary>
         private const float k_PingInterval = 1f;
+
+        private int m_PintCount = 0;
+
+        [HideInInspector]
+        public int PongCount = 0;
 
         /// <summary>
         /// Initialize the MultipeerSession instance on Objective-C side.
@@ -121,14 +127,13 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_MultipeerStartAdvertising();
 
         /// <summary>
+        /// Send connection request message to the server.
         /// This delegate function is only called by a client.
         /// </summary>
         delegate void MultipeerSendConnectionRequestForMLAPI(ulong serverId);
         [AOT.MonoPInvokeCallback(typeof(MultipeerSendConnectionRequestForMLAPI))]
         static void OnMultipeerConnectionRequestSentForMLAPI(ulong serverId)
         {
-            // This delegate function gets called from Objective-C side when AR collaboration started.
-            // We start MLAPI connection right after that.
             Debug.Log("[MultipeerConnectivityTransport]: send multipeer connection request to MLAPI.");
 
             Instance.m_ServerId = serverId;
@@ -216,13 +221,16 @@ namespace MLAPI.Transports.MultipeerConnectivity
         [AOT.MonoPInvokeCallback(typeof(MultipeerPongMessageReceived))]
         static void OnMultipeerPongMessageReceived(ulong clientId)
         {
-            //Debug.Log($"Pong time: {Time.time}");
+            Debug.Log($"Pong time: {Time.time} with count {Instance.PongCount}");
             // The unit is millisecond.
             Instance.CurrentRtt = (Time.time - Instance.LastPingTime) * 1000;
-            Debug.Log($"Current Rtt {Instance.CurrentRtt}");
+            Debug.Log($"[MultipeerConnectivityTransport]: Current Rtt {Instance.CurrentRtt}");
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(MultipeerPongMessageReceived callback);
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_MultipeerSendPingMessageViaStream(ulong clientId);
 
         private void Awake()
         {
@@ -243,25 +251,6 @@ namespace MLAPI.Transports.MultipeerConnectivity
             UnityHoloKit_SetMultipeerDisconnectionMessageReceivedForMLAPIDelegate(OnMultipeerDisconnectionMessageReceivedForMLAPI);
             UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(OnPeerDataReceivedForMLAPI);
             UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(OnMultipeerPongMessageReceived);
-
-            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
-        }
-
-        private void OnDisable()
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
-        }
-
-        private void OnClientConnected(ulong clientId)
-        {
-            Debug.Log($"OnClientConnected {clientId}");
-        }
-
-        private void OnClientDisconnect(ulong clientId)
-        {
-            Debug.Log($"OnClientDisconnect {clientId}");
         }
 
         public override void Init()
@@ -304,8 +293,8 @@ namespace MLAPI.Transports.MultipeerConnectivity
                 if (Time.time - m_LastPingTime > k_PingInterval)
                 {
                     m_LastPingTime = Time.time;
-                    //Debug.Log($"Last Ping time: {Time.time}");
-                    UnityHoloKit_MultipeerSendPingMessage(m_ServerId);
+                    Debug.Log($"Last Ping time: {m_LastPingTime} with count {m_PintCount++}");
+                    UnityHoloKit_MultipeerSendPingMessageViaStream(m_ServerId);
                 }
             }
         }
@@ -355,7 +344,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
         public override void Send(ulong clientId, ArraySegment<byte> data, NetworkChannel networkChannel)
         {
-            Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId}");
+            //Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId}");
 
             // Convert ArraySegment to Array
             // https://stackoverflow.com/questions/5756692/arraysegment-returning-the-actual-segment-c-sharp

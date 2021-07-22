@@ -15,8 +15,6 @@ MultipeerSendConnectionRequestForMLAPI MultipeerSendConnectionRequestForMLAPIDel
 typedef void (*MultipeerDisconnectionMessageReceivedForMLAPI)(unsigned long clientId);
 MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageReceivedForMLAPIDelegate = NULL;
 
-
-
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
 @property (nonatomic, strong) NSString *serviceType;
@@ -26,6 +24,8 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 @property (nonatomic, strong) MCNearbyServiceBrowser *serviceBrowser;
 // Reference: http://fuckingblocksyntax.com/
 @property (nonatomic, copy, nullable) void (^receivedDataHandler)(NSData *, MCPeerID *);
+@property (nonatomic, strong, nullable) NSMutableDictionary<MCPeerID *, NSOutputStream *> *outputStreams;
+@property (nonatomic, strong, nullable) NSMutableArray<InputStreamForMLAPI *> *inputStreams;
 
 @end
 
@@ -54,6 +54,8 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
         self.receivedDataHandler = receivedDataHandler;
         
         self.connectedPeersForMLAPI = [[NSMutableArray alloc] init];
+        self.outputStreams = [[NSMutableDictionary alloc] init];
+        self.inputStreams = [[NSMutableArray alloc] init];
     }
 
     return self;
@@ -177,7 +179,15 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
         NSLog(@"[multipeer_session]: connected with peer %@.", peerID.displayName);
         if (self.isHost) {
             [self.connectedPeersForMLAPI addObject:peerID];
-            // TODO: Notify the host that there is a new peer joining the session.
+            // Set a byte stream channel
+            // https://gist.github.com/lucasecf/bde1d9bd3492f29b7534
+            NSOutputStream *newOutputStream = [session startStreamWithName:@"MLAPI" toPeer:peerID error:nil];
+            [self.outputStreams setObject:newOutputStream forKey:peerID];
+            if (newOutputStream != nil) {
+                newOutputStream.delegate = self;
+                [newOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+                [newOutputStream open];
+            }
             
         } else {
             // As a client, we only need to connect to the server.
@@ -186,6 +196,15 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
                 
                 unsigned long serverId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
                 NSLog(@"[multipeer_session]: send connection request to server %lu", serverId);
+                // TODO: Set the byte stream channel before MLAPI gets connected.
+                NSOutputStream *newOutputStream = [session startStreamWithName:@"MLAPI" toPeer:peerID error:nil];
+                [self.outputStreams setObject:newOutputStream forKey:peerID];
+                if (newOutputStream != nil) {
+                    //newOutputStream.delegate = self;
+                    [newOutputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+                    [newOutputStream open];
+                }
+                
                 MultipeerSendConnectionRequestForMLAPIDelegate(serverId);
             }
         }
@@ -198,7 +217,17 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 }
 
 - (void)session:(MCSession *)session didReceiveStream:(NSInputStream *)stream withName:(NSString *)streamName fromPeer:(MCPeerID *)peerID {
-    
+    NSLog(@"[mc_session]: did receive stream");
+    if ([streamName isEqual:@"MLAPI"]) {
+        if ([self.connectedPeersForMLAPI containsObject:peerID]) {
+            InputStreamForMLAPI *newInputStream = [[InputStreamForMLAPI alloc] initWithMultipeerSession:self peerID:peerID];
+            [self.inputStreams addObject:newInputStream];
+            stream.delegate = newInputStream;
+            [stream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+            [stream open];
+            NSLog(@"[mc_session]: intput stream opened");
+        }
+    }
 }
 
 - (void)session:(MCSession *)session didStartReceivingResourceWithName:(NSString *)resourceName fromPeer:(MCPeerID *)peerID withProgress:(NSProgress *)progress {
@@ -234,6 +263,40 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 }
 
 @end
+
+#pragma mark - StreamForMLAPI
+
+@interface InputStreamForMLAPI()
+
+@end
+
+@implementation InputStreamForMLAPI
+
+- (instancetype)initWithMultipeerSession:(MultipeerSession *)multipeerSession peerID:(MCPeerID *)peerID {
+    self = [super init];
+    if (self) {
+        self.multipeerSession = multipeerSession;
+        self.peerID = peerID;
+    }
+    return self;
+}
+
+// https://gist.github.com/lucasecf/bde1d9bd3492f29b7534
+// https://github.com/lianhuaren/cocoa/blob/04e46392d51018ed589e46d5114079d6ed3e3946/rtmp01/SGLivingPublisher-master/SGLivingPublisher/SGRTMPKit/Rtmp/SGStreamSession.m
+- (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode {
+    //NSLog(@"[input_stream]: did receive new stream data");
+    if (eventCode == NSStreamEventHasBytesAvailable) {
+        // TODO: Is this size appropriate?
+        uint8_t buffer[1024];
+        NSUInteger len = [(NSInputStream *)aStream read:buffer maxLength:sizeof(buffer)];
+        NSData *data = [NSData dataWithBytes:buffer length:len];
+        [self.multipeerSession session:self.multipeerSession.session didReceiveData:data fromPeer:self.peerID];
+    }
+}
+
+@end
+
+#pragma mark - extern "C"
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(MultipeerSendConnectionRequestForMLAPI callback) {
@@ -329,6 +392,26 @@ UnityHoloKit_MultipeerSendPingMessage(unsigned long clientId) {
             pingMessageData[0] = (unsigned char)2;
             NSData *dataReadyToBeSent = [NSData dataWithBytes:pingMessageData length:sizeof(pingMessageData)];
             [session sendToPeer:dataReadyToBeSent peer:peerId mode:MCSessionSendDataUnreliable];
+            return;
+        }
+    }
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerSendPingMessageViaStream(unsigned long clientId) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    MultipeerSession *multipeerSession = ar_session_delegate_controller.multipeerSession;
+    for (MCPeerID *peerId in multipeerSession.connectedPeersForMLAPI) {
+        if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
+            // Prepare the Ping message
+            unsigned char pingMessageData[1];
+            pingMessageData[0] = (unsigned char)2;
+            NSData *dataReadyToBeSent = [NSData dataWithBytes:pingMessageData length:sizeof(pingMessageData)];
+            if (multipeerSession.outputStreams[peerId] != nil) {
+                //NSLog(@"[mc_session]: write to output stream");
+                multipeerSession.lastPingTime = [[NSProcessInfo processInfo] systemUptime];
+                [multipeerSession.outputStreams[peerId] write:dataReadyToBeSent.bytes maxLength:dataReadyToBeSent.length];
+            }
             return;
         }
     }
