@@ -50,10 +50,6 @@ public class PPvEUIManager : MonoBehaviour
         get => m_IsSpectator;
     }
 
-    private float m_LastRttUpdateTime = 0f;
-
-    private const float k_RttUpdateInterval = 1.0f;
-
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_GetRenderingMode();
 
@@ -162,15 +158,7 @@ public class PPvEUIManager : MonoBehaviour
             }
         }
 
-        if (Time.time - m_LastRttUpdateTime > k_RttUpdateInterval)
-        {
-            m_LastRttUpdateTime = Time.time;
-            m_Rtts.text = "Rtt: ";
-            foreach(var rtt in MultipeerConnectivityTransport.Instance.ConnectedClientsRtt.Values)
-            {
-                m_Rtts.text += $"{rtt} ";
-            }
-        }
+        m_Rtts.text = $"Rtt: {MultipeerConnectivityTransport.Instance.CurrentRtt}";
     }
 
     private void StartAsBoss()

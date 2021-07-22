@@ -26,6 +26,7 @@
 #import <ARKit/ARKit.h>
 #import <CoreVideo/CoreVideo.h>
 #import <CoreMotion/CoreMotion.h>
+#import <CoreLocation/CoreLocation.h>
 #import "profiling_data.h"
 
 #define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
@@ -65,7 +66,7 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
 typedef void (*MultipeerPongMessageReceived)(unsigned long clientId);
 MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
 
-@interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate>
+@interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
 @property (nonatomic, strong) NSOperationQueue* motionQueue;
@@ -77,6 +78,8 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
 @property (nonatomic, strong) CMMotionManager* motionManager;
 @property (assign) bool isARWorldMapSynced;
 @property (nonatomic, strong) WCSession *wcSession;
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, strong) CLLocation *currentLocation;
 
 @end
 
@@ -195,6 +198,22 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
     };
     self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
     self.isARWorldMapSynced = false;
+}
+
+- (void)initCoreLocationManager {
+    self.locationManager = [[CLLocationManager alloc] init];
+    // TODO: Adjust this.
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    self.locationManager.delegate = self;
+    [self.locationManager requestWhenInUseAuthorization];
+}
+
+- (void)startUpdatingLocation {
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)stopUpdatingLocation {
+    [self.locationManager stopUpdatingLocation];
 }
 
 - (void)startAccelerometer {
@@ -754,6 +773,18 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
     } else if (id value = [message objectForKey:@"strange"]) {
         NSInteger circleNum = [value integerValue];
         DoctorStrangeMessageReceivedDelegate((int)circleNum);
+    }
+}
+
+#pragma mark - CLLocationManagerDelegate
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
+    if (locations[0] != nil) {
+        self.currentLocation = locations[0];
+        NSLog(@"[core_location]: latitude %f, longitude %f and altitude %f", self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude, self.currentLocation.altitude);
+        // TODO: Update the location date in Unity
+        
+        [manager stopUpdatingLocation];
     }
 }
 

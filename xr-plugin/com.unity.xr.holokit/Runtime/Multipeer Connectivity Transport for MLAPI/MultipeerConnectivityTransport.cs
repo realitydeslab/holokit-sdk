@@ -73,8 +73,11 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// </summary>
         public bool IsRttAvailable = true;
 
-        [HideInInspector]
-        public Dictionary<ulong, float> ConnectedClientsRtt = new Dictionary<ulong, float>();
+        /// <summary>
+        /// The lastest round trip time to the server as a client.
+        /// This variable is not used on the server side.
+        /// </summary>
+        public float CurrentRtt = 0f;
 
         /// <summary>
         /// The time when the system sents the last Ping message.
@@ -213,9 +216,10 @@ namespace MLAPI.Transports.MultipeerConnectivity
         [AOT.MonoPInvokeCallback(typeof(MultipeerPongMessageReceived))]
         static void OnMultipeerPongMessageReceived(ulong clientId)
         {
-            Debug.Log($"Pong time: {Time.time}");
+            //Debug.Log($"Pong time: {Time.time}");
             // The unit is millisecond.
-            Instance.ConnectedClientsRtt[clientId] = (Time.time - Instance.LastPingTime) * 1000;
+            Instance.CurrentRtt = (Time.time - Instance.LastPingTime) * 1000;
+            Debug.Log($"Current Rtt {Instance.CurrentRtt}");
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(MultipeerPongMessageReceived callback);
@@ -295,19 +299,13 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
         private void Update()
         {
-            if (IsRttAvailable)
+            if (NetworkManager.Singleton.IsConnectedClient && IsRttAvailable)
             {
                 if (Time.time - m_LastPingTime > k_PingInterval)
                 {
-                    foreach (var clientId in NetworkManager.Singleton.ConnectedClients.Keys)
-                    {
-                        if (clientId != m_ClientId)
-                        {
-                            m_LastPingTime = Time.time;
-                            Debug.Log($"Last Ping time: {Time.time}");
-                            UnityHoloKit_MultipeerSendPingMessage(clientId);
-                        }
-                    }
+                    m_LastPingTime = Time.time;
+                    //Debug.Log($"Last Ping time: {Time.time}");
+                    UnityHoloKit_MultipeerSendPingMessage(m_ServerId);
                 }
             }
         }
@@ -370,11 +368,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             Debug.Log($"[MultipeerConnectivityTransport]: GetCurrentRtt() {Time.time}");
 
-            if (ConnectedClientsRtt.ContainsKey(clientId))
-            {
-                return(ulong)ConnectedClientsRtt[clientId];
-            }
-            return 0;
+            return (ulong)CurrentRtt;
         }
 
         public override void DisconnectLocalClient()
