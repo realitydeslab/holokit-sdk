@@ -162,11 +162,11 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback);
 
         /// <summary>
-        /// Tell all peers connected through the multipeer connectivity network to disconnect.
+        /// Notify a peer to disconnect.
         /// This function should only be called on the server side.
         /// </summary>
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI();
+        private static extern void UnityHoloKit_MultipeerDisconnectPeerForMLAPI(ulong clientId);
 
         /// <summary>
         /// Disconnect from the multipeer connectivity network.
@@ -286,6 +286,8 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             Debug.Log($"[MultipeerConnectivityTransport]: GetCurrentRtt() {Time.time}");
             // TODO: Implement this.
+
+
             return 0;
         }
 
@@ -302,7 +304,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
             Debug.Log($"[MultipeerConnectivityTransport]: DisconnectRemoteClient() {Time.time}");
 
             // TODO: This is not correct, we should disconnect one client at a time.
-            UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI();
+            UnityHoloKit_MultipeerDisconnectPeerForMLAPI(clientId);
         }
 
         public override void Shutdown()
