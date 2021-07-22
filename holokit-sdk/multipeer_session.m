@@ -131,7 +131,7 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
         case(5):
             // DefaultMessage
             // TODO: Check again
-            result = MCSessionSendDataUnreliable;
+            result = MCSessionSendDataReliable;
             break;
         case(6):
             // PositionUpdate

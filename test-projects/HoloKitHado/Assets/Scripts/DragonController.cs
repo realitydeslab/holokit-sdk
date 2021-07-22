@@ -34,6 +34,10 @@ public class DragonController : NetworkBehaviour
 
     private float m_DragonBulletSpeed = 160f;
 
+    private float m_LastFireTime = 0f;
+
+    private const float k_FireCoolDownTime = 1.2f;
+
     private void Start()
     {
         m_AudioSource = GetComponent<AudioSource>();
@@ -85,11 +89,17 @@ public class DragonController : NetworkBehaviour
 
         if (gamepad.aButton.wasReleasedThisFrame)
         {
-            AttackClientRpc();
-            var bulletInstance = Instantiate(m_DragonBulletPrefab, m_DragonMouse.position, Quaternion.identity);
-            bulletInstance.Spawn();
-
-            bulletInstance.GetComponent<Rigidbody>().AddForce(transform.forward * m_DragonBulletSpeed);
+            if (Time.time - m_LastFireTime > k_FireCoolDownTime)
+            {
+                m_LastFireTime = Time.time;
+                AttackClientRpc();
+                var bulletInstance = Instantiate(m_DragonBulletPrefab, m_DragonMouse.position, Quaternion.identity);
+                if (bulletInstance.TryGetComponent<DragonBullet>(out var bulletScript))
+                {
+                    bulletScript.InitialForce.Value = transform.forward * m_DragonBulletSpeed;
+                }
+                bulletInstance.Spawn();
+            }
         }
 
         if (gamepad.bButton.isPressed)

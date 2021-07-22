@@ -1,6 +1,6 @@
-using System.Collections;
 using UnityEngine;
 using MLAPI;
+using MLAPI.NetworkVariable;
 
 public class HadoBullet : NetworkBehaviour
 {
@@ -14,6 +14,12 @@ public class HadoBullet : NetworkBehaviour
 
     private int k_FrameToOpenCollider = 5;
 
+    public NetworkVariableVector3 InitialForce = new NetworkVariableVector3(new NetworkVariableSettings
+    {
+        WritePermission = NetworkVariablePermission.OwnerOnly,
+        ReadPermission = NetworkVariablePermission.Everyone
+    }, Vector3.zero);
+
     private void Start()
     {
         m_AudioSource = GetComponent<AudioSource>();
@@ -23,7 +29,9 @@ public class HadoBullet : NetworkBehaviour
         {
             m_Collider = GetComponent<SphereCollider>();
             m_Collider.enabled = false;
-        } 
+        }
+
+        GetComponent<Rigidbody>().AddForce(InitialForce.Value);
     }
 
     private void Update()
@@ -52,11 +60,5 @@ public class HadoBullet : NetworkBehaviour
                 Destroy(gameObject);
             }            
         }
-    }
-
-    IEnumerator WaitForDestroy()
-    {
-        yield return new WaitForSeconds(0.1f);
-        Destroy(gameObject);
     }
 }

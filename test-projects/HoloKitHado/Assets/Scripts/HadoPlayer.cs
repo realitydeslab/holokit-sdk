@@ -193,10 +193,10 @@ public class HadoPlayer : NetworkBehaviour
     private void FireServerRpc(Vector3 position, Vector3 direction)
     {
         var bulletInstance = Instantiate(m_BulletPrefab, position, Quaternion.identity);
-        // Only the owner of the NetworkObject can add force to it.
+        if(bulletInstance.TryGetComponent<HadoBullet>(out var bulletScript)) {
+            bulletScript.InitialForce.Value = direction * m_BulletSpeed;
+        }
         bulletInstance.Spawn();
-
-        bulletInstance.GetComponent<Rigidbody>().AddForce(direction * m_BulletSpeed);
     }
 
     [ServerRpc]

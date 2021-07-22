@@ -273,7 +273,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
 
         public override void Send(ulong clientId, ArraySegment<byte> data, NetworkChannel networkChannel)
         {
-            //Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId}");
+            Debug.Log($"[MultipeerConnectivityTransport]: Send() with network channel {networkChannel} to clientId {clientId}");
 
             // Convert ArraySegment to Array
             // https://stackoverflow.com/questions/5756692/arraysegment-returning-the-actual-segment-c-sharp

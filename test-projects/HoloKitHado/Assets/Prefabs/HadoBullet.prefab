@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3052240294432383533}
   - component: {fileID: 7153235707511637825}
-  - component: {fileID: 797167950043025539}
   - component: {fileID: 2307754798560519309}
   - component: {fileID: 3394865553355362643}
   - component: {fileID: 8192698344979357259}
@@ -56,33 +55,6 @@ MonoBehaviour:
   PrefabHashGenerator: HadoBullet
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
---- !u!114 &797167950043025539
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9162929649202537259}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84b9d75cd8237f6429418fd635be7b6f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  netVelocity:
-    m_InternalValue: {x: 0, y: 0, z: 0}
-  netAngularVelocity:
-    m_InternalValue: {x: 0, y: 0, z: 0}
-  netPosition:
-    m_InternalValue: {x: 0, y: 0, z: 0}
-  netRotation:
-    m_InternalValue: {x: 0, y: 0, z: 0, w: 0}
-  netUpdateId:
-    m_InternalValue: 0
-  m_SyncVelocity: 1
-  m_SyncAngularVelocity: 1
-  m_SyncPosition: 1
-  m_SyncRotation: 1
-  m_InterpolationTime: 0.1
 --- !u!114 &2307754798560519309
 MonoBehaviour:
   m_ObjectHideFlags: 0

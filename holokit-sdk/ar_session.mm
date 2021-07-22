@@ -167,6 +167,10 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
                 [self.multipeerSession disconnect];
                 break;
             }
+            case 2: {
+                // TODO: Did receive a Ping Pong data
+                
+            }
             default: {
                 NSLog(@"[ar_session]: Failed to decode the received data.");
                 break;
