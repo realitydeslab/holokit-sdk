@@ -59,14 +59,14 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
     return self;
 }
 
-- (void)sendToAllPeers: (NSData *)data {
+- (void)sendToAllPeers: (NSData *)data mode:(MCSessionSendDataMode)mode {
     //NSLog(@"[ar_session]: send to all peers.");
     if (self.connectedPeersForMLAPI.count == 0) {
         NSLog(@"[multipeer_session]: There is no connected peer.");
         return;
     }
     // Client only sends data to the server.
-    bool success = [self.session sendData:data toPeers:self.connectedPeersForMLAPI withMode:MCSessionSendDataReliable error:nil];
+    bool success = [self.session sendData:data toPeers:self.connectedPeersForMLAPI withMode:mode error:nil];
     if (success) {
         //NSLog(@"Send to all peers successfully.");
     } else {
@@ -285,7 +285,7 @@ UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI(void) {
     disconnectionData[0] = (unsigned char)1;
     
     NSData *dataReadyToBeSent = [NSData dataWithBytes:disconnectionData length:sizeof(disconnectionData)];
-    [session sendToAllPeers:dataReadyToBeSent];
+    [session sendToAllPeers:dataReadyToBeSent mode:MCSessionSendDataReliable];
 }
 
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
@@ -313,4 +313,23 @@ UnityHoloKit_MultipeerDisconnectForMLAPI(void) {
     [session.session disconnect];
 }
 
+// 0 for normal MLAPI data
+// 1 for disconnection message
+// 2 for ping message
+// 3 for pong message
 
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerSendPingMessage(unsigned long clientId) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    MultipeerSession *session = ar_session_delegate_controller.multipeerSession;
+    for (MCPeerID *peerId in session.connectedPeersForMLAPI) {
+        if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
+            // Prepare the Ping message
+            unsigned char pingMessageData[1];
+            pingMessageData[0] = (unsigned char)2;
+            NSData *dataReadyToBeSent = [NSData dataWithBytes:pingMessageData length:sizeof(pingMessageData)];
+            [session sendToPeer:dataReadyToBeSent peer:peerId mode:MCSessionSendDataUnreliable];
+            return;
+        }
+    }
+}

@@ -62,6 +62,9 @@ DoctorStrangeMessageReceived DoctorStrangeMessageReceivedDelegate = NULL;
 typedef void (*AppleWatchReachabilityDidChange)(bool isReachable);
 AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
 
+typedef void (*MultipeerPongMessageReceived)(unsigned long clientId);
+MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
+
 @interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
@@ -142,7 +145,7 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
             [self.session updateWithCollaborationData:collaborationData];
             return;
         }
-        
+        //NSLog(@"receive data");
         unsigned char *decodedData = (unsigned char *) [data bytes];
         if (decodedData == nil) {
             NSLog(@"[ar_session]: Failed to decode the received data.");
@@ -168,8 +171,21 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
                 break;
             }
             case 2: {
-                // TODO: Did receive a Ping Pong data
-                
+                //NSLog(@"Ping data");
+                // TODO: Did receive a Ping data
+                // Send a Pong message back
+                unsigned char pongMessageData[1];
+                pongMessageData[0] = (unsigned char)3;
+                NSData *dataReadyToBeSent = [NSData dataWithBytes:pongMessageData length:sizeof(pongMessageData)];
+                [self.multipeerSession sendToPeer:dataReadyToBeSent peer:peerID mode:MCSessionSendDataUnreliable];
+                break;
+            }
+            case 3: {
+                //NSLog(@"Pong data");
+                // TODO: Did receive a Pong message
+                unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+                MultipeerPongMessageReceivedDelegate(clientId);
+                break;
             }
             default: {
                 NSLog(@"[ar_session]: Failed to decode the received data.");
@@ -318,7 +334,7 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
     // If there is at least one peer nearby, send the newly updated collaboration data
     // to all peers.
     NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:YES error:nil];
-    [self.multipeerSession sendToAllPeers:encodedData];
+    [self.multipeerSession sendToAllPeers:encodedData mode:MCSessionSendDataUnreliable];
     //NSLog(@"didOutputCollaborationData");
 }
 
@@ -892,6 +908,11 @@ UnityHoloKit_SendMessageToAppleWatch(int messageIndex) {
         NSDictionary<NSString *, id> *message = [[NSDictionary alloc] initWithObjects:@[(id)0] forKeys:@[@"iPhone"]];
         [ar_session_delegate_controller.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
     }
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(MultipeerPongMessageReceived callback) {
+    MultipeerPongMessageReceivedDelegate = callback;
 }
 
 } // extern "C"

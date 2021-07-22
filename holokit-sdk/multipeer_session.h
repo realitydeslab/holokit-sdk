@@ -15,7 +15,8 @@
 
 - (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID;
 - (NSArray<MCPeerID *> *)getConnectedPeers;
-- (void)sendToAllPeers: (NSData *)data;
+- (void)sendToAllPeers: (NSData *)data mode:(MCSessionSendDataMode)mode;
+- (void)sendToPeer: (NSData *)data peer:(MCPeerID *)peerId mode:(MCSessionSendDataMode)mode;
 - (void)startBrowsing;
 - (void)startAdvertising;
 - (void)disconnect;

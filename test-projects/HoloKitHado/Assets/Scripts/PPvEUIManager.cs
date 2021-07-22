@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.HoloKit;
 using MLAPI;
 using MLAPI.Connection;
+using MLAPI.Transports.MultipeerConnectivity;
 using System.Runtime.InteropServices;
 
 public class PPvEUIManager : MonoBehaviour
@@ -31,6 +31,8 @@ public class PPvEUIManager : MonoBehaviour
 
     private Text m_Sync;
 
+    private Text m_Rtts;
+
     private bool m_IsConnected;
 
     private bool m_IsSynced;
@@ -47,6 +49,10 @@ public class PPvEUIManager : MonoBehaviour
     {
         get => m_IsSpectator;
     }
+
+    private float m_LastRttUpdateTime = 0f;
+
+    private const float k_RttUpdateInterval = 1.0f;
 
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_GetRenderingMode();
@@ -118,6 +124,8 @@ public class PPvEUIManager : MonoBehaviour
         m_CancelSpawnBossButton = transform.GetChild(8).GetComponent<Button>();
         m_CancelSpawnBossButton.onClick.AddListener(CancelSpawnBoss);
 
+        m_Rtts = transform.GetChild(9).GetComponent<Text>();
+
         m_StartSpawnBossButton.gameObject.SetActive(false);
         m_SpawnBossButton.gameObject.SetActive(false);
         m_CancelSpawnBossButton.gameObject.SetActive(false);
@@ -151,6 +159,16 @@ public class PPvEUIManager : MonoBehaviour
             {
                 m_Sync.text = "Synced";
                 m_IsSynced = true;
+            }
+        }
+
+        if (Time.time - m_LastRttUpdateTime > k_RttUpdateInterval)
+        {
+            m_LastRttUpdateTime = Time.time;
+            m_Rtts.text = "Rtt: ";
+            foreach(var rtt in MultipeerConnectivityTransport.Instance.ConnectedClientsRtt.Values)
+            {
+                m_Rtts.text += $"{rtt} ";
             }
         }
     }

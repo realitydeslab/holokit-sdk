@@ -69,6 +69,29 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private string m_ServiceType = "ar-collab";
 
         /// <summary>
+        /// If the system is executing the Ping Pong scheme.
+        /// </summary>
+        public bool IsRttAvailable = true;
+
+        [HideInInspector]
+        public Dictionary<ulong, float> ConnectedClientsRtt = new Dictionary<ulong, float>();
+
+        /// <summary>
+        /// The time when the system sents the last Ping message.
+        /// </summary>
+        private float m_LastPingTime = 0f;
+
+        public float LastPingTime
+        {
+            get => m_LastPingTime;
+        }
+
+        /// <summary>
+        /// The time interval for sending Ping messages.
+        /// </summary>
+        private const float k_PingInterval = 1f;
+
+        /// <summary>
         /// Initialize the MultipeerSession instance on Objective-C side.
         /// </summary>
         /// <param name="serviceType"></param>
@@ -112,7 +135,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(MultipeerSendConnectionRequestForMLAPI callback);
 
         /// <summary>
-        /// This delegate function is only called by the server.
+        /// This delegate function is only called on the server.
         /// This function gets called when the server notices that a client is
         /// disconnected through multipeer connectivity network.
         /// </summary>
@@ -175,6 +198,28 @@ namespace MLAPI.Transports.MultipeerConnectivity
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerDisconnectForMLAPI();
 
+        /// <summary>
+        /// Send a Ping message to a specific client.
+        /// </summary>
+        /// <param name="clientId">The client Id</param>
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_MultipeerSendPingMessage(ulong clientId);
+
+        /// <summary>
+        /// This delegate function is called when a Pong message is received.
+        /// </summary>
+        /// <param name="clientId">The sender of the Pong message</param>
+        delegate void MultipeerPongMessageReceived(ulong clientId);
+        [AOT.MonoPInvokeCallback(typeof(MultipeerPongMessageReceived))]
+        static void OnMultipeerPongMessageReceived(ulong clientId)
+        {
+            Debug.Log($"Pong time: {Time.time}");
+            // The unit is millisecond.
+            Instance.ConnectedClientsRtt[clientId] = (Time.time - Instance.LastPingTime) * 1000;
+        }
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(MultipeerPongMessageReceived callback);
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -193,6 +238,26 @@ namespace MLAPI.Transports.MultipeerConnectivity
             UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(OnMultipeerConnectionRequestSentForMLAPI);
             UnityHoloKit_SetMultipeerDisconnectionMessageReceivedForMLAPIDelegate(OnMultipeerDisconnectionMessageReceivedForMLAPI);
             UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(OnPeerDataReceivedForMLAPI);
+            UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(OnMultipeerPongMessageReceived);
+
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+        }
+
+        private void OnDisable()
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+        }
+
+        private void OnClientConnected(ulong clientId)
+        {
+            Debug.Log($"OnClientConnected {clientId}");
+        }
+
+        private void OnClientDisconnect(ulong clientId)
+        {
+            Debug.Log($"OnClientDisconnect {clientId}");
         }
 
         public override void Init()
@@ -226,6 +291,25 @@ namespace MLAPI.Transports.MultipeerConnectivity
             Debug.Log($"[MultipeerConnectivityTransport]: StartClient() {Time.time}");
             UnityHoloKit_MultipeerStartAdvertising();
             return SocketTask.Done.AsTasks();
+        }
+
+        private void Update()
+        {
+            if (IsRttAvailable)
+            {
+                if (Time.time - m_LastPingTime > k_PingInterval)
+                {
+                    foreach (var clientId in NetworkManager.Singleton.ConnectedClients.Keys)
+                    {
+                        if (clientId != m_ClientId)
+                        {
+                            m_LastPingTime = Time.time;
+                            Debug.Log($"Last Ping time: {Time.time}");
+                            UnityHoloKit_MultipeerSendPingMessage(clientId);
+                        }
+                    }
+                }
+            }
         }
 
         public override NetworkEvent PollEvent(out ulong clientId, out NetworkChannel networkChannel, out ArraySegment<byte> payload, out float receiveTime)
@@ -285,9 +369,11 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public override ulong GetCurrentRtt(ulong clientId)
         {
             Debug.Log($"[MultipeerConnectivityTransport]: GetCurrentRtt() {Time.time}");
-            // TODO: Implement this.
 
-
+            if (ConnectedClientsRtt.ContainsKey(clientId))
+            {
+                return(ulong)ConnectedClientsRtt[clientId];
+            }
             return 0;
         }
 
