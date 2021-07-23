@@ -113,6 +113,8 @@ namespace UnityEditor.XR.HoloKit
                 array.AddString("_ar-collab._tcp");
                 array.AddString("_ar-collab._udp");
 
+                // For CoreLocation
+                rootDict.SetString("NSLocationWhenInUseUsageDescription", "For thatReality to locate your current location.");
 
                 File.WriteAllText(plistPath, plist.WriteToString());
             }

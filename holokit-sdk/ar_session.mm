@@ -66,6 +66,9 @@ AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
 typedef void (*MultipeerPongMessageReceived)(unsigned long clientId, double rtt);
 MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
 
+typedef void (*DidUpdateLocation)(double latitude, double longtitude, double altitude);
+DidUpdateLocation DidUpdateLocationDelegate = NULL;
+
 @interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
@@ -208,7 +211,7 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
     self.isARWorldMapSynced = false;
 }
 
-- (void)initCoreLocationManager {
+- (void)initLocationManager {
     self.locationManager = [[CLLocationManager alloc] init];
     // TODO: Adjust this.
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -789,9 +792,9 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
     if (locations[0] != nil) {
         self.currentLocation = locations[0];
-        NSLog(@"[core_location]: latitude %f, longitude %f and altitude %f", self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude, self.currentLocation.altitude);
-        // TODO: Update the location date in Unity
-        
+        //NSLog(@"[core_location]: latitude %f, longitude %f and altitude %f", self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude, self.currentLocation.altitude);
+        // Send updated location data back to Unity.
+        DidUpdateLocationDelegate(self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude, self.currentLocation.altitude);
         [manager stopUpdatingLocation];
     }
 }
@@ -952,6 +955,23 @@ UnityHoloKit_SendMessageToAppleWatch(int messageIndex) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(MultipeerPongMessageReceived callback) {
     MultipeerPongMessageReceivedDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_InitLocationManager() {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    [ar_session_delegate_controller initLocationManager];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_StartUpdatingLocation() {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    [ar_session_delegate_controller startUpdatingLocation];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidUpdateLocationDelegate(DidUpdateLocation callback) {
+    DidUpdateLocationDelegate = callback;
 }
 
 } // extern "C"
