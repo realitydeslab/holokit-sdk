@@ -10,9 +10,10 @@
 @interface MultipeerSession : NSObject
 
 @property (assign) bool isHost;
-// Storing all connected peers.
+// TODO: Change this to a dictionary for faster indexing through client Id.
 @property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeersForMLAPI;
 @property (assign) double lastPingTime;
+@property (nonatomic, strong, nullable) NSMutableDictionary<MCPeerID *, NSOutputStream *> *outputStreams;
 
 - (instancetype)initWithReceivedDataHandler:(void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID;
 - (NSArray<MCPeerID *> *)getConnectedPeers;

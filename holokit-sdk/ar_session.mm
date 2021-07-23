@@ -63,7 +63,7 @@ DoctorStrangeMessageReceived DoctorStrangeMessageReceivedDelegate = NULL;
 typedef void (*AppleWatchReachabilityDidChange)(bool isReachable);
 AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
 
-typedef void (*MultipeerPongMessageReceived)(unsigned long clientId);
+typedef void (*MultipeerPongMessageReceived)(unsigned long clientId, double rtt);
 MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
 
 @interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate, CLLocationManagerDelegate>
@@ -137,6 +137,7 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
 - (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID {
     // TODO: Can I move this into a separate block?
     void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
+        //NSLog(@"receivedDataHandler %@", [NSThread currentThread]);
         if ([self.multipeerSession.connectedPeersForMLAPI containsObject:peerID] == NO) {
             return;
         }
@@ -174,21 +175,27 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
                 break;
             }
             case 2: {
-                NSLog(@"Ping data");
+                //NSLog(@"Ping data");
                 // Did receive a Ping data
                 // Send a Pong message back
                 unsigned char pongMessageData[1];
                 pongMessageData[0] = (unsigned char)3;
                 NSData *dataReadyToBeSent = [NSData dataWithBytes:pongMessageData length:sizeof(pongMessageData)];
                 [self.multipeerSession sendToPeer:dataReadyToBeSent peer:peerID mode:MCSessionSendDataUnreliable];
+                
+                // Send message via stream
+//                if (self.multipeerSession.outputStreams[peerID] != nil) {
+//                    [self.multipeerSession.outputStreams[peerID] write:(const uint8_t *)dataReadyToBeSent.bytes maxLength:dataReadyToBeSent.length];
+//                }
                 break;
             }
             case 3: {
-                NSLog(@"Pong data");
+                //NSLog(@"Pong data");
                 // Did receive a Pong message
-                NSLog(@"[mc_session]: curernt rtt is %f", [[NSProcessInfo processInfo] systemUptime] - self.multipeerSession.lastPingTime);
+                double rtt = ([[NSProcessInfo processInfo] systemUptime] - self.multipeerSession.lastPingTime) * 1000;
+                NSLog(@"[mc_session]: curernt rtt is %f", rtt);
                 unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-                MultipeerPongMessageReceivedDelegate(clientId);
+                MultipeerPongMessageReceivedDelegate(clientId, rtt);
                 break;
             }
             default: {

@@ -158,7 +158,7 @@ public class PPvEUIManager : MonoBehaviour
             }
         }
 
-        m_Rtts.text = $"Rtt: {MultipeerConnectivityTransport.Instance.CurrentRtt}";
+        m_Rtts.text = $"Rtt: {(int)MultipeerConnectivityTransport.Instance.CurrentRtt}";
     }
 
     private void StartAsBoss()

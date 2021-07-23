@@ -78,7 +78,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// This variable is not used on the server side.
         /// </summary>
         [HideInInspector]
-        public float CurrentRtt = 0f;
+        public double CurrentRtt = 0f;
 
         /// <summary>
         /// The time when the system sents the last Ping message.
@@ -94,11 +94,6 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// The time interval for sending Ping messages.
         /// </summary>
         private const float k_PingInterval = 1f;
-
-        private int m_PintCount = 0;
-
-        [HideInInspector]
-        public int PongCount = 0;
 
         /// <summary>
         /// Initialize the MultipeerSession instance on Objective-C side.
@@ -217,14 +212,13 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// This delegate function is called when a Pong message is received.
         /// </summary>
         /// <param name="clientId">The sender of the Pong message</param>
-        delegate void MultipeerPongMessageReceived(ulong clientId);
+        delegate void MultipeerPongMessageReceived(ulong clientId, double rtt);
         [AOT.MonoPInvokeCallback(typeof(MultipeerPongMessageReceived))]
-        static void OnMultipeerPongMessageReceived(ulong clientId)
+        static void OnMultipeerPongMessageReceived(ulong clientId, double rtt)
         {
-            Debug.Log($"Pong time: {Time.time} with count {Instance.PongCount}");
             // The unit is millisecond.
-            Instance.CurrentRtt = (Time.time - Instance.LastPingTime) * 1000;
-            Debug.Log($"[MultipeerConnectivityTransport]: Current Rtt {Instance.CurrentRtt}");
+            Instance.CurrentRtt = rtt;
+            //Debug.Log($"[MultipeerConnectivityTransport]: Current Rtt {Instance.CurrentRtt}");
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(MultipeerPongMessageReceived callback);
@@ -293,8 +287,8 @@ namespace MLAPI.Transports.MultipeerConnectivity
                 if (Time.time - m_LastPingTime > k_PingInterval)
                 {
                     m_LastPingTime = Time.time;
-                    Debug.Log($"Last Ping time: {m_LastPingTime} with count {m_PintCount++}");
-                    UnityHoloKit_MultipeerSendPingMessageViaStream(m_ServerId);
+                    UnityHoloKit_MultipeerSendPingMessage(m_ServerId);
+                    //UnityHoloKit_MultipeerSendPingMessageViaStream(m_ServerId);
                 }
             }
         }
