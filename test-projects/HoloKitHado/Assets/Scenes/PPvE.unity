@@ -2010,7 +2010,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7014186050555902013, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
       propertyPath: m_CollaborationEnabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}

@@ -8,7 +8,7 @@ PlayerSettings:
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
-  defaultScreenOrientation: 4
+  defaultScreenOrientation: 3
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
@@ -136,8 +136,8 @@ PlayerSettings:
     Others: 1
   bundleVersion: 0.1
   preloadedAssets:
-  - {fileID: 4800000, guid: e7c77f6eaab324a819efdc13b8125a39, type: 3}
   - {fileID: 8007401921281185799, guid: 5122b331fe35240108ce5e2fb4c4c206, type: 2}
+  - {fileID: 4800000, guid: e7c77f6eaab324a819efdc13b8125a39, type: 3}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -470,7 +470,7 @@ PlayerSettings:
   enableCrashReportAPI: 0
   cameraUsageDescription: HoloKit
   locationUsageDescription: 
-  microphoneUsageDescription: 
+  microphoneUsageDescription: fuck
   bluetoothUsageDescription: 
   switchNMETAOverride: 
   switchNetLibKey: 

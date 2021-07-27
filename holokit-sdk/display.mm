@@ -510,11 +510,6 @@ public:
             CreateTextures(num_textures);
         }
         
-        // Refresh the texture with full black
-        if (refresh_texture_) {
-            
-        }
-        
         // AR mode rendering
         if (rendering_mode_ != RenderingMode::XRMode || refresh_texture_) {
             next_frame->renderPassesCount = 1;

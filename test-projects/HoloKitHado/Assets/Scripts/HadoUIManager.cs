@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using MLAPI;
 using MLAPI.Connection;
+using MLAPI.Transports.MultipeerConnectivity;
 using System.Runtime.InteropServices;
 
 public class HadoUIManager : MonoBehaviour
@@ -23,6 +24,8 @@ public class HadoUIManager : MonoBehaviour
     private Text m_Connection;
 
     private Text m_Sync;
+
+    private Text m_Rtt;
 
     private bool m_IsConnected;
 
@@ -99,6 +102,7 @@ public class HadoUIManager : MonoBehaviour
 
         m_Connection = transform.GetChild(4).GetComponent<Text>();
         m_Sync = transform.GetChild(5).GetComponent<Text>();
+        m_Rtt = transform.GetChild(6).GetComponent<Text>();
     }
 
     private void Update()
@@ -131,6 +135,8 @@ public class HadoUIManager : MonoBehaviour
                 m_IsSynced = true;
             }
         }
+
+        m_Rtt.text = $"Rtt: {(int)MultipeerConnectivityTransport.Instance.CurrentRtt}";
     }
 
     private void StartHost()
