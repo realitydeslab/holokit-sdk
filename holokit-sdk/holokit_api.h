@@ -62,6 +62,10 @@ public:
     
     bool GetNfcVerificationResult() { return nfc_verification_result_; }
     
+    bool IsSecondCameraActive() { return is_second_camera_active_; }
+    
+    void SetSecondCameraActive(bool value) { is_second_camera_active_ = value; }
+    
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
 private:
@@ -107,6 +111,8 @@ private:
     RenderingMode current_rendering_mode_;
     
     bool nfc_verification_result_ = false;
+    
+    bool is_second_camera_active_ = true;
 }; // class HoloKitApi
 
 std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;

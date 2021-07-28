@@ -19,6 +19,8 @@ public class LocationUIManager : MonoBehaviour
 
     private int m_FrameCount = 0;
 
+    public static bool IsStereo = false;
+
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_GetRenderingMode();
 
@@ -50,6 +52,7 @@ public class LocationUIManager : MonoBehaviour
     private void Update()
     {
         Debug.Log($"Frame count: {++m_FrameCount}");
+        HoloKitARBackgroundRendererFeature.CurrentRenderPass = 0;
 
         string newLocationData = $"Latitude: {LocationManager.Instance.CurrentLatitude}\n" +
             $"Longitude: {LocationManager.Instance.CurrentLongitude}\n" +
@@ -75,7 +78,7 @@ public class LocationUIManager : MonoBehaviour
 
     private void StartUpdatingLocation()
     {
-        LocationManager.Instance.StartUpdateLocation();
+        LocationManager.Instance.StartUpdatingLocation();
     }
 
     private void Record()
@@ -103,8 +106,9 @@ public class LocationUIManager : MonoBehaviour
         {
             // Switch to XR mode.
             UnityHoloKit_SetRenderingMode(2);
-            Camera.main.GetComponent<ARCameraBackground>().enabled = false;
+            //Camera.main.GetComponent<ARCameraBackground>().enabled = false;
             m_RenderingButton.transform.GetChild(0).GetComponent<Text>().text = "AR";
+            IsStereo = true;
         }
         else
         {
@@ -112,6 +116,7 @@ public class LocationUIManager : MonoBehaviour
             UnityHoloKit_SetRenderingMode(1);
             Camera.main.GetComponent<ARCameraBackground>().enabled = true;
             m_RenderingButton.transform.GetChild(0).GetComponent<Text>().text = "XR";
+            IsStereo = false;
         }
     }
 }

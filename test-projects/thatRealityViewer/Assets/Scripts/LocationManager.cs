@@ -69,7 +69,7 @@ public class LocationManager : MonoBehaviour
         UnityHoloKit_InitLocationManager();
     }
 
-    public void StartUpdateLocation()
+    public void StartUpdatingLocation()
     {
         UnityHoloKit_StartUpdatingLocation();
     }

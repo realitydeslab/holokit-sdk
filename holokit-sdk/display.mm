@@ -506,7 +506,8 @@ public:
 
         if (reallocate_textures) {
             DestroyTextures();
-            int num_textures = 1;
+            // The second texture is for the invisible second camera.
+            int num_textures = 1 + 1;
             CreateTextures(num_textures);
         }
         
@@ -554,33 +555,55 @@ public:
         
         // CHANGE THIS TO SWITCH BETWEEN RENDERING MODES
         bool single_pass_rendering = false;
-        //NSLog(@"Single-pass rendering: %d", single_pass_rendering);
         // Frame hints tells us if we should setup our renderpasses with a single pass
         if (!single_pass_rendering)
         {
-            // Can increase render pass count to do wide FOV or to have a separate view into scene.
-            next_frame->renderPassesCount = NUM_RENDER_PASSES;
-
+            
+            if (holokit::HoloKitApi::GetInstance()->IsSecondCameraActive()) {
+                next_frame->renderPassesCount = NUM_RENDER_PASSES + 1;
+            } else {
+                next_frame->renderPassesCount = NUM_RENDER_PASSES;
+            }
+            
             for (int pass = 0; pass < next_frame->renderPassesCount; ++pass)
             {
                 auto& render_pass = next_frame->renderPasses[pass];
+                
+                if (pass == 2) {
+                    // The extra pass for the invisible AR camera.
+                    render_pass.textureId = unity_textures_[1];
+                    NSLog(@"texture id: %u", unity_textures_[1]);
+                    render_pass.renderParamsCount = 1;
+                    render_pass.cullingPassIndex = 0;
+                    
+                    auto& render_params = render_pass.renderParams[0];
+                    UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
+                    UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
+                    UnityXRPose pose = { position, rotation };
+                    render_params.deviceAnchorToEyePose = pose;
+                    render_params.projection.type = kUnityXRProjectionTypeMatrix;
+                    simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
+                    render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
+                    render_params.viewportRect = {
+                        0.0f,                    // x
+                        0.0f,                    // y
+                        1.0f,                    // width
+                        1.0f                     // height
+                    };
+                } else {
+                    // The first two passes for stereo rendering.
+                    render_pass.textureId = unity_textures_[0];
 
-                // Texture that unity will render to next frame.  We created it above.
-                // You might want to change this dynamically to double / triple buffer.
-    #if !SIDE_BY_SIDE
-                render_pass.textureId = unity_textures_[pass];
-    #else
-                render_pass.textureId = unity_textures_[0];
-    #endif
+                    render_pass.renderParamsCount = 1;
+                    // Both passes share the same set of culling parameters.
+                    render_pass.cullingPassIndex = 0;
 
-                render_pass.renderParamsCount = 1;
-                render_pass.cullingPassIndex = 0;
-
-                auto& render_params = render_pass.renderParams[0];
-                render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
-                render_params.projection.type = kUnityXRProjectionTypeMatrix;
-                render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
-                render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
+                    auto& render_params = render_pass.renderParams[0];
+                    render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
+                    render_params.projection.type = kUnityXRProjectionTypeMatrix;
+                    render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
+                    render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
+                }
             }
             auto& culling_pass = next_frame->cullingPasses[0];
             culling_pass.separation = 0.064f;

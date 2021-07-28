@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using UnityEngine;
 using UnityEngine.Rendering;
 //#if MODULE_URP_ENABLED
 using UnityEngine.Rendering.Universal;
@@ -27,13 +28,15 @@ namespace UnityEngine.XR.ARFoundation
         /// </summary>
         Mesh m_BackgroundMesh;
 
+        public static int CurrentRenderPass = 0;
+
         /// <summary>
         /// Create the scriptable render pass.
         /// </summary>
         public override void Create()
         {
             //#if !UNITY_EDITOR
-            m_ScriptablePass = new CustomRenderPass(RenderPassEvent.BeforeRenderingOpaques);
+            m_ScriptablePass = new CustomRenderPass(RenderPassEvent.AfterRendering);
 
             m_BackgroundMesh = new Mesh();
             m_BackgroundMesh.vertices =  new Vector3[]
@@ -61,6 +64,15 @@ namespace UnityEngine.XR.ARFoundation
         /// <param name="renderingData">Additional rendering data about the current state of rendering.</param>
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
+            if (LocationUIManager.IsStereo)
+            {
+                if (CurrentRenderPass++ < 2)
+                {
+                    return;
+                }
+                //Debug.Log($"current render pass {CurrentRenderPass}");
+            }
+
 #if !UNITY_EDITOR
             Camera currentCamera = renderingData.cameraData.camera;
             if ((currentCamera != null) && (currentCamera.cameraType == CameraType.Game))
@@ -148,10 +160,6 @@ namespace UnityEngine.XR.ARFoundation
             /// <param name="renderingData">Additional rendering data about the current state of rendering.</param>
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
             {
-                Debug.Log("fuck execute");
-                List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
-                SubsystemManager.GetSubsystems(displaySubsystems);
-
                 var cmd = CommandBufferPool.Get(k_CustomRenderPassName);
                 cmd.BeginSample(k_CustomRenderPassName);
 

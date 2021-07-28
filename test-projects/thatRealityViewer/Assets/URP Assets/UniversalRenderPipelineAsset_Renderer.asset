@@ -30,7 +30,8 @@ MonoBehaviour:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
   m_RendererFeatures:
   - {fileID: -2703124348060271205}
-  m_RendererFeatureMap: 9b7d282aba927cda
+  - {fileID: 6571423076468089359}
+  m_RendererFeatureMap: 9b7d282aba927cda0f62af9d7862325b
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 0}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -60,3 +61,16 @@ MonoBehaviour:
   m_ShadowTransparentReceive: 1
   m_RenderingMode: 0
   m_AccurateGbufferNormals: 0
+--- !u!114 &6571423076468089359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68a24147b58e64825899fa5a435fe84a, type: 3}
+  m_Name: NewHoloKitBlit
+  m_EditorClassIdentifier: 
+  m_Active: 1

@@ -608,6 +608,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7014186050555902013, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
+      propertyPath: m_RenderTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: 8c444fe06d1c644c7a9df5251a31f2fc, type: 2}
+    - target: {fileID: 7014186050555902013, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
       propertyPath: m_XrModeEnabled
       value: 0
       objectReference: {fileID: 0}
@@ -874,7 +878,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &633987595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1185,7 +1189,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66cdefaf4a174b6eb1d75a4161d158c, type: 2}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

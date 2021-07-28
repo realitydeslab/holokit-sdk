@@ -21,6 +21,27 @@ namespace UnityEngine.XR.HoloKit
 
         private Camera m_ARCamera;
 
+        private bool m_HasStarted = false;
+
+        public bool HasStarted
+        {
+            get => m_HasStarted;
+        }
+
+        private XRDisplaySubsystem m_DisplaySubsystem;
+
+        public XRDisplaySubsystem DisplaySubsystem
+        {
+            get => m_DisplaySubsystem;
+        }
+
+        private RenderTexture m_SecondCameraRenderTexture;
+
+        public RenderTexture SecondCameraRenderTexture
+        {
+            get => m_SecondCameraRenderTexture;
+        }
+
         private static Vector3 m_CameraToCenterEyeOffset;
 
         public static Vector3 CameraToCenterEyeOffset
@@ -49,7 +70,7 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
             m_ARCamera = Camera.main;
 
@@ -84,6 +105,18 @@ namespace UnityEngine.XR.HoloKit
             Debug.Log($"[HoloKitSettings]: camera to center eye offset [{offset[0]}, {offset[1]}, {-offset[2]}]");
             m_CameraToCenterEyeOffset = new Vector3(offset[0], offset[1], -offset[2]);
             UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(offsetPtr);
+
+            List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
+            SubsystemManager.GetSubsystems(displaySubsystems);
+            if (displaySubsystems.Count > 0)
+            {
+                m_DisplaySubsystem = displaySubsystems[0];
+            }
+        }
+
+        private void Start()
+        {
+            m_HasStarted = true;
         }
 
         public void EnableMeshing(bool enabled)
