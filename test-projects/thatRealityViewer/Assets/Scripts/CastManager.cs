@@ -22,7 +22,7 @@ public class CastManager : MonoBehaviour
         Debug.Log($"Height: {m_SecondCameraRenderTexture.height}");
     }
 
-    private void Update()
+    private void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
         
 

@@ -196,8 +196,9 @@ UnityHoloKit_StartNfcVerification() {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetSecondCameraActive(bool value) {
-    holokit::HoloKitApi::GetInstance()->SetSecondCameraActive(value);
+UnityHoloKit_SetSecondDisplayAvailable(bool value) {
+    holokit::HoloKitApi::GetInstance()->SetSecondDisplayAvailable(value);
 }
+
 
 } // extern "C"

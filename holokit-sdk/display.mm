@@ -224,6 +224,8 @@ public:
     
     void SetMtlInterface(IUnityGraphicsMetal* mtl_interface) { metal_interface_ = mtl_interface; }
     
+    void SetSecondDisplayColorBuffer(UnityRenderBuffer unity_render_buffer) { second_display_native_render_buffer_ptr_ = unity_render_buffer; }
+    
     ///@return A reference to the static instance of this singleton class.
     static std::unique_ptr<HoloKitDisplayProvider>& GetInstance();
 
@@ -309,7 +311,6 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
     
-
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
@@ -321,6 +322,10 @@ public:
         RenderContent2();
         if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL) {
             RenderAlignmentMarker();
+        }
+        
+        if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable() && second_display_native_render_buffer_ptr_ != nullptr) {
+          //  RenderToSecondDisplay();
         }
         
         //os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
@@ -379,10 +384,30 @@ public:
                                        vertexCount:4];
     }
     
+    void RenderToSecondDisplay() {
+        NSLog(@"[display]: render to second display");
+        id<MTLRenderCommandEncoder> mtl_render_command_encoder =
+            (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
+        
+        MTLRenderPassDescriptor *mtl_render_pass_descriptor = metal_interface_->CurrentRenderPassDescriptor();
+        id<MTLTexture> original_texture = mtl_render_pass_descriptor.colorAttachments[0].texture;
+        // Force Metal to draw to the second display's color buffer.
+        mtl_render_pass_descriptor.colorAttachments[0].texture = metal_interface_->TextureFromRenderBuffer(second_display_native_render_buffer_ptr_);
+        
+        [mtl_render_command_encoder setRenderPipelineState:main_render_pipeline_state_];
+        [mtl_render_command_encoder setVertexBytes:main_vertices length:sizeof(main_vertices) atIndex:VertexInputIndexPosition];
+        [mtl_render_command_encoder setVertexBytes:main_uvs length:sizeof(main_uvs) atIndex:VertexInputIndexTexCoords];
+        [mtl_render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:FragmentInputIndexTexture];
+        //[mtl_render_command_encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
+        
+        mtl_render_pass_descriptor.colorAttachments[0].texture = original_texture;
+    }
+    
     void RenderContent() {
         // Metal initialization is expensive and we only want to run it once.
         if (!main_metal_setup_) {
             id<MTLDevice> mtl_device = metal_interface_->MetalDevice();
+            
             // set up buffers
             main_vertex_buffer_ = [mtl_device newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
             main_index_buffer_ = [mtl_device newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
@@ -559,7 +584,7 @@ public:
         if (!single_pass_rendering)
         {
             
-            if (holokit::HoloKitApi::GetInstance()->IsSecondCameraActive()) {
+            if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable()) {
                 next_frame->renderPassesCount = NUM_RENDER_PASSES + 1;
             } else {
                 next_frame->renderPassesCount = NUM_RENDER_PASSES;
@@ -572,7 +597,7 @@ public:
                 if (pass == 2) {
                     // The extra pass for the invisible AR camera.
                     render_pass.textureId = unity_textures_[1];
-                    NSLog(@"texture id: %u", unity_textures_[1]);
+                    //NSLog(@"texture id: %u", unity_textures_[1]);
                     render_pass.renderParamsCount = 1;
                     render_pass.cullingPassIndex = 0;
                     
@@ -783,6 +808,10 @@ private:
     /// @brief This value is true if XR mode is enabled, false if AR mode is enabled.
     RenderingMode rendering_mode_;
     
+    UnityRenderBuffer second_display_native_render_buffer_ptr_ = nullptr;
+    
+    CADisplayLink* aDisplayLink = nullptr;
+    
     static std::unique_ptr<HoloKitDisplayProvider> display_provider_;
 };
 
@@ -831,7 +860,9 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
 
 void UnloadDisplay() { holokit::HoloKitDisplayProvider::GetInstance().reset(); }
 
-extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+extern "C" {
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetUnityProjectionMatrix(float column0[4], float column1[4], float column2[4], float column3[4]) {
     unity_projection_matrix.columns[0].x = column0[0];
     unity_projection_matrix.columns[0].y = column0[1];
@@ -853,3 +884,10 @@ UnityHoloKit_SetUnityProjectionMatrix(float column0[4], float column1[4], float 
     unity_projection_matrix.columns[3].z = column3[2];
     unity_projection_matrix.columns[3].w = column3[3];
 }
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(UnityRenderBuffer unity_render_buffer) {
+    holokit::HoloKitDisplayProvider::GetInstance()->SetSecondDisplayColorBuffer(unity_render_buffer);
+}
+
+} // extern "C"

@@ -42,6 +42,8 @@ namespace UnityEngine.XR.HoloKit
             get => m_SecondCameraRenderTexture;
         }
 
+        private Display m_SecondDisplay = null;
+
         private static Vector3 m_CameraToCenterEyeOffset;
 
         public static Vector3 CameraToCenterEyeOffset
@@ -53,10 +55,16 @@ namespace UnityEngine.XR.HoloKit
         public static extern void UnityHoloKit_SetRenderingMode(int val);
 
         [DllImport("__Internal")]
-        public static extern IntPtr UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
+        private static extern IntPtr UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
 
         [DllImport("__Internal")]
-        public static extern int UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(IntPtr ptr);
+        private static extern void UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(IntPtr ptr);
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetSecondDisplayAvailable(bool value);
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(IntPtr nativeRenderBufferPtr);
 
         private void Awake()
         {
@@ -117,6 +125,28 @@ namespace UnityEngine.XR.HoloKit
         private void Start()
         {
             m_HasStarted = true;
+        }
+
+        private void OnRenderImage(RenderTexture source, RenderTexture destination)
+        {
+            Debug.Log("fuckfucxk");
+            if (Display.displays.Length > 1)
+            {
+                if (m_SecondDisplay == null)
+                {
+                    m_SecondDisplay = Display.displays[1];
+                    //m_SecondDisplay.SetRenderingResolution(Display.main.renderingWidth, Display.main.renderingHeight);
+                    Debug.Log(m_SecondDisplay.colorBuffer.ToString());
+                    Debug.Log($"Main display width {Display.main.renderingWidth} and height {Display.main.renderingHeight}");
+                    //UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(m_SecondDisplay.colorBuffer.GetNativeRenderBufferPtr());
+                    //UnityHoloKit_SetSecondDisplayAvailable(true);
+                }
+            }
+        }
+
+        private void Update()
+        {
+            
         }
 
         public void EnableMeshing(bool enabled)

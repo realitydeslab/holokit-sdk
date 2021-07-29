@@ -69,6 +69,9 @@ MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
 typedef void (*DidUpdateLocation)(double latitude, double longtitude, double altitude);
 DidUpdateLocation DidUpdateLocationDelegate = NULL;
 
+typedef void (*DidUpdateHeading)(double trueHeading, double magneticHeading, double headingAccuracy);
+DidUpdateHeading DidUpdateHeadingDelegate = NULL;
+
 @interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
@@ -83,6 +86,8 @@ DidUpdateLocation DidUpdateLocationDelegate = NULL;
 @property (nonatomic, strong) WCSession *wcSession;
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) CLLocation *currentLocation;
+@property (nonatomic, strong) CLHeading *currentHeading;
+@property (nonatomic ,strong) CADisplayLink *aDisplayLink;
 
 @end
 
@@ -131,10 +136,21 @@ DidUpdateLocation DidUpdateLocationDelegate = NULL;
             //[self.wcSession activateSession];
         }
         
+        NSLog(@"number of screens: %lu", (unsigned long)[[UIScreen screens] count]);
+        NSLog(@"Maximum FPS = %ld", [UIScreen mainScreen].maximumFramesPerSecond);
+
+        self.aDisplayLink = [[UIScreen mainScreen] displayLinkWithTarget:self selector:@selector(printNextVsyncTime)];
+       // [aDisplayLink setFrameInterval:animationFrameInterval];
+        [self.aDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        
 //        frame_count = 0;
 //        last_frame_time = 0.0f;
     }
     return self;
+}
+
+- (void)printNextVsyncTime {
+    //NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
 }
 
 - (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID {
@@ -225,6 +241,14 @@ DidUpdateLocation DidUpdateLocationDelegate = NULL;
 
 - (void)stopUpdatingLocation {
     [self.locationManager stopUpdatingLocation];
+}
+
+- (void)startUpdatingHeading {
+    [self.locationManager startUpdatingHeading];
+}
+
+- (void)stopUpdatingHeading {
+    [self.locationManager stopUpdatingHeading];
 }
 
 - (void)startAccelerometer {
@@ -799,6 +823,15 @@ DidUpdateLocation DidUpdateLocationDelegate = NULL;
     }
 }
 
+- (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading {
+    if (newHeading != nil) {
+        self.currentHeading = newHeading;
+        // Call the C# delegate
+        DidUpdateHeadingDelegate(self.currentHeading.trueHeading, self.currentHeading.magneticHeading, self.currentHeading.headingAccuracy);
+        [manager stopUpdatingHeading];
+    }
+}
+
 @end
 
 #pragma mark - SetARSession
@@ -972,6 +1005,17 @@ UnityHoloKit_StartUpdatingLocation() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetDidUpdateLocationDelegate(DidUpdateLocation callback) {
     DidUpdateLocationDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_StartUpdatingHeading() {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    [ar_session_delegate_controller startUpdatingHeading];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidUpdateHeadingDelegate(DidUpdateHeading callback) {
+    DidUpdateHeadingDelegate = callback;
 }
 
 } // extern "C"

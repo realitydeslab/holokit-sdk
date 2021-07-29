@@ -36,7 +36,7 @@ namespace UnityEngine.XR.ARFoundation
         public override void Create()
         {
             //#if !UNITY_EDITOR
-            m_ScriptablePass = new CustomRenderPass(RenderPassEvent.AfterRendering);
+            m_ScriptablePass = new CustomRenderPass(RenderPassEvent.BeforeRenderingOpaques);
 
             m_BackgroundMesh = new Mesh();
             m_BackgroundMesh.vertices =  new Vector3[]

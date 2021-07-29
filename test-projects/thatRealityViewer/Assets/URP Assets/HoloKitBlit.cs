@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -17,18 +19,32 @@ public class HoloKitBlit : ScriptableRendererFeature
 
     class CustomRenderPass : ScriptableRenderPass
     {
-        public XRDisplaySubsystem DisplaySubsystem;
+        const string k_CustomRenderPassName = "HoloKit Mirror Blit";
+        public XRDisplaySubsystem m_DisplaySubsystem;
 
         RenderTargetIdentifier m_CameraColorTargetId;
 
         RenderTexture m_SecondCameraRenderTexture;
 
+        Display m_SecondDisplay;
+
+        private Material copyMaterial;
+
         //RenderTargetHandle tempTexture;
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetSecondDisplayAvailable(bool value);
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(IntPtr nativeRenderBufferPtr);
 
         public void Setup(RenderTargetIdentifier cameraColorTargetId, RenderTexture secondCameraRenderTexture)
         {
             this.m_CameraColorTargetId = cameraColorTargetId;
             this.m_SecondCameraRenderTexture = secondCameraRenderTexture;
+
+            Shader shader = Shader.Find("Hidden/BlitCopy");
+            copyMaterial = new Material(shader);
         }
 
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
@@ -44,17 +60,28 @@ public class HoloKitBlit : ScriptableRendererFeature
         {
             if (Display.displays.Length > 1)
             {
-                if (DisplaySubsystem.GetRenderPassCount() > 2)
                 {
-                    //Display secondDisplay = Display.displays[1];
-                    DisplaySubsystem.GetRenderPass(2, out var renderPass);
-                    CommandBuffer cmd = CommandBufferPool.Get("Second Display Blit");
-                    cmd.Clear();
+                    m_SecondDisplay = Display.displays[1];
+                    //m_SecondDisplay.SetRenderingResolution(Display.main.renderingWidth, Display.main.renderingHeight);
+                    Debug.Log($"Main display width {Display.main.renderingWidth} and height {Display.main.renderingHeight}");
 
-                    //cmd.Blit(renderPass.renderTarget, m_CameraColorTargetId);
+                    m_SecondDisplay.SetRenderingResolution(Display.main.renderingWidth, Display.main.renderingHeight);
+                    //UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(m_SecondDisplay.colorBuffer.GetNativeRenderBufferPtr());
+                    //UnityHoloKit_SetSecondDisplayAvailable(true);
 
+                    var cmd = CommandBufferPool.Get(k_CustomRenderPassName);
+                    cmd.BeginSample(k_CustomRenderPassName);
+
+                    //   cmd.SetRenderTarget(, m_SecondDisplay.depthBuffer);
+                    RenderTargetIdentifier ss = new RenderTargetIdentifier(m_SecondDisplay.colorBuffer);
+
+                    m_DisplaySubsystem.GetRenderPass(0, out var renderPass);
+
+                    cmd.Blit(renderPass.renderTarget, ss, copyMaterial);
+
+                    cmd.EndSample(k_CustomRenderPassName);
                     context.ExecuteCommandBuffer(cmd);
-                    cmd.Clear();
+
                     CommandBufferPool.Release(cmd);
                 }
             }
@@ -79,7 +106,7 @@ public class HoloKitBlit : ScriptableRendererFeature
         SubsystemManager.GetSubsystems(displaySubsystems);
         if (displaySubsystems.Count > 0)
         {
-            m_ScriptablePass.DisplaySubsystem = displaySubsystems[0];
+            m_ScriptablePass.m_DisplaySubsystem = displaySubsystems[0];
         }
     }
 
@@ -88,6 +115,8 @@ public class HoloKitBlit : ScriptableRendererFeature
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         var cameraColorTargetId = renderer.cameraColorTarget;
+
+
         m_ScriptablePass.Setup(cameraColorTargetId, settings.SecondCameraRenderTexture);
 
         renderer.EnqueuePass(m_ScriptablePass);

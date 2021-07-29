@@ -29,6 +29,27 @@ public class LocationManager : MonoBehaviour
         get => m_CurrentAltitude;
     }
 
+    private double m_CurrentTrueHeading = 0;
+
+    public double CurrentTrueHeading
+    {
+        get => m_CurrentTrueHeading;
+    }
+
+    private double m_CurrentMagneticHeading = 0;
+
+    public double CurrentMagneticHeading
+    {
+        get => m_CurrentMagneticHeading;
+    }
+
+    private double m_CurrentHeadingAccuracy = 0f;
+
+    public double CurrentHeadingAccuracy
+    {
+        get => m_CurrentHeadingAccuracy;
+    }
+
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_InitLocationManager();
 
@@ -47,6 +68,21 @@ public class LocationManager : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void UnityHoloKit_SetDidUpdateLocationDelegate(DidUpdateLocation callback);
 
+    [DllImport("__Internal")]
+    private static extern int UnityHoloKit_StartUpdatingHeading();
+
+    delegate void DidUpdateHeading(double trueHeading, double magneticHeading, double headingAccuracy);
+    [AOT.MonoPInvokeCallback(typeof(DidUpdateHeading))]
+    static void OnDidUpdateHeading(double trueHeading, double magneticHeading, double headingAccuracy)
+    {
+        Debug.Log($"[LocationManager]: did update heading with true heading {trueHeading}, magnetic heading {magneticHeading} and heading accuracy {headingAccuracy}");
+        Instance.m_CurrentTrueHeading = trueHeading;
+        Instance.m_CurrentMagneticHeading = magneticHeading;
+        Instance.m_CurrentHeadingAccuracy = headingAccuracy;
+    }
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_SetDidUpdateHeadingDelegate(DidUpdateHeading callback);
+
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -62,6 +98,7 @@ public class LocationManager : MonoBehaviour
     private void OnEnable()
     {
         UnityHoloKit_SetDidUpdateLocationDelegate(OnDidUpdateLocation);
+        UnityHoloKit_SetDidUpdateHeadingDelegate(OnDidUpdateHeading);
     }
 
     public void InitLocationManager()
@@ -72,5 +109,10 @@ public class LocationManager : MonoBehaviour
     public void StartUpdatingLocation()
     {
         UnityHoloKit_StartUpdatingLocation();
+    }
+
+    public void StartUpdatingHeading()
+    {
+        UnityHoloKit_StartUpdatingHeading();
     }
 }
