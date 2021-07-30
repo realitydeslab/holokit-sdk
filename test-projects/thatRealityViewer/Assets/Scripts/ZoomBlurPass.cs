@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.XR;
 
 //首先我们创建ZoomBlurPass类让它继承自 ScriptableRenderPass，
 
@@ -117,7 +118,57 @@ public class ZoomBlurPass : ScriptableRenderPass
         // 我们使用camera buffer的Command。Buffer。GetTemporaryRT方法来申请这样一张render tex。
         // 传入着色器属性ID以及相机像素尺寸相匹配的纹理宽高，FilterMode， RenderTextureFormat/
         cmd.GetTemporaryRT(destination, w, h, 0, FilterMode.Point, RenderTextureFormat.Default);
-        cmd.Blit(source, destination, zoomBlurMaterial, shaderPass);
-        cmd.Blit(destination, source);
+
+        if (Display.displays.Length > 1)
+        {
+            //List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
+            //SubsystemManager.GetSubsystems(displaySubsystems);
+            //XRDisplaySubsystem displaySubsystem = displaySubsystems[0];
+            Display secondDisplay = Display.displays[1];
+            
+            RenderTargetIdentifier destId = new RenderTargetIdentifier(secondDisplay.colorBuffer);
+            
+            
+
+            cmd.Blit(source, destination, zoomBlurMaterial, shaderPass);
+            cmd.SetRenderTarget(secondDisplay.colorBuffer, secondDisplay.depthBuffer);
+            cmd.Blit(destination, secondDisplay.colorBuffer);
+
+            //cmd.Blit(destination, source);
+            return;
+        }
+        else
+        {
+            List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
+            SubsystemManager.GetSubsystems(displaySubsystems);
+            XRDisplaySubsystem displaySubsystem;
+
+
+            if (displaySubsystems.Count > 0)
+            {
+                displaySubsystem = displaySubsystems[0];
+                if (displaySubsystem.GetRenderPassCount() > 2)
+                {
+                    Debug.Log("fuck");
+                    displaySubsystem.GetRenderPass(2, out var renderPass);
+                  
+                    cmd.Blit(RenderTexture.GetTemporary(renderPass.renderTargetDesc), destination, zoomBlurMaterial, shaderPass);
+                    cmd.Blit(destination, source);
+                    return;
+                }
+                else
+                {
+                    displaySubsystem.GetRenderPass(0, out var renderPass);
+                    cmd.Blit(RenderTexture.GetTemporary(renderPass.renderTargetDesc), destination, zoomBlurMaterial, shaderPass);
+                    cmd.Blit(destination, source);
+                }
+            }
+
+
+            
+            cmd.Blit(source, destination, zoomBlurMaterial, shaderPass);
+            cmd.Blit(destination, source);
+        }
+        
     }
 }

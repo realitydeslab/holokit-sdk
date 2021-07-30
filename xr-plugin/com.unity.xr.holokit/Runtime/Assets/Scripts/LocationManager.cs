@@ -43,7 +43,7 @@ public class LocationManager : MonoBehaviour
         get => m_CurrentMagneticHeading;
     }
 
-    private double m_CurrentHeadingAccuracy = 0f;
+    private double m_CurrentHeadingAccuracy = 0;
 
     public double CurrentHeadingAccuracy
     {

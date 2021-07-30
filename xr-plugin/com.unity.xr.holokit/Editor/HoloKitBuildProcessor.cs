@@ -116,6 +116,10 @@ namespace UnityEditor.XR.HoloKit
                 // For CoreLocation
                 rootDict.SetString("NSLocationWhenInUseUsageDescription", "For thatReality to locate your current location.");
 
+                rootDict.SetString("NSPhotoLibraryAddUsageDescription", "Export AR replay.");
+                rootDict.SetString("NSPhotoLibraryUsageDescription", "Export AR replay.");
+
+
                 File.WriteAllText(plistPath, plist.WriteToString());
             }
 

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e59e4c5dae76e40c5b80b9b639c43193, type: 3}
   m_Name: NewZoomBlurRenderFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &-2703124348060271205
 MonoBehaviour:
   m_ObjectHideFlags: 0

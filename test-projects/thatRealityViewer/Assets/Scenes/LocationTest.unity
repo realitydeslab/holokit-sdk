@@ -255,7 +255,7 @@ GameObject:
   - component: {fileID: 51949629}
   - component: {fileID: 51949628}
   m_Layer: 5
-  m_Name: PreviewButton
+  m_Name: FinishRecordingButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -546,6 +546,10 @@ PrefabInstance:
     - target: {fileID: 3570850918954108864, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3570850918954108865, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
+      propertyPath: far clip plane
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 3570850918954108875, guid: 23cf20b6f43ff4e48878bcb09ca00519, type: 3}
       propertyPath: m_EnvironmentDepthMode
@@ -852,7 +856,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Preview
+  m_Text: Finish Recoding
 --- !u!222 &352849221
 CanvasRenderer:
   m_ObjectHideFlags: 0

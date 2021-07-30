@@ -2790,8 +2790,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dca20344f92e2444cbd3c5a9cd107974, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_IsHost: 0
-  m_IsARCollaborationStarted: 0
   m_ResettingInverval: 30
 --- !u!1 &3570850918826158724
 GameObject:
@@ -3242,7 +3240,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.1
-  far clip plane: 20
+  far clip plane: 1000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -3884,7 +3882,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc733b2a7062d436393ac67577907ef9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_XrModeEnabled: 1
+  m_XrModeEnabled: 0
   m_CollaborationEnabled: 0
 --- !u!1 &3570850919165092328
 GameObject:
@@ -3931,7 +3929,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8103ea89d23654bb4b4477b291c29a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HandTrackingEnabled: 1
+  m_HandTrackingEnabled: 0
   m_LandmarksVisibilityEnabled: 1
   m_ColliderEnabled: 1
   m_GestureRecognitionEnabled: 1

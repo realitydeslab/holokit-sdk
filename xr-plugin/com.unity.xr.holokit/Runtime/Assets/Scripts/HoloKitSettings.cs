@@ -127,28 +127,6 @@ namespace UnityEngine.XR.HoloKit
             m_HasStarted = true;
         }
 
-        private void OnRenderImage(RenderTexture source, RenderTexture destination)
-        {
-            Debug.Log("fuckfucxk");
-            if (Display.displays.Length > 1)
-            {
-                if (m_SecondDisplay == null)
-                {
-                    m_SecondDisplay = Display.displays[1];
-                    //m_SecondDisplay.SetRenderingResolution(Display.main.renderingWidth, Display.main.renderingHeight);
-                    Debug.Log(m_SecondDisplay.colorBuffer.ToString());
-                    Debug.Log($"Main display width {Display.main.renderingWidth} and height {Display.main.renderingHeight}");
-                    //UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(m_SecondDisplay.colorBuffer.GetNativeRenderBufferPtr());
-                    //UnityHoloKit_SetSecondDisplayAvailable(true);
-                }
-            }
-        }
-
-        private void Update()
-        {
-            
-        }
-
         public void EnableMeshing(bool enabled)
         {
             // We can only enable one of them at the same time.

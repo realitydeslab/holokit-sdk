@@ -18,6 +18,7 @@
 #include "math_helpers.h"
 #include "holokit_api.h"
 #include "profiling_data.h"
+#include "low-latency-tracking/low_latency_tracking_api.h"
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_INPUT_XR_TRACE_LOG(trace, message, ...)                \
@@ -309,6 +310,8 @@ public:
                 //os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
                 
                 simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
+                // TODO: low latency tracking - get predicted camera transform
+                
                 simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
                 //simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
                 simd_float3 center_eye_position = camera_position;

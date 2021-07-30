@@ -73,11 +73,20 @@ public class HoloKitBlit : ScriptableRendererFeature
                     cmd.BeginSample(k_CustomRenderPassName);
 
                     //   cmd.SetRenderTarget(, m_SecondDisplay.depthBuffer);
-                    RenderTargetIdentifier ss = new RenderTargetIdentifier(m_SecondDisplay.colorBuffer);
+                    //RenderTargetIdentifier ss = new RenderTargetIdentifier(m_SecondDisplay.colorBuffer);
 
                     m_DisplaySubsystem.GetRenderPass(0, out var renderPass);
 
-                    cmd.Blit(renderPass.renderTarget, ss, copyMaterial);
+
+                    var shader = Shader.Find("PostEffect/ZoomBlur");
+                    if (shader == null)
+                    {
+                        Debug.LogError("Shader not found.");
+                        return;
+                    }
+
+                    Material zoomBlurMaterial = CoreUtils.CreateEngineMaterial(shader);
+                    cmd.Blit(m_CameraColorTargetId, m_CameraColorTargetId, copyMaterial);
 
                     cmd.EndSample(k_CustomRenderPassName);
                     context.ExecuteCommandBuffer(cmd);

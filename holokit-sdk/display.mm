@@ -320,12 +320,43 @@ public:
         //os_signpost_interval_begin(log, spid, "SubmitCurrentFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
         
         RenderContent2();
-        if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL) {
+        if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL && holokit::HoloKitApi::GetInstance()->GetRenderingMode() == 2) {
             RenderAlignmentMarker();
         }
         
-        if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable() && second_display_native_render_buffer_ptr_ != nullptr) {
-          //  RenderToSecondDisplay();
+//        if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable() && second_display_native_render_buffer_ptr_ != nullptr) {
+//          //  RenderToSecondDisplay();
+//        }
+        
+        if (isRecordingARSession) {
+            CVPixelBufferRef pixelBuffer = NULL;
+            NSLog(@"before convert");
+            if (holokit::HoloKitApi::GetInstance()->GetRenderingMode() == 2) {
+                pixelBuffer = MTLTextureToCVPixelBufferRef(metal_color_textures_[1]);
+//                CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault,
+//                                                 io_surfaces_[1],
+//                                                 nil,
+//                                                 &pixelBuffer);
+            } else {
+                pixelBuffer = MTLTextureToCVPixelBufferRef(metal_color_textures_[0]);
+//                CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault,
+//                                                 io_surfaces_[0],
+//                                                 NULL,
+//                                                 &pixelBuffer);
+            }
+            NSLog(@"after convert");
+            if (pixelBuffer == NULL) {
+                NSLog(@"pixel buffer is NULL");
+            } else {
+                NSLog(@"pixel buffer is not NULL");
+            }
+            
+            //[writerInput appendSampleBuffer:pixelBuffer];
+            CMTime appendTime;
+            appendTime.value = [[NSProcessInfo processInfo] systemUptime];
+            appendTime.timescale = 1;
+            //writerInputPixelBufferAdaptor.pixelBufferPool
+            [writerInputPixelBufferAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:appendTime];
         }
         
         //os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
@@ -382,6 +413,95 @@ public:
         [mtl_render_command_encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip
                                        vertexStart:0
                                        vertexCount:4];
+    }
+    
+    // https://liveupdate.tistory.com/445
+    CVPixelBufferRef MTLTextureToCVPixelBufferRef(id<MTLTexture> texture) {
+        CVPixelBufferRef pixelBuffer;
+        CVPixelBufferCreate(kCFAllocatorDefault,
+                            texture.width,
+                            texture.height,
+                            kCVPixelFormatType_32BGRA,
+                            nil,
+                            &pixelBuffer);
+        
+        CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
+        void* pixelBufferBytes = CVPixelBufferGetBaseAddress(pixelBuffer);
+        size_t bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
+        MTLRegion region = MTLRegionMake2D(0, 0, texture.width, texture.height);
+        // This might have a problem.
+        [texture getBytes:pixelBufferBytes bytesPerRow:bytesPerRow fromRegion:region mipmapLevel:0];
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+        return pixelBuffer;
+    }
+    
+    // https://stackoverflow.com/questions/3741323/how-do-i-export-uiimage-array-as-a-movie/3742212#3742212
+    void SetupVideoWriter() {
+        NSError *error = nil;
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *outputURL = paths[0];
+        NSFileManager *manager = [NSFileManager defaultManager];
+        [manager createDirectoryAtPath:outputURL withIntermediateDirectories:YES attributes:nil error:nil];
+        outputURL = [outputURL stringByAppendingPathComponent:@"output.mov"];
+        [manager removeItemAtPath:outputURL error:nil];
+        replayURL = outputURL;
+        videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:outputURL] fileType:AVFileTypeQuickTimeMovie error:&error];
+        //NSParameterAssert(videoWriter);
+        if (videoWriter == nil) {
+            NSLog(@"[av_session]: failted to create AVAssetWriter.");
+            return;
+        }
+        
+        NSDictionary *videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       AVVideoCodecTypeHEVC, AVVideoCodecKey,
+                                       [NSNumber numberWithInt:640], AVVideoWidthKey,
+                                       [NSNumber numberWithInt:480], AVVideoHeightKey,
+                                       nil];
+        writerInput = [AVAssetWriterInput
+            assetWriterInputWithMediaType:AVMediaTypeVideo
+            outputSettings:videoSettings];
+        if (writerInput == nil) {
+            NSLog(@"[av_session]: failted to create AVAssetWriterInput.");
+            return;
+        }
+        
+        writerInputPixelBufferAdaptor = [[AVAssetWriterInputPixelBufferAdaptor alloc] initWithAssetWriterInput:writerInput sourcePixelBufferAttributes:nil];
+        if (writerInputPixelBufferAdaptor == nil) {
+            NSLog(@"[av_session]: failed to create AVAssetWriterInputPixelBufferAdaptor.");
+            return;
+        }
+        
+        if ([videoWriter canAddInput:writerInput]) {
+            [videoWriter addInput:writerInput];
+        }
+    }
+    
+    void StartARRecording() {
+        if (!isVideoWriterSetup) {
+            SetupVideoWriter();
+            isVideoWriterSetup = true;
+        }
+        [videoWriter startWriting];
+        CMTime startTime;
+        startTime.value = [[NSProcessInfo processInfo] systemUptime];
+        startTime.timescale = 1;
+        [videoWriter startSessionAtSourceTime:startTime];
+        isRecordingARSession = true;
+    }
+    
+    void FinishARRecording() {
+        isRecordingARSession = false;
+        [writerInput markAsFinished];
+        CMTime finishTime;
+        finishTime.value = [[NSProcessInfo processInfo] systemUptime];
+        finishTime.timescale = 1;
+        [videoWriter endSessionAtSourceTime:finishTime];
+        // https://stackoverflow.com/questions/35640815/writing-to-photos-library-with-avassetwriter
+        [videoWriter finishWritingWithCompletionHandler:^(void){
+            UISaveVideoAtPathToSavedPhotosAlbum(replayURL, nil, nil, nil);
+            
+        }];
     }
     
     void RenderToSecondDisplay() {
@@ -693,6 +813,7 @@ private:
         native_color_textures_.resize(num_textures);
         native_depth_textures_.resize(num_textures);
         metal_color_textures_.resize(num_textures);
+        io_surfaces_.resize(num_textures);
         
         for (int i = 0; i < num_textures; i++) {
             UnityXRRenderTextureDesc texture_descriptor;
@@ -710,19 +831,21 @@ private:
                 (NSString*)kIOSurfaceHeight : @(screen_height),
                 (NSString*)kIOSurfaceBytesPerElement : @4u
             };
-            IOSurfaceRef color_surfaces = IOSurfaceCreate((CFDictionaryRef)color_surface_attribs);
+            io_surfaces_[i] = IOSurfaceCreate((CFDictionaryRef)color_surface_attribs);
             MTLTextureDescriptor* texture_color_buffer_descriptor = [[MTLTextureDescriptor alloc] init];
             texture_color_buffer_descriptor.textureType = MTLTextureType2D;
             texture_color_buffer_descriptor.width = screen_width;
             texture_color_buffer_descriptor.height = screen_height;
             texture_color_buffer_descriptor.pixelFormat = MTLPixelFormatRGBA8Unorm;
             texture_color_buffer_descriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
-            metal_color_textures_[i] = [mtl_device newTextureWithDescriptor:texture_color_buffer_descriptor iosurface:color_surfaces plane:0];
+            metal_color_textures_[i] = [mtl_device newTextureWithDescriptor:texture_color_buffer_descriptor iosurface:io_surfaces_[i] plane:0];
             
-            uint64_t color_buffer = reinterpret_cast<uint64_t>(color_surfaces);
+            uint64_t color_buffer = reinterpret_cast<uint64_t>(io_surfaces_[i]);
             native_color_textures_[i] = reinterpret_cast<void*>(color_buffer);
             uint64_t depth_buffer = 0;
             native_depth_textures_[i] = reinterpret_cast<void*>(depth_buffer);
+            
+            //io_surfaces_[i] = color_surface;
             
             texture_descriptor.color.nativePtr = native_color_textures_[i];
             texture_descriptor.depth.nativePtr = native_depth_textures_[i];
@@ -745,12 +868,14 @@ private:
                 native_color_textures_[i] = nullptr;
                 native_depth_textures_[i] = nullptr;
                 metal_color_textures_[i] = nil;
+                io_surfaces_[i] = nil;
             }
         }
         
         unity_textures_.clear();
         native_color_textures_.clear();
         metal_color_textures_.clear();
+        io_surfaces_.clear();
     }
     
 #pragma mark - Private Properties
@@ -781,6 +906,8 @@ private:
     /// @brief An array of metal textures.
     std::vector<id<MTLTexture>> metal_color_textures_;
     
+    std::vector<IOSurfaceRef> io_surfaces_;
+    
     /// @brief This value is set to true when Metal is initialized for the first time.
     bool main_metal_setup_ = false;
     
@@ -809,8 +936,18 @@ private:
     RenderingMode rendering_mode_;
     
     UnityRenderBuffer second_display_native_render_buffer_ptr_ = nullptr;
+
+    AVAssetWriter *videoWriter;
     
-    CADisplayLink* aDisplayLink = nullptr;
+    AVAssetWriterInput* writerInput;
+    
+    AVAssetWriterInputPixelBufferAdaptor *writerInputPixelBufferAdaptor;
+    
+    NSString *replayURL;
+    
+    bool isVideoWriterSetup = false;
+    
+    bool isRecordingARSession = false;
     
     static std::unique_ptr<HoloKitDisplayProvider> display_provider_;
 };
@@ -888,6 +1025,16 @@ UnityHoloKit_SetUnityProjectionMatrix(float column0[4], float column1[4], float 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(UnityRenderBuffer unity_render_buffer) {
     holokit::HoloKitDisplayProvider::GetInstance()->SetSecondDisplayColorBuffer(unity_render_buffer);
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_StartARRecording() {
+    holokit::HoloKitDisplayProvider::GetInstance()->StartARRecording();
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_FinishARRecording() {
+    holokit::HoloKitDisplayProvider::GetInstance()->FinishARRecording();
 }
 
 } // extern "C"

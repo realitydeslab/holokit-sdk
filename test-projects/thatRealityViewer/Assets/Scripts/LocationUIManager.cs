@@ -11,9 +11,9 @@ public class LocationUIManager : MonoBehaviour
 
     private Text m_LocationData;
 
-    private Button m_RecordingButton;
+    private Button m_StartRecordingButton;
 
-    private Button m_PreviewButton;
+    private Button m_FinishRecordingButton;
 
     private Button m_RenderingButton;
 
@@ -27,6 +27,12 @@ public class LocationUIManager : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void UnityHoloKit_SetRenderingMode(int val);
 
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_StartARRecording();
+
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_FinishARRecording();
+
     private void Start()
     {
         m_InitLocationManagerButton = transform.GetChild(0).GetComponent<Button>();
@@ -37,11 +43,11 @@ public class LocationUIManager : MonoBehaviour
 
         m_LocationData = transform.GetChild(2).GetComponent<Text>();
 
-        m_RecordingButton = transform.GetChild(3).GetComponent<Button>();
-        m_RecordingButton.onClick.AddListener(Record);
+        m_StartRecordingButton = transform.GetChild(3).GetComponent<Button>();
+        m_StartRecordingButton.onClick.AddListener(StartRecording);
 
-        m_PreviewButton = transform.GetChild(4).GetComponent<Button>();
-        m_PreviewButton.onClick.AddListener(Preview);
+        m_FinishRecordingButton = transform.GetChild(4).GetComponent<Button>();
+        m_FinishRecordingButton.onClick.AddListener(FinishRecording);
 
         m_RenderingButton = transform.GetChild(5).GetComponent<Button>();
         m_RenderingButton.onClick.AddListener(SwitchRenderingMode);
@@ -58,15 +64,6 @@ public class LocationUIManager : MonoBehaviour
             $"Longitude: {LocationManager.Instance.CurrentLongitude}\n" +
             $"Altitude: {LocationManager.Instance.CurrentAltitude}";
         m_LocationData.text = newLocationData;
-
-        if (ReplayManager.Instance.IsPreviewAvailable)
-        {
-            m_PreviewButton.gameObject.SetActive(true);
-        }
-        else
-        {
-            m_PreviewButton.gameObject.SetActive(false);
-        }
     }
 
     private void InitLocationManager()
@@ -81,23 +78,14 @@ public class LocationUIManager : MonoBehaviour
         LocationManager.Instance.StartUpdatingLocation();
     }
 
-    private void Record()
+    private void StartRecording()
     {
-        if (!ReplayManager.Instance.IsRecording)
-        {
-            ReplayManager.Instance.StartRecording();
-            m_RecordingButton.transform.GetChild(0).GetComponent<Text>().text = "Stop Recording";
-        }
-        else
-        {
-            ReplayManager.Instance.StopRecording();
-            m_RecordingButton.transform.GetChild(0).GetComponent<Text>().text = "Start Recording";
-        }
+        UnityHoloKit_StartARRecording();
     }
 
-    private void Preview()
+    private void FinishRecording()
     {
-        ReplayManager.Instance.Preview();
+        UnityHoloKit_FinishARRecording();
     }
 
     private void SwitchRenderingMode()

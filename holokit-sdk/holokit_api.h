@@ -112,7 +112,7 @@ private:
     
     bool nfc_verification_result_ = false;
     
-    bool is_second_display_available_ = false;
+    bool is_second_display_available_ = true;
 }; // class HoloKitApi
 
 std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;

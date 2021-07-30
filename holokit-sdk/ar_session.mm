@@ -28,6 +28,7 @@
 #import <CoreMotion/CoreMotion.h>
 #import <CoreLocation/CoreLocation.h>
 #import "profiling_data.h"
+#import "low-latency-tracking/low_latency_tracking_api.h"
 
 #define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
@@ -255,7 +256,9 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     if ([self.motionManager isAccelerometerAvailable] == YES) {
         self.motionManager.accelerometerUpdateInterval = 1.0 / 100.0;
         [self.motionManager startAccelerometerUpdatesToQueue:self.motionQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
-            //NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
+//            NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
+            // TODO: low latency tracking - keep providing accelerometer data to low_latency_tracking_api
+            
         }];
     }
 }
@@ -264,11 +267,14 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     if ([self.motionManager isGyroAvailable] == YES) {
         self.motionManager.gyroUpdateInterval = 1.0 / 100.0;
         [self.motionManager startGyroUpdatesToQueue:self.motionQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
-            // self.gy_x = gyroData.rotationRate.x;
-            // self.gy_y = gyroData.rotationRate.y;
-            // self.gy_z = gyroData.rotationRate.z;
-            //    NSLog(@"[Gyro] thread=%@, gyroData.timestamp=%f, systemuptime=%f, gyroData.rotationRate.x=%f, gyroData.rotationRate.y=%f, gyroData.rotationRate.z=%f", [NSThread currentThread], gyroData.timestamp, [[NSProcessInfo processInfo] systemUptime], gyroData.rotationRate.x, gyroData.rotationRate.y,
-            //        gyroData.rotationRate.z);
+//             self.gy_x = gyroData.rotationRate.x;
+//             self.gy_y = gyroData.rotationRate.y;
+//             self.gy_z = gyroData.rotationRate.z;
+//                NSLog(@"[Gyro] thread=%@, gyroData.timestamp=%f, systemuptime=%f, gyroData.rotationRate.x=%f, gyroData.rotationRate.y=%f, gyroData.rotationRate.z=%f", [NSThread currentThread], gyroData.timestamp, [[NSProcessInfo processInfo] systemUptime], gyroData.rotationRate.x, gyroData.rotationRate.y,
+//                    gyroData.rotationRate.z);
+            // TODO: low latency tracking - keep providing gyro data to low_latency_tracking _api
+            
+            
         }];
     }
 }
@@ -302,6 +308,8 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         NSLog(@"[ar_session]: AR session started.");
         self.session = session;
     }
+    
+    // TODO: low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
     
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.
@@ -544,7 +552,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         NSArray<VNRequest *> * requests = [[NSArray alloc] initWithObjects:self.handPoseRequest, nil];
         [requestHandler performRequests:requests error:nil];
         // Get the results.
-        int numOfHands =  self.handPoseRequest.results.count;
+        int numOfHands = self.handPoseRequest.results.count;
         //NSLog(@"[ar_session]: number of hand %d", numOfHands);
         if (numOfHands == 0) {
             // There is no hand in this frame.
