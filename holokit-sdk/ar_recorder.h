@@ -17,5 +17,7 @@
 - (NSURL *)newVideoPath;
 - (void)insert:(CVPixelBufferRef)buffer with:(CMTime)time;
 - (void)end;
++ (CVPixelBufferRef)convertIOSurfaceRefToCVPixelBufferRef:(IOSurfaceRef)surface;
++ (CVPixelBufferRef)convertMTLTextureToCVPixelBufferRef:(id<MTLTexture>)texture;
 
 @end

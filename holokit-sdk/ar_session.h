@@ -12,6 +12,7 @@
 #import "LandmarkPosition.h"
 #import "multipeer_session.h"
 #import <WatchConnectivity/WatchConnectivity.h>
+#import "ar_recorder.h"
 
 @interface ARSessionDelegateController : NSObject
 
@@ -26,6 +27,8 @@
 @property (assign) bool primaryButtonRight;
 @property (assign) int handPosePredictionInterval;
 @property (nonatomic, strong) MultipeerSession *multipeerSession;
+@property (nonatomic, strong) ARRecorder *recorder;
+@property (assign) bool isRecording;
 
 + (id)sharedARSessionDelegateController;
 

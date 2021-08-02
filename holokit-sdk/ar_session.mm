@@ -29,7 +29,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import "profiling_data.h"
 #import "low-latency-tracking/low_latency_tracking_api.h"
-#import "ar_recorder.h"
 
 #define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
@@ -90,8 +89,6 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 @property (nonatomic, strong) CLLocation *currentLocation;
 @property (nonatomic, strong) CLHeading *currentHeading;
 @property (nonatomic, strong) CADisplayLink *aDisplayLink;
-@property (nonatomic, strong) ARRecorder *recorder;
-@property (assign) bool isRecording;
 
 @end
 
@@ -316,10 +313,15 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     }
     
     // AR recoding
-    if (self.isRecording) {
-        CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
-        [self.recorder insert:frame.capturedImage with:time];
-    }
+//    if (self.isRecording) {
+//        CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
+//        [self.recorder insert:frame.capturedImage with:time];
+//        
+//    } else {
+////        if (self.isRecordingFinished) {
+////            [self.recorder end];
+////        }
+//    }
     
     // TODO: low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
     

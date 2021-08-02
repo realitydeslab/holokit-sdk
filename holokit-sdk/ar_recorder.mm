@@ -11,10 +11,12 @@
 @interface ARRecorder()
 
 @property (assign) bool isRecordingStarted;
+@property (assign) bool isRecordingFinished;
 @property (nonatomic, strong) NSString *videoPath;
 
 @end
 
+// Reference: https://github.com/AFathi/ARVideoKit
 @implementation ARRecorder
 
 - (instancetype)init {
@@ -56,7 +58,8 @@
         }
         self.writer.shouldOptimizeForNetworkUse = NO;
         NSLog(@"[ar_recorder]: recorder successfully initialized.");
-        self.isRecordingStarted = false;
+        self.isRecordingStarted = NO;
+        self.isRecordingFinished = NO;
     }
     return self;
 }
@@ -78,11 +81,13 @@
 
 - (void)insert:(CVPixelBufferRef)buffer with:(CMTime)time {
     NSLog(@"[ar_recorder]: insert");
+    if (self.isRecordingFinished) return;
     //CMTime time = CMTimeMakeWithSeconds(intervals, 1000000);
-    if (self.isRecordingStarted == false) {
+    if (self.isRecordingStarted == NO) {
         if ([self.writer startWriting]) {
             [self.writer startSessionAtSourceTime:time];
-            self.isRecordingStarted = true;
+            self.isRecordingStarted = YES;
+            return;
         }
     }
     
@@ -94,11 +99,51 @@
 
 - (void)end {
     NSLog(@"[ar_recorder]: end");
+    self.isRecordingFinished = YES;
+    [self.writerInput markAsFinished];
+//    CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
+//    [self.writer endSessionAtSourceTime:time];
     [self.writer finishWritingWithCompletionHandler:^(void){
         NSLog(@"[ar_recorder]: recording finished successfully.");
         // https://stackoverflow.com/questions/35640815/writing-to-photos-library-with-avassetwriter
         UISaveVideoAtPathToSavedPhotosAlbum(self.videoPath, nil, nil, nil);
     }];
+}
+
+// Didn't work
++ (CVPixelBufferRef)convertIOSurfaceRefToCVPixelBufferRef:(IOSurfaceRef)surface {
+    NSDictionary* color_surface_attribs = @{
+        (NSString*)kIOSurfaceIsGlobal : @ YES,
+        (NSString*)kIOSurfaceWidth : @(holokit::HoloKitApi::GetInstance()->GetScreenWidth()),
+        (NSString*)kIOSurfaceHeight : @(holokit::HoloKitApi::GetInstance()->GetScreenHeight()),
+        (NSString*)kIOSurfaceBytesPerElement : @4u
+    };
+    CVPixelBufferRef pixelBuffer;
+    //CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault, surface, (__bridge CFDictionaryRef)color_surface_attribs, &pixelBuffer);
+    CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault, surface, nil, &pixelBuffer);
+    if (pixelBuffer == nil) {
+        NSLog(@"[ar_recorder]: converted pixel buffer is nil");
+    }
+    return pixelBuffer;
+}
+
+// https://liveupdate.tistory.com/445
++ (CVPixelBufferRef)convertMTLTextureToCVPixelBufferRef:(id<MTLTexture>)texture {
+    CVPixelBufferRef pixelBuffer;
+    CVPixelBufferCreate(kCFAllocatorDefault,
+                        texture.width,
+                        texture.height,
+                        kCVPixelFormatType_32BGRA,
+                        nil,
+                        &pixelBuffer);
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    void *pixelBufferBytes = CVPixelBufferGetBaseAddress(pixelBuffer);
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
+    MTLRegion region = MTLRegionMake2D(0, 0, texture.width, texture.height);
+    NSLog(@"texture format %d", texture.pixelFormat);
+    [texture getBytes:pixelBufferBytes bytesPerRow:bytesPerRow fromRegion:region mipmapLevel:0];
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+    return pixelBuffer;
 }
 
 @end
