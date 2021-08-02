@@ -28,10 +28,10 @@ public class LocationUIManager : MonoBehaviour
     private static extern void UnityHoloKit_SetRenderingMode(int val);
 
     [DllImport("__Internal")]
-    private static extern void UnityHoloKit_StartARRecording();
+    private static extern void UnityHoloKit_StartRecording();
 
     [DllImport("__Internal")]
-    private static extern void UnityHoloKit_FinishARRecording();
+    private static extern void UnityHoloKit_FinishRecording();
 
     private void Start()
     {
@@ -80,12 +80,12 @@ public class LocationUIManager : MonoBehaviour
 
     private void StartRecording()
     {
-        UnityHoloKit_StartARRecording();
+        UnityHoloKit_StartRecording();
     }
 
     private void FinishRecording()
     {
-        UnityHoloKit_FinishARRecording();
+        UnityHoloKit_FinishRecording();
     }
 
     private void SwitchRenderingMode()

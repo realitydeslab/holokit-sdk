@@ -29,6 +29,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import "profiling_data.h"
 #import "low-latency-tracking/low_latency_tracking_api.h"
+#import "ar_recorder.h"
 
 #define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
@@ -88,7 +89,9 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) CLLocation *currentLocation;
 @property (nonatomic, strong) CLHeading *currentHeading;
-@property (nonatomic ,strong) CADisplayLink *aDisplayLink;
+@property (nonatomic, strong) CADisplayLink *aDisplayLink;
+@property (nonatomic, strong) ARRecorder *recorder;
+@property (assign) bool isRecording;
 
 @end
 
@@ -143,6 +146,9 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         self.aDisplayLink = [[UIScreen mainScreen] displayLinkWithTarget:self selector:@selector(printNextVsyncTime)];
        // [aDisplayLink setFrameInterval:animationFrameInterval];
         [self.aDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        
+        self.recorder = [[ARRecorder alloc] init];
+        self.isRecording = NO;
         
 //        frame_count = 0;
 //        last_frame_time = 0.0f;
@@ -307,6 +313,12 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     if(self.session == NULL) {
         NSLog(@"[ar_session]: AR session started.");
         self.session = session;
+    }
+    
+    // AR recoding
+    if (self.isRecording) {
+        CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
+        [self.recorder insert:frame.capturedImage with:time];
     }
     
     // TODO: low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
@@ -1024,6 +1036,19 @@ UnityHoloKit_StartUpdatingHeading() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetDidUpdateHeadingDelegate(DidUpdateHeading callback) {
     DidUpdateHeadingDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_StartRecording() {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    ar_session_delegate_controller.isRecording = YES;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_FinishRecording() {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    ar_session_delegate_controller.isRecording = NO;
+    [ar_session_delegate_controller.recorder end];
 }
 
 } // extern "C"

@@ -18,6 +18,7 @@
 #include "math_helpers.h"
 #include "holokit_api.h"
 #include "profiling_data.h"
+#include "ar_recorder.h"
 
 #if __APPLE__
 #define XR_METAL 1
@@ -402,6 +403,9 @@ public:
                 return;
             }
             main_metal_setup_ = true;
+            
+//            ARRecorder *ar_recorder = [[ARRecorder alloc] init];
+//            NSLog(@"fuck %@", [ar_recorder newVideoPath]);
         }
         
         id<MTLRenderCommandEncoder> mtl_render_command_encoder =
@@ -1027,14 +1031,14 @@ UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(UnityRenderBuffer unity_rende
     holokit::HoloKitDisplayProvider::GetInstance()->SetSecondDisplayColorBuffer(unity_render_buffer);
 }
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StartARRecording() {
-    holokit::HoloKitDisplayProvider::GetInstance()->StartARRecording();
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_FinishARRecording() {
-    holokit::HoloKitDisplayProvider::GetInstance()->FinishARRecording();
-}
+//void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+//UnityHoloKit_StartARRecording() {
+//    holokit::HoloKitDisplayProvider::GetInstance()->StartARRecording();
+//}
+//
+//void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+//UnityHoloKit_FinishARRecording() {
+//    holokit::HoloKitDisplayProvider::GetInstance()->FinishARRecording();
+//}
 
 } // extern "C"

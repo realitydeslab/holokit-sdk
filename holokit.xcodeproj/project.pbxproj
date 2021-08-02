@@ -28,6 +28,7 @@
 		4B38245D25E77F6900B39EEB /* MathHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B38242C25E74B1200B39EEB /* MathHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4B38248225E77F8500B39EEB /* MathHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6AD99B25E34404008F9911 /* MathHelper.h */; };
 		4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */; };
+		4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B4431F926B7A1A000869815 /* ar_recorder.mm */; };
 		4B4CDC3125F06D36000C2AC7 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
 		4B66159525F39F9000CC4E81 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
 		4B6615A225F39FE000CC4E81 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
@@ -335,6 +336,8 @@
 		4B38242C25E74B1200B39EEB /* MathHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelpers.h; sourceTree = "<group>"; };
 		4B38244025E757D100B39EEB /* test_input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = test_input.mm; sourceTree = "<group>"; };
 		4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = "MyHandPoseClassifier01 1.mlpackage"; sourceTree = "<group>"; };
+		4B4431F826B7A19000869815 /* ar_recorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_recorder.h; sourceTree = "<group>"; };
+		4B4431F926B7A1A000869815 /* ar_recorder.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_recorder.mm; sourceTree = "<group>"; };
 		4B46940926B3C56C00DC960E /* low_latency_tracking_api.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = low_latency_tracking_api.h; sourceTree = "<group>"; };
 		4B4FFDF42604AA93002FC8D7 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		4B57A799267B4CC300A1ABAD /* profiling_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = profiling_data.h; sourceTree = "<group>"; };
@@ -863,6 +866,8 @@
 				4B57A799267B4CC300A1ABAD /* profiling_data.h */,
 				4B9C742525F5B909001935A8 /* LandmarkPosition.h */,
 				4B9C742625F5B948001935A8 /* LandmarkPosition.m */,
+				4B4431F826B7A19000869815 /* ar_recorder.h */,
+				4B4431F926B7A1A000869815 /* ar_recorder.mm */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -2018,6 +2023,7 @@
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
+				4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
