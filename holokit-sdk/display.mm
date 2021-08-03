@@ -332,7 +332,7 @@ public:
         ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
         //NSLog(@"[ar_recorder]: writer status %ld", (long)ar_session_delegate_controller.recorder.writer.status);
         if (ar_session_delegate_controller.isRecording) {
-            //CVPixelBufferRef pixelBuffer = [ARRecorder convertIOSurfaceRefToCVPixelBufferRef:io_surfaces_[0]];
+            //CVPixelBufferRef pixelBuffer = [ARRecorder convertIOSurfaceRefToCVPixelBufferRef:metal_color_textures_[0].iosurface];
             CVPixelBufferRef pixelBuffer = [ARRecorder convertMTLTextureToCVPixelBufferRef:metal_color_textures_[0]];
             CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
             [ar_session_delegate_controller.recorder insert:pixelBuffer with:time];
@@ -452,7 +452,8 @@ public:
             render_pipeline_descriptor.sampleCount = 1;
             render_pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
             render_pipeline_descriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-            render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+            //render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+            render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
             render_pipeline_descriptor.colorAttachments[0].blendingEnabled = YES;
             render_pipeline_descriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
             render_pipeline_descriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
@@ -733,7 +734,7 @@ private:
             texture_color_buffer_descriptor.height = screen_height;
             texture_color_buffer_descriptor.pixelFormat = MTLPixelFormatRGBA8Unorm;
             //texture_color_buffer_descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm;
-            texture_color_buffer_descriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+            texture_color_buffer_descriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead | MTLTextureUsagePixelFormatView;
             metal_color_textures_[i] = [mtl_device newTextureWithDescriptor:texture_color_buffer_descriptor iosurface:io_surfaces_[i] plane:0];
             
             uint64_t color_buffer = reinterpret_cast<uint64_t>(io_surfaces_[i]);

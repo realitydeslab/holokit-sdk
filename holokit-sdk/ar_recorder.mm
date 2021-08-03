@@ -112,14 +112,12 @@
 
 // Didn't work
 + (CVPixelBufferRef)convertIOSurfaceRefToCVPixelBufferRef:(IOSurfaceRef)surface {
-    NSDictionary* color_surface_attribs = @{
-        (NSString*)kIOSurfaceIsGlobal : @ YES,
-        (NSString*)kIOSurfaceWidth : @(holokit::HoloKitApi::GetInstance()->GetScreenWidth()),
-        (NSString*)kIOSurfaceHeight : @(holokit::HoloKitApi::GetInstance()->GetScreenHeight()),
-        (NSString*)kIOSurfaceBytesPerElement : @4u
-    };
+    if (surface != nil) {
+        NSLog(@"surface is not nil");
+    }
     CVPixelBufferRef pixelBuffer;
-    //CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault, surface, (__bridge CFDictionaryRef)color_surface_attribs, &pixelBuffer);
+    //NSDictionary *pixelBufferAttributes = @{(NSString *)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};
+    //CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault, surface, (__bridge CFDictionaryRef _Nullable)(pixelBufferAttributes), &pixelBuffer);
     CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault, surface, nil, &pixelBuffer);
     if (pixelBuffer == nil) {
         NSLog(@"[ar_recorder]: converted pixel buffer is nil");
@@ -129,18 +127,30 @@
 
 // https://liveupdate.tistory.com/445
 + (CVPixelBufferRef)convertMTLTextureToCVPixelBufferRef:(id<MTLTexture>)texture {
+    //id<MTLTexture> convertedTexture = [texture newTextureViewWithPixelFormat: kCVPixelFormatType_422YpCbCr8BiPlanarFullRange];
+    //NSLog(@"%lu", texture.pixelFormat);
+    //NSLog(@"%lu", convertedTexture.pixelFormat);
     CVPixelBufferRef pixelBuffer;
+    
+//    NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+//                             [NSNumber numberWithBool:YES], kCVPixelBufferMetalCompatibilityKey,
+//                             [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
+//                             [NSNumber numberWithBool:YES], kCVPixelBufferCGBitmapContextCompatibilityKey,
+//                             nil];
+    
     CVPixelBufferCreate(kCFAllocatorDefault,
                         texture.width,
                         texture.height,
                         kCVPixelFormatType_32BGRA,
+                        //kCVPixelFormatType_422YpCbCr8BiPlanarFullRange,
+                        //(__bridge CFDictionaryRef) options,
                         nil,
                         &pixelBuffer);
     CVPixelBufferLockBaseAddress(pixelBuffer, 0);
     void *pixelBufferBytes = CVPixelBufferGetBaseAddress(pixelBuffer);
     size_t bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
     MTLRegion region = MTLRegionMake2D(0, 0, texture.width, texture.height);
-    NSLog(@"texture format %d", texture.pixelFormat);
+    
     [texture getBytes:pixelBufferBytes bytesPerRow:bytesPerRow fromRegion:region mipmapLevel:0];
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
     return pixelBuffer;

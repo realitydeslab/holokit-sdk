@@ -322,6 +322,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 ////            [self.recorder end];
 ////        }
 //    }
+    //NSLog(@"arkit pixel format type %u", (unsigned int)CVPixelBufferGetPixelFormatType(frame.capturedImage));
     
     // TODO: low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
     
