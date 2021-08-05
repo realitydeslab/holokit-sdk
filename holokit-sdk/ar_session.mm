@@ -29,6 +29,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import "profiling_data.h"
 #import "low-latency-tracking/low_latency_tracking_api.h"
+#import "holokit_api.h"
 
 #define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
@@ -102,9 +103,12 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 //        [self.handTracker startGraph];
 //        self.handTrackingQueue = [[NSOperationQueue alloc] init];
 //        self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-//        self.motionQueue = [[NSOperationQueue alloc] init];
-//        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-//        self.motionManager = [[CMMotionManager alloc] init];
+        
+        self.motionQueue = [[NSOperationQueue alloc] init];
+        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        self.motionManager = [[CMMotionManager alloc] init];
+        [self startAccelerometer];
+        [self startGyroscope];
         
         // Vision hand tracking
         //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
@@ -137,11 +141,11 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
             //[self.wcSession activateSession];
         }
         
-        NSLog(@"number of screens: %lu", (unsigned long)[[UIScreen screens] count]);
-        NSLog(@"Maximum FPS = %ld", [UIScreen mainScreen].maximumFramesPerSecond);
-
+        // Metal Vsync
+        //NSLog(@"number of screens: %lu", (unsigned long)[[UIScreen screens] count]);
+        //NSLog(@"Maximum FPS = %ld", [UIScreen mainScreen].maximumFramesPerSecond);
         self.aDisplayLink = [[UIScreen mainScreen] displayLinkWithTarget:self selector:@selector(printNextVsyncTime)];
-       // [aDisplayLink setFrameInterval:animationFrameInterval];
+        //[aDisplayLink setFrameInterval:animationFrameInterval];
         [self.aDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
         self.recorder = [[ARRecorder alloc] init];
@@ -154,7 +158,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 }
 
 - (void)printNextVsyncTime {
-    //NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
+    NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
 }
 
 - (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID {
@@ -259,9 +263,10 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     if ([self.motionManager isAccelerometerAvailable] == YES) {
         self.motionManager.accelerometerUpdateInterval = 1.0 / 100.0;
         [self.motionManager startAccelerometerUpdatesToQueue:self.motionQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
-//            NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
-            // TODO: low latency tracking - keep providing accelerometer data to low_latency_tracking_api
-            
+            //NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
+            // low latency tracking - keep providing accelerometer data to low_latency_tracking_api
+            holokit::AccelerometerData data = { accelerometerData.timestamp, CMAccelerationToEigenVector3d(accelerometerData.acceleration) };
+            holokit::LowLatencyTrackingApi::GetInstance()->OnAccelerometerDataUpdated(data);
         }];
     }
 }
@@ -270,14 +275,10 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     if ([self.motionManager isGyroAvailable] == YES) {
         self.motionManager.gyroUpdateInterval = 1.0 / 100.0;
         [self.motionManager startGyroUpdatesToQueue:self.motionQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
-//             self.gy_x = gyroData.rotationRate.x;
-//             self.gy_y = gyroData.rotationRate.y;
-//             self.gy_z = gyroData.rotationRate.z;
-//                NSLog(@"[Gyro] thread=%@, gyroData.timestamp=%f, systemuptime=%f, gyroData.rotationRate.x=%f, gyroData.rotationRate.y=%f, gyroData.rotationRate.z=%f", [NSThread currentThread], gyroData.timestamp, [[NSProcessInfo processInfo] systemUptime], gyroData.rotationRate.x, gyroData.rotationRate.y,
-//                    gyroData.rotationRate.z);
+            //NSLog(@"[Gyro] thread=%@, gyroData.timestamp=%f, systemuptime=%f, gyroData.rotationRate.x=%f, gyroData.rotationRate.y=%f, gyroData.rotationRate.z=%f", [NSThread currentThread], gyroData.timestamp, [[NSProcessInfo processInfo] systemUptime], gyroData.rotationRate.x, gyroData.rotationRate.y, gyroData.rotationRate.z);
             // TODO: low latency tracking - keep providing gyro data to low_latency_tracking _api
-            
-            
+            holokit::GyroData data = { gyroData.timestamp,  CMRotationRateToEigenVector3d(gyroData.rotationRate) };
+            holokit::LowLatencyTrackingApi::GetInstance()->OnGyroDataUpdated(data);
         }];
     }
 }
@@ -310,21 +311,17 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     if(self.session == NULL) {
         NSLog(@"[ar_session]: AR session started.");
         self.session = session;
+        
+        holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
     
-    // AR recoding
-//    if (self.isRecording) {
-//        CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
-//        [self.recorder insert:frame.capturedImage with:time];
-//        
-//    } else {
-////        if (self.isRecordingFinished) {
-////            [self.recorder end];
-////        }
-//    }
-    //NSLog(@"arkit pixel format type %u", (unsigned int)CVPixelBufferGetPixelFormatType(frame.capturedImage));
-    
-    // TODO: low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
+    // low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
+    //NSLog(@"[ar_session]: current thread %@", [NSThread currentThread]);
+    holokit::ARKitData data = { frame.timestamp,
+        TransformToEigenVector3d(frame.camera.transform),
+        TransformToEigenQuaterniond(frame.camera.transform),
+        MatrixToEigenMatrix3d(frame.camera.intrinsics) };
+    holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
     
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.

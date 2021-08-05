@@ -28,8 +28,8 @@ enum RenderingMode {
 
 /// Wrapper of HoloKit SDK
 class HoloKitApi {
-public:
     
+public:
     HoloKitApi() {};
     
     void Initialize();
@@ -56,7 +56,7 @@ public:
     
     RenderingMode GetRenderingMode() { return current_rendering_mode_; }
     
-    void SetRenderingMode(RenderingMode new_mode) {current_rendering_mode_ = new_mode; }
+    void SetRenderingMode(RenderingMode new_mode) { current_rendering_mode_ = new_mode; }
     
     void StartNfcVerification();
     

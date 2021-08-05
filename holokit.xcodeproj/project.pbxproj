@@ -51,7 +51,7 @@
 		4B9304D32625A4AA005D9975 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
 		4B99658F25F715E3006AF9A5 /* hand_tracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */; };
 		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
-		4BA0DBF626B401360097C1F5 /* low_latency_tracking_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.cpp */; };
+		4BA0DBF626B401360097C1F5 /* low_latency_tracking_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */; };
 		4BAD1933262026C3006884F1 /* view_controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BAD1932262026C3006884F1 /* view_controller.m */; };
 		4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* nfc_session.m */; };
 		4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
@@ -368,7 +368,7 @@
 		4B9C52BE261F0B330020E4C8 /* ar_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_session.h; sourceTree = "<group>"; };
 		4B9C742525F5B909001935A8 /* LandmarkPosition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LandmarkPosition.h; sourceTree = "<group>"; };
 		4B9C742625F5B948001935A8 /* LandmarkPosition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LandmarkPosition.m; sourceTree = "<group>"; };
-		4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = low_latency_tracking_api.cpp; sourceTree = "<group>"; };
+		4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = low_latency_tracking_api.mm; sourceTree = "<group>"; };
 		4BAD1932262026C3006884F1 /* view_controller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = view_controller.m; sourceTree = "<group>"; };
 		4BAD1942262026D3006884F1 /* view_controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = view_controller.h; sourceTree = "<group>"; };
 		4BB5587226205B7D00DC0213 /* nfc_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = nfc_session.m; sourceTree = "<group>"; };
@@ -796,7 +796,7 @@
 			isa = PBXGroup;
 			children = (
 				4B46940926B3C56C00DC960E /* low_latency_tracking_api.h */,
-				4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.cpp */,
+				4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */,
 			);
 			path = "low-latency-tracking";
 			sourceTree = "<group>";
@@ -2016,7 +2016,7 @@
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
 				4B260C9926368C280004B771 /* multipeer_session.m in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
-				4BA0DBF626B401360097C1F5 /* low_latency_tracking_api.cpp in Sources */,
+				4BA0DBF626B401360097C1F5 /* low_latency_tracking_api.mm in Sources */,
 				4BAD1933262026C3006884F1 /* view_controller.m in Sources */,
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
 				4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */,

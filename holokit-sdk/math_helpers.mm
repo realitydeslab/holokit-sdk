@@ -116,3 +116,39 @@ std::vector<float> TransformToUnityRotation(simd_float4x4 transform_matrix) {
     rotation.push_back(quaternion.vector.w);
     return rotation;
 }
+
+Eigen::Vector3d TransformToEigenVector3d(simd_float4x4 transform_matrix) {
+    return Eigen::Vector3d(transform_matrix.columns[3].x, transform_matrix.columns[3].y, transform_matrix.columns[3].z);
+}
+
+Eigen::Quaterniond TransformToEigenQuaterniond(simd_float4x4 transform_matrix) {
+    simd_quatf quaternion = simd_quaternion(transform_matrix);
+    return Eigen::Quaterniond(quaternion.vector.w, quaternion.vector.x, quaternion.vector.y, quaternion.vector.z);
+}
+
+Eigen::Matrix3d MatrixToEigenMatrix3d(simd_float3x3 matrix) {
+    Eigen::Matrix3d result;
+    result << matrix.columns[0].x , matrix.columns[1].x , matrix.columns[2].x,
+              matrix.columns[0].y , matrix.columns[1].y , matrix.columns[2].y,
+              matrix.columns[0].z , matrix.columns[1].z , matrix.columns[2].z;
+    return result;
+}
+
+Eigen::Vector3d CMAccelerationToEigenVector3d(CMAcceleration acceleration) {
+    Eigen::Vector3d ret(acceleration.x, acceleration.y, acceleration.z);
+    //NSLog(@"CMAccelerationToEigenVector3d:: Eigen vector3d (%f, %f, %f)", ret(0), ret(1), ret(2));
+    return ret;
+}
+
+Eigen::Vector3d CMRotationRateToEigenVector3d(CMRotationRate rotationRate) {
+    Eigen::Vector3d ret(rotationRate.x, rotationRate.y, rotationRate.z);
+    return ret;
+}
+
+UnityXRVector3 EigenVector3dToUnityXRVector3(Eigen::Vector3d vector3) {
+    return UnityXRVector3 { (float)vector3(0), (float)vector3(1), (float)vector3(2) };
+}
+
+UnityXRVector4 EigenQuaterniondToUnityXRVector4(Eigen::Quaterniond quaternion) {
+    return UnityXRVector4 { -(float)quaternion.x(), -(float)quaternion.y(), (float)quaternion.z(), (float)quaternion.w() };
+}

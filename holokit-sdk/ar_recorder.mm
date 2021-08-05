@@ -31,7 +31,7 @@
         }
         
         NSDictionary *videoOutputSettings = [NSDictionary dictionaryWithObjectsAndKeys:
-                                             AVVideoCodecTypeH264, AVVideoCodecKey,
+                                             AVVideoCodecTypeHEVC, AVVideoCodecKey,
                                              [NSNumber numberWithInt:holokit::HoloKitApi::GetInstance()->GetScreenWidth()], AVVideoWidthKey,
                                              [NSNumber numberWithInt:holokit::HoloKitApi::GetInstance()->GetScreenHeight()], AVVideoHeightKey,
                                              nil];
@@ -118,7 +118,7 @@
     CVPixelBufferRef pixelBuffer;
     //NSDictionary *pixelBufferAttributes = @{(NSString *)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};
     //CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault, surface, (__bridge CFDictionaryRef _Nullable)(pixelBufferAttributes), &pixelBuffer);
-    CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault, surface, nil, &pixelBuffer);
+    CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault, surface, nullptr, &pixelBuffer);
     if (pixelBuffer == nil) {
         NSLog(@"[ar_recorder]: converted pixel buffer is nil");
     }
@@ -142,6 +142,7 @@
                         texture.width,
                         texture.height,
                         kCVPixelFormatType_32BGRA,
+                        //kCVPixelFormatType_32RGBA,
                         //kCVPixelFormatType_422YpCbCr8BiPlanarFullRange,
                         //(__bridge CFDictionaryRef) options,
                         nil,

@@ -309,19 +309,23 @@ public:
                 //os_signpost_id_t spid = os_signpost_id_generate(log);
                 //os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
                 
-                simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
                 // TODO: low latency tracking - get predicted camera transform
+                UnityXRVector3 position;
+                UnityXRVector4 rotation;
                 
-                simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
-                //simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
-                simd_float3 center_eye_position = camera_position;
-                //simd_float3 center_eye_position = camera_position + offset;
-                UnityXRVector3 position = UnityXRVector3 { center_eye_position.x, center_eye_position.y, -center_eye_position.z };
-                //UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
+                Eigen::Vector3d eigen_position;
+                Eigen::Quaterniond eigen_rotation;
+                if(holokit::HoloKitApi::GetInstance()->GetRenderingMode() == holokit::RenderingMode::XRMode && holokit::LowLatencyTrackingApi::GetInstance()->IsActive() && holokit::LowLatencyTrackingApi::GetInstance()->GetPose([[NSProcessInfo processInfo] systemUptime], eigen_position, eigen_rotation)) {
+                    position = EigenVector3dToUnityXRVector3(eigen_position);
+                    rotation = EigenQuaterniondToUnityXRVector4(eigen_rotation);
+                } else {
+                    simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
+                    simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
+                    position = UnityXRVector3 { camera_position.x, camera_position.y, -camera_position.z };
+                    simd_quatf quaternion = simd_quaternion(camera_transform);
+                    rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
+                }
                 
-                simd_quatf quaternion = simd_quaternion(camera_transform);
-                UnityXRVector4 rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
-                //UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
                 //Is Tracked
                 input_->DeviceState_SetBinaryValue(state, feature_index++, true);
                 //Track State

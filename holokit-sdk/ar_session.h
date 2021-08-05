@@ -4,7 +4,7 @@
 //
 //  Created by Yuchen on 2021/4/8.
 //
-
+#pragma once
 #import <ARKit/ARKit.h>
 #import <HandTracker/HandTracker.h>
 #import <CoreVideo/CoreVideo.h>

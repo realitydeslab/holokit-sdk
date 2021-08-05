@@ -9,7 +9,7 @@
 
 namespace holokit {
 
-class Profile{
+class Profile {
 
 public:
     // All vectors are in right-handed ARKit coordinate system.

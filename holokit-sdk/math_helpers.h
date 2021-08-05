@@ -8,6 +8,9 @@
 #include <simd/simd.h>
 #include <vector>
 #include "UnityXRTypes.h"
+#import <CoreMotion/CoreMotion.h>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 double GetCurrentTime();
 
@@ -26,3 +29,17 @@ simd_float4x4 TransformFromUnity(float position[3], float rotation[4]);
 std::vector<float> TransformToUnityPosition(simd_float4x4 transform_matrix);
 
 std::vector<float> TransformToUnityRotation(simd_float4x4 transform_matrix);
+
+Eigen::Vector3d CMAccelerationToEigenVector3d(CMAcceleration acceleration);
+
+Eigen::Vector3d CMRotationRateToEigenVector3d(CMRotationRate rotationRate);
+
+Eigen::Vector3d TransformToEigenVector3d(simd_float4x4 transform_matrix);
+
+Eigen::Quaterniond TransformToEigenQuaterniond(simd_float4x4 transform_matrix);
+
+Eigen::Matrix3d MatrixToEigenMatrix3d(simd_float3x3 matrix);
+
+UnityXRVector3 EigenVector3dToUnityXRVector3(Eigen::Vector3d vector3);
+
+UnityXRVector4 EigenQuaterniondToUnityXRVector4(Eigen::Quaterniond quaternion);
