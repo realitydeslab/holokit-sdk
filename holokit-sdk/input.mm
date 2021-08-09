@@ -25,7 +25,7 @@
   XR_TRACE_LOG(trace, "[HoloKitInputProvider]: " message "\n", \
                ##__VA_ARGS__)
 
-namespace{
+namespace {
 
 static int s_FrameCount = 0;
 
@@ -88,6 +88,7 @@ public:
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandLeft);
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandRight);
+        input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitAppleWatch);
         
         //ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
         
@@ -100,6 +101,7 @@ public:
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
         //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandLeft);
         //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandRight);
+        input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitAppleWatch);
     }
     
     UnitySubsystemErrorCode Tick() {
@@ -118,6 +120,8 @@ public:
         return kUnitySubsystemErrorCodeSuccess;
     }
     
+#pragma mark - FillDeviceDefinition()
+    
     // this function should be called once for each connected device
     UnitySubsystemErrorCode FillDeviceDefinition(
         UnityXRInternalInputDeviceId device_id,
@@ -130,10 +134,8 @@ public:
                 input_->DeviceDefinition_SetName(definition, "HoloKit HMD");
                 input_->DeviceDefinition_SetCharacteristics(definition, kHmdCharacteristics);
                 input_->DeviceDefinition_SetManufacturer(definition, "Holo Interactive");
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary,
-                                                             kUnityXRInputFeatureUsageIsTracked);
-                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates,
-                                                             kUnityXRInputFeatureUsageTrackingState);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Is Tracked", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageTrackingState);
                 input_->DeviceDefinition_AddFeatureWithUsage(definition,
                     "Center Eye Position", kUnityXRInputFeatureTypeAxis3D,
                     kUnityXRInputFeatureUsageCenterEyePosition);
@@ -192,21 +194,22 @@ public:
                 input_->DeviceDefinition_AddFeatureWithUsage(definition, "Ring Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageLegacyButton3);
                 input_->DeviceDefinition_AddFeatureWithUsage(definition, "Pinky Finger Open", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageLegacyButton4);
                 
-                // Gesture Status
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Spider Man", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "One", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Two", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Three", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Four", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Five", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Fist", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Thumb Up", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Okay", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+                break;
+            }
+            case kDeviceIdHoloKitAppleWatch: {
                 
-                // Movement
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Air Tap", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-//                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Bloom", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
-
+                input_->DeviceDefinition_SetName(definition, "HoloKit Apple Watch");
+                input_->DeviceDefinition_SetCharacteristics(definition, kAppleWatchCharacteristics);
+                input_->DeviceDefinition_SetManufacturer(definition, "Holo Interactive");
+                input_->DeviceDefinition_AddFeatureWithUsage(definition,  "Is Tracked",
+                    kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsageIsTracked);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Tracking State", kUnityXRInputFeatureTypeDiscreteStates, kUnityXRInputFeatureUsageTrackingState);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Device Rotation", kUnityXRInputFeatureTypeRotation, kUnityXRInputFeatureUsageDeviceRotation);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Device Acceleration", kUnityXRInputFeatureTypeAxis3D, kUnityXRInputFeatureUsageDeviceAcceleration);
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Device Angular Velocity", kUnityXRInputFeatureTypeAxis3D, kUnityXRInputFeatureUsageDeviceAngularVelocity);
+                // We can customize a button on Apple Watch in the future.
+                input_->DeviceDefinition_AddFeatureWithUsage(definition, "Primary Button", kUnityXRInputFeatureTypeBinary, kUnityXRInputFeatureUsagePrimaryButton);
+                
                 break;
             }
             default:
@@ -300,6 +303,31 @@ public:
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isMidFingerOpen);
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isRingFingerOpen);
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isPinkyFingerOpen);
+            } else if (device_id == kDeviceIdHoloKitAppleWatch) {
+                
+                ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+                
+                bool is_tracked = arSessionDelegateController.appleWatchIsTracked;
+                input_->DeviceState_SetBinaryValue(state, feature_index++, is_tracked);
+                if (is_tracked) {
+                    input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateRotation | kUnityXRInputTrackingStateAcceleration | kUnityXRInputTrackingStateAngularVelocity);
+                    UnityXRVector4 rotation= UnityXRVector4 { -static_cast<float>(arSessionDelegateController.appleWatchRotation.vector.x), -static_cast<float>(arSessionDelegateController.appleWatchRotation.vector.y), static_cast<float>(arSessionDelegateController.appleWatchRotation.vector.z), static_cast<float>(arSessionDelegateController.appleWatchRotation.vector.w)};
+                    input_->DeviceState_SetRotationValue(state, feature_index++, rotation);
+                    UnityXRVector3 acceleration = UnityXRVector3 {
+                        static_cast<float>(arSessionDelegateController.appleWatchAcceleration.x),
+                        static_cast<float>(arSessionDelegateController.appleWatchAcceleration.y),
+                        static_cast<float>(arSessionDelegateController.appleWatchAcceleration.z)};
+                    input_->DeviceState_SetAxis3DValue(state, feature_index++, acceleration);
+                    UnityXRVector3 angularVelocity = UnityXRVector3 {
+                        static_cast<float>(arSessionDelegateController.appleWatchAngularVelocity.x),
+                        static_cast<float>(arSessionDelegateController.appleWatchAngularVelocity.y),
+                        static_cast<float>(arSessionDelegateController.appleWatchAngularVelocity.z)};
+                    input_->DeviceState_SetAxis3DValue(state, feature_index++, angularVelocity);
+                    input_->DeviceState_SetBinaryValue(state, feature_index++, false);
+                    
+                    // To be deleted.
+                    NSLog(@"[apple_watch_device]: rotation (%f, %f, %f, %f), acceleration (%f, %f, %f) and angular velocity (%f, %f, %f)", rotation.x, rotation.y, rotation.z, rotation.w, acceleration.x, acceleration.y, acceleration.z, angularVelocity.x, angularVelocity.y, angularVelocity.z);
+                }
             }
         } else {
             // This kind of update happens right before Unity starts rendering.
@@ -339,126 +367,6 @@ public:
             }
         }
         return kUnitySubsystemErrorCodeSuccess;
-        
-        // Legacy version
-//        static const UnityXRInputFeatureIndex parent_bone_index[] = {kUnityInvalidXRInputFeatureIndex, 0, 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 0, 17, 18, 19};
-//
-//        static const UnityXRHand hand = {0, {
-//            {1, 2, 3, 4, kUnityInvalidXRInputFeatureIndex},
-//            {5, 6, 7, 8, kUnityInvalidXRInputFeatureIndex},
-//            {9, 10, 11, 12, kUnityInvalidXRInputFeatureIndex},
-//            {13, 14, 15, 16, kUnityInvalidXRInputFeatureIndex},
-//            {17, 18, 19, 20, kUnityInvalidXRInputFeatureIndex}
-//        }};
-//
-//        UnityXRInputFeatureIndex feature_index = 0;
-//
-//        switch (device_id) {
-//            case kDeviceIdHoloKitHmd: {
-//
-//                //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-//                //os_signpost_id_t spid = os_signpost_id_generate(log);
-//                //os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
-//
-//                simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
-//                simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
-//                //simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
-//                simd_float3 center_eye_position = camera_position;
-//                //simd_float3 center_eye_position = camera_position + offset;
-//                UnityXRVector3 position = UnityXRVector3 { center_eye_position.x, center_eye_position.y, -center_eye_position.z };
-//                //UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
-//
-//                simd_quatf quaternion = simd_quaternion(camera_transform);
-//                UnityXRVector4 rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
-//                //UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
-//                //Is Tracked
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, true);
-//                //Track State
-//                input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStatePosition | kUnityXRInputTrackingStateRotation);
-//                //Center Eye Position
-//                input_->DeviceState_SetAxis3DValue(state, feature_index++, position);
-//                //Center Eye Rotation
-//                input_->DeviceState_SetRotationValue(state, feature_index++, rotation);
-//
-//                //os_signpost_interval_end(log, spid, "UpdateCenterEyePositionAndRotation");
-//                break;
-//            }
-//            case kDeviceIdHoloKitHandLeft: {
-//                ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
-//
-//                if ([arSessionDelegateController.leftHandLandmarkPositions count] != 21){
-//                   //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
-//                   break;
-//                }
-//
-//                for (int i = 0; i < 21; i++) {
-//                  UnityXRVector3 position = {arSessionDelegateController.leftHandLandmarkPositions[i].x, arSessionDelegateController.leftHandLandmarkPositions[i].y, arSessionDelegateController.leftHandLandmarkPositions[i].z};
-//                  input_->DeviceState_SetBoneValue(state, feature_index++, UnityXRBone {.parentBoneIndex = parent_bone_index[i], .position = position, .rotation = {0, 0, 0, 1}});
-//                }
-//
-//                input_->DeviceState_SetHandValue(state, feature_index++, hand);
-//
-//                // Is Tracked
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.isLeftHandTracked);
-//                input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
-//                // Primary button
-//                //NSLog(@"hahaha: %d", arSessionDelegateController.primaryButtonValues[0]);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.primaryButtonLeft);
-//
-//                bool isThumbFingerOpen = false;
-//                bool isIndexFingerOpen = true;
-//                bool isMidFingerOpen = false;
-//                bool isRingFingerOpen = true;
-//                bool isPinkyFingerOpen = false;
-//
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isThumbFingerOpen);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isIndexFingerOpen);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isMidFingerOpen);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isRingFingerOpen);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isPinkyFingerOpen);
-//
-//                break;
-//            }
-//            case kDeviceIdHoloKitHandRight: {
-//                ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
-//
-//                if ([arSessionDelegateController.rightHandLandmarkPositions count] != 21){
-//                   //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
-//                   break;
-//                }
-//
-//                for (int i = 0; i < 21; i++) {
-//                  UnityXRVector3 position = {arSessionDelegateController.rightHandLandmarkPositions[i].x, arSessionDelegateController.rightHandLandmarkPositions[i].y, arSessionDelegateController.rightHandLandmarkPositions[i].z};
-//                  input_->DeviceState_SetBoneValue(state, feature_index++, UnityXRBone {.parentBoneIndex = parent_bone_index[i], .position = position, .rotation = {0, 0, 0, 1}});
-//                }
-//
-//
-//                input_->DeviceState_SetHandValue(state, feature_index++, hand);
-//
-//                //Is Tracked
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.isRightHandTracked);
-//                input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
-//                // Primary button
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.primaryButtonRight);
-//
-//                bool isThumbFingerOpen = false;
-//                bool isIndexFingerOpen = false;
-//                bool isMidFingerOpen = false;
-//                bool isRingFingerOpen = false;
-//                bool isPinkyFingerOpen = false;
-//
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isThumbFingerOpen);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isIndexFingerOpen);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isMidFingerOpen);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isRingFingerOpen);
-//                input_->DeviceState_SetBinaryValue(state, feature_index++, isPinkyFingerOpen);
-//
-//                break;
-//            }
-//            default:
-//                return kUnitySubsystemErrorCodeFailure;
-//        }
-//        return kUnitySubsystemErrorCodeSuccess;
     }
     
     UnitySubsystemErrorCode QueryTrackingOriginMode(
@@ -484,6 +392,7 @@ private:
     static constexpr int kDeviceIdHoloKitHmd = 0;
     static constexpr int kDeviceIdHoloKitHandLeft = 1;
     static constexpr int kDeviceIdHoloKitHandRight = 2;
+    static constexpr int kDeviceIdHoloKitAppleWatch = 3;
     
     static constexpr UnityXRInputDeviceCharacteristics kHmdCharacteristics =
         static_cast<UnityXRInputDeviceCharacteristics>(
@@ -499,6 +408,14 @@ private:
                                                        kUnityXRInputDeviceCharacteristicsTrackedDevice);
     
     static constexpr UnityXRInputDeviceCharacteristics kRightHandCharacteristics =
+        static_cast<UnityXRInputDeviceCharacteristics>(
+                                                       kUnityXRInputDeviceCharacteristicsRight |
+                                                       kUnityXRInputDeviceCharacteristicsHandTracking |
+                                                       kUnityXRInputDeviceCharacteristicsController |
+                                                       kUnityXRInputDeviceCharacteristicsHeldInHand |
+                                                       kUnityXRInputDeviceCharacteristicsTrackedDevice);
+    
+    static constexpr UnityXRInputDeviceCharacteristics kAppleWatchCharacteristics =
         static_cast<UnityXRInputDeviceCharacteristics>(
                                                        kUnityXRInputDeviceCharacteristicsRight |
                                                        kUnityXRInputDeviceCharacteristicsHandTracking |

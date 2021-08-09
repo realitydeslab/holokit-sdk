@@ -29,6 +29,11 @@
 @property (nonatomic, strong) MultipeerSession *multipeerSession;
 @property (nonatomic, strong) ARRecorder *recorder;
 @property (assign) bool isRecording;
+// For Apple Watch input device
+@property (assign) bool appleWatchIsTracked;
+@property (nonatomic, assign) simd_quatd appleWatchRotation;
+@property (nonatomic, assign) simd_double3 appleWatchAcceleration;
+@property (nonatomic, assign) simd_double3 appleWatchAngularVelocity;
 
 + (id)sharedARSessionDelegateController;
 

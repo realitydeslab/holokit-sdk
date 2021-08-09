@@ -90,7 +90,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 @property (nonatomic, strong) CLLocation *currentLocation;
 @property (nonatomic, strong) CLHeading *currentHeading;
 @property (nonatomic, strong) CADisplayLink *aDisplayLink;
-
+ 
 @end
 
 @implementation ARSessionDelegateController
@@ -151,6 +151,8 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         self.recorder = [[ARRecorder alloc] init];
         self.isRecording = NO;
         
+        self.appleWatchIsTracked = NO;
+        
 //        frame_count = 0;
 //        last_frame_time = 0.0f;
     }
@@ -158,7 +160,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 }
 
 - (void)printNextVsyncTime {
-    NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
+    //NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
 }
 
 - (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID {
@@ -812,10 +814,10 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     }
     NSLog(@"[wc_session]: session reachability did change");
     if (session.isReachable) {
-        AppleWatchReachabilityDidChangeDelegate(true);
+        //AppleWatchReachabilityDidChangeDelegate(true);
         NSLog(@"[wc_session]: is reachable");
     } else {
-        AppleWatchReachabilityDidChangeDelegate(false);
+        //AppleWatchReachabilityDidChangeDelegate(false);
         NSLog(@"[wc_session]: is not reachable");
     }
 }
@@ -828,6 +830,23 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     } else if (id value = [message objectForKey:@"strange"]) {
         NSInteger circleNum = [value integerValue];
         DoctorStrangeMessageReceivedDelegate((int)circleNum);
+    } else if (id value = [message objectForKey:@"isTracking"]) {
+        if ([value integerValue] == 0) {
+            self.appleWatchIsTracked = NO;
+        } else {
+            self.appleWatchIsTracked = YES;
+        }
+    } else if ([message objectForKey:@"deviceData"]) {
+        self.appleWatchRotation = simd_quaternion((double)[message[@"rotation.x"] doubleValue],
+                                                  (double)[message[@"rotation.y"] doubleValue],
+                                                  (double)[message[@"rotation.z"] doubleValue],
+                                                  (double)[message[@"rotation.w"] doubleValue]);
+        self.appleWatchAcceleration = simd_make_double3((double)[message[@"acceleration.x"] doubleValue],
+                                                        (double)[message[@"acceleration.y"] doubleValue],
+                                                        (double)[message[@"acceleration.z"] doubleValue]);
+        self.appleWatchAngularVelocity = simd_make_double3((double)[message[@"angularVelocity.x"] doubleValue],
+                                                           (double)[message[@"angularVelocity.y"] doubleValue],
+                                                           (double)[message[@"angularVelocity.z"] doubleValue]);
     }
 }
 
