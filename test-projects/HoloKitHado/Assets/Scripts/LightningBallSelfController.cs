@@ -14,6 +14,6 @@ public class LightningBallSelfController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        this.transform.position = Vector3.zero;
+        this.transform.position = Camera.main.transform.position;
     }
 }
