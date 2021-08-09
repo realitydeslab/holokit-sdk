@@ -88,7 +88,7 @@ public:
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandLeft);
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandRight);
-        input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitAppleWatch);
+        //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitAppleWatch);
         
         //ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
         
@@ -101,7 +101,7 @@ public:
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
         //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandLeft);
         //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandRight);
-        input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitAppleWatch);
+        //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitAppleWatch);
     }
     
     UnitySubsystemErrorCode Tick() {

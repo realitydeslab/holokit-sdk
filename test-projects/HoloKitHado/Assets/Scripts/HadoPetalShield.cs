@@ -93,6 +93,7 @@ public class HadoPetalShield : NetworkBehaviour
 
         if (other.tag.Equals("Bullet") || other.tag.Equals("DragonBullet"))
         {
+            HadoController.UnityHoloKit_SendMessageToAppleWatch(5);
             m_LastHitTime = Time.time;
             m_CurrentHealth--;
 

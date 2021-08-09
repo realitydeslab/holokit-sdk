@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.HoloKit;
@@ -19,6 +20,15 @@ public class HadoPlayer : NetworkBehaviour
     [SerializeField] private NetworkObject m_DoctorStrangeCirclePrefab;
 
     [SerializeField] private NetworkObject m_BossPrefab;
+
+    public NetworkObject BulletPrefab
+    {
+        get => m_BulletPrefab;
+        set
+        {
+            m_BulletPrefab = value;
+        }
+    }
 
     /// <summary>
     /// The offset from the center eye position to the spawn position of a new bullet.
@@ -56,6 +66,27 @@ public class HadoPlayer : NetworkBehaviour
 
     // TODO: Adjust this value.
     private float m_BulletSpeed = 400f;
+
+    delegate void MagicSwitchMessageReceived(int magicIndex);
+    [AOT.MonoPInvokeCallback(typeof(MagicSwitchMessageReceived))]
+    static void OnMagicSwitchMessageReceived(int magicIndex)
+    {
+        ulong localClientId = NetworkManager.Singleton.LocalClientId;
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(localClientId, out NetworkClient networkClient))
+        {
+            if (networkClient.PlayerObject.TryGetComponent<HadoPlayer>(out HadoPlayer script))
+            {
+                script.BulletPrefab = HadoController.Instance.BulletPrefabs[magicIndex];
+            }
+        }
+    }
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_SetMagicSwitchMessageReceivedDelegate(MagicSwitchMessageReceived callback);
+
+    private void OnEnable()
+    {
+        UnityHoloKit_SetMagicSwitchMessageReceivedDelegate(OnMagicSwitchMessageReceived);
+    }
 
     private void Start()
     {

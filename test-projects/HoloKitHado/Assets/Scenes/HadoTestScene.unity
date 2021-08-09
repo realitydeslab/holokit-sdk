@@ -188,6 +188,8 @@ MonoBehaviour:
       PlayerPrefab: 1
     - Prefab: {fileID: 2562388930272273525, guid: 3e28bc590691c42a09a3928b2a1ad9b1, type: 3}
       PlayerPrefab: 1
+    - Prefab: {fileID: 5330260697919111220, guid: 696313fdd36d3464e95173520273697a, type: 3}
+      PlayerPrefab: 1
     PlayerPrefabHash:
       rid: 356237672928247808
     CreatePlayerPrefab: 1
@@ -266,6 +268,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BulletRechargedAudioClip: {fileID: 8300000, guid: e70ae735f3e4948f4822e8ad4158ab9f, type: 3}
   m_ShieldRechargedAudioClip: {fileID: 8300000, guid: ff028835c478e4c38a82835c8d66bed0, type: 3}
+  BulletPrefabs:
+  - {fileID: 7153235707511637825, guid: 4831f74da2daf4e4393560965c703844, type: 3}
+  - {fileID: 6166771300442465374, guid: 696313fdd36d3464e95173520273697a, type: 3}
 --- !u!4 &133917424
 Transform:
   m_ObjectHideFlags: 0
@@ -428,7 +433,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -438,7 +443,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 40
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 4
     m_MaxSize: 50
@@ -448,7 +453,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Start Client
+  m_Text: Client
 --- !u!222 &164696660
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1014,7 +1019,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1024,7 +1029,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 40
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 4
     m_MaxSize: 50
@@ -1034,7 +1039,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Start Spectator
+  m_Text: Spectator
 --- !u!222 &684494585
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1537,7 +1542,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1547,7 +1552,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 40
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 4
     m_MaxSize: 50
@@ -1557,7 +1562,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Start Host
+  m_Text: Host
 --- !u!222 &1456135034
 CanvasRenderer:
   m_ObjectHideFlags: 0

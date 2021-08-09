@@ -62,6 +62,9 @@ AppleWatchMessageReceived AppleWatchMessageReceivedDelegate = NULL;
 typedef void (*DoctorStrangeMessageReceived)(int circleNum);
 DoctorStrangeMessageReceived DoctorStrangeMessageReceivedDelegate = NULL;
 
+typedef void (*MagicSwitchMessageReceived)(int magicIndex);
+MagicSwitchMessageReceived MagicSwitchMessageReceivedDelegate = NULL;
+
 typedef void (*AppleWatchReachabilityDidChange)(bool isReachable);
 AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
 
@@ -104,11 +107,11 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 //        self.handTrackingQueue = [[NSOperationQueue alloc] init];
 //        self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
         
-        self.motionQueue = [[NSOperationQueue alloc] init];
-        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        self.motionManager = [[CMMotionManager alloc] init];
-        [self startAccelerometer];
-        [self startGyroscope];
+        //self.motionQueue = [[NSOperationQueue alloc] init];
+        //self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        //self.motionManager = [[CMMotionManager alloc] init];
+        //[self startAccelerometer];
+        //[self startGyroscope];
         
         // Vision hand tracking
         //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
@@ -314,7 +317,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         NSLog(@"[ar_session]: AR session started.");
         self.session = session;
         
-        holokit::LowLatencyTrackingApi::GetInstance()->Activate();
+        //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
     
     // low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
@@ -830,6 +833,13 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     } else if (id value = [message objectForKey:@"strange"]) {
         NSInteger circleNum = [value integerValue];
         DoctorStrangeMessageReceivedDelegate((int)circleNum);
+    } else if (id value = [message objectForKey:@"magic"]) {
+        NSInteger magicIndex = [value integerValue];
+        if (MagicSwitchMessageReceivedDelegate != NULL) {
+            MagicSwitchMessageReceivedDelegate((int)magicIndex);
+        } else {
+            NSLog(@"[wc_session]: MagicSwitchMessageReceivedDelegate is NULL.");
+        }
     } else if (id value = [message objectForKey:@"isTracking"]) {
         if ([value integerValue] == 0) {
             self.appleWatchIsTracked = NO;
@@ -1001,6 +1011,11 @@ UnityHoloKit_SetDoctorStrangeMessageReceivedDelegate(DoctorStrangeMessageReceive
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetMagicSwitchMessageReceivedDelegate(MagicSwitchMessageReceived callback) {
+    MagicSwitchMessageReceivedDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetAppleWatchReachabilityDidChangeDelegate(AppleWatchReachabilityDidChange callback) {
     AppleWatchReachabilityDidChangeDelegate = callback;
 }
@@ -1017,9 +1032,10 @@ UnityHoloKit_ActivateWatchConnectivitySession() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendMessageToAppleWatch(int messageIndex) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    NSLog(@"[wc_session]: send to Apple Watch.");
     if (ar_session_delegate_controller.wcSession.isReachable) {
         NSLog(@"[wc_session]: send message to Apple Watch.");
-        NSDictionary<NSString *, id> *message = [[NSDictionary alloc] initWithObjects:@[(id)0] forKeys:@[@"iPhone"]];
+        NSDictionary<NSString *, id> *message = @{ @"iPhone" : [NSNumber numberWithInt:messageIndex] };
         [ar_session_delegate_controller.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
     }
 }

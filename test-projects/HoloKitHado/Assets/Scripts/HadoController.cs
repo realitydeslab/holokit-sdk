@@ -1,6 +1,8 @@
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using UnityEngine;
+using MLAPI;
 
 public class HadoController : MonoBehaviour
 {
@@ -122,6 +124,8 @@ public class HadoController : MonoBehaviour
     {
         get => m_DoctorStrangeCircleNum;
     }
+
+    public List<NetworkObject> BulletPrefabs = new List<NetworkObject>();
 
     [DllImport("__Internal")]
     public static extern void UnityHoloKit_ActivateWatchConnectivitySession();
@@ -260,6 +264,8 @@ public class HadoController : MonoBehaviour
 
             if (m_CurrentAttackNum < (int)Math.Floor(m_CurrentAttackRecharge / k_AttackRechargeUnit))
             {
+                //UnityHoloKit_SendMessageToAppleWatch((int)iPhoneMessageType.AttackRecharged);
+                UnityHoloKit_SendMessageToAppleWatch(2);
                 m_AudioSource.clip = m_BulletRechargedAudioClip;
                 m_AudioSource.Play();
                 m_CurrentAttackNum++;
@@ -277,7 +283,8 @@ public class HadoController : MonoBehaviour
 
             if (m_CurrentShieldNum < (int)Math.Floor(m_CurrentShieldRecharge / k_ShieldRechargeUnit))
             {
-                Debug.Log("[HadoController]: shield recharged");
+                //UnityHoloKit_SendMessageToAppleWatch((int)iPhoneMessageType.ShieldRecharged);
+                UnityHoloKit_SendMessageToAppleWatch(3);
                 m_AudioSource.clip = m_ShieldRechargedAudioClip;
                 m_AudioSource.Play();
                 m_CurrentShieldNum++;
