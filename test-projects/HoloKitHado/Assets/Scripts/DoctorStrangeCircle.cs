@@ -39,20 +39,10 @@ public class DoctorStrangeCircle : NetworkBehaviour
 
         if (IsServer && !isSecondPortal)
         {
-            if (Random.value < 0.5)
-            {
-                // Left
-                correspondingPortalPosition = transform.position + transform.forward * 2f - transform.right * 2f;
-                correspondingPortalRotation = transform.rotation * Quaternion.AngleAxis(45f, Vector3.up);
-                correspondingPortalDirection = (Quaternion.AngleAxis(45f, Vector3.up) * transform.forward).normalized;
-            }
-            else
-            {
-                // Right
-                correspondingPortalPosition = transform.position + transform.forward * 2f + transform.right * 2f;
-                correspondingPortalRotation = transform.rotation * Quaternion.AngleAxis(-45f, Vector3.up);
-                correspondingPortalDirection = (Quaternion.AngleAxis(-45f, Vector3.up) * transform.forward).normalized;
-            }
+            correspondingPortalPosition = transform.position + Vector3.up * 1.5f;
+            correspondingPortalRotation = transform.rotation * Quaternion.AngleAxis(20f, transform.right);
+            correspondingPortalDirection = (Quaternion.AngleAxis(20f, transform.right) * transform.forward).normalized;
+
             var secondCircleInstance = Instantiate(HadoController.Instance.PortalPrefab, correspondingPortalPosition, correspondingPortalRotation);
             if (secondCircleInstance.TryGetComponent<DoctorStrangeCircle>(out var script))
             {

@@ -5,5 +5,6 @@ public enum iPhoneMessageType
     AttackRecharged = 2,
     ShieldRecharged = 3,
     HitEnemy = 4,
-    BeingHit = 5
+    BeingHit = 5,
+    Fire = 6
 }

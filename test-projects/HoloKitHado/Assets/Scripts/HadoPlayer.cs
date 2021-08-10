@@ -165,6 +165,7 @@ public class HadoPlayer : NetworkBehaviour
             // Fire
             if (HadoController.Instance.currentAttackNum > 0)
             {
+                HadoController.UnityHoloKit_SendMessageToAppleWatch(6);
                 Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
                 Vector3 bulletSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_BulletSpawnOffset);
                 FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);
