@@ -190,6 +190,8 @@ MonoBehaviour:
       PlayerPrefab: 1
     - Prefab: {fileID: 5330260697919111220, guid: 696313fdd36d3464e95173520273697a, type: 3}
       PlayerPrefab: 1
+    - Prefab: {fileID: 9162929649202537259, guid: 975e6f2a29ead404e95683d8ec6a9b28, type: 3}
+      PlayerPrefab: 1
     PlayerPrefabHash:
       rid: 356237672928247808
     CreatePlayerPrefab: 1
@@ -271,6 +273,7 @@ MonoBehaviour:
   BulletPrefabs:
   - {fileID: 7153235707511637825, guid: 4831f74da2daf4e4393560965c703844, type: 3}
   - {fileID: 6166771300442465374, guid: 696313fdd36d3464e95173520273697a, type: 3}
+  - {fileID: 7153235707511637825, guid: 975e6f2a29ead404e95683d8ec6a9b28, type: 3}
   PortalPrefab: {fileID: 8369470735683357632, guid: 3e28bc590691c42a09a3928b2a1ad9b1, type: 3}
 --- !u!4 &133917424
 Transform:
