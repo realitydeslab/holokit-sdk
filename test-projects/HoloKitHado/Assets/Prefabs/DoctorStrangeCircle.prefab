@@ -58,13 +58,13 @@ VisualEffect:
       - m_Value: -12
         m_Name: Displacement Angle
         m_Overridden: 1
-      - m_Value: 0.4
+      - m_Value: 0.3
         m_Name: Major Radius
         m_Overridden: 1
       - m_Value: 1
         m_Name: Alpha Scale
         m_Overridden: 1
-      - m_Value: 0
+      - m_Value: 1
         m_Name: Lerp
         m_Overridden: 1
     m_Vector2f:
@@ -85,17 +85,17 @@ VisualEffect:
       m_Array:
       - m_Value:
           serializedVersion: 2
-          key0: {r: 766.9961, g: 212.83138, b: 56.21961, a: 1}
-          key1: {r: 21.112122, g: 11.867428, b: 7.1823626, a: 1}
-          key2: {r: 2.8427334, g: 1.1901772, b: 1.0086479, a: 0}
-          key3: {r: 0.03189603, g: 0.003676507, b: 4.398916, a: 0}
+          key0: {r: 383.49805, g: 106.41569, b: 28.109804, a: 1}
+          key1: {r: 2.9960785, g: 1.6941177, b: 1.0196079, a: 1}
+          key2: {r: 0.7490196, g: 0.3137255, b: 0.26666668, a: 0}
+          key3: {r: 0.007843138, g: 0.003921569, b: 0.7490196, a: 0}
           key4: {r: 0, g: 0, b: 0, a: 0}
           key5: {r: 0, g: 0, b: 0, a: 0}
           key6: {r: 0, g: 0, b: 0, a: 0}
           key7: {r: 0, g: 0, b: 0, a: 0}
           ctime0: 0
-          ctime1: 17180
-          ctime2: 37209
+          ctime1: 12529
+          ctime2: 37586
           ctime3: 65268
           ctime4: 0
           ctime5: 0
