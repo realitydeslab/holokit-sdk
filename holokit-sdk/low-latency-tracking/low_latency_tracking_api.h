@@ -62,6 +62,8 @@ private:
     
     std::deque<GyroData> gyro_data_;
     
+    ARKitData last_arkit_data_;
+    
     std::mutex accel_mtx_;
     
     std::mutex gyro_mtx_;
@@ -69,8 +71,6 @@ private:
     std::mutex arkit_mtx_;
     
     bool is_active_ = false;
-    
-    ARKitData last_arkit_data_;
 }; // class LowLatencyTrackingApi
 
 std::unique_ptr<LowLatencyTrackingApi> LowLatencyTrackingApi::low_latency_tracking_api_;

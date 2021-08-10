@@ -37,22 +37,22 @@ public class DoctorStrangeCircle : NetworkBehaviour
             m_CircleNum = 0;
         }
 
-        if (IsServer && !isSecondPortal)
-        {
-            correspondingPortalPosition = transform.position + Vector3.up * 1.5f;
-            correspondingPortalRotation = transform.rotation * Quaternion.AngleAxis(20f, transform.right);
-            correspondingPortalDirection = (Quaternion.AngleAxis(20f, transform.right) * transform.forward).normalized;
+        //if (IsServer && !isSecondPortal)
+        //{
+        //    correspondingPortalPosition = transform.position + Vector3.up * 0.9f;
+        //    correspondingPortalRotation = transform.rotation * Quaternion.AngleAxis(20f, transform.right);
+        //    correspondingPortalDirection = (Quaternion.AngleAxis(20f, transform.right) * transform.forward).normalized;
 
-            var secondCircleInstance = Instantiate(HadoController.Instance.PortalPrefab, correspondingPortalPosition, correspondingPortalRotation);
-            if (secondCircleInstance.TryGetComponent<DoctorStrangeCircle>(out var script))
-            {
-                script.isSecondPortal = true;
-                script.correspondingPortalPosition = transform.position;
-                script.correspondingPortalRotation = transform.rotation;
-                script.correspondingPortalDirection = transform.forward;
-            }
-            secondCircleInstance.SpawnWithOwnership(OwnerClientId);
-        }
+        //    var secondCircleInstance = Instantiate(HadoController.Instance.PortalPrefab, correspondingPortalPosition, correspondingPortalRotation);
+        //    if (secondCircleInstance.TryGetComponent<DoctorStrangeCircle>(out var script))
+        //    {
+        //        script.isSecondPortal = true;
+        //        script.correspondingPortalPosition = transform.position;
+        //        script.correspondingPortalRotation = transform.rotation;
+        //        script.correspondingPortalDirection = transform.forward;
+        //    }
+        //    secondCircleInstance.SpawnWithOwnership(OwnerClientId);
+        //}
     }
 
     private void Update()
@@ -79,7 +79,7 @@ public class DoctorStrangeCircle : NetworkBehaviour
                 if (!script.hasTransformed)
                 {
                     script.hasTransformed = true;
-                    script.ChangePositionServerRpc(correspondingPortalPosition, correspondingPortalRotation, correspondingPortalDirection);
+                    script.ChangePositionServerRpc(transform.position, transform.rotation, transform.forward);
                 } 
             }
         }
