@@ -64,8 +64,14 @@ VisualEffect:
       - m_Value: 1
         m_Name: Alpha Scale
         m_Overridden: 1
-      - m_Value: 1
+      - m_Value: 0
         m_Name: Lerp
+        m_Overridden: 1
+      - m_Value: 0.7
+        m_Name: Displacement Thickness
+        m_Overridden: 1
+      - m_Value: -20
+        m_Name: Rotation Speed
         m_Overridden: 1
     m_Vector2f:
       m_Array: []
