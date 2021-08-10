@@ -1,6 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using MLAPI;
 using MLAPI.NetworkVariable;
+using MLAPI.Messaging;
 
 public class HadoBullet : NetworkBehaviour
 {
@@ -14,6 +16,8 @@ public class HadoBullet : NetworkBehaviour
     private int m_FrameCount = 0;
 
     private int k_FrameToOpenCollider = 5;
+
+    public bool hasTransformed = false;
 
     public NetworkVariableVector3 InitialForce = new NetworkVariableVector3(new NetworkVariableSettings
     {
@@ -66,5 +70,21 @@ public class HadoBullet : NetworkBehaviour
                 Destroy(gameObject);
             }            
         }
+    }
+
+    [ServerRpc]
+    public void ChangePositionServerRpc(Vector3 position, Quaternion rotation, Vector3 direction)
+    {
+        ChangePositionClientRpc(position, rotation, direction);
+    }
+
+    [ClientRpc]
+    private void ChangePositionClientRpc(Vector3 position, Quaternion rotation, Vector3 direction)
+    {
+        transform.position = position;
+        transform.rotation = rotation;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        GetComponent<Rigidbody>().AddForce(400f * direction);
     }
 }

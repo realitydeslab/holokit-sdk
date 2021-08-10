@@ -14,6 +14,15 @@ public class PortalController : MonoBehaviour
     private float m_lerp;
     [SerializeField]
     private float m_speed =1f;
+
+    public float Speed
+    {
+        set
+        {
+            m_speed = value;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {

@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.Connection;
 
 public class DoctorStrangeCircle : NetworkBehaviour
 {
@@ -13,6 +14,14 @@ public class DoctorStrangeCircle : NetworkBehaviour
     private int m_CircleNum;
 
     private PortalController m_ControllerScript;
+
+    public bool isSecondPortal = false;
+
+    public Vector3 correspondingPortalPosition;
+
+    public Quaternion correspondingPortalRotation;
+
+    public Vector3 correspondingPortalDirection;
 
     private void Start()
     {
@@ -26,6 +35,33 @@ public class DoctorStrangeCircle : NetworkBehaviour
         if (IsOwner)
         {
             m_CircleNum = 0;
+        }
+
+        if (IsServer && !isSecondPortal)
+        {
+            if (Random.value < 0.5)
+            {
+                // Left
+                correspondingPortalPosition = transform.position + transform.forward * 2f - transform.right * 2f;
+                correspondingPortalRotation = transform.rotation * Quaternion.AngleAxis(45f, Vector3.up);
+                correspondingPortalDirection = (Quaternion.AngleAxis(45f, Vector3.up) * transform.forward).normalized;
+            }
+            else
+            {
+                // Right
+                correspondingPortalPosition = transform.position + transform.forward * 2f + transform.right * 2f;
+                correspondingPortalRotation = transform.rotation * Quaternion.AngleAxis(-45f, Vector3.up);
+                correspondingPortalDirection = (Quaternion.AngleAxis(-45f, Vector3.up) * transform.forward).normalized;
+            }
+            var secondCircleInstance = Instantiate(HadoController.Instance.PortalPrefab, correspondingPortalPosition, correspondingPortalRotation);
+            if (secondCircleInstance.TryGetComponent<DoctorStrangeCircle>(out var script))
+            {
+                script.isSecondPortal = true;
+                script.correspondingPortalPosition = transform.position;
+                script.correspondingPortalRotation = transform.rotation;
+                script.correspondingPortalDirection = transform.forward;
+            }
+            secondCircleInstance.SpawnWithOwnership(OwnerClientId);
         }
     }
 
@@ -45,9 +81,17 @@ public class DoctorStrangeCircle : NetworkBehaviour
     {
         if (!IsServer) { return; }
 
-        if (other.tag.Equals("DragonBullet"))
+        if (other.tag.Equals("Bullet"))
         {
-            // TODO: Teleport 
+            // Teleport the attack.
+            if(other.transform.TryGetComponent<HadoBullet>(out var script))
+            {
+                if (!script.hasTransformed)
+                {
+                    script.hasTransformed = true;
+                    script.ChangePositionServerRpc(correspondingPortalPosition, correspondingPortalRotation, correspondingPortalDirection);
+                } 
+            }
         }
     }
 

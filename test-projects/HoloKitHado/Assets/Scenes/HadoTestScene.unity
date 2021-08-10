@@ -271,6 +271,7 @@ MonoBehaviour:
   BulletPrefabs:
   - {fileID: 7153235707511637825, guid: 4831f74da2daf4e4393560965c703844, type: 3}
   - {fileID: 6166771300442465374, guid: 696313fdd36d3464e95173520273697a, type: 3}
+  PortalPrefab: {fileID: 8369470735683357632, guid: 3e28bc590691c42a09a3928b2a1ad9b1, type: 3}
 --- !u!4 &133917424
 Transform:
   m_ObjectHideFlags: 0
