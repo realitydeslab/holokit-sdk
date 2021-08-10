@@ -193,6 +193,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_CircleAudioClip: {fileID: 8300000, guid: c63ed91d2116b4a43aaf3017d04383bd, type: 3}
+  isSecondPortal: 0
+  correspondingPortalPosition: {x: 0, y: 0, z: 0}
+  correspondingPortalRotation: {x: 0, y: 0, z: 0, w: 0}
+  correspondingPortalDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &8369470735683357632
 MonoBehaviour:
   m_ObjectHideFlags: 0

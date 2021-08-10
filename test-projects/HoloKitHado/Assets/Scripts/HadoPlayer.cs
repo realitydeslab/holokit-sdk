@@ -40,7 +40,7 @@ public class HadoPlayer : NetworkBehaviour
     /// </summary>
     private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1.2f, 1.3f);
 
-    private Vector3 m_DoctorStrangeCircleSpawnOffset = new Vector3(0f, 0f, 1.7f);
+    private Vector3 m_DoctorStrangeCircleSpawnOffset = new Vector3(0f, 0f, 1.2f);
 
     private NetworkVariableBool isReady = new NetworkVariableBool(new NetworkVariableSettings
     {
