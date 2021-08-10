@@ -56,7 +56,7 @@ VisualEffect:
       - m_Value: 1
         m_Name: Spawn Rate
         m_Overridden: 1
-      - m_Value: 0.68
+      - m_Value: 0.3
         m_Name: Scale
         m_Overridden: 1
     m_Vector2f:
@@ -204,7 +204,7 @@ Transform:
   m_GameObject: {fileID: 5330260697919111220}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3950114452599016462}
@@ -240,6 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2f279887d1b147ebbe63358bbb1c934, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isForcedLookCamera: 0
   m_FireAudioClip: {fileID: 8300000, guid: 24c0fcb5c23ff4e38a947cab0d11f3da, type: 3}
   InitialForce:
     m_InternalValue: {x: 0, y: 0, z: 0}

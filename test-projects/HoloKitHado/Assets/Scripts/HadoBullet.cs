@@ -4,6 +4,7 @@ using MLAPI.NetworkVariable;
 
 public class HadoBullet : NetworkBehaviour
 {
+    [SerializeField] private bool isForcedLookCamera = false;
     private AudioSource m_AudioSource;
 
     [SerializeField] private AudioClip m_FireAudioClip;
@@ -36,6 +37,11 @@ public class HadoBullet : NetworkBehaviour
 
     private void Update()
     {
+        if (isForcedLookCamera)
+        {
+            this.transform.LookAt(Camera.main.transform.position);
+        }
+
         if (IsServer)
         {
             if (++m_FrameCount == k_FrameToOpenCollider)
