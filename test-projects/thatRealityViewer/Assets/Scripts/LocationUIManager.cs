@@ -33,6 +33,9 @@ public class LocationUIManager : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void UnityHoloKit_FinishRecording();
 
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_ActivateWatchConnectivitySession();
+
     private void Start()
     {
         m_InitLocationManagerButton = transform.GetChild(0).GetComponent<Button>();
@@ -53,11 +56,13 @@ public class LocationUIManager : MonoBehaviour
         m_RenderingButton.onClick.AddListener(SwitchRenderingMode);
 
         m_StartUpdatingLocationButton.gameObject.SetActive(false);
+
+        UnityHoloKit_ActivateWatchConnectivitySession();
     }
 
     private void Update()
     {
-        Debug.Log($"Frame count: {++m_FrameCount}");
+        //Debug.Log($"Frame count: {++m_FrameCount}");
         HoloKitARBackgroundRendererFeature.CurrentRenderPass = 0;
 
         string newLocationData = $"Latitude: {LocationManager.Instance.CurrentLatitude}\n" +

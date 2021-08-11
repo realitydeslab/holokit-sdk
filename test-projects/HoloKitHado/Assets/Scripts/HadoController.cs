@@ -127,6 +127,8 @@ public class HadoController : MonoBehaviour
 
     public List<NetworkObject> BulletPrefabs = new List<NetworkObject>();
 
+    public NetworkObject PortalPrefab;
+
     [DllImport("__Internal")]
     public static extern void UnityHoloKit_ActivateWatchConnectivitySession();
 

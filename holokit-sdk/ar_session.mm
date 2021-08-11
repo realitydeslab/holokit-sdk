@@ -1032,9 +1032,7 @@ UnityHoloKit_ActivateWatchConnectivitySession() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendMessageToAppleWatch(int messageIndex) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    NSLog(@"[wc_session]: send to Apple Watch.");
     if (ar_session_delegate_controller.wcSession.isReachable) {
-        NSLog(@"[wc_session]: send message to Apple Watch.");
         NSDictionary<NSString *, id> *message = @{ @"iPhone" : [NSNumber numberWithInt:messageIndex] };
         [ar_session_delegate_controller.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
     }

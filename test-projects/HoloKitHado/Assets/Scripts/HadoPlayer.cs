@@ -40,7 +40,7 @@ public class HadoPlayer : NetworkBehaviour
     /// </summary>
     private Vector3 m_GrantShieldSpawnOffset = new Vector3(0, -1.2f, 1.3f);
 
-    private Vector3 m_DoctorStrangeCircleSpawnOffset = new Vector3(0f, 0f, 1.7f);
+    private Vector3 m_DoctorStrangeCircleSpawnOffset = new Vector3(0f, 0f, 1.2f);
 
     private NetworkVariableBool isReady = new NetworkVariableBool(new NetworkVariableSettings
     {
@@ -165,6 +165,7 @@ public class HadoPlayer : NetworkBehaviour
             // Fire
             if (HadoController.Instance.currentAttackNum > 0)
             {
+                HadoController.UnityHoloKit_SendMessageToAppleWatch(6);
                 Vector3 centerEyePosition = m_ARCamera.position + m_ARCamera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
                 Vector3 bulletSpawnPosition = centerEyePosition + m_ARCamera.TransformVector(m_BulletSpawnOffset);
                 FireServerRpc(bulletSpawnPosition, m_ARCamera.forward);

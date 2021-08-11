@@ -190,6 +190,8 @@ MonoBehaviour:
       PlayerPrefab: 1
     - Prefab: {fileID: 5330260697919111220, guid: 696313fdd36d3464e95173520273697a, type: 3}
       PlayerPrefab: 1
+    - Prefab: {fileID: 9162929649202537259, guid: 975e6f2a29ead404e95683d8ec6a9b28, type: 3}
+      PlayerPrefab: 1
     PlayerPrefabHash:
       rid: 356237672928247808
     CreatePlayerPrefab: 1
@@ -271,6 +273,8 @@ MonoBehaviour:
   BulletPrefabs:
   - {fileID: 7153235707511637825, guid: 4831f74da2daf4e4393560965c703844, type: 3}
   - {fileID: 6166771300442465374, guid: 696313fdd36d3464e95173520273697a, type: 3}
+  - {fileID: 7153235707511637825, guid: 975e6f2a29ead404e95683d8ec6a9b28, type: 3}
+  PortalPrefab: {fileID: 8369470735683357632, guid: 3e28bc590691c42a09a3928b2a1ad9b1, type: 3}
 --- !u!4 &133917424
 Transform:
   m_ObjectHideFlags: 0
@@ -609,15 +613,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6012893595002701827, guid: a064f86737a769843b6a437c11b8c857, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.2
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6012893595002701827, guid: a064f86737a769843b6a437c11b8c857, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.2
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6012893595002701827, guid: a064f86737a769843b6a437c11b8c857, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.2
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6012893595002701827, guid: a064f86737a769843b6a437c11b8c857, type: 3}
       propertyPath: m_LocalPosition.x
@@ -658,6 +662,14 @@ PrefabInstance:
     - target: {fileID: 6012893595002701827, guid: a064f86737a769843b6a437c11b8c857, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6012893595002701828, guid: a064f86737a769843b6a437c11b8c857, type: 3}
+      propertyPath: m_maxSpeed
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6012893595002701828, guid: a064f86737a769843b6a437c11b8c857, type: 3}
+      propertyPath: m_offset.z
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a064f86737a769843b6a437c11b8c857, type: 3}

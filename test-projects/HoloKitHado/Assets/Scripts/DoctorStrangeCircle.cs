@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.Connection;
 
 public class DoctorStrangeCircle : NetworkBehaviour
 {
@@ -13,6 +14,14 @@ public class DoctorStrangeCircle : NetworkBehaviour
     private int m_CircleNum;
 
     private PortalController m_ControllerScript;
+
+    public bool isSecondPortal = false;
+
+    public Vector3 correspondingPortalPosition;
+
+    public Quaternion correspondingPortalRotation;
+
+    public Vector3 correspondingPortalDirection;
 
     private void Start()
     {
@@ -27,6 +36,23 @@ public class DoctorStrangeCircle : NetworkBehaviour
         {
             m_CircleNum = 0;
         }
+
+        //if (IsServer && !isSecondPortal)
+        //{
+        //    correspondingPortalPosition = transform.position + Vector3.up * 0.9f;
+        //    correspondingPortalRotation = transform.rotation * Quaternion.AngleAxis(20f, transform.right);
+        //    correspondingPortalDirection = (Quaternion.AngleAxis(20f, transform.right) * transform.forward).normalized;
+
+        //    var secondCircleInstance = Instantiate(HadoController.Instance.PortalPrefab, correspondingPortalPosition, correspondingPortalRotation);
+        //    if (secondCircleInstance.TryGetComponent<DoctorStrangeCircle>(out var script))
+        //    {
+        //        script.isSecondPortal = true;
+        //        script.correspondingPortalPosition = transform.position;
+        //        script.correspondingPortalRotation = transform.rotation;
+        //        script.correspondingPortalDirection = transform.forward;
+        //    }
+        //    secondCircleInstance.SpawnWithOwnership(OwnerClientId);
+        //}
     }
 
     private void Update()
@@ -45,9 +71,17 @@ public class DoctorStrangeCircle : NetworkBehaviour
     {
         if (!IsServer) { return; }
 
-        if (other.tag.Equals("DragonBullet"))
+        if (other.tag.Equals("Bullet"))
         {
-            // TODO: Teleport 
+            // Teleport the attack.
+            if(other.transform.TryGetComponent<HadoBullet>(out var script))
+            {
+                if (!script.hasTransformed)
+                {
+                    script.hasTransformed = true;
+                    script.ChangePositionServerRpc(transform.position, transform.rotation, transform.forward);
+                } 
+            }
         }
     }
 
