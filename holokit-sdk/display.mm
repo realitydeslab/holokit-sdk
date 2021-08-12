@@ -333,7 +333,7 @@ public:
         //NSLog(@"[ar_recorder]: writer status %ld", (long)ar_session_delegate_controller.recorder.writer.status);
         if (ar_session_delegate_controller.isRecording) {
             //CVPixelBufferRef pixelBuffer = [ARRecorder convertIOSurfaceRefToCVPixelBufferRef:metal_color_textures_[0].iosurface];
-            CVPixelBufferRef pixelBuffer = [ARRecorder convertMTLTextureToCVPixelBufferRef:metal_color_textures_[1]];
+            CVPixelBufferRef pixelBuffer = [HoloKitARRecorder convertMTLTextureToCVPixelBufferRef:metal_color_textures_[1]];
             CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
             [ar_session_delegate_controller.recorder insert:pixelBuffer with:time];
             CVPixelBufferRelease(pixelBuffer);

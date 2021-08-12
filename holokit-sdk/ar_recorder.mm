@@ -8,7 +8,7 @@
 #import "ar_recorder.h"
 #import "holokit_api.h"
 
-@interface ARRecorder()
+@interface HoloKitARRecorder()
 
 @property (assign) bool isRecordingStarted;
 @property (assign) bool isRecordingFinished;
@@ -17,7 +17,7 @@
 @end
 
 // Reference: https://github.com/AFathi/ARVideoKit
-@implementation ARRecorder
+@implementation HoloKitARRecorder
 
 - (instancetype)init {
     NSLog(@"[ar_recorder]: init");

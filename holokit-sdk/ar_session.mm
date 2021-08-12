@@ -100,7 +100,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 
 #pragma mark - init
 - (instancetype)init {
-    if(self = [super init]) {
+    if (self = [super init]) {
 //        self.handTracker = [[HandTracker alloc] init];
 //        self.handTracker.delegate = self;
 //        [self.handTracker startGraph];
@@ -151,7 +151,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         //[aDisplayLink setFrameInterval:animationFrameInterval];
         [self.aDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
-        self.recorder = [[ARRecorder alloc] init];
+        self.recorder = [[HoloKitARRecorder alloc] init];
         self.isRecording = NO;
         
         self.appleWatchIsTracked = NO;

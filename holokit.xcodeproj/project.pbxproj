@@ -12,6 +12,7 @@
 		4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B4FFDF42604AA93002FC8D7 /* Shaders.metal */; };
 		4B06069D25F5C963006DF0B0 /* test_display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B06069C25F5C963006DF0B0 /* test_display.cpp */; };
 		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
+		4B1C73E726C4F6BD0063AC2A /* speech_recognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */; };
 		4B260C9926368C280004B771 /* multipeer_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B260C9826368C280004B771 /* multipeer_session.m */; };
 		4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
 		4B2B2FE825E23588002AC24F /* HandTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -312,6 +313,8 @@
 		4B0606CB25F5CA08006DF0B0 /* libtest-unity-plugin-display-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtest-unity-plugin-display-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B06070C25F5F8F4006DF0B0 /* ProviderContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProviderContext.h; sourceTree = "<group>"; };
 		4B06977225ECADA3009D51BD /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = System/Library/Frameworks/Vision.framework; sourceTree = SDKROOT; };
+		4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = speech_recognizer.m; sourceTree = "<group>"; };
+		4B1C73E826C4F6D00063AC2A /* speech_recognizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = speech_recognizer.h; sourceTree = "<group>"; };
 		4B260C9826368C280004B771 /* multipeer_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = multipeer_session.m; sourceTree = "<group>"; };
 		4B260CA926368C3A0004B771 /* multipeer_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = multipeer_session.h; sourceTree = "<group>"; };
 		4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-monocular-handtracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -868,6 +871,8 @@
 				4B9C742625F5B948001935A8 /* LandmarkPosition.m */,
 				4B4431F826B7A19000869815 /* ar_recorder.h */,
 				4B4431F926B7A1A000869815 /* ar_recorder.mm */,
+				4B1C73E826C4F6D00063AC2A /* speech_recognizer.h */,
+				4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -2024,6 +2029,7 @@
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
 				4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */,
+				4B1C73E726C4F6BD0063AC2A /* speech_recognizer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

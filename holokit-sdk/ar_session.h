@@ -27,7 +27,7 @@
 @property (assign) bool primaryButtonRight;
 @property (assign) int handPosePredictionInterval;
 @property (nonatomic, strong) MultipeerSession *multipeerSession;
-@property (nonatomic, strong) ARRecorder *recorder;
+@property (nonatomic, strong) HoloKitARRecorder *recorder;
 @property (assign) bool isRecording;
 // For Apple Watch input device
 @property (assign) bool appleWatchIsTracked;
