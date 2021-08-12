@@ -116,9 +116,12 @@ namespace UnityEditor.XR.HoloKit
                 // For CoreLocation
                 rootDict.SetString("NSLocationWhenInUseUsageDescription", "For thatReality to locate your current location.");
 
+                // For save replay to iPhone's photo library
                 rootDict.SetString("NSPhotoLibraryAddUsageDescription", "Export AR replay.");
                 rootDict.SetString("NSPhotoLibraryUsageDescription", "Export AR replay.");
 
+                // For speech recognition
+                rootDict.SetString("NSSpeechRecognitionUsageDescription", "HoloKit uses speech recognition to cast spell.");
 
                 File.WriteAllText(plistPath, plist.WriteToString());
             }
