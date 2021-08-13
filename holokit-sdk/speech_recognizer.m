@@ -65,6 +65,10 @@
 }
 
 - (void)startRecording {
+    if (!self.isReadyToRecord) {
+        NSLog(@"[speech_recognizer]: speech recognition is not ready.");
+        return;
+    }
     // Cancel the previous task if it's running.
     [self.recognitionTask cancel];
     self.recognitionTask = nil;

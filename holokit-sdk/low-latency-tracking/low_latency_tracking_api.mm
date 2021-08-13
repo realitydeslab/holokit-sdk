@@ -11,6 +11,15 @@
 
 namespace holokit {
 
+std::unique_ptr<LowLatencyTrackingApi> LowLatencyTrackingApi::low_latency_tracking_api_;
+
+std::unique_ptr<LowLatencyTrackingApi>& LowLatencyTrackingApi::GetInstance() {
+    if (!low_latency_tracking_api_) {
+        low_latency_tracking_api_.reset(new holokit::LowLatencyTrackingApi);
+    }
+    return low_latency_tracking_api_;
+}
+
 bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& position, Eigen::Quaterniond& rotation) const {
     if (target_timestamp < last_arkit_data_.sensor_timestamp) {
         return false;
@@ -68,6 +77,20 @@ void LowLatencyTrackingApi::OnARKitDataUpdated(const ARKitData& data) {
     arkit_mtx_.lock();
     last_arkit_data_ = data;
     arkit_mtx_.unlock();
+}
+
+void LowLatencyTrackingApi::Clear() {
+    accel_mtx_.lock();
+    accelerometer_data_.clear();
+    accel_mtx_.unlock();
+    
+    gyro_mtx_.lock();
+    gyro_data_.clear();
+    gyro_mtx_.unlock();
+    
+//    arkit_mtx_.lock();
+//    last_arkit_data_ = nullptr;
+//    arkit_mtx_.unlock();
 }
 
 } // namespace holokit

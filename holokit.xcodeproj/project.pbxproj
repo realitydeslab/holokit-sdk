@@ -34,6 +34,8 @@
 		4B66159525F39F9000CC4E81 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
 		4B6615A225F39FE000CC4E81 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		4B6615A425F39FED00CC4E81 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
+		4B69FF4126C611D200843FCF /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B69FF4026C611D200843FCF /* main.mm */; };
+		4B69FF4726C6197F00843FCF /* low_latency_tracking_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */; };
 		4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6AD99125E343EB008F9911 /* MathHelper.m */; };
 		4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C84E825E3F19B00B04F03 /* MathHelper.m */; };
 		4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ar_session.mm */; };
@@ -234,6 +236,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B69FF3C26C611D200843FCF /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		4BE7B609261104ED001F39F2 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -347,6 +358,8 @@
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615B025F3A0C700CC4E81 /* hand_tracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hand_tracking.h; sourceTree = "<group>"; };
+		4B69FF3E26C611D200843FCF /* low-latency-tracking-api-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "low-latency-tracking-api-test"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B69FF4026C611D200843FCF /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		4B6AD99125E343EB008F9911 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
 		4B6AD99B25E34404008F9911 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
 		4B6C84E825E3F19B00B04F03 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
@@ -619,6 +632,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B69FF3B26C611D200843FCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4B6CC26325D42C2C0068CB66 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -804,6 +824,14 @@
 			path = "low-latency-tracking";
 			sourceTree = "<group>";
 		};
+		4B69FF3F26C611D200843FCF /* low-latency-tracking-api-test */ = {
+			isa = PBXGroup;
+			children = (
+				4B69FF4026C611D200843FCF /* main.mm */,
+			);
+			path = "low-latency-tracking-api-test";
+			sourceTree = "<group>";
+		};
 		4B6CC26725D42C2C0068CB66 /* test-stereoscopic-rendering */ = {
 			isa = PBXGroup;
 			children = (
@@ -939,6 +967,7 @@
 				4B2D6E4225E7CFD500DAAD13 /* test-unity-input-ios */,
 				4B0606CC25F5CA08006DF0B0 /* test-unity-display-ios */,
 				4BC45AE0262813BD00BA98E4 /* factory-app-nfc */,
+				4B69FF3F26C611D200843FCF /* low-latency-tracking-api-test */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -965,6 +994,7 @@
 				4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */,
 				4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */,
 				4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */,
+				4B69FF3E26C611D200843FCF /* low-latency-tracking-api-test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1370,6 +1400,23 @@
 			productReference = 4B38240625E7491B00B39EEB /* libtest-unity-plugin-input-mac.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		4B69FF3D26C611D200843FCF /* low-latency-tracking-api-test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B69FF4426C611D200843FCF /* Build configuration list for PBXNativeTarget "low-latency-tracking-api-test" */;
+			buildPhases = (
+				4B69FF3A26C611D200843FCF /* Sources */,
+				4B69FF3B26C611D200843FCF /* Frameworks */,
+				4B69FF3C26C611D200843FCF /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "low-latency-tracking-api-test";
+			productName = "low-latency-tracking-api-test";
+			productReference = 4B69FF3E26C611D200843FCF /* low-latency-tracking-api-test */;
+			productType = "com.apple.product-type.tool";
+		};
 		4B6CC26525D42C2C0068CB66 /* test-stereoscopic-rendering */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4B6CC28125D42C2D0068CB66 /* Build configuration list for PBXNativeTarget "test-stereoscopic-rendering" */;
@@ -1640,6 +1687,9 @@
 					4B38240525E7491B00B39EEB = {
 						CreatedOnToolsVersion = 12.4;
 					};
+					4B69FF3D26C611D200843FCF = {
+						CreatedOnToolsVersion = 13.0;
+					};
 					4B6CC26525D42C2C0068CB66 = {
 						CreatedOnToolsVersion = 12.3;
 					};
@@ -1712,6 +1762,7 @@
 				4BDFC53D2600AB210087F728 /* test-unity-plugin-display-mac */,
 				4BE7B60A261104ED001F39F2 /* holokit-sdk */,
 				4BC45ADE262813BD00BA98E4 /* factory-app-nfc */,
+				4B69FF3D26C611D200843FCF /* low-latency-tracking-api-test */,
 			);
 		};
 /* End PBXProject section */
@@ -1975,6 +2026,15 @@
 			files = (
 				4B06069D25F5C963006DF0B0 /* test_display.cpp in Sources */,
 				4B4CDC3125F06D36000C2AC7 /* test_input.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B69FF3A26C611D200843FCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B69FF4126C611D200843FCF /* main.mm in Sources */,
+				4B69FF4726C6197F00843FCF /* low_latency_tracking_api.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2474,6 +2534,52 @@
 			};
 			name = Release;
 		};
+		4B69FF4226C611D200843FCF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/sdk/third_party/eigen",
+					"$(SRCROOT)/holokit-sdk",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		4B69FF4326C611D200843FCF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E5MH87P5T3;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/sdk/third_party/eigen",
+					"$(SRCROOT)/holokit-sdk",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/sdk/third_party",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		4B6CC27F25D42C2D0068CB66 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2618,10 +2724,10 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk/third_party/eigen",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
-					"$(SRCROOT)/sdk/third_party/eigen",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LIBRARY_SEARCH_PATHS = (
@@ -2643,10 +2749,10 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk/third_party/eigen",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
-					"$(SRCROOT)/sdk/third_party/eigen",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LIBRARY_SEARCH_PATHS = (
@@ -2831,7 +2937,7 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -2889,7 +2995,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -3259,6 +3365,15 @@
 			buildConfigurations = (
 				4B38240C25E7491B00B39EEB /* Debug */,
 				4B38240D25E7491B00B39EEB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B69FF4426C611D200843FCF /* Build configuration list for PBXNativeTarget "low-latency-tracking-api-test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B69FF4226C611D200843FCF /* Debug */,
+				4B69FF4326C611D200843FCF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

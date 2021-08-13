@@ -4,10 +4,12 @@
 //
 //  Created by Yuchen on 2021/7/30.
 //
-#pragma once
+
+#ifndef low_latency_tracking_api_h
+#define low_latency_tracking_api_h
+
 #include <simd/simd.h>
 #include "Eigen/Geometry"
-#include "ceres/internal/eigen.h"
 #include <deque>
 #include <mutex>
 #include <memory>
@@ -52,6 +54,8 @@ public:
     
     bool IsActive() { return is_active_; }
     
+    void Clear();
+    
 private:
     Eigen::Quaterniond ConvertToEigenQuaterniond(Eigen::Vector3d euler) const;
     
@@ -73,14 +77,8 @@ private:
     bool is_active_ = false;
 }; // class LowLatencyTrackingApi
 
-std::unique_ptr<LowLatencyTrackingApi> LowLatencyTrackingApi::low_latency_tracking_api_;
-
-std::unique_ptr<LowLatencyTrackingApi>& LowLatencyTrackingApi::GetInstance() {
-    if (!low_latency_tracking_api_) {
-        low_latency_tracking_api_.reset(new holokit::LowLatencyTrackingApi);
-    }
-    return low_latency_tracking_api_;
-}
-
+//std::unique_ptr<LowLatencyTrackingApi>& LowLatencyTrackingApi::GetInstance();
 
 } // namespace holokit
+
+#endif /* low_latency_tracking_api_h */
