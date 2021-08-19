@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using MLAPI;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
@@ -26,10 +27,19 @@ public class FloatingBallUIManager : MonoBehaviour
 
     private Button m_GameStartButton;
 
+    private Button m_QuitButton;
+
+    private Button m_ReturnButton;
+
+    public static bool IsUnloading = false;
+
     [SerializeField] private GameObject m_Volume;
 
     [DllImport("__Internal")]
     private static extern void UnityHoloKit_SetRenderingMode(int val);
+
+    [DllImport("__Internal")]
+    private static extern void sendMessageToMobileApp(string message);
 
     void Start()
     {
@@ -54,6 +64,12 @@ public class FloatingBallUIManager : MonoBehaviour
 
         m_GameStartButton = transform.GetChild(7).GetComponent<Button>();
         m_GameStartButton.onClick.AddListener(GameStart);
+
+        m_QuitButton = transform.GetChild(8).GetComponent<Button>();
+        m_QuitButton.onClick.AddListener(Quit);
+
+        m_ReturnButton = transform.GetChild(9).GetComponent<Button>();
+        m_ReturnButton.onClick.AddListener(Return);
 
         DisableRenderingButtons();
         m_SpawnFloatingBallButton.gameObject.SetActive(false);
@@ -152,5 +168,19 @@ public class FloatingBallUIManager : MonoBehaviour
                 player.SpawnHandSphere();
             }
         }
+    }
+
+    private void Quit()
+    {
+
+        SceneManager.LoadScene("EmptyRoom", LoadSceneMode.Single);
+        //Application.Unload();
+        //Application.Quit();
+        Gatekeeper.sendMessageToMobileApp("Hide unity");
+    }
+
+    private void Return()
+    {
+        SceneManager.LoadScene("EmptyRoom", LoadSceneMode.Single);
     }
 }

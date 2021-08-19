@@ -25,24 +25,27 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 // Reference: http://fuckingblocksyntax.com/
 @property (nonatomic, copy, nullable) void (^receivedDataHandler)(NSData *, MCPeerID *);
 @property (nonatomic, strong, nullable) NSMutableArray<InputStreamForMLAPI *> *inputStreams;
+@property (nonatomic, strong) NSString *identityString;
 
 @end
 
 @implementation MultipeerSession
 
 // This constructor is for MLAPI.
-- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID {
+- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID identityString:(NSString *) identityString {
     self = [super init];
     if (self) {
         self.serviceType = serviceType;
         self.myPeerID = [[MCPeerID alloc] initWithDisplayName:peerID];
+        self.identityString = identityString;
         NSLog(@"[multipeer_session]: service type is %@ and peerID display name is %@", serviceType, peerID);
         
         // TODO: If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
         self.session = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
         self.session.delegate = self;
 
-        self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:nil serviceType:self.serviceType];
+        NSDictionary<NSString *, NSString *> *identityInfo = @{ @"identity" : self.identityString };
+        self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:identityInfo serviceType:self.serviceType];
         self.serviceAdvertiser.delegate = self;
         //[self.serviceAdvertiser startAdvertisingPeer];
 
@@ -248,19 +251,16 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
     NSLog(@"[multipeer_session]: did receive invitation from peer %@.", peerID.displayName);
     invitationHandler(true, self.session);
-    // TODO: notify MLAPI
 }
-
-//- (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
-//    NSLog(@"[multipeer_session]: did receive invitation from peer.");
-//}
 
 #pragma mark - MCNearbyServiceBrowserDelegate
 
 - (void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary<NSString *,NSString *> *)info {
     NSLog(@"[multipeer_session]: found peer %@.", peerID.displayName);
-    // Invite the found peer into my MCSession.
-    [browser invitePeer:peerID toSession:self.session withContext:nil timeout:10];
+    if ([self.identityString isEqualToString:info[@"identity"]]) {
+        // Invite the found peer into my MCSession.
+        [browser invitePeer:peerID toSession:self.session withContext:nil timeout:10];
+    }
 }
 
 - (void)browser:(nonnull MCNearbyServiceBrowser *)browser lostPeer:(nonnull MCPeerID *)peerID {

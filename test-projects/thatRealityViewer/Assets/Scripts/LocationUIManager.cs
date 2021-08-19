@@ -5,19 +5,19 @@ using UnityEngine.XR.ARFoundation;
 
 public class LocationUIManager : MonoBehaviour
 {
-    private Button m_InitLocationManagerButton;
-
-    private Button m_StartUpdatingLocationButton;
-
-    private Text m_LocationData;
-
     private Button m_StartRecordingButton;
 
     private Button m_FinishRecordingButton;
 
     private Button m_RenderingButton;
 
-    private int m_FrameCount = 0;
+    private Button m_OpenLLTButton;
+
+    private Button m_CloseLLTButton;
+
+    private Button m_OpenFilterButton;
+
+    private Button m_CloseFilterButton;
 
     public static bool IsStereo = false;
 
@@ -36,51 +36,39 @@ public class LocationUIManager : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void UnityHoloKit_ActivateWatchConnectivitySession();
 
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_SetLowLatencyTrackingApiActive(bool value);
+
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_SetIsFilteringGyro(bool value);
+
+    [DllImport("__Internal")]
+    private static extern void UnityHoloKit_SetIsFilteringAcc(bool value);
+
     private void Start()
     {
-        m_InitLocationManagerButton = transform.GetChild(0).GetComponent<Button>();
-        m_InitLocationManagerButton.onClick.AddListener(InitLocationManager);
-
-        m_StartUpdatingLocationButton = transform.GetChild(1).GetComponent<Button>();
-        m_StartUpdatingLocationButton.onClick.AddListener(StartUpdatingLocation);
-
-        m_LocationData = transform.GetChild(2).GetComponent<Text>();
-
-        m_StartRecordingButton = transform.GetChild(3).GetComponent<Button>();
+        m_StartRecordingButton = transform.GetChild(0).GetComponent<Button>();
         m_StartRecordingButton.onClick.AddListener(StartRecording);
 
-        m_FinishRecordingButton = transform.GetChild(4).GetComponent<Button>();
+        m_FinishRecordingButton = transform.GetChild(1).GetComponent<Button>();
         m_FinishRecordingButton.onClick.AddListener(FinishRecording);
 
-        m_RenderingButton = transform.GetChild(5).GetComponent<Button>();
+        m_RenderingButton = transform.GetChild(2).GetComponent<Button>();
         m_RenderingButton.onClick.AddListener(SwitchRenderingMode);
 
-        m_StartUpdatingLocationButton.gameObject.SetActive(false);
+        m_OpenLLTButton = transform.GetChild(3).GetComponent<Button>();
+        m_OpenLLTButton.onClick.AddListener(OpenLLT);
+
+        m_CloseLLTButton = transform.GetChild(4).GetComponent<Button>();
+        m_CloseLLTButton.onClick.AddListener(CloseLLT);
+
+        m_OpenFilterButton = transform.GetChild(5).GetComponent<Button>();
+        m_OpenFilterButton.onClick.AddListener(OpenFilter);
+
+        m_CloseFilterButton = transform.GetChild(6).GetComponent<Button>();
+        m_CloseFilterButton.onClick.AddListener(CloseFilter);
 
         UnityHoloKit_ActivateWatchConnectivitySession();
-    }
-
-    private void Update()
-    {
-        //Debug.Log($"Frame count: {++m_FrameCount}");
-        HoloKitARBackgroundRendererFeature.CurrentRenderPass = 0;
-
-        string newLocationData = $"Latitude: {LocationManager.Instance.CurrentLatitude}\n" +
-            $"Longitude: {LocationManager.Instance.CurrentLongitude}\n" +
-            $"Altitude: {LocationManager.Instance.CurrentAltitude}";
-        m_LocationData.text = newLocationData;
-    }
-
-    private void InitLocationManager()
-    {
-        LocationManager.Instance.InitLocationManager();
-        m_InitLocationManagerButton.gameObject.SetActive(false);
-        m_StartUpdatingLocationButton.gameObject.SetActive(true);
-    }
-
-    private void StartUpdatingLocation()
-    {
-        LocationManager.Instance.StartUpdatingLocation();
     }
 
     private void StartRecording()
@@ -99,7 +87,7 @@ public class LocationUIManager : MonoBehaviour
         {
             // Switch to XR mode.
             UnityHoloKit_SetRenderingMode(2);
-            //Camera.main.GetComponent<ARCameraBackground>().enabled = false;
+            Camera.main.GetComponent<ARCameraBackground>().enabled = false;
             m_RenderingButton.transform.GetChild(0).GetComponent<Text>().text = "AR";
             IsStereo = true;
         }
@@ -111,5 +99,27 @@ public class LocationUIManager : MonoBehaviour
             m_RenderingButton.transform.GetChild(0).GetComponent<Text>().text = "XR";
             IsStereo = false;
         }
+    }
+
+    private void OpenLLT()
+    {
+        UnityHoloKit_SetLowLatencyTrackingApiActive(true);
+    }
+
+    private void CloseLLT()
+    {
+        UnityHoloKit_SetLowLatencyTrackingApiActive(false);
+    }
+
+    private void OpenFilter()
+    {
+        UnityHoloKit_SetIsFilteringGyro(true);
+        UnityHoloKit_SetIsFilteringAcc(true);
+    }
+
+    private void CloseFilter()
+    {
+        UnityHoloKit_SetIsFilteringGyro(false);
+        UnityHoloKit_SetIsFilteringAcc(false);
     }
 }

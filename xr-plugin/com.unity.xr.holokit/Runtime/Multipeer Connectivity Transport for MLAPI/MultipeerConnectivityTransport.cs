@@ -66,7 +66,22 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// Only devices with the same service type get connected.
         /// </summary>
         [SerializeField]
-        private string m_ServiceType = "ar-collab";
+        private string m_ServiceType = "holo-official";
+
+        /// <summary>
+        /// Manually set this value before calling init().
+        /// This is usually the scene name.
+        /// </summary>
+        private string m_IdentityString = null;
+
+        public string IdentityString
+        {
+            get => m_IdentityString;
+            set
+            {
+                m_IdentityString = value;
+            }
+        }
 
         /// <summary>
         /// If the system is executing the Ping Pong scheme.
@@ -101,7 +116,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// <param name="serviceType"></param>
         /// <param name="peerID"></param>
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerInit(string serviceType, string peerID);
+        private static extern void UnityHoloKit_MultipeerInit(string serviceType, string peerID, string identityString);
 
         /// <summary>
         /// Release the MultipeerSession instance on Objective-C side.
@@ -261,8 +276,14 @@ namespace MLAPI.Transports.MultipeerConnectivity
             if (m_ServiceType == null)
             {
                 Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because the service type is null.");
+                return;
             }
-            UnityHoloKit_MultipeerInit(m_ServiceType, newClientId.ToString());
+            if (m_IdentityString == null)
+            {
+                Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because the identity string is null.");
+                return;
+            }
+            UnityHoloKit_MultipeerInit(m_ServiceType, newClientId.ToString(), m_IdentityString);
         }
 
         public override SocketTasks StartServer()

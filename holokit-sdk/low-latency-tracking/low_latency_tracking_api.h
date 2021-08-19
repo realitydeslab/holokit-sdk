@@ -13,6 +13,7 @@
 #include <deque>
 #include <mutex>
 #include <memory>
+#include "imu_process.h"
 
 namespace holokit {
 
@@ -48,13 +49,17 @@ public:
     
     static std::unique_ptr<LowLatencyTrackingApi>& GetInstance();
     
-    void Activate() { is_active_ = true; };
+    void Activate() { is_active_ = true; is_filtering_gyro_ = true; is_filtering_acc_ = true; };
     
     void Deactivate() { is_active_ = false; }
     
     bool IsActive() { return is_active_; }
     
     void Clear();
+    
+    void SetIsFilteringGyro(bool value) { is_filtering_gyro_ = value; }
+    
+    void SetIsFilteringAcc(bool value) { is_filtering_acc_ = value; }
     
 private:
     Eigen::Quaterniond ConvertToEigenQuaterniond(Eigen::Vector3d euler) const;
@@ -75,6 +80,10 @@ private:
     std::mutex arkit_mtx_;
     
     bool is_active_ = false;
+    
+    bool is_filtering_gyro_ = true;
+    
+    bool is_filtering_acc_ = true;
 }; // class LowLatencyTrackingApi
 
 //std::unique_ptr<LowLatencyTrackingApi>& LowLatencyTrackingApi::GetInstance();

@@ -120,13 +120,14 @@ int main(int argc, const char * argv[]) {
                 std::cout << "Cannot open gyro data file" << std::endl;
             }
             
-            // Make the prediction
+            // Make the prediction.
             Eigen::Vector3d predicted_position;
             Eigen::Quaterniond predicted_rotation;
             holokit::LowLatencyTrackingApi::GetInstance()->GetPose(target_receive_time, predicted_position, predicted_rotation);
             std::cout << "Position error: (" << abs(predicted_position(0), target_position_x) << ", " << abs(predicted_position(1), target_position_y) << ", " << abs(predicted_position(2), target_position_z) << ")" << std::endl;
             std::cout << "Rotation error: (" << abs(predicted_rotation(0), target_quaternion_w) << ", " << abs(predicted_rotation(1), target_quaternion_x) << ", " << abs(predicted_rotation(2), target_quaternion_y) << ", " << abs(predicted_rotation(3), target_quaternion_z) << ")" << std::endl;
             
+            // Clear all data.
             holokit::LowLatencyTrackingApi::GetInstance()->Clear();
         }
     }

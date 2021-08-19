@@ -362,8 +362,8 @@ public:
             MTLRenderPipelineDescriptor* mtl_render_pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
             mtl_render_pipeline_descriptor.vertexFunction = vertex_function;
             mtl_render_pipeline_descriptor.fragmentFunction = fragment_function;
-            //mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-            mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
+            mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+            //mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
             mtl_render_pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
             mtl_render_pipeline_descriptor.stencilAttachmentPixelFormat =
                 MTLPixelFormatDepth32Float_Stencil8;

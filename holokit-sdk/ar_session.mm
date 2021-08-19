@@ -92,7 +92,6 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) CLLocation *currentLocation;
 @property (nonatomic, strong) CLHeading *currentHeading;
-@property (nonatomic, strong) CADisplayLink *aDisplayLink;
  
 @end
 
@@ -107,17 +106,18 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 //        self.handTrackingQueue = [[NSOperationQueue alloc] init];
 //        self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
         
-        //self.motionQueue = [[NSOperationQueue alloc] init];
-        //self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        //self.motionManager = [[CMMotionManager alloc] init];
-        //[self startAccelerometer];
-        //[self startGyroscope];
-        
         // Vision hand tracking
         //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
         // TODO: This value can be changed to one to save performance.
         //self.handPoseRequest.maximumHandCount = 2;
         //self.handPoseRequest.revision = VNDetectHumanHandPoseRequestRevision1;
+        
+        // Accel and gyro data
+        self.motionQueue = [[NSOperationQueue alloc] init];
+        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        self.motionManager = [[CMMotionManager alloc] init];
+        [self startAccelerometer];
+        [self startGyroscope];
         
         self.frameCount = 0;
         self.handPosePredictionInterval = 8;
@@ -164,9 +164,10 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 
 - (void)printNextVsyncTime {
     //NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
+    
 }
 
-- (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID {
+- (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID identityString:(NSString *)identityString{
     // TODO: Can I move this into a separate block?
     void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
         //NSLog(@"receivedDataHandler %@", [NSThread currentThread]);
@@ -236,7 +237,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
             }
         }
     };
-    self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID];
+    self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID identityString:identityString];
     self.isARWorldMapSynced = false;
 }
 
@@ -317,7 +318,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         NSLog(@"[ar_session]: AR session started.");
         self.session = session;
         
-        //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
+        holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
     
     // low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
@@ -327,6 +328,13 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         TransformToEigenQuaterniond(frame.camera.transform),
         MatrixToEigenMatrix3d(frame.camera.intrinsics) };
     holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
+    
+//    std::cout << std::endl;
+//    double current = [[NSProcessInfo processInfo] systemUptime];
+//    double vsync = [self.aDisplayLink targetTimestamp];
+//    NSLog(@"[arkit_lag]: %f at %f", current - frame.timestamp, current);
+//    NSLog(@"[vsync_lag] %f at %f", vsync - frame.timestamp, current);
+//    NSLog(@"[lag]: %f at %f", vsync - current, current);
     
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.
@@ -362,10 +370,11 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"[ar_session]: a new peer is connected to the AR collaboration session.");
             // Let the ARWorldOriginManager know that AR collaboration session has started.
-            if (!self.isARWorldMapSynced) {
-                self.isARWorldMapSynced = true;
-                ARWorldMapSyncedDelegate();
-            }
+//            if (!self.isARWorldMapSynced) {
+//                self.isARWorldMapSynced = true;
+//                ARWorldMapSyncedDelegate();
+//            }
+            ARWorldMapSyncedDelegate();
             continue;
         }
         if (anchor.name != nil) {
@@ -964,9 +973,9 @@ UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerInit(const char* serviceType, const char* peerID) {
+UnityHoloKit_MultipeerInit(const char* serviceType, const char* peerID, const char* identityString) {
     ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    [ar_session_delegate_controller initMultipeerSessionWithServiceType:[NSString stringWithUTF8String:serviceType] peerID:[NSString stringWithUTF8String:peerID]];
+    [ar_session_delegate_controller initMultipeerSessionWithServiceType:[NSString stringWithUTF8String:serviceType] peerID:[NSString stringWithUTF8String:peerID] identityString:[NSString stringWithUTF8String:identityString]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

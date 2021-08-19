@@ -34,6 +34,7 @@
 @property (nonatomic, assign) simd_quatd appleWatchRotation;
 @property (nonatomic, assign) simd_double3 appleWatchAcceleration;
 @property (nonatomic, assign) simd_double3 appleWatchAngularVelocity;
+@property (nonatomic, strong) CADisplayLink *aDisplayLink;
 
 + (id)sharedARSessionDelegateController;
 

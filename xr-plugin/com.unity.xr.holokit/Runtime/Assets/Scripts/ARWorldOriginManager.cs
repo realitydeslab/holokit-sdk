@@ -25,13 +25,21 @@ namespace UnityEngine.XR.HoloKit
         /// <summary>
         /// The time interval between two AR world origin resettings.
         /// </summary>
-        [SerializeField]
-        private float m_ResettingInverval = 30.0f;
+        private float m_ResettingInterval = 5.0f;
+
+        private const float k_ResettingIntervalIncreament = 20.0f;
 
         /// <summary>
         /// The time of last AR world origin resetting.
         /// </summary>
         private float m_LastResettingTime = 0.0f;
+
+        private int m_SyncedClientsNum = 0;
+
+        public int SyncedClientsNum
+        {
+            get => m_SyncedClientsNum;
+        }
 
         /// <summary>
         /// Add an ARKit native anchor with an anchor name.
@@ -49,8 +57,12 @@ namespace UnityEngine.XR.HoloKit
         [AOT.MonoPInvokeCallback(typeof(ARWorldMapSynced))]
         static void OnARWorldMapSynced()
         {
-            Debug.Log("[ARWorldOriginManager]: AR collaboration session started.");
+            //Debug.Log("[ARWorldOriginManager]: AR collaboration session started.");
             ARWorldOriginManager.Instance.m_IsARWorldMapSynced = true;
+            if (NetworkManager.Singleton.IsServer)
+            {
+                Instance.m_SyncedClientsNum++;
+            }
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback);
@@ -77,7 +89,7 @@ namespace UnityEngine.XR.HoloKit
         {
             if (!m_IsARWorldMapSynced) return;
 
-            if (NetworkManager.Singleton.IsServer && Time.time - m_LastResettingTime > m_ResettingInverval)
+            if (NetworkManager.Singleton.IsServer && Time.time - m_LastResettingTime > m_ResettingInterval)
             {
                 // Add origin anchor
                 float[] position = { 0f, 0f, 0f };
@@ -85,6 +97,8 @@ namespace UnityEngine.XR.HoloKit
                 UnityHoloKit_AddNativeAnchor("-1", position, rotation);
                 Debug.Log("[ARWorldOriginManager]: added an origin anchor.");
                 m_LastResettingTime = Time.time;
+                // We gradually increase the resetting interval.
+                m_ResettingInterval += k_ResettingIntervalIncreament;
             }
         }
     }

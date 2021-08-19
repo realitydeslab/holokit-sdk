@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NewZoomBlurRenderFeature
   m_EditorClassIdentifier: 
   m_Active: 0
---- !u!114 &-2703124348060271205
+--- !u!114 &-3797024023971727273
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -22,8 +22,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8618d98198ee347b686fe10211ce13b4, type: 3}
-  m_Name: NewHoloKitARBackgroundRendererFeature
+  m_Script: {fileID: 11500000, guid: 0ae4d376c05df421b98c5b39b25b0d29, type: 3}
+  m_Name: NewARBackgroundRendererFeature
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &11400000
@@ -42,10 +42,10 @@ MonoBehaviour:
     NumberFont: {fileID: 2800000, guid: f06a37246bbff114da01277637ca397e, type: 3}
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
   m_RendererFeatures:
-  - {fileID: -2703124348060271205}
   - {fileID: 6571423076468089359}
   - {fileID: -5317736476661043801}
-  m_RendererFeatureMap: 9b7d282aba927cda0f62af9d7862325ba72d7b5bd99a33b6
+  - {fileID: -3797024023971727273}
+  m_RendererFeatureMap: 0f62af9d7862325ba72d7b5bd99a33b657788a87c4424ecb
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}

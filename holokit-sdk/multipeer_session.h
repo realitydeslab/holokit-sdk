@@ -15,7 +15,7 @@
 @property (assign) double lastPingTime;
 @property (nonatomic, strong, nullable) NSMutableDictionary<MCPeerID *, NSOutputStream *> *outputStreams;
 
-- (instancetype)initWithReceivedDataHandler:(void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID;
+- (instancetype)initWithReceivedDataHandler: (void (^)(NSData *, MCPeerID *))receivedDataHandler serviceType:(NSString *)serviceType peerID:(NSString *)peerID identityString:(NSString *) identityString;
 - (NSArray<MCPeerID *> *)getConnectedPeers;
 - (void)sendToAllPeers:(NSData *)data mode:(MCSessionSendDataMode)mode;
 - (void)sendToPeer:(NSData *)data peer:(MCPeerID *)peerId mode:(MCSessionSendDataMode)mode;

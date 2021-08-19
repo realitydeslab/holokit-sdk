@@ -146,7 +146,7 @@ Eigen::Vector3d CMRotationRateToEigenVector3d(CMRotationRate rotationRate) {
 }
 
 UnityXRVector3 EigenVector3dToUnityXRVector3(Eigen::Vector3d vector3) {
-    return UnityXRVector3 { (float)vector3(0), (float)vector3(1), (float)vector3(2) };
+    return UnityXRVector3 { (float)vector3(0), (float)vector3(1), -(float)vector3(2) };
 }
 
 UnityXRVector4 EigenQuaterniondToUnityXRVector4(Eigen::Quaterniond quaternion) {

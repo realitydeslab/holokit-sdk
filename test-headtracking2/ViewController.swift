@@ -235,8 +235,9 @@ extension ViewController: MTKViewDelegate {
         
      
         os_signpost(.begin, log: logHandler, name: "drawcall", "begin processing for frameCnt=%d, systemtime=%f", frameCnt, ProcessInfo.processInfo.systemUptime)
-        
-        
+        print("[drawcall begin] current at \(ProcessInfo.processInfo.systemUptime)");
+
+              
         if let cd = view.currentDrawable {
             
             
@@ -253,7 +254,8 @@ extension ViewController: MTKViewDelegate {
                 
                 os_signpost(.end, log: strongSelf.logHandler, name: "currentDrawable", "presented frameCnt=%d, cd.drawableID=%d, systemtime=%f, presentedTime=%f",strongSelf.frameCnt, cd.drawableID, ProcessInfo.processInfo.systemUptime, drawable.presentedTime)
 
-                
+                print("[presentedTime] current at \(ProcessInfo.processInfo.systemUptime)");
+
             })
         }
        
@@ -262,6 +264,7 @@ extension ViewController: MTKViewDelegate {
         renderer.update()
         
         os_signpost(.end, log: logHandler, name: "drawcall", "finished processing for frameCnt=%d", frameCnt)
+        print("[drawcall end] current at \(ProcessInfo.processInfo.systemUptime)");
 
         
         
@@ -280,7 +283,9 @@ extension ViewController: ARSessionDelegate
 
         frameCnt += 1
         os_signpost(.begin, log: logHandler, name: "ar session", "begin ar session for frameCnt=%d, frametime=%f, systemtime=%f", frameCnt, frame.timestamp, ProcessInfo.processInfo.systemUptime )
-       
+        
+        print("[arkit session] current with sensor time at \(ProcessInfo.processInfo.systemUptime), \(frame.timestamp)");
+
         let projection = session.currentFrame!.camera.projectionMatrix
         let yScale = projection[1,1]
         let yFov = 2 * atan(1/yScale) // in radians
