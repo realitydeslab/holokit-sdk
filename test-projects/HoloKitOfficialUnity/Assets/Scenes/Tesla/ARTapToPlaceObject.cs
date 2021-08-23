@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class ARTapToPlaceObject : MonoBehaviour
 {
-    public GameObject objectToPlace;
+    //public GameObject objectToPlace;
     //public GameObject placementIndicator;
     [SerializeField] Text m_Text;
     [SerializeField] Transform LineRenderer;
@@ -77,11 +77,11 @@ public class ARTapToPlaceObject : MonoBehaviour
 
     public void PlaceObject()
     {
-        Instantiate(objectToPlace, m_PlacementPose.position, m_PlacementPose.rotation);
+        //Instantiate(objectToPlace, m_PlacementPose.position, m_PlacementPose.rotation);
         //
         //placementIndicator.SetActive(false);
         FindObjectOfType<VFXLineRenderer>().gameObject.SetActive(false);
-        FindObjectOfType<ARPlaneManager>().enabled = false;
+        //FindObjectOfType<ARPlaneManager>().enabled = false;
         FindObjectOfType<MenuSimple>().gameObject.SetActive(false);
     }
 

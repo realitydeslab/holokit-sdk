@@ -32,8 +32,6 @@ public class HoloKitGameManager : MonoBehaviour
 
     private Button m_QuitButton;
 
-    private Button m_ResetButton;
-
     private int m_ConnectedClientsNum = 0;
 
     private int m_SyncedClientsNum = 0;
@@ -77,6 +75,7 @@ public class HoloKitGameManager : MonoBehaviour
 
     protected virtual void Start()
     {
+        Debug.Log("[HoloKitGameManager]: Start begin");
         // WEIRD: If I don't do this, the world origin won't get ret after re-entering Unity.
         m_ARSession = FindObjectOfType<ARSession>();
         m_ARSession.Reset();
@@ -96,15 +95,13 @@ public class HoloKitGameManager : MonoBehaviour
         m_QuitButton = transform.GetChild(6).GetComponent<Button>();
         m_QuitButton.onClick.AddListener(QuitUnity);
 
-        m_ResetButton = transform.GetChild(7).GetComponent<Button>();
-        m_ResetButton.onClick.AddListener(Reset);
-
         m_StartButton.gameObject.SetActive(false);
         m_ConnectedClientsText.gameObject.SetActive(false);
         m_SyncedClientsText.gameObject.SetActive(false);
         m_ConnectedToHostText.gameObject.SetActive(false);
         m_SyncedToHostText.gameObject.SetActive(false);
 
+        Debug.Log("[HoloKitGameManager]: Start end");
         sendMessageToMobileApp("NetworkMode");
     }
 

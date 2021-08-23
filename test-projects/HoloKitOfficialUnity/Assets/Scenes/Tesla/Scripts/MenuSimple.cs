@@ -12,7 +12,7 @@ public class MenuSimple : MonoBehaviour
 {
     [Range(0, 1)]
     public float loading = 0;
-    public Transform hand;
+    //public Transform hand;
     [SerializeField]
     private float m_interactRadius = 1f;
     [SerializeField]
@@ -54,16 +54,26 @@ public class MenuSimple : MonoBehaviour
 
     void LoadingValue()
     {
-        if (Vector3.Distance(hand.position, this.transform.position) < m_interactRadius)
+        var handposition = FindObjectOfType<UnityEngine.XR.HoloKit.HoloKitHandMovementManager>().transform.position;
+        if(handposition == null)
         {
-            loading += Time.deltaTime * loadSpeed;
-            if (loading > 1) loading = 1;
+            Debug.LogError("Not find handpositon of MenuSimple");
+            return;
         }
         else
         {
-            loading -= Time.deltaTime * loadSpeed;
-            if (loading < 0) loading = 0;
+            if (Vector3.Distance(handposition, this.transform.position) < m_interactRadius)
+            {
+                loading += Time.deltaTime * loadSpeed;
+                if (loading > 1) loading = 1;
+            }
+            else
+            {
+                loading -= Time.deltaTime * loadSpeed;
+                if (loading < 0) loading = 0;
+            }
         }
+
     }
 
     private TeslaPlayer GetPlayerScript(ulong clientId)

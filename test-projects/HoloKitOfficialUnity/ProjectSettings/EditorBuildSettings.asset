@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PhantomBuddhas.unity
     guid: 52cf429da987d4bd48c3edd3879aab95
+  - enabled: 1
+    path: Assets/Scenes/Tesla.unity
+    guid: fa528bfe0ba745346911dc4a93a4fd2a
   m_configObjects:
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: aff287b6ccbe549fcb278439dd7a04ea, type: 2}
     UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: bedab01c161494909a44113e8111bcf7, type: 2}

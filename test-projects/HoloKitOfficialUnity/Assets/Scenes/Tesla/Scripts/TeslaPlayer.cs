@@ -22,7 +22,7 @@ public class TeslaPlayer : NetworkBehaviour
         else
         {
             FindObjectOfType<VFXLineRenderer>().gameObject.SetActive(false);
-            FindObjectOfType<ARPlaneManager>().enabled = false;
+            //FindObjectOfType<ARPlaneManager>().enabled = false;
             FindObjectOfType<MenuSimple>().gameObject.SetActive(false);
         }
 
@@ -42,7 +42,7 @@ public class TeslaPlayer : NetworkBehaviour
 
         //
         FindObjectOfType<VFXLineRenderer>().gameObject.SetActive(false);
-        FindObjectOfType<ARPlaneManager>().enabled = false;
+        //FindObjectOfType<ARPlaneManager>().enabled = false;
         FindObjectOfType<MenuSimple>().gameObject.SetActive(false);
     }
 

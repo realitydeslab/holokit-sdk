@@ -154,6 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AvailableSceneNames:
   - PhantomBuddhas
+  - Tesla
 --- !u!4 &490107346
 Transform:
   m_ObjectHideFlags: 0
