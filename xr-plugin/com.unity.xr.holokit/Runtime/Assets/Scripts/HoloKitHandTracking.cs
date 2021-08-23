@@ -5,10 +5,10 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
 using System.Linq;
-using MLAPI;
 
 namespace UnityEngine.XR.HoloKit
 {
+
     public class HoloKitHandTracking : MonoBehaviour
     {
 
@@ -24,15 +24,9 @@ namespace UnityEngine.XR.HoloKit
 
         private bool m_IsHandValid = false;
 
-        [SerializeField] private GameObject m_HandCenter;
-
-        public GameObject HandCenter
-        {
-            set
-            {
-                m_HandCenter = value;
-            }
-        }
+        [SerializeField] bool m_WriteToObjectPosition = false;
+        [SerializeField] GameObject m_HandObject;
+        private Vector3 m_CurrentHandPosition;
 
         private int m_InitializeHorizonalHistogramKernel;
         private int m_InitializeVerticalHistogramKernel;
@@ -45,6 +39,11 @@ namespace UnityEngine.XR.HoloKit
 
         private int m_Width = 0;
         private int m_Height = 0;
+
+        public Vector3 CurrentHandPosition
+        {
+            get { return m_CurrentHandPosition; }
+        }
 
         private void Start()
         {
@@ -75,8 +74,6 @@ namespace UnityEngine.XR.HoloKit
 
         private void Update()
         {
-            if (m_HandCenter == null) return;
-
             if (m_InitializeHorizonalHistogramKernel >= 0 &&
                 m_InitializeVerticalHistogramKernel >= 0 &&
                 m_CalculateHistogramKernel >= 0 &&
@@ -123,22 +120,34 @@ namespace UnityEngine.XR.HoloKit
 
                 if (m_IsHandValid)
                 {
-                    m_HandCenter.SetActive(true);
-                    m_HandCenter.transform.position = m_ARCamera.ScreenToWorldPoint(new Vector3(xCoordinateInCamera, yCoordinateInCamera, zCoordinateInCamera));
+                    m_CurrentHandPosition = m_ARCamera.ScreenToWorldPoint(new Vector3(xCoordinateInCamera, yCoordinateInCamera, zCoordinateInCamera));
+                    if (m_WriteToObjectPosition)
+                    {
+                        m_HandObject.SetActive(true);
+                        m_HandObject.transform.position = m_CurrentHandPosition;
+                        //Debug.Log("Hand is valid with a value of:" + m_HandObject.transform.position);
+                    }
                 }
                 else
                 {
-                    //m_HandCenter.SetActive(false);
-                    //m_HandCenter.transform.position = new Vector3(0f, 100f, 0f);
-                    m_HandCenter.transform.position = m_ARCamera.transform.position;
+                    m_CurrentHandPosition = Camera.main.transform.position;
+                    if (m_WriteToObjectPosition)
+                    {
+                        m_HandObject.SetActive(true);
+                        m_HandObject.transform.position = m_CurrentHandPosition;
+                    }
                 }
             }
             else
             {
                 //m_HandCenter.SetActive(false);
-                //m_HandCenter.transform.position = new Vector3(0f, 100f, 0f);
-                m_HandCenter.transform.position = m_ARCamera.transform.position;
                 m_IsHandValid = false;
+                m_CurrentHandPosition = Camera.main.transform.position;
+                if (m_WriteToObjectPosition)
+                {
+                    m_HandObject.SetActive(true);
+                    m_HandObject.transform.position = m_CurrentHandPosition;
+                }
             }
         }
 
@@ -156,6 +165,5 @@ namespace UnityEngine.XR.HoloKit
                 m_VerticalHistogramBuffer = null;
             }
         }
-
     }
 }
