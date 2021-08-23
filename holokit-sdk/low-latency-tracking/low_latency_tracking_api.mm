@@ -36,19 +36,17 @@ bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& po
     Eigen::Matrix3d R_I2C;
     R_I2C << 0, -1, 0, 1, 0, 0, 0, 0, 1;
     
-    std::cout << "[time lag arkit]: " << target_timestamp - last_arkit_data_.sensor_timestamp << std::endl;
-    std::cout << "[time lag]: " << target_timestamp - gyro_data_.back().sensor_timestamp << std::endl;
+    //std::cout << "[time lag arkit]: " << target_timestamp - last_arkit_data_.sensor_timestamp << std::endl;
+    //std::cout << "[time lag]: " << target_timestamp - gyro_data_.back().sensor_timestamp << std::endl;
     for (auto it = gyro_data_.begin(); it != gyro_data_.end(); ++it) {
         GyroData data = *it;
-        
-        
         
         if (is_filtering_gyro_) {
             Vector3d filtered_gyro;
             imu_filter.get_filted_gyro(data.rotationRate, filtered_gyro);
-            std::cout << std::endl;
-            std::cout << "[before filtered]: (" << data.rotationRate(0) << ", " << data.rotationRate(1) << ", " << data.rotationRate(2) << ")" << std::endl;
-            std::cout << "[after filtered]: (" << filtered_gyro(0) << ", " << filtered_gyro(1) << ", " << filtered_gyro(2) << ")" << std::endl;
+            //std::cout << std::endl;
+            //std::cout << "[before filtered]: (" << data.rotationRate(0) << ", " << data.rotationRate(1) << ", " << data.rotationRate(2) << ")" << std::endl;
+            //std::cout << "[after filtered]: (" << filtered_gyro(0) << ", " << filtered_gyro(1) << ", " << filtered_gyro(2) << ")" << std::endl;
             q *= LowLatencyTrackingApi::ConvertToEigenQuaterniond((data.sensor_timestamp - last_time) * R_I2C * filtered_gyro);
         } else {
             q *= LowLatencyTrackingApi::ConvertToEigenQuaterniond((data.sensor_timestamp - last_time) * R_I2C * data.rotationRate);

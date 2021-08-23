@@ -65,7 +65,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// The service type for multipeer connectivity.
         /// Only devices with the same service type get connected.
         /// </summary>
-        [SerializeField]
+        //[SerializeField]
         private string m_ServiceType = "holo-official";
 
         /// <summary>
@@ -130,11 +130,17 @@ namespace MLAPI.Transports.MultipeerConnectivity
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerStartBrowsing();
 
+        [DllImport("__Internal")]
+        public static extern void UnityHoloKit_MultipeerStopBrowsing();
+
         /// <summary>
         /// Expose the device to other browsers in the multipeer connectivity network.
         /// </summary>
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MultipeerStartAdvertising();
+
+        [DllImport("__Internal")]
+        public static extern void UnityHoloKit_MultipeerStopAdvertising();
 
         /// <summary>
         /// Send connection request message to the server.
@@ -290,14 +296,14 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             Debug.Log($"[MultipeerConnectivityTransport]: StartServer() {Time.time}");
             m_ServerId = m_ClientId;
-            UnityHoloKit_MultipeerStartBrowsing();
+            UnityHoloKit_MultipeerStartAdvertising();
             return SocketTask.Done.AsTasks();
         }
 
         public override SocketTasks StartClient()
         {
             Debug.Log($"[MultipeerConnectivityTransport]: StartClient() {Time.time}");
-            UnityHoloKit_MultipeerStartAdvertising();
+            UnityHoloKit_MultipeerStartBrowsing();
             return SocketTask.Done.AsTasks();
         }
 

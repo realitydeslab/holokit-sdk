@@ -979,32 +979,6 @@ UnityHoloKit_MultipeerInit(const char* serviceType, const char* peerID, const ch
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerShutdown() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    ar_session_delegate_controller.multipeerSession = nil;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerStartBrowsing() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    if (ar_session_delegate_controller.multipeerSession == nil) {
-        NSLog(@"[ar_session]: multipeer session is not initialized.");
-        return;
-    }
-    [ar_session_delegate_controller.multipeerSession startBrowsing];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerStartAdvertising() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    if (ar_session_delegate_controller.multipeerSession == nil) {
-        NSLog(@"[ar_session]: multipeer session is not initialized.");
-        return;
-    }
-    [ar_session_delegate_controller.multipeerSession startAdvertising];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback) {
     PeerDataReceivedForMLAPIDelegate = callback;
 }

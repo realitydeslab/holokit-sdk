@@ -24,7 +24,15 @@ namespace UnityEngine.XR.HoloKit
 
         private bool m_IsHandValid = false;
 
-        [SerializeField] public GameObject m_HandCenter;
+        [SerializeField] private GameObject m_HandCenter;
+
+        public GameObject HandCenter
+        {
+            set
+            {
+                m_HandCenter = value;
+            }
+        }
 
         private int m_InitializeHorizonalHistogramKernel;
         private int m_InitializeVerticalHistogramKernel;

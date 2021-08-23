@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7330050835745993730}
   - component: {fileID: 4309421602009706483}
   - component: {fileID: 2547830009084816066}
-  - component: {fileID: 7787651927440819697}
   - component: {fileID: -7068428160667114089}
+  - component: {fileID: 5533037535440318164}
   m_Layer: 8
   m_Name: TriangleBuddha
   m_TagString: Untagged
@@ -188,21 +188,6 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &7787651927440819697
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9025556257065596040}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdafc37f32b176349b1684c4455b98e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ExecuteInEditor: 1
-  m_Bindings: []
-  m_VisualEffect: {fileID: 4309421602009706483}
 --- !u!114 &-7068428160667114089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,3 +205,15 @@ MonoBehaviour:
   PrefabHashGenerator: TriangleBuddha
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
+--- !u!114 &5533037535440318164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9025556257065596040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d51a7e9cbffd4967be2b44da00045b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

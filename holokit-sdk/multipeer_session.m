@@ -96,14 +96,24 @@ MultipeerDisconnectionMessageReceivedForMLAPI MultipeerDisconnectionMessageRecei
 
 - (void)startBrowsing {
     NSLog(@"[multipeer_session]: startBrowsing");
-    self.isHost = true;
+    self.isHost = false;
     [self.serviceBrowser startBrowsingForPeers];
+}
+
+- (void)stopBrowsing {
+    NSLog(@"[multipeer_session]: stopBrowsing");
+    [self.serviceBrowser stopBrowsingForPeers];
 }
 
 - (void)startAdvertising {
     NSLog(@"[multipeer_session]: startAdvertising");
-    self.isHost = false;
+    self.isHost = true;
     [self.serviceAdvertiser startAdvertisingPeer];
+}
+
+- (void)stopAdvertising {
+    NSLog(@"[multipeer_session]: stopAdvertising");
+    [self.serviceAdvertiser stopAdvertisingPeer];
 }
 
 - (void)disconnect {
@@ -424,4 +434,52 @@ UnityHoloKit_MultipeerSendPingMessageViaStream(unsigned long clientId) {
             return;
         }
     }
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerStartBrowsing(void) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    if (ar_session_delegate_controller.multipeerSession == nil) {
+        NSLog(@"[ar_session]: multipeer session is not initialized.");
+        return;
+    }
+    [ar_session_delegate_controller.multipeerSession startBrowsing];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerStartAdvertising(void) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    if (ar_session_delegate_controller.multipeerSession == nil) {
+        NSLog(@"[ar_session]: multipeer session is not initialized.");
+        return;
+    }
+    [ar_session_delegate_controller.multipeerSession startAdvertising];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerStopBrowsing(void) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    if (ar_session_delegate_controller.multipeerSession == nil) {
+        NSLog(@"[ar_session]: multipeer session is not initialized.");
+        return;
+    }
+    [ar_session_delegate_controller.multipeerSession stopBrowsing];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerStopAdvertising(void) {
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    if (ar_session_delegate_controller.multipeerSession == nil) {
+        NSLog(@"[ar_session]: multipeer session is not initialized.");
+        return;
+    }
+    [ar_session_delegate_controller.multipeerSession stopAdvertising];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_MultipeerShutdown() {
+    UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI();
+    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    [ar_session_delegate_controller.multipeerSession disconnect];
+    ar_session_delegate_controller.multipeerSession = nil;
 }

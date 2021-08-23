@@ -67,4 +67,4 @@ MonoBehaviour:
   - {fileID: 2099715444712652453, guid: 240632a7daf5f400ead6575042a85760, type: 3}
   - {fileID: -5773389341605098593, guid: 5de09d33fa55b4349846857a48982f33, type: 3}
   - {fileID: -2107508790891705635, guid: 1d8e06e19d22c4ce38b9ab7e2b2d0609, type: 3}
-  m_Hand: {fileID: 0}
+  m_HandPrefab: {fileID: 299857324113689952, guid: 1a7b98d78d98849ce8da8a88fdb723ae, type: 3}

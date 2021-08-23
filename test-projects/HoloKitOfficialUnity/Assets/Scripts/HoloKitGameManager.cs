@@ -1,12 +1,13 @@
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR.HoloKit;
 using UnityEngine.XR.ARFoundation;
 using MLAPI;
 using MLAPI.Transports.MultipeerConnectivity;
 
-public abstract class HoloKitGameManager : MonoBehaviour
+public class HoloKitGameManager : MonoBehaviour
 {
     private static HoloKitGameManager _instance;
 
@@ -14,6 +15,7 @@ public abstract class HoloKitGameManager : MonoBehaviour
 
     protected bool m_IsHost = false;
 
+    [HideInInspector]
     public bool IsSpectator = false;
 
     private Button m_StartButton;
@@ -28,15 +30,29 @@ public abstract class HoloKitGameManager : MonoBehaviour
 
     private Button m_XRButton;
 
+    private Button m_QuitButton;
+
+    private Button m_ResetButton;
+
     private int m_ConnectedClientsNum = 0;
 
     private int m_SyncedClientsNum = 0;
 
     private bool m_IsUISetup = false;
 
-    private bool m_IsGameStarted = false;
+    private ARSession m_ARSession;
+
+    [SerializeField]
+    private string m_SceneName;
+
+    /// <summary>
+    /// Whether the host has pressed the start button?
+    /// </summary>
+    protected bool m_IsGameStarted = false;
 
     public bool IsGameStarted => m_IsGameStarted;
+
+    protected bool m_IsNetworkStarted = false;
 
     [DllImport("__Internal")]
     public static extern void sendMessageToMobileApp(string message);
@@ -61,7 +77,9 @@ public abstract class HoloKitGameManager : MonoBehaviour
 
     protected virtual void Start()
     {
-        sendMessageToMobileApp("NetworkRole");
+        // WEIRD: If I don't do this, the world origin won't get ret after re-entering Unity.
+        m_ARSession = FindObjectOfType<ARSession>();
+        m_ARSession.Reset();
 
         m_StartButton = transform.GetChild(0).GetComponent<Button>();
         m_StartButton.onClick.AddListener(StartGame);
@@ -75,15 +93,28 @@ public abstract class HoloKitGameManager : MonoBehaviour
         m_XRButton = transform.GetChild(5).GetComponent<Button>();
         m_XRButton.onClick.AddListener(SwitchRenderingMode);
 
+        m_QuitButton = transform.GetChild(6).GetComponent<Button>();
+        m_QuitButton.onClick.AddListener(QuitUnity);
+
+        m_ResetButton = transform.GetChild(7).GetComponent<Button>();
+        m_ResetButton.onClick.AddListener(Reset);
+
         m_StartButton.gameObject.SetActive(false);
         m_ConnectedClientsText.gameObject.SetActive(false);
         m_SyncedClientsText.gameObject.SetActive(false);
         m_ConnectedToHostText.gameObject.SetActive(false);
         m_SyncedToHostText.gameObject.SetActive(false);
+
+        sendMessageToMobileApp("NetworkMode");
     }
 
     protected virtual void Update()
     {
+        if (!m_IsNetworkStarted) return;
+
+        // We no longer need to update the lobby information if the game has already started.
+        if (m_IsGameStarted) return;
+
         if (NetworkManager.Singleton.IsServer)
         {
             if (!m_IsUISetup)
@@ -117,37 +148,63 @@ public abstract class HoloKitGameManager : MonoBehaviour
         }
     }
 
-    protected virtual void StartGame()
+    private void StartGame()
     {
+        if (m_SyncedClientsNum < m_ConnectedClientsNum)
+        {
+            Debug.Log("[HoloKitGameManager]: Please wait all clients to be synced before game starts.");
+            return;
+        }
+        
+        Handheld.Vibrate();
         if (!m_IsGameStarted)
+        {
             m_IsGameStarted = true;
+            m_StartButton.gameObject.SetActive(false);
+            m_ConnectedClientsText.gameObject.SetActive(false);
+            m_SyncedClientsText.gameObject.SetActive(false);
+
+            // BETA: Stop advertising as the server.
+            MultipeerConnectivityTransport.UnityHoloKit_MultipeerStopAdvertising();
+        }
+    }
+
+    public void StartAsClient()
+    {
+        m_ConnectedToHostText.gameObject.SetActive(false);
+        m_SyncedToHostText.gameObject.SetActive(false);
     }
 
     /// <summary>
     /// Set m_Identity string before calling this function.
     /// </summary>
     /// <param name="networkRole">Whether this is a host, client or spectator.</param>
-    public virtual void StartNetwork(string networkRole)
+    public virtual void StartNetwork(string networkMode)
     {
-        if (MultipeerConnectivityTransport.Instance.IdentityString == null)
+        Debug.Log("StartNewtork()");
+
+        if (m_SceneName == null)
         {
             return;
         }
 
-        if (networkRole.Equals("Host"))
+        MultipeerConnectivityTransport.Instance.IdentityString = m_SceneName;
+
+        if (networkMode.Equals("single"))
         {
             NetworkManager.Singleton.StartHost();
-            m_IsHost = true;
+            // Start game without waiting for other players to join.
+            StartGame();
         }
-        else if (networkRole.Equals("Client"))
+        else if (networkMode.Equals("host"))
+        {
+            NetworkManager.Singleton.StartHost();;
+        }
+        else if (networkMode.Equals("client"))
         {
             NetworkManager.Singleton.StartClient();
         }
-        else if (networkRole.Equals("Spectator"))
-        {
-            NetworkManager.Singleton.StartClient();
-            IsSpectator = true;
-        }
+        m_IsNetworkStarted = true;
     }
 
     private void SwitchRenderingMode()
@@ -169,6 +226,41 @@ public abstract class HoloKitGameManager : MonoBehaviour
             m_XRButton.transform.GetChild(0).GetComponent<Text>().text = "XR";
             //m_Volume.SetActive(false);
             //m_Reticle.SetActive(false);
+        }
+    }
+
+    private void Disconnect()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            NetworkManager.Singleton.StopHost();
+        }
+        else if (NetworkManager.Singleton.IsServer)
+        {
+            NetworkManager.Singleton.StopServer();
+        }
+        else if (NetworkManager.Singleton.IsClient)
+        {
+            NetworkManager.Singleton.StopClient();
+        }
+    }
+
+    private void QuitUnity()
+    {
+        Debug.Log("[HoloKitGameManager]: QuitUnity()");
+        // Disconnect Multipeer Connectivity
+        Disconnect();
+        // Back to the void scene
+        SceneManager.LoadScene("Void", LoadSceneMode.Single);
+        // Hide Unity
+        Gatekeeper.sendMessageToMobileApp("QuitUnity");
+    }
+
+    private void Reset()
+    {
+        if (m_ARSession)
+        {
+            m_ARSession.Reset();
         }
     }
 }

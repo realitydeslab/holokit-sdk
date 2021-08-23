@@ -499,6 +499,8 @@ public:
             pipeline_descriptor.vertexFunction = vertex_function;
             pipeline_descriptor.fragmentFunction = fragment_function;
             pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+            pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+            pipeline_descriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
             pipeline_descriptor.sampleCount = 1;
             
             second_render_pipeline_state_ = [mtl_device newRenderPipelineStateWithDescriptor:pipeline_descriptor error:nil];

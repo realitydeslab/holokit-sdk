@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 691496063633902061}
   - component: {fileID: 691496063633902060}
   - component: {fileID: 691496063633902059}
-  - component: {fileID: 691496063633902063}
   - component: {fileID: -2107508790891705635}
+  - component: {fileID: 4676423931643066781}
   m_Layer: 0
   m_Name: TrailsWithForce
   m_TagString: Untagged
@@ -127,21 +127,6 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &691496063633902063
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 691496063633902058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdafc37f32b176349b1684c4455b98e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ExecuteInEditor: 1
-  m_Bindings: []
-  m_VisualEffect: {fileID: 691496063633902060}
 --- !u!114 &-2107508790891705635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,3 +144,15 @@ MonoBehaviour:
   PrefabHashGenerator: TrailsWithForce
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
+--- !u!114 &4676423931643066781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 691496063633902058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d51a7e9cbffd4967be2b44da00045b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

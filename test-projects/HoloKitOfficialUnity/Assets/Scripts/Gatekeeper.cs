@@ -7,12 +7,18 @@ public class Gatekeeper : MonoBehaviour
 {
     public List<string> AvailableSceneNames = new List<string>();
 
+    private bool m_IsFirstLoaded = true;
+
     [DllImport("__Internal")]
     public static extern void sendMessageToMobileApp(string message);
 
     private void Start()
     {
-        sendMessageToMobileApp("Loaded");
+        if (m_IsFirstLoaded)
+        {
+            m_IsFirstLoaded = false;
+            sendMessageToMobileApp("Loaded");
+        }
     }
 
     // This function is called from the Swift side to enter demo scenes.

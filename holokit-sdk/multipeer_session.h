@@ -19,8 +19,8 @@
 - (NSArray<MCPeerID *> *)getConnectedPeers;
 - (void)sendToAllPeers:(NSData *)data mode:(MCSessionSendDataMode)mode;
 - (void)sendToPeer:(NSData *)data peer:(MCPeerID *)peerId mode:(MCSessionSendDataMode)mode;
-- (void)startBrowsing;
-- (void)startAdvertising;
+//- (void)startBrowsing;
+//- (void)startAdvertising;
 - (void)disconnect;
 + (MCSessionSendDataMode)convertMLAPINetworkChannelToSendDataMode:(int)channel;
 
@@ -28,8 +28,8 @@
 
 @interface InputStreamForMLAPI : NSObject <NSStreamDelegate>
 
-@property (nonatomic, strong) MultipeerSession *multipeerSession;
-@property (nonatomic, strong) MCPeerID *peerID;
+@property (nonatomic, strong, nullable) MultipeerSession *multipeerSession;
+@property (nonatomic, strong, nullable) MCPeerID *peerID;
 
 - (instancetype)initWithMultipeerSession:(MultipeerSession *)multipeerSession peerID:(MCPeerID *)peerID;
 

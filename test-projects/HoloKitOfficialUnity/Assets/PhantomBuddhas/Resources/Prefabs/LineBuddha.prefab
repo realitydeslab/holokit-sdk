@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 6085241028815015180}
   - component: {fileID: 219706733357636876}
   - component: {fileID: 6742321759088761229}
-  - component: {fileID: 2320988977451281885}
   - component: {fileID: 2099715444712652453}
+  - component: {fileID: 3955836707810511850}
   m_Layer: 8
   m_Name: LineBuddha
   m_TagString: Untagged
@@ -140,13 +140,13 @@ VisualEffect:
         m_Overridden: 1
     m_NamedObject:
       m_Array:
-      - m_Value: {fileID: 0}
+      - m_Value: {fileID: 6918954641851045129, guid: acdf1d355626345b89139d272f046d9e, type: 3}
         m_Name: PositionMap
         m_Overridden: 1
       - m_Value: {fileID: -2231058418007342408, guid: 08fb0939e6171ce4eac591c16d8cbfa6, type: 3}
         m_Name: ColorAttributeMap
         m_Overridden: 1
-      - m_Value: {fileID: 0}
+      - m_Value: {fileID: -2231058418007342408, guid: acdf1d355626345b89139d272f046d9e, type: 3}
         m_Name: ColorMap
         m_Overridden: 1
     m_Bool:
@@ -191,21 +191,6 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &2320988977451281885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7100620754851673520}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdafc37f32b176349b1684c4455b98e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ExecuteInEditor: 1
-  m_Bindings: []
-  m_VisualEffect: {fileID: 219706733357636876}
 --- !u!114 &2099715444712652453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -223,3 +208,15 @@ MonoBehaviour:
   PrefabHashGenerator: LineBuddha
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
+--- !u!114 &3955836707810511850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7100620754851673520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d51a7e9cbffd4967be2b44da00045b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
