@@ -330,6 +330,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
                 m_SentConnectionRequest = false;
                 clientId = m_ServerId;
                 networkChannel = NetworkChannel.DefaultMessage;
+                payload = new ArraySegment<byte>();
                 receiveTime = Time.realtimeSinceStartup;
                 return NetworkEvent.Connect;
             }
@@ -340,6 +341,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
                 m_ReceivedDisconnectionMessage = false;
                 clientId = m_LastDisconnectedClientId;
                 networkChannel = NetworkChannel.DefaultMessage;
+                payload = new ArraySegment<byte>();
                 receiveTime = Time.realtimeSinceStartup;
                 return NetworkEvent.Disconnect;
             }
@@ -359,6 +361,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // We do nothing here if nothing happens.
             clientId = 0;
             networkChannel = NetworkChannel.ChannelUnused;
+            payload = new ArraySegment<byte>();
             receiveTime = Time.realtimeSinceStartup;
             return NetworkEvent.Nothing;
         }
