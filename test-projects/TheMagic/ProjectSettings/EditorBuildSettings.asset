@@ -7,3 +7,4 @@ EditorBuildSettings:
   m_Scenes: []
   m_configObjects:
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 45a704024975d6145b6d3737e2ddf379, type: 2}
+    UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: 3fe6779f1b19a0f43928b41e1183d6d2, type: 2}
