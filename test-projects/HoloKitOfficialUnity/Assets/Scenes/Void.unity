@@ -155,6 +155,7 @@ MonoBehaviour:
   AvailableSceneNames:
   - PhantomBuddhas
   - Tesla
+  - Balls
 --- !u!4 &490107346
 Transform:
   m_ObjectHideFlags: 0

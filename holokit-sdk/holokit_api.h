@@ -56,7 +56,7 @@ public:
     
     RenderingMode GetRenderingMode() { return current_rendering_mode_; }
     
-    void SetRenderingMode(RenderingMode new_mode) { current_rendering_mode_ = new_mode; }
+    bool SetRenderingMode(RenderingMode new_mode);
     
     void StartNfcVerification();
     

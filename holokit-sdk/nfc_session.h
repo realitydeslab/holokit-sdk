@@ -9,10 +9,13 @@
 
 @interface NFCSession : NSObject
 
-- (void) startReaderSession;
+@property (nonatomic, assign) bool isFinished;
+@property (nonatomic, assign) bool isValid;
 
-- (bool) isUrlValid;
+- (void)startReaderSession;
 
-+ (id) sharedNFCSession;
+- (void)stopReaderSession;
+
++ (id)sharedNFCSession;
 
 @end

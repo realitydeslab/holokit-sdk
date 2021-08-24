@@ -147,7 +147,31 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
 void HoloKitApi::StartNfcVerification() {
     NFCSession* nfcSession = [NFCSession sharedNFCSession];
     [nfcSession startReaderSession];
-    NSLog(@"[holokit_api]: NFC authorization finished.");
+    
+    double nfc_start_time = [[NSProcessInfo processInfo] systemUptime];
+    double nfc_timeout = 15;
+    while([[NSProcessInfo processInfo] systemUptime] - nfc_start_time < nfc_timeout && !nfcSession.isFinished) {
+         //Waiting the user to validate NFC
+    }
+    
+    if (nfcSession.isValid) {
+        nfc_verification_result_ = true;
+    } else {
+        [nfcSession stopReaderSession];
+        nfc_verification_result_ = false;
+    }
+    
+    // BETA: Wait for a short period of time
+    double start_time = [[NSProcessInfo processInfo] systemUptime];
+    double interval;
+    if (nfc_verification_result_) {
+        interval = 4;
+    } else {
+        interval = 1.5;
+    }
+    while([[NSProcessInfo processInfo] systemUptime] - start_time < interval) {
+        // Wait
+    }
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
@@ -158,13 +182,31 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
     }
 }
 
+bool HoloKitApi::SetRenderingMode(RenderingMode new_mode) {
+    if (new_mode != RenderingMode::XRMode) {
+        current_rendering_mode_ = new_mode;
+        return true;
+    } else {
+        // NFC validation
+        StartNfcVerification();
+        if (nfc_verification_result_) {
+            current_rendering_mode_ = RenderingMode::XRMode;
+            NSLog(@"[nfc_session]: NFC verification succeeded.");
+            return true;
+        } else {
+            NSLog(@"[nfc_session]: NFC verification failed.");
+            return false;
+        }
+    }
+}
+
 } // namespace
 
 extern "C" {
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetRenderingMode(int val) {
-    holokit::HoloKitApi::GetInstance()->SetRenderingMode((holokit::RenderingMode)val);
+    return holokit::HoloKitApi::GetInstance()->SetRenderingMode((holokit::RenderingMode)val);
 }
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

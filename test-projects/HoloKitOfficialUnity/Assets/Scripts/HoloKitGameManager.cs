@@ -59,7 +59,7 @@ public class HoloKitGameManager : MonoBehaviour
     private static extern int UnityHoloKit_GetRenderingMode();
 
     [DllImport("__Internal")]
-    private static extern void UnityHoloKit_SetRenderingMode(int val);
+    private static extern bool UnityHoloKit_SetRenderingMode(int val);
 
     private void Awake()
     {
@@ -145,6 +145,9 @@ public class HoloKitGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// This function is only called on the host side.
+    /// </summary>
     private void StartGame()
     {
         if (m_SyncedClientsNum < m_ConnectedClientsNum)
@@ -164,6 +167,9 @@ public class HoloKitGameManager : MonoBehaviour
             // BETA: Stop advertising as the server.
             MultipeerConnectivityTransport.UnityHoloKit_MultipeerStopAdvertising();
         }
+
+        // Switch to XR mode and start the NFC verification session.
+        SwitchRenderingMode();
     }
 
     public void StartAsClient()
@@ -209,18 +215,22 @@ public class HoloKitGameManager : MonoBehaviour
         if (UnityHoloKit_GetRenderingMode() != 2)
         {
             // Switch to XR mode.
-            UnityHoloKit_SetRenderingMode(2);
-            Camera.main.GetComponent<ARCameraBackground>().enabled = false;
-            m_XRButton.transform.GetChild(0).GetComponent<Text>().text = "AR";
+            if(UnityHoloKit_SetRenderingMode(2))
+            {
+                Camera.main.GetComponent<ARCameraBackground>().enabled = false;
+                m_XRButton.transform.GetChild(0).GetComponent<Text>().text = "AR";
+            }
             //m_Volume.SetActive(true);
             //m_Reticle.SetActive(true);
         }
         else
         {
             // Switch to AR mode.
-            UnityHoloKit_SetRenderingMode(1);
-            Camera.main.GetComponent<ARCameraBackground>().enabled = true;
-            m_XRButton.transform.GetChild(0).GetComponent<Text>().text = "XR";
+            if (UnityHoloKit_SetRenderingMode(1))
+            {
+                Camera.main.GetComponent<ARCameraBackground>().enabled = true;
+                m_XRButton.transform.GetChild(0).GetComponent<Text>().text = "XR";
+            }
             //m_Volume.SetActive(false);
             //m_Reticle.SetActive(false);
         }
