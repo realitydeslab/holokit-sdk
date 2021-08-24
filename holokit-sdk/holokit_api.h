@@ -58,9 +58,7 @@ public:
     
     bool SetRenderingMode(RenderingMode new_mode);
     
-    void StartNfcVerification();
-    
-    bool GetNfcVerificationResult() { return nfc_verification_result_; }
+    bool StartNfcVerification();
     
     bool IsSecondDisplayAvailable() { return is_second_display_available_; }
     
@@ -109,8 +107,6 @@ private:
     bool is_initialized_ = false;
     
     RenderingMode current_rendering_mode_;
-    
-    bool nfc_verification_result_ = false;
     
     bool is_second_display_available_ = true;
 }; // class HoloKitApi

@@ -144,7 +144,7 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     return simd_make_float3(0);
 }
 
-void HoloKitApi::StartNfcVerification() {
+bool HoloKitApi::StartNfcVerification() {
     NFCSession* nfcSession = [NFCSession sharedNFCSession];
     [nfcSession startReaderSession];
     
@@ -154,17 +154,10 @@ void HoloKitApi::StartNfcVerification() {
          //Waiting the user to validate NFC
     }
     
-    if (nfcSession.isValid) {
-        nfc_verification_result_ = true;
-    } else {
-        [nfcSession stopReaderSession];
-        nfc_verification_result_ = false;
-    }
-    
     // BETA: Wait for a short period of time
     double start_time = [[NSProcessInfo processInfo] systemUptime];
     double interval;
-    if (nfc_verification_result_) {
+    if (nfcSession.isValid) {
         interval = 4;
     } else {
         interval = 1.5;
@@ -172,6 +165,8 @@ void HoloKitApi::StartNfcVerification() {
     while([[NSProcessInfo processInfo] systemUptime] - start_time < interval) {
         // Wait
     }
+    
+    return nfcSession.isValid;
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
@@ -188,8 +183,7 @@ bool HoloKitApi::SetRenderingMode(RenderingMode new_mode) {
         return true;
     } else {
         // NFC validation
-        StartNfcVerification();
-        if (nfc_verification_result_) {
+        if (StartNfcVerification()) {
             current_rendering_mode_ = RenderingMode::XRMode;
             NSLog(@"[nfc_session]: NFC verification succeeded.");
             return true;
