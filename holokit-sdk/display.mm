@@ -232,6 +232,7 @@ public:
         rendering_caps->skipPresentToMainScreen = false;
         
         allocate_new_textures_ = true;
+        is_first_frame_ = true;
         holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(true);
         
         return kUnitySubsystemErrorCodeSuccess;
@@ -379,8 +380,8 @@ public:
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
             
         // Stop the display subsystem before the splash screen.
-        if (is_first_frame_) {
-            is_first_frame_ = false;
+        if (before_splash_screen_) {
+            before_splash_screen_ = false;
             return kUnitySubsystemErrorCodeFailure;
         }
         
@@ -454,7 +455,16 @@ public:
                     render_pass.cullingPassIndex = 0;
 
                     auto& render_params = render_pass.renderParams[0];
-                    render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
+                    // Render a black image in the first frame to avoid left viewport glitch.
+                    if (is_first_frame_) {
+                        UnityXRVector3 sky_position = UnityXRVector3 { 0, 999, 0 };
+                        UnityXRVector4 sky_rotation = UnityXRVector4 { 0, 0, 0, 1 };
+                        UnityXRPose sky_pose = { sky_position, sky_rotation };
+                        render_params.deviceAnchorToEyePose = sky_pose;
+                        is_first_frame_ = false;
+                    } else {
+                        render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
+                    }
                     render_params.projection.type = kUnityXRProjectionTypeMatrix;
                     render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
                     render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
@@ -566,8 +576,6 @@ private:
             UnityXRRenderTextureId unity_texture_id;
             display_->CreateTexture(handle_, &texture_descriptor, &unity_texture_id);
             unity_textures_[i] = unity_texture_id;
-            
-            refresh_texture_ = true;
         }
     }
     
@@ -639,8 +647,7 @@ private:
     /// @brief The render pipeline state for rendering alignment marker.
     id <MTLRenderPipelineState> second_render_pipeline_state_;
     
-    /// @brief If this value is set to true, the renderer
-    bool refresh_texture_ = false;
+    bool before_splash_screen_ = true;
     
     bool is_first_frame_ = true;
     
