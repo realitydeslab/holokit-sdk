@@ -4,7 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/SingleCard.unity
+    guid: 40c0eaa3faf8c1149be8b2ed9004fe44
   m_configObjects:
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 45a704024975d6145b6d3737e2ddf379, type: 2}
     UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: 3fe6779f1b19a0f43928b41e1183d6d2, type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: d239f8c7ba4134224a751bc0f2e7173f, type: 2}
