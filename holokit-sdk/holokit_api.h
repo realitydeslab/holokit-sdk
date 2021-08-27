@@ -54,11 +54,19 @@ public:
     
     int GetScreenHeight() { return screen_height_; }
     
-    RenderingMode GetRenderingMode() { return current_rendering_mode_; }
+    bool StereoscopicRendering() { return stereoscopic_rendering_; }
     
-    bool SetRenderingMode(RenderingMode new_mode);
+    bool SetStereoscopicRendering(bool value);
     
-    bool StartNfcVerification();
+    bool ShouldAllocateNewTextures() { return should_allocate_new_textures_; }
+    
+    void DidAllocateNewTextures() { should_allocate_new_textures_ = false; }
+    
+    bool SinglePassRendering() { return single_pass_rendering_; }
+    
+    void SetSinglePassRendering(bool value) { single_pass_rendering_ = value; }
+    
+    bool StartNfcSession();
     
     bool IsSecondDisplayAvailable() { return is_second_display_available_; }
     
@@ -106,7 +114,13 @@ private:
     
     bool is_initialized_ = false;
     
-    RenderingMode current_rendering_mode_;
+    /// @brief Whether stereoscopic rendering is open.
+    bool stereoscopic_rendering_ = false;
+    
+    /// @brief Should the system allocate new texture for the next frame? This is set to true when rendering mode is changed.
+    bool should_allocate_new_textures_ = false;
+    
+    bool single_pass_rendering_ = false;
     
     bool is_second_display_available_ = true;
 }; // class HoloKitApi

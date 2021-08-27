@@ -31,8 +31,6 @@ void HoloKitApi::Initialize() {
         NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
     }
     
-    current_rendering_mode_ = RenderingMode::ARMode;
-    
     is_initialized_ = true;
 }
 
@@ -144,7 +142,7 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     return simd_make_float3(0);
 }
 
-bool HoloKitApi::StartNfcVerification() {
+bool HoloKitApi::StartNfcSession() {
     NFCSession* nfcSession = [NFCSession sharedNFCSession];
     [nfcSession startReaderSession];
     
@@ -177,14 +175,20 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
     }
 }
 
-bool HoloKitApi::SetRenderingMode(RenderingMode new_mode) {
-    if (new_mode != RenderingMode::XRMode) {
-        current_rendering_mode_ = new_mode;
+bool HoloKitApi::SetStereoscopicRendering(bool value) {
+    // There is no need to change.
+    if (stereoscopic_rendering_ == value) return true;
+    
+    if (!value) {
+        stereoscopic_rendering_ = false;
+        should_allocate_new_textures_ = true;
         return true;
     } else {
         // NFC validation
-        if (StartNfcVerification()) {
-            current_rendering_mode_ = RenderingMode::XRMode;
+        //if (StartNfcSession()) {
+        if (true) {
+            stereoscopic_rendering_ = true;
+            should_allocate_new_textures_ = true;
             NSLog(@"[nfc_session]: NFC verification succeeded.");
             return true;
         } else {
@@ -199,13 +203,13 @@ bool HoloKitApi::SetRenderingMode(RenderingMode new_mode) {
 extern "C" {
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetRenderingMode(int val) {
-    return holokit::HoloKitApi::GetInstance()->SetRenderingMode((holokit::RenderingMode)val);
+UnityHoloKit_StereoscopicRendering(bool value) {
+    return holokit::HoloKitApi::GetInstance()->StereoscopicRendering();
 }
 
-int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetRenderingMode() {
-    return holokit::HoloKitApi::GetInstance()->GetRenderingMode();
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetStereoscopicRendering(bool value) {
+    return holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(value);
 }
 
 float* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -228,7 +232,7 @@ UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(float* ptr) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_StartNfcVerification() {
     NSLog(@"[holokit_api]: StartNfcVerification()");
-    holokit::HoloKitApi::GetInstance()->StartNfcVerification();
+    holokit::HoloKitApi::GetInstance()->StartNfcSession();
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

@@ -8,6 +8,9 @@ using System;
 
 namespace UnityEngine.XR.HoloKit
 {
+    /// <summary>
+    /// This is a master class to help Unity communiate with HoloKit SDK. 
+    /// </summary>
     public class HoloKitSettings : MonoBehaviour
     {
         // This class is a singleton.
@@ -15,11 +18,7 @@ namespace UnityEngine.XR.HoloKit
 
         public static HoloKitSettings Instance { get { return _instance; } }
 
-        [SerializeField] private bool m_XrModeEnabled = true;
-
         [SerializeField] private bool m_CollaborationEnabled = false;
-
-        private Camera m_ARCamera;
 
         private bool m_HasStarted = false;
 
@@ -52,7 +51,10 @@ namespace UnityEngine.XR.HoloKit
         }
 
         [DllImport("__Internal")]
-        public static extern void UnityHoloKit_SetRenderingMode(int val);
+        private static extern bool UnityHoloKit_StereoscopicRendering();
+
+        [DllImport("__Internal")]
+        private static extern bool UnityHoloKit_SetStereoscopicRendering(bool value);
 
         [DllImport("__Internal")]
         private static extern IntPtr UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
@@ -80,20 +82,6 @@ namespace UnityEngine.XR.HoloKit
 
         private void OnEnable()
         {
-            m_ARCamera = Camera.main;
-
-            // Set the rendering mode.
-            if (m_XrModeEnabled)
-            {
-                UnityHoloKit_SetRenderingMode(2);
-                m_ARCamera.GetComponent<ARCameraBackground>().enabled = false;
-            }
-            else
-            {
-                UnityHoloKit_SetRenderingMode(1);
-                m_ARCamera.GetComponent<ARCameraBackground>().enabled = true;
-            }
-
             // Set up the collaboration setting.
             if (m_CollaborationEnabled)
             {
@@ -145,6 +133,16 @@ namespace UnityEngine.XR.HoloKit
                 EnablePlaneDetection(false);
             }
             transform.GetChild(0).GetComponent<ARPlaneManager>().enabled = enabled;
+        }
+
+        public bool StereoscopicRendering()
+        {
+            return UnityHoloKit_StereoscopicRendering();
+        }
+
+        public bool SetStereoscopicRendering(bool value)
+        {
+            return UnityHoloKit_SetStereoscopicRendering(value);
         }
     }
 }

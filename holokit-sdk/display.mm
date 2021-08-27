@@ -290,8 +290,6 @@ public:
     UnitySubsystemErrorCode Start() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
-        rendering_mode_ = holokit::HoloKitApi::GetInstance()->GetRenderingMode();
-        
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -314,16 +312,14 @@ public:
     
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
         //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
         //os_signpost_id_t spid = os_signpost_id_generate(log);
         //os_signpost_interval_begin(log, spid, "SubmitCurrentFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
         
         RenderContent2();
-        if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session != NULL && holokit::HoloKitApi::GetInstance()->GetRenderingMode() == 2) {
-            RenderAlignmentMarker();
-        }
+        RenderAlignmentMarker();
         
 //        if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable() && second_display_native_render_buffer_ptr_ != nullptr) {
 //          //  RenderToSecondDisplay();
@@ -517,16 +513,18 @@ public:
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
-        //WORKAROUND_SKIP_FIRST_FRAME();
 
-        // BlockUntilUnityShouldStartSubmittingRenderingCommands();
+        // Don't use XR render pipeline if stereoscopic rendering is not open.
+        if (!holokit::HoloKitApi::GetInstance()->StereoscopicRendering()) {
+            return kUnitySubsystemErrorCodeFailure;
+        }
         
         // Reference: https://stackoverflow.com/questions/62667953/can-i-set-signposts-before-and-after-a-call-in-objective-c
         //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
         //os_signpost_id_t spid = os_signpost_id_generate(log);
         //os_signpost_interval_begin(log, spid, "PopulateNextFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
         
-        bool reallocate_textures = (unity_textures_.size() == 0);
+        //bool reallocate_textures = (unity_textures_.size() == 0);
 //        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0) {
 //            NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedSinglePassRendering");
 //            reallocate_textures = true;
@@ -540,66 +538,24 @@ public:
 //            // App wants different reprojection mode, configure compositor if possible.
 //        }
         
+        UnityXRVector3 position_offset = UnityXRVector3 { 0, 0, 0 };
+        
         // If the rendering mode has been changed
-        if (rendering_mode_ != holokit::HoloKitApi::GetInstance()->GetRenderingMode()) {
-            HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Rendering mode switched.", GetCurrentTime());
-            rendering_mode_ = holokit::HoloKitApi::GetInstance()->GetRenderingMode();
-            reallocate_textures = true;
-        }
+        if (holokit::HoloKitApi::GetInstance()->ShouldAllocateNewTextures()) {
+            HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Rendering mode changed.", GetCurrentTime());
 
-        if (reallocate_textures) {
             DestroyTextures();
             // The second texture is for the invisible second camera.
             int num_textures = 1 + 1;
             CreateTextures(num_textures);
+            position_offset = UnityXRVector3 { 0, 100, 0 };
+            
+            holokit::HoloKitApi::GetInstance()->DidAllocateNewTextures();
         }
+
         
-        // AR mode rendering
-        if (rendering_mode_ != RenderingMode::XRMode || refresh_texture_) {
-            next_frame->renderPassesCount = 1;
-            
-            auto& render_pass = next_frame->renderPasses[0];
-            render_pass.textureId = unity_textures_[0];
-            render_pass.renderParamsCount = 1;
-            render_pass.cullingPassIndex = 0;
-            
-            auto& culling_pass = next_frame->cullingPasses[0];
-            culling_pass.separation = 0.064f;
-            
-            auto& render_params = render_pass.renderParams[0];
-            // view matrix
-            UnityXRVector3 position;
-            if (refresh_texture_) {
-                position = UnityXRVector3 { 0, 100, 0 };
-            } else {
-                position = UnityXRVector3 { 0, 0, 0 };
-            }
-            UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
-            UnityXRPose pose = { position, rotation };
-            render_params.deviceAnchorToEyePose = culling_pass.deviceAnchorToCullingPose = pose;
-            // get ARKit projection matrix
-            simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
-            render_params.projection.type = culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-            // Make sure we can see the splash screen when ar session is not initialized.
-            if (holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session == NULL) {
-                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(0));
-            } else {
-                render_params.projection.data.matrix = culling_pass.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
-            }
-            render_params.viewportRect = {
-                0.0f,                    // x
-                0.0f,                    // y
-                1.0f,                    // width
-                1.0f                     // height
-            };
-            refresh_texture_ = false;
-            return kUnitySubsystemErrorCodeSuccess;
-        }
         
-        // CHANGE THIS TO SWITCH BETWEEN RENDERING MODES
-        bool single_pass_rendering = false;
-        // Frame hints tells us if we should setup our renderpasses with a single pass
-        if (!single_pass_rendering)
+        if (!holokit::HoloKitApi::GetInstance()->SinglePassRendering())
         {
             
             if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable()) {
@@ -621,6 +577,7 @@ public:
                     
                     auto& render_params = render_pass.renderParams[0];
                     UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
+                    position.y = position.y + position_offset.y;
                     UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
                     UnityXRPose pose = { position, rotation };
                     render_params.deviceAnchorToEyePose = pose;
@@ -692,6 +649,7 @@ public:
     
     UnitySubsystemErrorCode QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f QueryMirrorViewBlitDesc()", GetCurrentTime());
+        //return kUnitySubsystemErrorCodeSuccess;
         return kUnitySubsystemErrorCodeFailure;
     }
     
@@ -830,9 +788,6 @@ private:
     
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
-    
-    /// @brief This value is true if XR mode is enabled, false if AR mode is enabled.
-    RenderingMode rendering_mode_;
     
     UnityRenderBuffer second_display_native_render_buffer_ptr_ = nullptr;
     
