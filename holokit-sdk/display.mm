@@ -53,58 +53,7 @@ static bool s_SkipFrame = true;
   XR_TRACE_LOG(trace, "[HoloKitDisplayProvider]: " message "\n", \
                ##__VA_ARGS__)
 
-// TODO: put the following data in a proper place
-NSString* side_by_side_shader = @
-        "#include <metal_stdlib>\n"
-        "using namespace metal;\n"
-        "struct AppData\n"
-        "{\n"
-        "    float4 in_pos [[attribute(0)]];\n"
-        "};\n"
-        "struct VProgOutput\n"
-        "{\n"
-        "    float4 out_pos [[position]];\n"
-        "    float2 texcoord;\n"
-        "};\n"
-        "struct FShaderOutput\n"
-        "{\n"
-        "    half4 frag_data [[color(0)]];\n"
-        "};\n"
-        "vertex VProgOutput vprog(AppData input [[stage_in]])\n"
-        "{\n"
-        "    VProgOutput out = { float4(input.in_pos.xy, 0, 1), input.in_pos.zw };\n"
-        "    return out;\n"
-        "}\n"
-        "constexpr sampler blit_tex_sampler(address::clamp_to_edge, filter::linear);\n"
-        "fragment FShaderOutput fshader_tex(VProgOutput input [[stage_in]], texture2d<half> tex [[texture(0)]], texture2d<half> tex2 [[texture(1)]])"
-        "{\n"
-        "    FShaderOutput out = { half4(1,0,0,1) };\n"
-        "    if(input.out_pos.x < tex.get_width() / 2) {\n"
-        "       //input.texcoord.x *= 2;\n"
-        "       out = { tex.sample(blit_tex_sampler, input.texcoord) };\n"
-        "    } else {\n"
-        "       //input.texcoord.x = (input.texcoord.x - 0.5) * 2;\n"
-        "       out = { tex2.sample(blit_tex_sampler, input.texcoord) };\n"
-        "    }\n"
-        "    return out;\n"
-        "}\n"
-        "fragment FShaderOutput fshader_color(VProgOutput input [[stage_in]])\n"
-        "{\n"
-        "    FShaderOutput out = { half4(1,0,0,1) };\n"
-        "    return out;\n"
-        "}\n";
-
-// position + texture coordinate
-const float vdata[] = {
-        -1.0f,  1.0f, 0.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f, 1.0f,
-        1.0f, -1.0f, 1.0f, 1.0f,
-        1.0f,  1.0f, 1.0f, 0.0f,
-    };
-
-const uint16_t idata[] = {0, 1, 2, 2, 3, 0};
-
-NSString* myShader = @
+NSString* alignment_marker_shader = @
     "#include <metal_stdlib>\n"
     "using namespace metal;\n"
     "struct VertexInOut\n"
@@ -182,32 +131,6 @@ NSString* content_shader = @
         return float4(colorTexture.sample(textureSampler, in.tex_coords));
     })msl";
 
-NSString* black_shader = @
-    R"msl(#include <metal_stdlib>
-    #include <simd/simd.h>
-    
-    using namespace metal;
-    
-    typedef enum VertexInputIndex {
-        VertexInputIndexPosition = 0
-    } VertexInputIndex;
-    
-    struct VertexOut {
-        float4 position [[position]];
-    };
-    
-    vertex VertexOut vertexShader(uint vertexID [[vertex_id]],
-                                constant vector_float2 *position [[buffer(VertexInputIndexPosition)]]) {
-        VertexOut out;
-        out.position = vector_float4(position[vertexID], 0.0, 1.0);
-        return out;
-    }
-    
-    fragment float4 fragmentShader(VertexOut in [[stage_in]]) {
-        return float4(0.0, 0.0, 1.0, 1.0);
-    })msl";
-
-
 simd_float4x4 unity_projection_matrix;
 
 namespace holokit {
@@ -260,6 +183,7 @@ public:
         gfx_thread_provider.Stop = [](UnitySubsystemHandle, void*) -> UnitySubsystemErrorCode {
             return GetInstance()->GfxThread_Stop();
         };
+
         GetInstance()->GetDisplay()->RegisterProviderForGraphicsThread(
             handle, &gfx_thread_provider);
         
@@ -298,7 +222,7 @@ public:
     void Shutdown() const {}
     
     UnitySubsystemErrorCode GfxThread_Start(
-            UnityXRRenderingCapabilities* rendering_caps) const {
+            UnityXRRenderingCapabilities* rendering_caps) {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Start()", GetCurrentTime());
         // Does the system use multi-pass rendering?
         rendering_caps->noSinglePassRenderingSupport = false;
@@ -307,18 +231,21 @@ public:
         // is executed.
         rendering_caps->skipPresentToMainScreen = false;
         
+        allocate_new_textures_ = true;
+        holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(true);
+        
         return kUnitySubsystemErrorCodeSuccess;
     }
     
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
         //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
         //os_signpost_id_t spid = os_signpost_id_generate(log);
         //os_signpost_interval_begin(log, spid, "SubmitCurrentFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
         
-        RenderContent2();
+        RenderContent();
         RenderAlignmentMarker();
         
 //        if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable() && second_display_native_render_buffer_ptr_ != nullptr) {
@@ -340,7 +267,7 @@ public:
     }
     
     // Mimic how Google Cardboard does the rendering
-    void RenderContent2() {
+    void RenderContent() {
         if (!main_metal_setup_) {
             id<MTLDevice> mtl_device = metal_interface_->MetalDevice();
             // Compile Metal library
@@ -414,69 +341,6 @@ public:
         mtl_render_pass_descriptor.colorAttachments[0].texture = original_texture;
     }
     
-    void RenderContent() {
-        // Metal initialization is expensive and we only want to run it once.
-        if (!main_metal_setup_) {
-            id<MTLDevice> mtl_device = metal_interface_->MetalDevice();
-            
-            // set up buffers
-            main_vertex_buffer_ = [mtl_device newBufferWithBytes:vdata length:sizeof(vdata) options:MTLResourceOptionCPUCacheModeDefault];
-            main_index_buffer_ = [mtl_device newBufferWithBytes:idata length:sizeof(idata) options:MTLResourceOptionCPUCacheModeDefault];
-            // Set up library and functions
-            id<MTLLibrary> lib = [mtl_device newLibraryWithSource:side_by_side_shader options:nil error:nil];
-            //id<MTLLibrary> lib = [mtlDevice newDefaultLibrary];
-            id<MTLFunction> vertex_function = [lib newFunctionWithName:@"vprog"];
-            id<MTLFunction> fragment_function = [lib newFunctionWithName:@"fshader_tex"];
-
-            MTLVertexBufferLayoutDescriptor* buffer_layout_descriptor = [[MTLVertexBufferLayoutDescriptor alloc] init];
-            buffer_layout_descriptor.stride = 4 * sizeof(float);
-            buffer_layout_descriptor.stepFunction = MTLVertexStepFunctionPerVertex;
-            buffer_layout_descriptor.stepRate = 1;
-
-            MTLVertexAttributeDescriptor* attribute_descriptor = [[MTLVertexAttributeDescriptor alloc] init];
-            attribute_descriptor.format = MTLVertexFormatFloat4;
-
-            MTLVertexDescriptor* vertex_descriptor = [[MTLVertexDescriptor alloc] init];
-            vertex_descriptor.attributes[0] = attribute_descriptor;
-            vertex_descriptor.layouts[0] = buffer_layout_descriptor;
-
-            MTLRenderPipelineDescriptor* render_pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
-
-            render_pipeline_descriptor.fragmentFunction = fragment_function;
-            render_pipeline_descriptor.vertexFunction = vertex_function;
-            render_pipeline_descriptor.vertexDescriptor = vertex_descriptor;
-            render_pipeline_descriptor.sampleCount = 1;
-            render_pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-            render_pipeline_descriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-            //render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-            render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
-            render_pipeline_descriptor.colorAttachments[0].blendingEnabled = YES;
-            render_pipeline_descriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
-            render_pipeline_descriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
-            render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
-            //render_pipeline_descriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorZero; // MTLBlendFactorSourceAlpha;
-            // TODO: this pamameter is vital.
-            //render_pipeline_descriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-            render_pipeline_descriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOne;
-            //render_pipeline_descriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorZero;// MTLBlendFactorOneMinusSourceAlpha;
-
-            main_render_pipeline_state_ = [mtl_device newRenderPipelineStateWithDescriptor:render_pipeline_descriptor error:nil];
-            main_metal_setup_ = true;
-        }
-
-        id<MTLRenderCommandEncoder> render_command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [render_command_encoder setRenderPipelineState:main_render_pipeline_state_];
-        [render_command_encoder setCullMode:MTLCullModeNone];
-        [render_command_encoder setVertexBuffer:main_vertex_buffer_ offset:0 atIndex:0];
-        [render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:0];
-#if SIDE_BY_SIDE
-        [render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:1];
-#else
-        [render_command_encoder setFragmentTexture:metal_color_textures_[1] atIndex:1];
-#endif
-        [render_command_encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:6 indexType:MTLIndexTypeUInt16 indexBuffer:main_index_buffer_ indexBufferOffset:0];
-    }
-    
     void RenderAlignmentMarker() {
         if (!second_metal_setup_) {
             id<MTLDevice> mtl_device = metal_interface_->MetalDevice();
@@ -487,7 +351,7 @@ public:
             //id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
             //vertex_color_buffer.label = @"colors";
             
-            id<MTLLibrary> lib = [mtl_device newLibraryWithSource:myShader options:nil error:nil];
+            id<MTLLibrary> lib = [mtl_device newLibraryWithSource:alignment_marker_shader options:nil error:nil];
             id<MTLFunction> vertex_function = [lib newFunctionWithName:@"passThroughVertex"];
             id<MTLFunction> fragment_function = [lib newFunctionWithName:@"passThroughFragment"];
             
@@ -513,9 +377,10 @@ public:
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
-
-        // Don't use XR render pipeline if stereoscopic rendering is not open.
-        if (!holokit::HoloKitApi::GetInstance()->StereoscopicRendering()) {
+            
+        // Stop the display subsystem before the splash screen.
+        if (is_first_frame_) {
+            is_first_frame_ = false;
             return kUnitySubsystemErrorCodeFailure;
         }
         
@@ -524,9 +389,9 @@ public:
         //os_signpost_id_t spid = os_signpost_id_generate(log);
         //os_signpost_interval_begin(log, spid, "PopulateNextFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
         
-        //bool reallocate_textures = (unity_textures_.size() == 0);
+//        bool reallocate_textures = (unity_textures_.size() == 0);
 //        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0) {
-//            NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedSinglePassRendering");
+//            //NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedSinglePassRendering");
 //            reallocate_textures = true;
 //        }
 //        if ((kUnityXRFrameSetupHintsChangedTextureResolutionScale & frame_hints->changedFlags) != 0) {
@@ -538,22 +403,13 @@ public:
 //            // App wants different reprojection mode, configure compositor if possible.
 //        }
         
-        UnityXRVector3 position_offset = UnityXRVector3 { 0, 0, 0 };
-        
-        // If the rendering mode has been changed
-        if (holokit::HoloKitApi::GetInstance()->ShouldAllocateNewTextures()) {
-            HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Rendering mode changed.", GetCurrentTime());
-
+        // If this is the first frame for stereoscopic rendering mode.
+        if (allocate_new_textures_) {
             DestroyTextures();
-            // The second texture is for the invisible second camera.
             int num_textures = 1 + 1;
             CreateTextures(num_textures);
-            position_offset = UnityXRVector3 { 0, 100, 0 };
-            
-            holokit::HoloKitApi::GetInstance()->DidAllocateNewTextures();
+            allocate_new_textures_ = false;
         }
-
-        
         
         if (!holokit::HoloKitApi::GetInstance()->SinglePassRendering())
         {
@@ -577,7 +433,6 @@ public:
                     
                     auto& render_params = render_pass.renderParams[0];
                     UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
-                    position.y = position.y + position_offset.y;
                     UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
                     UnityXRPose pose = { position, rotation };
                     render_params.deviceAnchorToEyePose = pose;
@@ -638,7 +493,8 @@ public:
     
     UnitySubsystemErrorCode GfxThread_Stop() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
-        // TODO: reset holokit api
+
+        holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(false);
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -786,6 +642,10 @@ private:
     /// @brief If this value is set to true, the renderer
     bool refresh_texture_ = false;
     
+    bool is_first_frame_ = true;
+    
+    bool allocate_new_textures_ = true;
+    
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
     
@@ -830,7 +690,7 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
     display_lifecycle_handler.Shutdown = [](UnitySubsystemHandle, void*) -> void {
         return holokit::HoloKitDisplayProvider::GetInstance()->Shutdown();
     };
-    
+
     // the names do matter
     // The parameters passed to RegisterLifecycleProvider must match the name and id fields in your manifest file.
     // see https://docs.unity3d.com/Manual/xrsdk-provider-setup.html

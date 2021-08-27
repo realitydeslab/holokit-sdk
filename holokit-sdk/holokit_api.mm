@@ -8,6 +8,7 @@
 #include "holokit_api.h"
 #include "IUnityInterface.h"
 #include <sys/utsname.h>
+#import "display.mm"
 
 const float kUserInterpupillaryDistance = 0.064;
 
@@ -175,41 +176,13 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
     }
 }
 
-bool HoloKitApi::SetStereoscopicRendering(bool value) {
-    // There is no need to change.
-    if (stereoscopic_rendering_ == value) return true;
-    
-    if (!value) {
-        stereoscopic_rendering_ = false;
-        should_allocate_new_textures_ = true;
-        return true;
-    } else {
-        // NFC validation
-        //if (StartNfcSession()) {
-        if (true) {
-            stereoscopic_rendering_ = true;
-            should_allocate_new_textures_ = true;
-            NSLog(@"[nfc_session]: NFC verification succeeded.");
-            return true;
-        } else {
-            NSLog(@"[nfc_session]: NFC verification failed.");
-            return false;
-        }
-    }
-}
-
 } // namespace
 
 extern "C" {
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StereoscopicRendering(bool value) {
+UnityHoloKit_StereoscopicRendering() {
     return holokit::HoloKitApi::GetInstance()->StereoscopicRendering();
-}
-
-bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetStereoscopicRendering(bool value) {
-    return holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(value);
 }
 
 float* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -229,10 +202,11 @@ UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(float* ptr) {
     return 0;
 }
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StartNfcVerification() {
-    NSLog(@"[holokit_api]: StartNfcVerification()");
-    holokit::HoloKitApi::GetInstance()->StartNfcSession();
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_StartNfcSession() {
+    // TEMPORARY
+    return true;
+    return holokit::HoloKitApi::GetInstance()->StartNfcSession();
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

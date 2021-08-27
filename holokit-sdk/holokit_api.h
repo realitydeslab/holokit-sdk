@@ -56,11 +56,7 @@ public:
     
     bool StereoscopicRendering() { return stereoscopic_rendering_; }
     
-    bool SetStereoscopicRendering(bool value);
-    
-    bool ShouldAllocateNewTextures() { return should_allocate_new_textures_; }
-    
-    void DidAllocateNewTextures() { should_allocate_new_textures_ = false; }
+    void SetStereoscopicRendering(bool value) { stereoscopic_rendering_ = value; }
     
     bool SinglePassRendering() { return single_pass_rendering_; }
     
@@ -116,9 +112,6 @@ private:
     
     /// @brief Whether stereoscopic rendering is open.
     bool stereoscopic_rendering_ = false;
-    
-    /// @brief Should the system allocate new texture for the next frame? This is set to true when rendering mode is changed.
-    bool should_allocate_new_textures_ = false;
     
     bool single_pass_rendering_ = false;
     

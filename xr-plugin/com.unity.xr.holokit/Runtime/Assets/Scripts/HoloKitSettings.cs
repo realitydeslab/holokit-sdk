@@ -50,17 +50,24 @@ namespace UnityEngine.XR.HoloKit
             get => m_CameraToCenterEyeOffset;
         }
 
-        [DllImport("__Internal")]
-        private static extern bool UnityHoloKit_StereoscopicRendering();
+        private ARCameraBackground m_ARCameraBackground;
+
+        public bool StereoscopicRendering
+        {
+            get => UnityHoloKit_StereoscopicRendering();
+        }
 
         [DllImport("__Internal")]
-        private static extern bool UnityHoloKit_SetStereoscopicRendering(bool value);
+        private static extern bool UnityHoloKit_StereoscopicRendering();
 
         [DllImport("__Internal")]
         private static extern IntPtr UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
 
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(IntPtr ptr);
+
+        [DllImport("__Internal")]
+        private static extern bool UnityHoloKit_StartNfcSession();
 
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetSecondDisplayAvailable(bool value);
@@ -104,10 +111,13 @@ namespace UnityEngine.XR.HoloKit
 
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
+            Debug.Log($"Number of display subsystem {displaySubsystems.Count}");
             if (displaySubsystems.Count > 0)
             {
                 m_DisplaySubsystem = displaySubsystems[0];
             }
+
+            m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
         }
 
         private void Start()
@@ -135,14 +145,27 @@ namespace UnityEngine.XR.HoloKit
             transform.GetChild(0).GetComponent<ARPlaneManager>().enabled = enabled;
         }
 
-        public bool StereoscopicRendering()
-        {
-            return UnityHoloKit_StereoscopicRendering();
-        }
-
         public bool SetStereoscopicRendering(bool value)
         {
-            return UnityHoloKit_SetStereoscopicRendering(value);
+            if (value)
+            {
+                if (UnityHoloKit_StartNfcSession())
+                {
+                    m_ARCameraBackground.enabled = false;
+                    m_DisplaySubsystem.Start();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                m_DisplaySubsystem.Stop();
+                m_ARCameraBackground.enabled = true;
+                return true;
+            }
         }
     }
 }
