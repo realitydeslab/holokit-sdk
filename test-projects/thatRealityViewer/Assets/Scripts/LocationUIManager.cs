@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.HoloKit;
 
 public class LocationUIManager : MonoBehaviour
 {
@@ -20,12 +21,6 @@ public class LocationUIManager : MonoBehaviour
     private Button m_CloseFilterButton;
 
     public static bool IsStereo = false;
-
-    [DllImport("__Internal")]
-    private static extern int UnityHoloKit_GetRenderingMode();
-
-    [DllImport("__Internal")]
-    private static extern void UnityHoloKit_SetRenderingMode(int val);
 
     [DllImport("__Internal")]
     private static extern void UnityHoloKit_StartRecording();
@@ -83,19 +78,17 @@ public class LocationUIManager : MonoBehaviour
 
     private void SwitchRenderingMode()
     {
-        if (UnityHoloKit_GetRenderingMode() != 2)
+        if (!HoloKitSettings.Instance.StereoscopicRendering)
         {
             // Switch to XR mode.
-            UnityHoloKit_SetRenderingMode(2);
-            Camera.main.GetComponent<ARCameraBackground>().enabled = false;
+            HoloKitSettings.Instance.SetStereoscopicRendering(true);
             m_RenderingButton.transform.GetChild(0).GetComponent<Text>().text = "AR";
             IsStereo = true;
         }
         else
         {
             // Switch to AR mode.
-            UnityHoloKit_SetRenderingMode(1);
-            Camera.main.GetComponent<ARCameraBackground>().enabled = true;
+            HoloKitSettings.Instance.SetStereoscopicRendering(false);
             m_RenderingButton.transform.GetChild(0).GetComponent<Text>().text = "XR";
             IsStereo = false;
         }

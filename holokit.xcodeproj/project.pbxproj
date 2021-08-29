@@ -74,6 +74,9 @@
 		4BC45AEC262813BD00BA98E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEA262813BD00BA98E4 /* Main.storyboard */; };
 		4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AED262813BE00BA98E4 /* Assets.xcassets */; };
 		4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */; };
+		4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */; };
+		4BD62BC926D9ECAD00CC0197 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC826D9ECAD00CC0197 /* state.cpp */; };
+		4BD62BCC26D9ECC500CC0197 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BCB26D9ECC500CC0197 /* utility.cpp */; };
 		4BDFC4E72600A54C0087F728 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4E62600A54C0087F728 /* Main.cpp */; };
 		4BDFC4F52600A5830087F728 /* ExampleDisplayProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */; };
 		4BDFC5022600A59B0087F728 /* ExampleTrackingProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */; };
@@ -423,6 +426,15 @@
 		4BC45AF3262813BE00BA98E4 /* factory_app_nfc-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "factory_app_nfc-Bridging-Header.h"; sourceTree = "<group>"; };
 		4BC45B06262813CA00BA98E4 /* factory-app-nfc.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "factory-app-nfc.entitlements"; sourceTree = "<group>"; };
 		4BC45B25262815CB00BA98E4 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
+		4BD62BC026D9EC2100CC0197 /* calcQ.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = calcQ.h; sourceTree = "<group>"; };
+		4BD62BC126D9EC3D00CC0197 /* eigen_utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = eigen_utils.h; sourceTree = "<group>"; };
+		4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pose_ekf.cpp; sourceTree = "<group>"; };
+		4BD62BC626D9EC8B00CC0197 /* pose_ekf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pose_ekf.h; sourceTree = "<group>"; };
+		4BD62BC726D9EC9B00CC0197 /* sensor_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sensor_config.h; sourceTree = "<group>"; };
+		4BD62BC826D9ECAD00CC0197 /* state.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = state.cpp; sourceTree = "<group>"; };
+		4BD62BCA26D9ECB800CC0197 /* state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state.h; sourceTree = "<group>"; };
+		4BD62BCB26D9ECC500CC0197 /* utility.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
+		4BD62BCD26D9ECD100CC0197 /* utility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
 		4BDFC4E62600A54C0087F728 /* Main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
 		4BDFC4F32600A56E0087F728 /* ProviderContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProviderContext.h; sourceTree = "<group>"; };
 		4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ExampleDisplayProvider.mm; sourceTree = "<group>"; };
@@ -847,8 +859,17 @@
 			children = (
 				4B46940926B3C56C00DC960E /* low_latency_tracking_api.h */,
 				4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */,
+				4BD62BC026D9EC2100CC0197 /* calcQ.h */,
+				4BD62BC126D9EC3D00CC0197 /* eigen_utils.h */,
 				4B8A528626CCDF96005D55C5 /* imu_process.cpp */,
 				4B8A528726CCDF96005D55C5 /* imu_process.h */,
+				4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */,
+				4BD62BC626D9EC8B00CC0197 /* pose_ekf.h */,
+				4BD62BC726D9EC9B00CC0197 /* sensor_config.h */,
+				4BD62BC826D9ECAD00CC0197 /* state.cpp */,
+				4BD62BCA26D9ECB800CC0197 /* state.h */,
+				4BD62BCB26D9ECC500CC0197 /* utility.cpp */,
+				4BD62BCD26D9ECD100CC0197 /* utility.h */,
 			);
 			path = "low-latency-tracking";
 			sourceTree = "<group>";
@@ -2165,7 +2186,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BD62BCC26D9ECC500CC0197 /* utility.cpp in Sources */,
 				4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */,
+				4BD62BC926D9ECAD00CC0197 /* state.cpp in Sources */,
 				4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */,
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
 				4B260C9926368C280004B771 /* multipeer_session.m in Sources */,
@@ -2176,6 +2199,7 @@
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
 				4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
+				4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
 				4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */,

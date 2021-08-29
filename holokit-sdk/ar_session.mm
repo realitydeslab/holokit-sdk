@@ -80,7 +80,8 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 @interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
-@property (nonatomic, strong) NSOperationQueue* motionQueue;
+@property (nonatomic, strong) NSOperationQueue* accelGyroQueue;
+@property (nonatomic, strong) NSOperationQueue* deviceMotionQueue;
 @property (nonatomic, strong) HandTracker* handTracker;
 @property (assign) double lastHandTrackingTimestamp;
 @property (nonatomic, strong) VNDetectHumanHandPoseRequest *handPoseRequest;
@@ -113,11 +114,14 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         //self.handPoseRequest.revision = VNDetectHumanHandPoseRequestRevision1;
         
         // Accel and gyro data
-        self.motionQueue = [[NSOperationQueue alloc] init];
-        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        self.accelGyroQueue = [[NSOperationQueue alloc] init];
+        self.accelGyroQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        self.deviceMotionQueue = [[NSOperationQueue alloc] init];
+        self.deviceMotionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
         self.motionManager = [[CMMotionManager alloc] init];
-        [self startAccelerometer];
-        [self startGyroscope];
+//        [self startAccelerometer];
+//        [self startGyroscope];
+        //[self startDeviceMotion];
         
         self.frameCount = 0;
         self.handPosePredictionInterval = 8;
@@ -268,8 +272,9 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 - (void)startAccelerometer {
     if ([self.motionManager isAccelerometerAvailable] == YES) {
         self.motionManager.accelerometerUpdateInterval = 1.0 / 100.0;
-        [self.motionManager startAccelerometerUpdatesToQueue:self.motionQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
+        [self.motionManager startAccelerometerUpdatesToQueue:self.accelGyroQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
             //NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
+            //NSLog(@"acc time: %f, data: (%f, %f, %f)", accelerometerData.timestamp, accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
             // low latency tracking - keep providing accelerometer data to low_latency_tracking_api
             holokit::AccelerometerData data = { accelerometerData.timestamp, CMAccelerationToEigenVector3d(accelerometerData.acceleration) };
             holokit::LowLatencyTrackingApi::GetInstance()->OnAccelerometerDataUpdated(data);
@@ -280,11 +285,24 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 - (void)startGyroscope {
     if ([self.motionManager isGyroAvailable] == YES) {
         self.motionManager.gyroUpdateInterval = 1.0 / 100.0;
-        [self.motionManager startGyroUpdatesToQueue:self.motionQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
+        [self.motionManager startGyroUpdatesToQueue:self.accelGyroQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
             //NSLog(@"[Gyro] thread=%@, gyroData.timestamp=%f, systemuptime=%f, gyroData.rotationRate.x=%f, gyroData.rotationRate.y=%f, gyroData.rotationRate.z=%f", [NSThread currentThread], gyroData.timestamp, [[NSProcessInfo processInfo] systemUptime], gyroData.rotationRate.x, gyroData.rotationRate.y, gyroData.rotationRate.z);
-            // TODO: low latency tracking - keep providing gyro data to low_latency_tracking _api
+            //NSLog(@"gyro time: %f, data: (%f, %f, %f)", gyroData.timestamp, gyroData.rotationRate.x, gyroData.rotationRate.y, gyroData.rotationRate.z);
+            // low latency tracking - keep providing gyro data to low_latency_tracking _api
             holokit::GyroData data = { gyroData.timestamp,  CMRotationRateToEigenVector3d(gyroData.rotationRate) };
             holokit::LowLatencyTrackingApi::GetInstance()->OnGyroDataUpdated(data);
+        }];
+    }
+}
+
+- (void)startDeviceMotion {
+    if ([self.motionManager isDeviceMotionAvailable] == YES) {
+        self.motionManager.deviceMotionUpdateInterval = 1.0 / 100.0;
+        [self.motionManager startDeviceMotionUpdatesToQueue:self.deviceMotionQueue withHandler:^(CMDeviceMotion *deviceMotionData, NSError *error) {
+            NSLog(@"----------------------------------------------------");
+            NSLog(@"device motion timestamp: %f", deviceMotionData.timestamp);
+            NSLog(@"device motion user acceleration: (%f, %f, %f)", deviceMotionData.userAcceleration.x, deviceMotionData.userAcceleration.y, deviceMotionData.userAcceleration.z);
+            NSLog(@"device motion rotation rate: (%f, %f, %f)", deviceMotionData.rotationRate.x, deviceMotionData.rotationRate.y,  deviceMotionData.rotationRate.z);
         }];
     }
 }
@@ -318,7 +336,9 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         NSLog(@"[ar_session]: AR session started.");
         self.session = session;
         
-        holokit::LowLatencyTrackingApi::GetInstance()->Activate();
+        [self startAccelerometer];
+        [self startGyroscope];
+        //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
     
     // low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
@@ -328,13 +348,6 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         TransformToEigenQuaterniond(frame.camera.transform),
         MatrixToEigenMatrix3d(frame.camera.intrinsics) };
     holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
-    
-//    std::cout << std::endl;
-//    double current = [[NSProcessInfo processInfo] systemUptime];
-//    double vsync = [self.aDisplayLink targetTimestamp];
-//    NSLog(@"[arkit_lag]: %f at %f", current - frame.timestamp, current);
-//    NSLog(@"[vsync_lag] %f at %f", vsync - frame.timestamp, current);
-//    NSLog(@"[lag]: %f at %f", vsync - current, current);
     
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.

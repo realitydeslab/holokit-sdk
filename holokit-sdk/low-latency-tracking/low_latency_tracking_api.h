@@ -14,6 +14,7 @@
 #include <mutex>
 #include <memory>
 #include "imu_process.h"
+#include "pose_ekf.h"
 
 namespace holokit {
 
@@ -27,6 +28,12 @@ struct GyroData {
     Eigen::Vector3d rotationRate;
 };
 
+struct IMUData {
+    double sensor_timestamp;
+    Eigen::Vector3d acceleration;
+    Eigen::Vector3d rotationRate;
+};
+
 struct ARKitData {
     double sensor_timestamp;
     Eigen::Vector3d position;
@@ -37,9 +44,9 @@ struct ARKitData {
 class LowLatencyTrackingApi {
     
 public:
-    LowLatencyTrackingApi() {};
+    LowLatencyTrackingApi();
     
-    bool GetPose(double target_timestamp, Eigen::Vector3d& position, Eigen::Quaterniond& rotation) const;
+    bool GetPose(double target_timestamp, Eigen::Vector3d& position, Eigen::Quaterniond& rotation);
     
     void OnAccelerometerDataUpdated(const AccelerometerData& data);
     
@@ -48,6 +55,8 @@ public:
     void OnARKitDataUpdated(const ARKitData& data);
     
     static std::unique_ptr<LowLatencyTrackingApi>& GetInstance();
+    
+    void InitEKF();
     
     void Activate() { is_active_ = true; is_filtering_gyro_ = true; is_filtering_acc_ = true; };
     
@@ -79,11 +88,27 @@ private:
     
     std::mutex arkit_mtx_;
     
-    bool is_active_ = false;
+    bool is_active_ = true;
     
     bool is_filtering_gyro_ = true;
     
     bool is_filtering_acc_ = true;
+
+
+    // for Interpolation
+    AccelerometerData cur_acc;
+    std::vector<GyroData> gyro_buf;
+    IMUData imu_data;
+    int imu_prepare = 0;
+
+    PoseEKF pose_ekf;
+    IMUFilter imu_filter;
+    
+    Vector3d gyro_bias;
+
+    bool ekf_init_flag = false;
+    bool imu_good_flag = false;
+
 }; // class LowLatencyTrackingApi
 
 //std::unique_ptr<LowLatencyTrackingApi>& LowLatencyTrackingApi::GetInstance();

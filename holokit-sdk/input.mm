@@ -353,6 +353,7 @@ public:
                     simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
                     position = UnityXRVector3 { camera_position.x, camera_position.y, -camera_position.z };
                     simd_quatf quaternion = simd_quaternion(camera_transform);
+                    NSLog(@"quaternion: (%f, %f, %f, %f)", quaternion.vector.x, quaternion.vector.y, quaternion.vector.z, quaternion.vector.w);
                     rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
                 }
                 

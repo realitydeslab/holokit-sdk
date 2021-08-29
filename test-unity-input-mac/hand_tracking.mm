@@ -38,7 +38,7 @@ static const float kMaxLandmarkDistance = 0.8f;
 @interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
-@property (nonatomic, strong) NSOperationQueue* motionQueue;
+@property (nonatomic, strong) NSOperationQueue* accelQueue;
 @property (nonatomic, strong) HandTracker* handTracker;
 //@property (nonatomic, strong) NSArray<NSArray<Landmark *> *> *landmarks;
 @property (nonatomic, strong) NSMutableArray<LandmarkPosition *> *leftHandLandmarkPositions;
@@ -67,8 +67,8 @@ static const float kMaxLandmarkDistance = 0.8f;
         self.handTrackingQueue = [[NSOperationQueue alloc] init];
         self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
         
-        self.motionQueue = [[NSOperationQueue alloc] init];
-        self.motionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+        self.accelQueue = [[NSOperationQueue alloc] init];
+        self.accelQueue.qualityOfService = NSQualityOfServiceUserInteractive;
         
         self.motionManager = [[CMMotionManager alloc] init];
         
@@ -97,7 +97,7 @@ static const float kMaxLandmarkDistance = 0.8f;
 - (void)startAccelerometer {
     if ([self.motionManager isAccelerometerAvailable] == YES) {
         self.motionManager.accelerometerUpdateInterval = 1.0 / 100.0;
-        [self.motionManager startAccelerometerUpdatesToQueue:self.motionQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
+        [self.motionManager startAccelerometerUpdatesToQueue:self.accelQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
           //  NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y,
            //       accelerometerData.acceleration.z);
         }];
@@ -107,7 +107,7 @@ static const float kMaxLandmarkDistance = 0.8f;
 - (void)startGyroscope {
     if ([self.motionManager isGyroAvailable] == YES) {
         self.motionManager.gyroUpdateInterval = 1.0 / 100.0;
-        [self.motionManager startGyroUpdatesToQueue:self.motionQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
+        [self.motionManager startGyroUpdatesToQueue:self.accelQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
            // self.gy_x = gyroData.rotationRate.x;
            // self.gy_y = gyroData.rotationRate.y;
            // self.gy_z = gyroData.rotationRate.z;
