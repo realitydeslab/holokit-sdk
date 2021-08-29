@@ -345,7 +345,9 @@ public:
                 
                 Eigen::Vector3d eigen_position;
                 Eigen::Quaterniond eigen_rotation;
-                if(holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && holokit::LowLatencyTrackingApi::GetInstance()->IsActive() && holokit::LowLatencyTrackingApi::GetInstance()->GetPose(vsync_time_stamp, eigen_position, eigen_rotation)) {
+                if(holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && holokit::LowLatencyTrackingApi::GetInstance()->IsActive() && holokit::LowLatencyTrackingApi::GetInstance()->GetPose(vsync_time_stamp, eigen_position, eigen_rotation) &&
+                    holokit::LowLatencyTrackingApi::GetInstance()->GetIsLltOpen()) {
+                    
                     position = EigenVector3dToUnityXRVector3(eigen_position);
                     rotation = EigenQuaterniondToUnityXRVector4(eigen_rotation);
                 } else {

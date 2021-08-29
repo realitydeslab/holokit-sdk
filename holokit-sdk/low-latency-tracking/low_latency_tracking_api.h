@@ -61,10 +61,14 @@ public:
     void Activate() { is_active_ = true; is_filtering_gyro_ = true; is_filtering_acc_ = true; };
     
     void Deactivate() { is_active_ = false; }
-    
+
     bool IsActive() { return is_active_; }
     
     void Clear();
+    
+    bool GetIsLltOpen() { return is_llt_open_; }
+    
+    void SetIsLltOpen(bool value) { is_llt_open_ = value; }
     
     void SetIsFilteringGyro(bool value) { is_filtering_gyro_ = value; }
     
@@ -94,6 +98,7 @@ private:
     
     bool is_filtering_acc_ = true;
 
+    bool is_llt_open_ = true;
 
     // for Interpolation
     AccelerometerData cur_acc;
