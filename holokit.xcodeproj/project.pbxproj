@@ -12,6 +12,10 @@
 		4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B4FFDF42604AA93002FC8D7 /* Shaders.metal */; };
 		4B06069D25F5C963006DF0B0 /* test_display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B06069C25F5C963006DF0B0 /* test_display.cpp */; };
 		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
+		4B16B10826DB99E40016FFA0 /* imu_process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A528626CCDF96005D55C5 /* imu_process.cpp */; };
+		4B16B10926DB99E70016FFA0 /* pose_ekf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */; };
+		4B16B10A26DB99EC0016FFA0 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC826D9ECAD00CC0197 /* state.cpp */; };
+		4B16B10B26DB99EE0016FFA0 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BCB26D9ECC500CC0197 /* utility.cpp */; };
 		4B1C73E726C4F6BD0063AC2A /* speech_recognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */; };
 		4B260C9926368C280004B771 /* multipeer_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B260C9826368C280004B771 /* multipeer_session.m */; };
 		4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
@@ -2132,8 +2136,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B16B10A26DB99EC0016FFA0 /* state.cpp in Sources */,
 				4B69FF4126C611D200843FCF /* main.mm in Sources */,
 				4B69FF4726C6197F00843FCF /* low_latency_tracking_api.mm in Sources */,
+				4B16B10826DB99E40016FFA0 /* imu_process.cpp in Sources */,
+				4B16B10926DB99E70016FFA0 /* pose_ekf.cpp in Sources */,
+				4B16B10B26DB99EE0016FFA0 /* utility.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
