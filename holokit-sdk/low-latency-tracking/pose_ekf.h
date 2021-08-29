@@ -7,6 +7,7 @@
 #include <vector>
 #include "state.h"
 #include "sensor_config.h"
+#include <mutex>
 
 #define N_STATE_BUFFER 256
 #define HLI_EKF_STATE_SIZE 16
@@ -29,7 +30,7 @@ void initialize(const Eigen::Vector3d & p, const Eigen::Vector3d & v,
   unsigned char getClosestState(State* timestate, double tstamp, double delay = 0.00);
 
   bool getStateAtIdx(State* timestate, unsigned char idx);
-
+  void preditFutureState(const double dt, Eigen::Quaterniond &q, Eigen::Vector3d &p);
 
 public:
   const static int nBuff_ = 30;
@@ -61,6 +62,7 @@ public:
 
 
   bool data_playback_;
+  std::mutex state_mtx_;
 
   void propagateState(const double dt);
 

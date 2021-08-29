@@ -43,12 +43,14 @@ void LowLatencyTrackingApi::InitEKF()
     
     //std::cout << "acc num: " << accelerometer_data_.size() << std::endl;
     //std::cout << "gyro num: " << gyro_data_.size() << std::endl;
-//    Eigen::Vector3d t = last_arkit_data_.position;
-//    Eigen::Quaterniond q = last_arkit_data_.rotation;
-    Eigen::Vector3d t(0,0,0);
-    Eigen::Quaterniond q(1,0,0,0);
+    Eigen::Vector3d t = last_arkit_data_.position;
+    Eigen::Quaterniond q = last_arkit_data_.rotation;
+//    Eigen::Vector3d t(0,0,0);
+//    Eigen::Quaterniond q(1,0,0,0);
     Eigen::Vector3d acc = imu_data.acceleration;
     Eigen::Vector3d gyro = imu_data.rotationRate + gyro_bias;
+//    Eigen::Vector3d acc(0,0,0);
+//    Eigen::Vector3d gyro(0,0,0);
     
     Eigen::Matrix3d R_ci;
     R_ci << 0,-1,0,1,0,0,0,0,1;
@@ -183,11 +185,6 @@ void LowLatencyTrackingApi::OnGyroDataUpdated(const GyroData& data) {
         pose_ekf.imuCallback(imu_data.acceleration, imu_data.rotationRate + gyro_bias, imu_data.sensor_timestamp);
     }
     
-    if(imu_good_flag && !ekf_init_flag)
-    {
-        InitEKF();
-        ekf_init_flag = true;
-    }
 }
 
 void LowLatencyTrackingApi::OnARKitDataUpdated(const ARKitData& data) {
@@ -213,7 +210,12 @@ void LowLatencyTrackingApi::OnARKitDataUpdated(const ARKitData& data) {
     {
         pose_ekf.measurementCallback(last_arkit_data_.position, last_arkit_data_.rotation, last_arkit_data_.sensor_timestamp);
     }
-
+    
+    if(imu_good_flag && !ekf_init_flag)
+    {
+        InitEKF();
+        ekf_init_flag = true;
+    }
 
 }
 

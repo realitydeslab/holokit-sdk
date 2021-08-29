@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <vector>
+#include <iostream>
 
 #define N_STATE 15//25 /// error state size
 

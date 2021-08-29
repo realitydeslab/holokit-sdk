@@ -94,7 +94,7 @@ void PoseEKF::imuCallback(const Eigen::Vector3d &linear_acceleration, const Eige
     
     if (!initialized_)
         return;
-    
+    state_mtx_.lock();
     StateBuffer_[idx_state_].time_ = time_stamp;
     
     static int seq = 0;
@@ -125,7 +125,7 @@ void PoseEKF::imuCallback(const Eigen::Vector3d &linear_acceleration, const Eige
     checkForNumeric((double*)(&StateBuffer_[idx_state_ - 1].p_[0]), 3, "prediction p");
     
     predictionMade_ = true;
-    
+    state_mtx_.unlock();
     seq++;
 }
 
@@ -175,10 +175,15 @@ void PoseEKF::propagateState(const double dt)
     // first oder quaternion integration
     cur_state.q_.coeffs() = quat_int * prev_state.q_.coeffs();
     cur_state.q_.normalize();
-    
+    std::cout << "ea " << ea.transpose() << "eaold " << eaold.transpose() << std::endl;
+    std::cout << "cur_state.q_" << cur_state.q_.w() << " " << cur_state.q_.x() << " " << cur_state.q_.y() << " " << cur_state.q_.z() << std::endl;
+    std::cout << "prev_state.q_" << prev_state.q_.w() << " " << prev_state.q_.x() << " " << prev_state.q_.y() << " " << prev_state.q_.z() << std::endl;
     dv = (cur_state.q_.toRotationMatrix() * ea + prev_state.q_.toRotationMatrix() * eaold) / 2;
+    std::cout << "dv " << dv.transpose() << std::endl;
     cur_state.v_ = prev_state.v_ + (dv - g_) * dt;
     cur_state.p_ = prev_state.p_ + ((cur_state.v_ + prev_state.v_) / 2 * dt);
+    std::cout << "cur_state.v" << cur_state.v_.transpose() << std::endl;
+    std::cout << "cur_state.p" << cur_state.p_.transpose() << std::endl;
     
     idx_state_++;
 }
@@ -411,15 +416,28 @@ bool PoseEKF::applyCorrection(unsigned char idx_delaystate, const ErrorState & r
     //    qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.q_wv_.coeffs());
     //    qvw_inittimer_++;
     //  }
-    
+    state_mtx_.lock();
     // idx fiddeling to ensure correct update until now from the past
     idx_time_ = idx_state_;
     idx_state_ = idx_delaystate + 1;
     idx_P_ = idx_delaystate + 1;
     
+    auto start = std::chrono::system_clock::now();
     // propagate state matrix until now
     while (idx_state_ != idx_time_)
+    {
         propagateState(StateBuffer_[idx_state_].time_ - StateBuffer_[(unsigned char)(idx_state_ - 1)].time_);
+        predictProcessCovariance(StateBuffer_[idx_P_].time_ - StateBuffer_[(unsigned char)(idx_P_ - 1)].time_);
+        
+    }
+    state_mtx_.unlock();
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+    std::cout<< "elapsed time: " << elapsed_seconds.count() << "s\n";
+    
+    
     
     checkForNumeric(&correction_[0], HLI_EKF_STATE_SIZE, "update");
     
@@ -469,8 +487,8 @@ void PoseEKF::measurementCallback(const Eigen::Vector3d &p, const Eigen::Quatern
     bool use_fixed_covariance_ = true;
     if (use_fixed_covariance_)
     {
-        const double s_zp = 0.001 * 0.001;
-        const double s_zq = 0.001 * 0.001;
+        const double s_zp = 0.0001 * 0.0001;
+        const double s_zq = 0.0001 * 0.0001;
         R = (Eigen::Matrix<double, N_MEAS, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq/*, 1e-6*/).finished().asDiagonal();
     }
     
@@ -479,6 +497,8 @@ void PoseEKF::measurementCallback(const Eigen::Vector3d &p, const Eigen::Quatern
     if (state_old.time_ == -1)
         return; // // early abort // //
     
+    std::cout << "idx p" << state_old.p_ << std::endl;
+    std::cout << "idx q" << state_old.q_.w()  << std::endl;
     // get rotation matrices
     Eigen::Matrix3d C_wv = state_old.q_wv_.conjugate().toRotationMatrix();
     Eigen::Matrix3d C_q = state_old.q_.conjugate().toRotationMatrix();
@@ -520,19 +540,23 @@ void PoseEKF::measurementCallback(const Eigen::Vector3d &p, const Eigen::Quatern
     //from c to world
     Quaterniond q_cw = state_old.q_ * state_old.q_ci_;
     Vector3d p_cw = state_old.q_.toRotationMatrix() * state_old.p_ci_ + state_old.p_;
-    std::cout << "state_old pose" << p_cw.transpose() << std::endl;
+    std::cout << "state_old pose" << state_old.p_ << std::endl;
     
     applyMeasurement(idx, H_old, r_old, R);
 }
 
 bool PoseEKF::getRealPose(Vector3d &pos, Quaterniond &q)
 {
-    unsigned char id = idx_state_ - 1;
-    State& state = StateBuffer_[id];
+//    unsigned char id = idx_state_ - 1;
+//    State& state = StateBuffer_[id];
+//
+//    Quaterniond quat = state.q_ * state.q_ci_;
+//    Vector3d position = state.q_.toRotationMatrix() * state.p_ci_ + state.p_;
+    Quaterniond quat;
+    Vector3d position;
+    preditFutureState(0.0166, quat, position);
     
-    Quaterniond quat = state.q_ * state.q_ci_;
-    Vector3d position = state.q_.toRotationMatrix() * state.p_ci_ + state.p_;
-    
+
     if(quat.norm() < 0.5 || quat.norm() > 1.5 || position.norm() > 10000)
     {
         std::cout << "fusion pose failed!!!!" << std::endl;
@@ -549,3 +573,51 @@ bool PoseEKF::getRealPose(Vector3d &pos, Quaterniond &q)
     return true;
 }
 
+
+
+void PoseEKF::preditFutureState(const double dt, Eigen::Quaterniond &q, Eigen::Vector3d &p)
+{
+    typedef const Eigen::Matrix<double, 4, 4> ConstMatrix4;
+    typedef const Eigen::Vector3d ConstVector3;
+    typedef Eigen::Matrix<double, 4, 4> Matrix4;
+    
+    // get references to current and previous state
+    State & cur_state = StateBuffer_[(unsigned char)(idx_state_ - 1)];
+    State & prev_state = StateBuffer_[(unsigned char)(idx_state_ - 2)];
+    
+    //  Eigen::Quaterniond dq;
+    Eigen::Vector3d dv;
+    ConstVector3 ew = cur_state.w_m_ - cur_state.b_w_;
+//    ConstVector3 ewold = prev_state.w_m_ - prev_state.b_w_;
+    ConstVector3 ea = cur_state.a_m_ - cur_state.b_a_;
+//    ConstVector3 eaold = prev_state.a_m_ - prev_state.b_a_;
+    ConstMatrix4 Omega = omegaMatJPL(ew);
+    ConstMatrix4 OmegaOld = omegaMatJPL(ew);
+    Matrix4 OmegaMean = omegaMatJPL((ew + ew) / 2);
+    
+    int div = 1;
+    Matrix4 MatExp;
+    MatExp.setIdentity();
+    OmegaMean *= 0.5 * dt;
+    for (int i = 1; i < 5; i++)
+    {
+        div *= i;
+        MatExp = MatExp + OmegaMean / div;
+        OmegaMean *= OmegaMean;
+    }
+    
+    // first oder quat integration matrix
+    ConstMatrix4 quat_int = MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
+    
+    // first oder quaternion integration
+    Quaterniond quat;
+    Vector3d position;
+    quat.coeffs() = quat_int * cur_state.q_.coeffs();
+    quat.normalize();
+    dv = (q.toRotationMatrix() * ea + cur_state.q_.toRotationMatrix() * ea) / 2;
+    Eigen::Vector3d v = cur_state.v_ + (dv - g_) * dt;
+    position = prev_state.p_ + ((cur_state.v_ + v) / 2 * dt);
+    //get from c to w
+    q = quat * cur_state.q_ci_;
+    p = quat.toRotationMatrix() * cur_state.p_ci_ + position;
+}
