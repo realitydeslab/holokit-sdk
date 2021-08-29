@@ -136,7 +136,9 @@ void LowLatencyTrackingApi::OnAccelerometerDataUpdated(const AccelerometerData& 
     
 //    accelerometer_data_.push_back(data);
 //    accel_mtx_.unlock();
-    cur_acc.acceleration = data.acceleration * 9.81f;
+    Eigen::Vector3d acc_filted;
+    imu_filter.get_filted_acc(data.acceleration * 9.81f,acc_filted);
+    cur_acc.acceleration = acc_filted;
     cur_acc.sensor_timestamp = data.sensor_timestamp;
     if(imu_prepare<10)
      {
@@ -152,17 +154,21 @@ void LowLatencyTrackingApi::OnGyroDataUpdated(const GyroData& data) {
 //    gyro_mtx_.unlock();
     if(data.sensor_timestamp <= 0) return;
     if(imu_prepare < 10) return;
-
+    Eigen::Vector3d filted_gyro;
+    imu_filter.get_filted_gyro(data.rotationRate, filted_gyro);
+    GyroData filted_data;
+    filted_data.rotationRate = filted_gyro;
+    filted_data.sensor_timestamp = data.sensor_timestamp;
     if(gyro_buf.size() == 0)
      {
-         gyro_buf.push_back(data);
-         gyro_buf.push_back(data);
+         gyro_buf.push_back(filted_data);
+         gyro_buf.push_back(filted_data);
          return;
      }
      else
      {
          gyro_buf[0] = gyro_buf[1];
-         gyro_buf[1] = data;
+         gyro_buf[1] = filted_data;
      }
      //interpolation
      if(cur_acc.sensor_timestamp >= gyro_buf[0].sensor_timestamp && cur_acc.sensor_timestamp < gyro_buf[1].sensor_timestamp)

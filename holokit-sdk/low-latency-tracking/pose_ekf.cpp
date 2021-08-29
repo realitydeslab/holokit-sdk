@@ -487,8 +487,8 @@ void PoseEKF::measurementCallback(const Eigen::Vector3d &p, const Eigen::Quatern
     bool use_fixed_covariance_ = true;
     if (use_fixed_covariance_)
     {
-        const double s_zp = 0.0001 * 0.0001;
-        const double s_zq = 0.0001 * 0.0001;
+        const double s_zp = 0.001 * 0.001;
+        const double s_zq = 0.001 * 0.001;
         R = (Eigen::Matrix<double, N_MEAS, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq/*, 1e-6*/).finished().asDiagonal();
     }
     

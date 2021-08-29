@@ -339,7 +339,8 @@ public:
                 
                 // TODO: low latency tracking - get predicted camera transform
                 ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
-                double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp] + 0.0166 * 2;
+                //double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp];
+                double vsync_time_stamp = [[NSProcessInfo processInfo] systemUptime];
                 UnityXRVector3 position;
                 UnityXRVector4 rotation;
                 
