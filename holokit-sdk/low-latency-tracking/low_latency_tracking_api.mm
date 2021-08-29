@@ -254,4 +254,14 @@ UnityHoloKit_SetIsFilteringAcc(bool value) {
     holokit::LowLatencyTrackingApi::GetInstance()->SetIsFilteringAcc(value);
 }
 
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetIsLltOpen() {
+    return holokit::LowLatencyTrackingApi::GetInstance()->GetIsLltOpen();
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetIsLltOpen(bool value) {
+    holokit::LowLatencyTrackingApi::GetInstance()->SetIsLltOpen(value);
+}
+
 }
