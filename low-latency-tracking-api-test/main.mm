@@ -141,7 +141,7 @@ void read_gyro_data() {
 
 int main(int argc, const char * argv[]) {
     
-    const double FIXED_LAG_TIME = 16.6;
+    const double FIXED_LAG_TIME = 0.0166;
     
 
     // Open the file.
@@ -189,9 +189,9 @@ int main(int argc, const char * argv[]) {
         Eigen::Vector3d predicted_position;
         Eigen::Quaterniond predicted_rotation;
         holokit::LowLatencyTrackingApi::GetInstance()->GetPose(target_arkit_sensor_time, predicted_position, predicted_rotation);
-        std::cout << "Position error: " << (predicted_position - target_position) << std::endl;
-        std::cout << "Rotation error: " << predicted_rotation.coeffs() << target_rotation.coeffs() << std::endl;
-
+        std::cout << "Position error: " << (predicted_position - target_position).norm() << std::endl;
+        std::cout << "Rotation error: " << predicted_rotation.angularDistance(target_rotation) / M_PI * 180 << std::endl << std::endl ;
+        
     }
 
     
