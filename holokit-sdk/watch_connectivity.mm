@@ -5,10 +5,15 @@
 //  Created by Yuchen on 2021/8/30.
 //
 
-#import <Foundation/Foundation.h>
 #import "watch_connectivity.h"
+#import "core_motion.h"
+#import "math_helpers.h"
+#include "IUnityInterface.h"
 
-typedef void (*DidReceiveWatchActionMessage)(int messageIndex, double watchYaw, double iphoneYaw);
+typedef void (*DidReceiveWatchSystemMessage)(int messageIndex);
+DidReceiveWatchSystemMessage DidReceiveWatchSystemMessageDelegate = NULL;
+
+typedef void (*DidReceiveWatchActionMessage)(int messageIndex, int watchYaw, int iphoneYaw);
 DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
 
 @interface HoloKitWatchConnectivity() <WCSessionDelegate>
@@ -25,10 +30,26 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
             self.wcSession = [WCSession defaultSession];
             self.wcSession.delegate = self;
             // We let Unity manually activate the session when needed.
-            //[self.wcSession activateSession];
+            [self.wcSession activateSession];
+            
+            HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion getSingletonInstance];
+            [coreMotionInstance startDeviceMotion];
         }
     }
     return self;
+}
+
+- (void)close {
+    
+}
+
++ (id)getSingletonInstance {
+    static dispatch_once_t onceToken = 0;
+    static id _sharedObject = nil;
+    dispatch_once(&onceToken, ^{
+        _sharedObject = [[self alloc] init];
+    });
+    return _sharedObject;
 }
 
 #pragma mark - WCSessionDelegate
@@ -56,11 +77,13 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
         if (id watchYawValue = [message objectForKey:@"WatchYaw"]) {
             NSInteger watchActionIndex = [watchActionValue integerValue];
             NSInteger watchYaw = [watchYawValue integerValue];
-            //DidReceiveWatchActionMessageDelegate(watchActionIndex, watchYaw, )
+            HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion getSingletonInstance];
+            DidReceiveWatchActionMessageDelegate((int)watchActionIndex, (int)watchYaw, (int)Radians2Degrees(coreMotionInstance.currentDeviceMotion.attitude.yaw));
         }
-        
+    } else if (id watchSystemValue = [message objectForKey:@"WatchSystem"]) {
+        NSInteger watchSystemIndex = [watchSystemValue integerValue];
+        DidReceiveWatchSystemMessageDelegate((int)watchSystemIndex);
     }
-
 }
 
 - (void)sessionDidBecomeInactive:(nonnull WCSession *)session {
@@ -72,5 +95,36 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
     
 }
 
-
 @end
+
+#pragma mark - extern "C"
+
+extern "C" {
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_InitWatchConnectivitySession() {
+    [HoloKitWatchConnectivity getSingletonInstance];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SendMessage2Watch(NSString *messageType, int messageIndex) {
+    HoloKitWatchConnectivity *instance = [HoloKitWatchConnectivity getSingletonInstance];
+    if (instance.wcSession.isReachable) {
+        NSDictionary<NSString *, id> *message = @{ messageType : [NSNumber numberWithInt:messageIndex] };
+        [instance.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
+    } else {
+        NSLog(@"[wc_session]: The Apple Watch is not reachable.");
+    }
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidReceiveWatchSystemMessageDelegate(DidReceiveWatchSystemMessage callback) {
+    DidReceiveWatchSystemMessageDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidReceiveWatchActionMessageDelegate(DidReceiveWatchActionMessage callback) {
+    DidReceiveWatchActionMessageDelegate = callback;
+}
+
+} // extern "C"

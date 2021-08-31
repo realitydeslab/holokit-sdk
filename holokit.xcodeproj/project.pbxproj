@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		4B04D8A8260CCC9C0055020F /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B04D8AA260CCCA20055020F /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B04D8A9260CCCA20055020F /* MetalKit.framework */; };
-		4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B4FFDF42604AA93002FC8D7 /* Shaders.metal */; };
 		4B06069D25F5C963006DF0B0 /* test_display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B06069C25F5C963006DF0B0 /* test_display.cpp */; };
 		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
 		4B16B10826DB99E40016FFA0 /* imu_process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A528626CCDF96005D55C5 /* imu_process.cpp */; };
@@ -65,6 +64,7 @@
 		4B8A529F26CE3FA7005D55C5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B8A529D26CE3FA7005D55C5 /* LaunchScreen.storyboard */; };
 		4B921B0526DCE6D600EC359F /* watch_connectivity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0426DCE6D600EC359F /* watch_connectivity.mm */; };
 		4B921B0926DCF07800EC359F /* core_motion.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0826DCF07800EC359F /* core_motion.m */; };
+		4B921B0C26DDE4B400EC359F /* core_location.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0B26DDE4B400EC359F /* core_location.m */; };
 		4B9304D32625A4AA005D9975 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
 		4B99658F25F715E3006AF9A5 /* hand_tracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */; };
 		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
@@ -82,14 +82,6 @@
 		4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */; };
 		4BD62BC926D9ECAD00CC0197 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC826D9ECAD00CC0197 /* state.cpp */; };
 		4BD62BCC26D9ECC500CC0197 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BCB26D9ECC500CC0197 /* utility.cpp */; };
-		4BDFC4E72600A54C0087F728 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4E62600A54C0087F728 /* Main.cpp */; };
-		4BDFC4F52600A5830087F728 /* ExampleDisplayProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */; };
-		4BDFC5022600A59B0087F728 /* ExampleTrackingProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */; };
-		4BDFC54E2600AB800087F728 /* ExampleDisplayProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */; };
-		4BDFC55B2600AB820087F728 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC4E62600A54C0087F728 /* Main.cpp */; };
-		4BDFC5682600AB830087F728 /* ExampleTrackingProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */; };
-		4BDFC5902600EC940087F728 /* GetCurrentTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */; };
-		4BE7B4C026105532001F39F2 /* ArSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B4BF26105532001F39F2 /* ArSession.mm */; };
 		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
 		4BE7B63E2611051A001F39F2 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
 		4BE7B64F26110544001F39F2 /* load.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* load.mm */; };
@@ -370,8 +362,6 @@
 		4B4431F826B7A19000869815 /* ar_recorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_recorder.h; sourceTree = "<group>"; };
 		4B4431F926B7A1A000869815 /* ar_recorder.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_recorder.mm; sourceTree = "<group>"; };
 		4B46940926B3C56C00DC960E /* low_latency_tracking_api.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = low_latency_tracking_api.h; sourceTree = "<group>"; };
-		4B4FFDF42604AA93002FC8D7 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
-		4B57A799267B4CC300A1ABAD /* profiling_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = profiling_data.h; sourceTree = "<group>"; };
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615B025F3A0C700CC4E81 /* hand_tracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hand_tracking.h; sourceTree = "<group>"; };
@@ -412,6 +402,8 @@
 		4B921B0426DCE6D600EC359F /* watch_connectivity.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = watch_connectivity.mm; sourceTree = "<group>"; };
 		4B921B0726DCF06C00EC359F /* core_motion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_motion.h; sourceTree = "<group>"; };
 		4B921B0826DCF07800EC359F /* core_motion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = core_motion.m; sourceTree = "<group>"; };
+		4B921B0A26DDE4A600EC359F /* core_location.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_location.h; sourceTree = "<group>"; };
+		4B921B0B26DDE4B400EC359F /* core_location.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = core_location.m; sourceTree = "<group>"; };
 		4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = holokit_profile.mm; sourceTree = "<group>"; };
 		4B9C52AF261EF13A0020E4C8 /* holokit_profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = holokit_profile.h; sourceTree = "<group>"; };
 		4B9C52BE261F0B330020E4C8 /* ar_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_session.h; sourceTree = "<group>"; };
@@ -443,14 +435,7 @@
 		4BD62BCA26D9ECB800CC0197 /* state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state.h; sourceTree = "<group>"; };
 		4BD62BCB26D9ECC500CC0197 /* utility.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
 		4BD62BCD26D9ECD100CC0197 /* utility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
-		4BDFC4E62600A54C0087F728 /* Main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
-		4BDFC4F32600A56E0087F728 /* ProviderContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProviderContext.h; sourceTree = "<group>"; };
-		4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ExampleDisplayProvider.mm; sourceTree = "<group>"; };
-		4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ExampleTrackingProvider.cpp; sourceTree = "<group>"; };
 		4BDFC53E2600AB210087F728 /* libtest-unity-plugin-display-mac.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libtest-unity-plugin-display-mac.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4BDFC58E2600EC470087F728 /* GetCurrentTime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GetCurrentTime.h; sourceTree = "<group>"; };
-		4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GetCurrentTime.mm; sourceTree = "<group>"; };
-		4BE7B4BF26105532001F39F2 /* ArSession.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ArSession.mm; sourceTree = "<group>"; };
 		4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE7B62126110504001F39F2 /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 		4BE7B63D2611051A001F39F2 /* input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = input.mm; sourceTree = "<group>"; };
@@ -801,21 +786,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4B0606CC25F5CA08006DF0B0 /* test-unity-display-ios */ = {
-			isa = PBXGroup;
-			children = (
-				4BDFC4E62600A54C0087F728 /* Main.cpp */,
-				4BDFC4F32600A56E0087F728 /* ProviderContext.h */,
-				4BDFC4F42600A5830087F728 /* ExampleDisplayProvider.mm */,
-				4BDFC5012600A59B0087F728 /* ExampleTrackingProvider.cpp */,
-				4BDFC58E2600EC470087F728 /* GetCurrentTime.h */,
-				4BDFC58F2600EC940087F728 /* GetCurrentTime.mm */,
-				4B4FFDF42604AA93002FC8D7 /* Shaders.metal */,
-				4BE7B4BF26105532001F39F2 /* ArSession.mm */,
-			);
-			path = "test-unity-display-ios";
-			sourceTree = "<group>";
-		};
 		4B2B2FF725E23E94002AC24F /* test-monocular-handtracking */ = {
 			isa = PBXGroup;
 			children = (
@@ -837,13 +807,6 @@
 				4B6AD99B25E34404008F9911 /* MathHelper.h */,
 			);
 			path = "test-monocular-handtracking";
-			sourceTree = "<group>";
-		};
-		4B2D6E4225E7CFD500DAAD13 /* test-unity-input-ios */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "test-unity-input-ios";
 			sourceTree = "<group>";
 		};
 		4B38240725E7491B00B39EEB /* test-unity-input-mac */ = {
@@ -967,7 +930,6 @@
 				4BB5587226205B7D00DC0213 /* nfc_session.m */,
 				4B260CA926368C3A0004B771 /* multipeer_session.h */,
 				4B260C9826368C280004B771 /* multipeer_session.m */,
-				4B57A799267B4CC300A1ABAD /* profiling_data.h */,
 				4B9C742525F5B909001935A8 /* LandmarkPosition.h */,
 				4B9C742625F5B948001935A8 /* LandmarkPosition.m */,
 				4B4431F826B7A19000869815 /* ar_recorder.h */,
@@ -978,6 +940,8 @@
 				4B921B0426DCE6D600EC359F /* watch_connectivity.mm */,
 				4B921B0726DCF06C00EC359F /* core_motion.h */,
 				4B921B0826DCF07800EC359F /* core_motion.m */,
+				4B921B0A26DDE4A600EC359F /* core_location.h */,
+				4B921B0B26DDE4B400EC359F /* core_location.m */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -1041,8 +1005,6 @@
 				4B6CC26725D42C2C0068CB66 /* test-stereoscopic-rendering */,
 				4B2B2FF725E23E94002AC24F /* test-monocular-handtracking */,
 				4B38240725E7491B00B39EEB /* test-unity-input-mac */,
-				4B2D6E4225E7CFD500DAAD13 /* test-unity-input-ios */,
-				4B0606CC25F5CA08006DF0B0 /* test-unity-display-ios */,
 				4BC45AE0262813BD00BA98E4 /* factory-app-nfc */,
 				4B69FF3F26C611D200843FCF /* low-latency-tracking-api-test */,
 				4B8A528E26CE3FA6005D55C5 /* test-headtracking3 */,
@@ -2097,12 +2059,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B04D8C3260CD07A0055020F /* Shaders.metal in Sources */,
-				4BDFC4F52600A5830087F728 /* ExampleDisplayProvider.mm in Sources */,
-				4BDFC5902600EC940087F728 /* GetCurrentTime.mm in Sources */,
-				4BE7B4C026105532001F39F2 /* ArSession.mm in Sources */,
-				4BDFC4E72600A54C0087F728 /* Main.cpp in Sources */,
-				4BDFC5022600A59B0087F728 /* ExampleTrackingProvider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2191,9 +2147,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BDFC54E2600AB800087F728 /* ExampleDisplayProvider.mm in Sources */,
-				4BDFC55B2600AB820087F728 /* Main.cpp in Sources */,
-				4BDFC5682600AB830087F728 /* ExampleTrackingProvider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2204,6 +2157,7 @@
 				4BD62BCC26D9ECC500CC0197 /* utility.cpp in Sources */,
 				4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */,
 				4BD62BC926D9ECAD00CC0197 /* state.cpp in Sources */,
+				4B921B0C26DDE4B400EC359F /* core_location.m in Sources */,
 				4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */,
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
 				4B921B0526DCE6D600EC359F /* watch_connectivity.mm in Sources */,

@@ -12,6 +12,10 @@
 
 @interface HoloKitWatchConnectivity: NSObject
 
+- (void)close;
+
++ (id)getSingletonInstance;
+
 @end
 
 #endif /* watch_connectivity_h */

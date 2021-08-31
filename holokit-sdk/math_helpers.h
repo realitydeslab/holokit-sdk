@@ -43,3 +43,5 @@ Eigen::Matrix3d MatrixToEigenMatrix3d(simd_float3x3 matrix);
 UnityXRVector3 EigenVector3dToUnityXRVector3(Eigen::Vector3d vector3);
 
 UnityXRVector4 EigenQuaterniondToUnityXRVector4(Eigen::Quaterniond quaternion);
+
+double Radians2Degrees(double radians);

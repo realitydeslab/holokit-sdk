@@ -46,7 +46,7 @@ public:
     
     simd_float3 GetCameraToCenterEyeOffset() { return camera_to_center_eye_offset_; }
     
-    ARSessionDelegateController* GetArSessionHandler() { return ar_session_handler_; }
+    HoloKitARSession* GetArSessionHandler() { return ar_session_handler_; }
     
     bool GetIsInitialized() { return is_initialized_; }
     
@@ -104,7 +104,7 @@ private:
     /// @brief The vector from camera pointing to the center of the eyes.
     simd_float3 camera_to_center_eye_offset_;
     
-    ARSessionDelegateController* ar_session_handler_ = nullptr;
+    HoloKitARSession* ar_session_handler_ = nullptr;
     
     static std::unique_ptr<HoloKitApi> holokit_api_;
     

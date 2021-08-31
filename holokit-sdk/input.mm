@@ -17,7 +17,6 @@
 #include "IUnityXRInput.h"
 #include "math_helpers.h"
 #include "holokit_api.h"
-#include "profiling_data.h"
 #include "low-latency-tracking/low_latency_tracking_api.h"
 
 // @def Logs to Unity XR Trace interface @p message.
@@ -90,7 +89,7 @@ public:
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandRight);
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitAppleWatch);
         
-        //ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+        //ar_session_handler = [HoloKitARSession getSingletonInstance];
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -239,7 +238,7 @@ public:
             }};
             
             if (device_id == kDeviceIdHoloKitHandLeft) {
-                ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+                HoloKitARSession* arSessionDelegateController = [HoloKitARSession getSingletonInstance];
 
                 if ([arSessionDelegateController.leftHandLandmarkPositions count] != 21){
                    //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
@@ -272,7 +271,7 @@ public:
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isRingFingerOpen);
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isPinkyFingerOpen);
             } else if (device_id == kDeviceIdHoloKitHandRight) {
-                ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+                HoloKitARSession* arSessionDelegateController = [HoloKitARSession getSingletonInstance];
 
                 if ([arSessionDelegateController.rightHandLandmarkPositions count] != 21){
                    //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
@@ -305,7 +304,7 @@ public:
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isPinkyFingerOpen);
             } else if (device_id == kDeviceIdHoloKitAppleWatch) {
                 
-                ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+                HoloKitARSession* arSessionDelegateController = [HoloKitARSession getSingletonInstance];
                 
                 bool is_tracked = arSessionDelegateController.appleWatchIsTracked;
                 input_->DeviceState_SetBinaryValue(state, feature_index++, is_tracked);
@@ -338,7 +337,7 @@ public:
                 //os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
                 
                 // TODO: low latency tracking - get predicted camera transform
-                ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+                HoloKitARSession* arSessionDelegateController = [HoloKitARSession getSingletonInstance];
                 //double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp];
                 double vsync_time_stamp = [[NSProcessInfo processInfo] systemUptime];
                 UnityXRVector3 position;
@@ -356,7 +355,6 @@ public:
                     simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
                     position = UnityXRVector3 { camera_position.x, camera_position.y, -camera_position.z };
                     simd_quatf quaternion = simd_quaternion(camera_transform);
-                    NSLog(@"quaternion: (%f, %f, %f, %f)", quaternion.vector.x, quaternion.vector.y, quaternion.vector.z, quaternion.vector.w);
                     rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
                 }
                 
@@ -435,7 +433,7 @@ private:
     
     static std::unique_ptr<HoloKitInputProvider> input_provider_;
     
-    ARSessionDelegateController* ar_session_handler;
+    HoloKitARSession* ar_session_handler;
     
     IUnityInterfaces* xr_interfaces_;
 };

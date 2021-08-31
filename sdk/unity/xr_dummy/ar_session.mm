@@ -15,13 +15,13 @@
 #import <CoreVideo/CoreVideo.h>
 #import <HandTracker/HandTracker.h>
 
-@interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
+@interface HoloKitARSession : NSObject <ARSessionDelegate, TrackerDelegate>
 {}
 @property (weak, nonatomic) HandTracker* _handTracker;
 @end
 
 
-@implementation ARSessionDelegateController
+@implementation HoloKitARSession
 {}
 
 
@@ -30,7 +30,7 @@
     handTracker.delegate = self;
 }
 
-+ (id) sharedARSessionDelegateController {
++ (id) getSingletonInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -126,7 +126,7 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
 //
     NSLog(@"before session.delegate=%d\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
  
-    [session setDelegate:ARSessionDelegateController.sharedARSessionDelegateController];
+    [session setDelegate:HoloKitARSession.sharedARSessionDelegateController];
 
     NSLog(@"after session.delegate=%d\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
 

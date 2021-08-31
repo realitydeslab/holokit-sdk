@@ -25,14 +25,9 @@
 #import <HandTracker/HandTracker.h>
 #import <ARKit/ARKit.h>
 #import <CoreVideo/CoreVideo.h>
-#import <CoreMotion/CoreMotion.h>
-#import <CoreLocation/CoreLocation.h>
-#import "profiling_data.h"
+
 #import "low-latency-tracking/low_latency_tracking_api.h"
 #import "holokit_api.h"
-
-#define MIN(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
-#define MAX(A,B)    ({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
 
 #define CLAMP(x, low, high) ({\
 __typeof__(x) __x = (x); \
@@ -53,50 +48,19 @@ static const float kLostHandTrackingInterval = 1.5f;
 typedef void (*ARWorldMapSynced)();
 ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 
-typedef void (*PeerDataReceivedForMLAPI)(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel);
-PeerDataReceivedForMLAPI PeerDataReceivedForMLAPIDelegate = NULL;
-
-typedef void (*AppleWatchMessageReceived)(int messageIndex);
-AppleWatchMessageReceived AppleWatchMessageReceivedDelegate = NULL;
-
-typedef void (*DoctorStrangeMessageReceived)(int circleNum);
-DoctorStrangeMessageReceived DoctorStrangeMessageReceivedDelegate = NULL;
-
-typedef void (*MagicSwitchMessageReceived)(int magicIndex);
-MagicSwitchMessageReceived MagicSwitchMessageReceivedDelegate = NULL;
-
-typedef void (*AppleWatchReachabilityDidChange)(bool isReachable);
-AppleWatchReachabilityDidChange AppleWatchReachabilityDidChangeDelegate = NULL;
-
-typedef void (*MultipeerPongMessageReceived)(unsigned long clientId, double rtt);
-MultipeerPongMessageReceived MultipeerPongMessageReceivedDelegate = NULL;
-
-typedef void (*DidUpdateLocation)(double latitude, double longtitude, double altitude);
-DidUpdateLocation DidUpdateLocationDelegate = NULL;
-
-typedef void (*DidUpdateHeading)(double trueHeading, double magneticHeading, double headingAccuracy);
-DidUpdateHeading DidUpdateHeadingDelegate = NULL;
-
-@interface ARSessionDelegateController () <ARSessionDelegate, TrackerDelegate, WCSessionDelegate, CLLocationManagerDelegate>
+@interface HoloKitARSession() <ARSessionDelegate, TrackerDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
-@property (nonatomic, strong) NSOperationQueue* accelGyroQueue;
-@property (nonatomic, strong) NSOperationQueue* deviceMotionQueue;
 @property (nonatomic, strong) HandTracker* handTracker;
 @property (assign) double lastHandTrackingTimestamp;
 @property (nonatomic, strong) VNDetectHumanHandPoseRequest *handPoseRequest;
 // Used to count the interval.
 @property (assign) int frameCount;
-@property (nonatomic, strong) CMMotionManager* motionManager;
 @property (assign) bool isARWorldMapSynced;
-@property (nonatomic, strong) WCSession *wcSession;
-@property (nonatomic, strong) CLLocationManager *locationManager;
-@property (nonatomic, strong) CLLocation *currentLocation;
-@property (nonatomic, strong) CLHeading *currentHeading;
  
 @end
 
-@implementation ARSessionDelegateController
+@implementation HoloKitARSession
 
 #pragma mark - init
 - (instancetype)init {
@@ -112,16 +76,6 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         // TODO: This value can be changed to one to save performance.
         //self.handPoseRequest.maximumHandCount = 2;
         //self.handPoseRequest.revision = VNDetectHumanHandPoseRequestRevision1;
-        
-        // Accel and gyro data
-        self.accelGyroQueue = [[NSOperationQueue alloc] init];
-        self.accelGyroQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        self.deviceMotionQueue = [[NSOperationQueue alloc] init];
-        self.deviceMotionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-        self.motionManager = [[CMMotionManager alloc] init];
-//        [self startAccelerometer];
-//        [self startGyroscope];
-        //[self startDeviceMotion];
         
         self.frameCount = 0;
         self.handPosePredictionInterval = 8;
@@ -142,12 +96,6 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         self.primaryButtonLeft = NO;
         self.primaryButtonRight = NO;
         
-        if ([WCSession isSupported]) {
-            self.wcSession = [WCSession defaultSession];
-            self.wcSession.delegate = self;
-            //[self.wcSession activateSession];
-        }
-        
         // Metal Vsync
         //NSLog(@"number of screens: %lu", (unsigned long)[[UIScreen screens] count]);
         //NSLog(@"Maximum FPS = %ld", [UIScreen mainScreen].maximumFramesPerSecond);
@@ -159,155 +107,15 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         self.isRecording = NO;
         
         self.appleWatchIsTracked = NO;
-        
-//        frame_count = 0;
-//        last_frame_time = 0.0f;
     }
     return self;
 }
 
 - (void)printNextVsyncTime {
     //NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
-    
 }
 
-- (void)initMultipeerSessionWithServiceType:(NSString *)serviceType peerID:(NSString *)peerID identityString:(NSString *)identityString{
-    // TODO: Can I move this into a separate block?
-    void (^receivedDataHandler)(NSData *, MCPeerID *) = ^void(NSData *data, MCPeerID *peerID) {
-        //NSLog(@"receivedDataHandler %@", [NSThread currentThread]);
-        if ([self.multipeerSession.connectedPeersForMLAPI containsObject:peerID] == NO) {
-            return;
-        }
-        
-        // Try to decode the received data as ARCollaboration data.
-        ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
-        if (collaborationData != nil) {
-            //NSLog(@"[ar_session]: did receive ARCollaboration data.");
-            [self.session updateWithCollaborationData:collaborationData];
-            return;
-        }
-        //NSLog(@"receive data");
-        unsigned char *decodedData = (unsigned char *) [data bytes];
-        if (decodedData == nil) {
-            NSLog(@"[ar_session]: Failed to decode the received data.");
-            return;
-        }
-        switch ((int)decodedData[0]) {
-            case 0: {
-                //NSLog(@"[ar_session]: did receive MLAPI data.");
-                int channel = (int)decodedData[1];
-                int dataArrayLength = (int)decodedData[2];
-                unsigned char mlapiData[dataArrayLength];
-                for (int i = 0; i < dataArrayLength; i++) {
-                    mlapiData[i] = decodedData[i + 3];
-                }
-                unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-                // Send this data back to MLAPI
-                PeerDataReceivedForMLAPIDelegate(clientId, mlapiData, dataArrayLength, channel);
-                break;
-            }
-            case 1: {
-                NSLog(@"[ar_session]: did receive a disconnection message.");
-                [self.multipeerSession disconnect];
-                break;
-            }
-            case 2: {
-                //NSLog(@"Ping data");
-                // Did receive a Ping data
-                // Send a Pong message back
-                unsigned char pongMessageData[1];
-                pongMessageData[0] = (unsigned char)3;
-                NSData *dataReadyToBeSent = [NSData dataWithBytes:pongMessageData length:sizeof(pongMessageData)];
-                [self.multipeerSession sendToPeer:dataReadyToBeSent peer:peerID mode:MCSessionSendDataUnreliable];
-                
-                // Send message via stream
-//                if (self.multipeerSession.outputStreams[peerID] != nil) {
-//                    [self.multipeerSession.outputStreams[peerID] write:(const uint8_t *)dataReadyToBeSent.bytes maxLength:dataReadyToBeSent.length];
-//                }
-                break;
-            }
-            case 3: {
-                //NSLog(@"Pong data");
-                // Did receive a Pong message
-                double rtt = ([[NSProcessInfo processInfo] systemUptime] - self.multipeerSession.lastPingTime) * 1000;
-                NSLog(@"[mc_session]: curernt rtt is %f", rtt);
-                unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-                MultipeerPongMessageReceivedDelegate(clientId, rtt);
-                break;
-            }
-            default: {
-                NSLog(@"[ar_session]: Failed to decode the received data.");
-                break;
-            }
-        }
-    };
-    self.multipeerSession = [[MultipeerSession alloc] initWithReceivedDataHandler:receivedDataHandler serviceType:serviceType peerID:peerID identityString:identityString];
-    self.isARWorldMapSynced = false;
-}
-
-- (void)initLocationManager {
-    self.locationManager = [[CLLocationManager alloc] init];
-    // TODO: Adjust this.
-    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-    self.locationManager.delegate = self;
-    [self.locationManager requestWhenInUseAuthorization];
-}
-
-- (void)startUpdatingLocation {
-    [self.locationManager startUpdatingLocation];
-}
-
-- (void)stopUpdatingLocation {
-    [self.locationManager stopUpdatingLocation];
-}
-
-- (void)startUpdatingHeading {
-    [self.locationManager startUpdatingHeading];
-}
-
-- (void)stopUpdatingHeading {
-    [self.locationManager stopUpdatingHeading];
-}
-
-- (void)startAccelerometer {
-    if ([self.motionManager isAccelerometerAvailable] == YES) {
-        self.motionManager.accelerometerUpdateInterval = 1.0 / 100.0;
-        [self.motionManager startAccelerometerUpdatesToQueue:self.accelGyroQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
-            //NSLog(@"[Accel] thread=%@, accelerometerData.timestamp=%f, systemuptime=%f, accelerometerData.acceleration.x=%f, accelerometerData.acceleration.y=%f, accelerometerData.acceleration.z=%f", [NSThread currentThread], accelerometerData.timestamp, [[NSProcessInfo processInfo] systemUptime], accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
-            //NSLog(@"acc time: %f, data: (%f, %f, %f)", accelerometerData.timestamp, accelerometerData.acceleration.x, accelerometerData.acceleration.y, accelerometerData.acceleration.z);
-            // low latency tracking - keep providing accelerometer data to low_latency_tracking_api
-            holokit::AccelerometerData data = { accelerometerData.timestamp, CMAccelerationToEigenVector3d(accelerometerData.acceleration) };
-            holokit::LowLatencyTrackingApi::GetInstance()->OnAccelerometerDataUpdated(data);
-        }];
-    }
-}
-
-- (void)startGyroscope {
-    if ([self.motionManager isGyroAvailable] == YES) {
-        self.motionManager.gyroUpdateInterval = 1.0 / 100.0;
-        [self.motionManager startGyroUpdatesToQueue:self.accelGyroQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
-            //NSLog(@"[Gyro] thread=%@, gyroData.timestamp=%f, systemuptime=%f, gyroData.rotationRate.x=%f, gyroData.rotationRate.y=%f, gyroData.rotationRate.z=%f", [NSThread currentThread], gyroData.timestamp, [[NSProcessInfo processInfo] systemUptime], gyroData.rotationRate.x, gyroData.rotationRate.y, gyroData.rotationRate.z);
-            //NSLog(@"gyro time: %f, data: (%f, %f, %f)", gyroData.timestamp, gyroData.rotationRate.x, gyroData.rotationRate.y, gyroData.rotationRate.z);
-            // low latency tracking - keep providing gyro data to low_latency_tracking _api
-            holokit::GyroData data = { gyroData.timestamp,  CMRotationRateToEigenVector3d(gyroData.rotationRate) };
-            holokit::LowLatencyTrackingApi::GetInstance()->OnGyroDataUpdated(data);
-        }];
-    }
-}
-
-- (void)startDeviceMotion {
-    if ([self.motionManager isDeviceMotionAvailable] == YES) {
-        self.motionManager.deviceMotionUpdateInterval = 1.0 / 100.0;
-        [self.motionManager startDeviceMotionUpdatesToQueue:self.deviceMotionQueue withHandler:^(CMDeviceMotion *deviceMotionData, NSError *error) {
-            NSLog(@"----------------------------------------------------");
-            NSLog(@"device motion timestamp: %f", deviceMotionData.timestamp);
-            NSLog(@"device motion user acceleration: (%f, %f, %f)", deviceMotionData.userAcceleration.x, deviceMotionData.userAcceleration.y, deviceMotionData.userAcceleration.z);
-            NSLog(@"device motion rotation rate: (%f, %f, %f)", deviceMotionData.rotationRate.x, deviceMotionData.rotationRate.y,  deviceMotionData.rotationRate.z);
-        }];
-    }
-}
-
-+ (id) sharedARSessionDelegateController {
++ (id) getSingletonInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -319,14 +127,6 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
-    //NSLog(@"[Frame] thread=%@, frame.timestamp=%f,  systemuptime=%f", [NSThread currentThread], frame.timestamp, [[NSProcessInfo processInfo] systemUptime]);
-    
-    frame_count++;
-    last_frame_time = frame.timestamp;
-    
-    //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-    //os_signpost_id_t spid = os_signpost_id_generate(log);
-    //os_signpost_interval_begin(log, spid, "session_didUpdateFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
     
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
@@ -336,13 +136,9 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         NSLog(@"[ar_session]: AR session started.");
         self.session = session;
         
-        [self startAccelerometer];
-        [self startGyroscope];
         //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
     
-    // low latency tracking - keep providing ARKit pose data to low_latency_tracking_api
-    //NSLog(@"[ar_session]: current thread %@", [NSThread currentThread]);
     holokit::ARKitData data = { frame.timestamp,
         TransformToEigenVector3d(frame.camera.transform),
         TransformToEigenQuaterniond(frame.camera.transform),
@@ -370,7 +166,6 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         
         [self performHumanHandPoseRequest:frame];
     }
-    //os_signpost_interval_end(log, spid, "session_didUpdateFrame");
 }
 
 - (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
@@ -383,23 +178,16 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"[ar_session]: a new peer is connected to the AR collaboration session.");
             // Let the ARWorldOriginManager know that AR collaboration session has started.
-//            if (!self.isARWorldMapSynced) {
-//                self.isARWorldMapSynced = true;
-//                ARWorldMapSyncedDelegate();
-//            }
             ARWorldMapSyncedDelegate();
             continue;
         }
         if (anchor.name != nil) {
-            if (!self.multipeerSession.isHost && [anchor.name isEqual:@"-1"]) {
+            if (![self.multipeerSession isHost] && [anchor.name isEqual:@"-1"]) {
                 // This is an origin anchor.
                 // If this is a client, reset the world origin.
-                NSLog(@"[ar_session]: did receive an origin anchor, resetting world origin.");
-                // Indicate the origin anchor transform in the previous coordinate system.
+                NSLog(@"[ar_session]: Did receive an origin anchor, reset the world origin.");
                 std::vector<float> position = TransformToUnityPosition(anchor.transform);
                 std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
-                NSLog(@"[ar_session]: the position of new world origin [%f, %f, %f]", position[0], position[1], position[2]);
-                NSLog(@"[ar_session]: the rotation of new world origin [%f, %f, %f, %f]", rotation[0], rotation[1], rotation[2], rotation[3]);
                 [session setWorldOrigin:anchor.transform];
                 continue;
             }
@@ -428,15 +216,11 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     if (self.multipeerSession == nil) {
         return;
     }
-    if ([self.multipeerSession getConnectedPeers].count == 0) {
-        //NSLog(@"Deferred sending collaboration to later because there are no peers.");
+    if (self.multipeerSession.connectedPeersForMLAPI.count == 0) {
         return;
     }
-    // If there is at least one peer nearby, send the newly updated collaboration data
-    // to all peers.
     NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:YES error:nil];
-    [self.multipeerSession sendToAllPeers:encodedData mode:MCSessionSendDataUnreliable];
-    //NSLog(@"didOutputCollaborationData");
+    [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
 }
 
 #pragma mark - HandTracking
@@ -655,7 +439,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
                     break;
                 }
                 if (landmarkIndex != 0) {
-                    int landmarkParentIndex = [ARSessionDelegateController getParentLandmarkIndex:landmarkIndex];
+                    int landmarkParentIndex = [HoloKitARSession getParentLandmarkIndex:landmarkIndex];
                     if (landmarkDepth > kMaxLandmarkDepth) {
                         landmarkDepth = landmarkDepths[landmarkParentIndex];
                     }
@@ -741,7 +525,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
                 break;
             }
             if (landmarkIndex != 0) {
-                int landmarkParentIndex = [ARSessionDelegateController getParentLandmarkIndex:landmarkIndex];
+                int landmarkParentIndex = [HoloKitARSession getParentLandmarkIndex:landmarkIndex];
                 if (landmarkDepth > kMaxLandmarkDepth) {
                     landmarkDepth = landmarkDepths[landmarkParentIndex];
                 }
@@ -821,125 +605,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
 }
 
-#pragma mark - WCSessionDelegate
-
-- (void)session:(WCSession *)session activationDidCompleteWithState:(WCSessionActivationState)activationState error:(NSError *)error {
-    if (activationState == WCSessionActivationStateActivated) {
-        NSLog(@"[wc_session]: activation did compelete with state activated.");
-    } else if (activationState == WCSessionActivationStateInactive) {
-        NSLog(@"[wc_session]: activation did compelete with state inactive.");
-    } else if (activationState == WCSessionActivationStateNotActivated) {
-        NSLog(@"[wc_session]: activation did compelete with state not activated.");
-    }
-}
-
-- (void)sessionReachabilityDidChange:(WCSession *)session {
-    if (self.session == nil) {
-        return;
-    }
-    NSLog(@"[wc_session]: session reachability did change");
-    if (session.isReachable) {
-        //AppleWatchReachabilityDidChangeDelegate(true);
-        NSLog(@"[wc_session]: is reachable");
-    } else {
-        //AppleWatchReachabilityDidChangeDelegate(false);
-        NSLog(@"[wc_session]: is not reachable");
-    }
-}
-
-- (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *,id> *)message {
-    if (id value = [message objectForKey:@"watch"]) {
-        NSInteger messageIndex = [value integerValue];
-        // Receive a message from Apple Watch side and pass the message to Unity.
-        AppleWatchMessageReceivedDelegate((int)messageIndex);
-    } else if (id value = [message objectForKey:@"strange"]) {
-        NSInteger circleNum = [value integerValue];
-        DoctorStrangeMessageReceivedDelegate((int)circleNum);
-    } else if (id value = [message objectForKey:@"magic"]) {
-        NSInteger magicIndex = [value integerValue];
-        if (MagicSwitchMessageReceivedDelegate != NULL) {
-            MagicSwitchMessageReceivedDelegate((int)magicIndex);
-        } else {
-            NSLog(@"[wc_session]: MagicSwitchMessageReceivedDelegate is NULL.");
-        }
-    } else if (id value = [message objectForKey:@"isTracking"]) {
-        if ([value integerValue] == 0) {
-            self.appleWatchIsTracked = NO;
-        } else {
-            self.appleWatchIsTracked = YES;
-        }
-    } else if ([message objectForKey:@"deviceData"]) {
-        self.appleWatchRotation = simd_quaternion((double)[message[@"rotation.x"] doubleValue],
-                                                  (double)[message[@"rotation.y"] doubleValue],
-                                                  (double)[message[@"rotation.z"] doubleValue],
-                                                  (double)[message[@"rotation.w"] doubleValue]);
-        self.appleWatchAcceleration = simd_make_double3((double)[message[@"acceleration.x"] doubleValue],
-                                                        (double)[message[@"acceleration.y"] doubleValue],
-                                                        (double)[message[@"acceleration.z"] doubleValue]);
-        self.appleWatchAngularVelocity = simd_make_double3((double)[message[@"angularVelocity.x"] doubleValue],
-                                                           (double)[message[@"angularVelocity.y"] doubleValue],
-                                                           (double)[message[@"angularVelocity.z"] doubleValue]);
-    }
-}
-
-#pragma mark - CLLocationManagerDelegate
-
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
-    if (locations[0] != nil) {
-        self.currentLocation = locations[0];
-        //NSLog(@"[core_location]: latitude %f, longitude %f and altitude %f", self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude, self.currentLocation.altitude);
-        // Send updated location data back to Unity.
-        DidUpdateLocationDelegate(self.currentLocation.coordinate.latitude, self.currentLocation.coordinate.longitude, self.currentLocation.altitude);
-        [manager stopUpdatingLocation];
-    }
-}
-
-- (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading {
-    if (newHeading != nil) {
-        self.currentHeading = newHeading;
-        // Call the C# delegate
-        DidUpdateHeadingDelegate(self.currentHeading.trueHeading, self.currentHeading.magneticHeading, self.currentHeading.headingAccuracy);
-        [manager stopUpdatingHeading];
-    }
-}
-
 @end
-
-#pragma mark - SetARSession
-void SetARSession(UnityXRNativeSession* ar_native_session) {
-    
-    NSLog(@"ar_native_session=%zu\n", reinterpret_cast<size_t>(ar_native_session));
-    if (ar_native_session == nullptr) {
-        NSLog(@"Native ARSession is NULL.");
-        return;
-    }
-    
-    ARSession* session = (__bridge ARSession*) ar_native_session->sessionPtr;
-    NSLog(@"ar_native_session->version=%d, ar_native_session->sessionPtr=%zu\n",
-          ar_native_session->version,
-          reinterpret_cast<size_t>(ar_native_session->sessionPtr));
-    
-    NSLog(@"identifier=%@", session.identifier);
-    ARFrame* frame = session.currentFrame;
-    if (frame != nullptr) {
-        NSLog(@"session.currentFrame.camera.intrinsics.columns[0]=%f", session.currentFrame.camera.intrinsics.columns[0]);
-    }
-    
-    //    NSObject *obj = session.delegate;
-    //    NSLog(@"%@", NSStringFromClass( [someObject class] );
-    
-    NSLog(@"before session.delegate=%zu\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
-    
-    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
-    ar_session_handler.unityARSessionDelegate = session.delegate;
-    
-    [session setDelegate:ARSessionDelegateController.sharedARSessionDelegateController];
-    
-    NSLog(@"after session.delegate=%zu\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
-    
-    //    NSLog(@"controller=%d\n", reinterpret_cast<size_t>((__bridge void *)(controller)));
-    //    session.delegate = controller;
-}
 
 #pragma mark - extern "C"
 
@@ -947,12 +613,22 @@ extern "C" {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
-    SetARSession(ar_native_session);
+    if (ar_native_session == nullptr) {
+        NSLog(@"[ar_session]: native ARSession is NULL.");
+        return;
+    }
+    
+    ARSession* sessionPtr = (__bridge ARSession*) ar_native_session->sessionPtr;
+    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    ar_session_instance.unityARSessionDelegate = sessionPtr.delegate;
+    
+    //[session setDelegate:HoloKitARSession.getSingletonInstance];
+    [sessionPtr setDelegate:ar_session_instance];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_EnableHandTracking(bool enabled) {
-    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+    HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
     ar_session_handler.isHandTrackingEnabled = enabled;
     NSLog(@"[ar_session]: EnableHandTracking(%d)", enabled);
 }
@@ -961,7 +637,7 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     
-    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+    HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
     [ar_session_handler.session setWorldOrigin:(transform_matrix)];
 }
 
@@ -970,13 +646,13 @@ UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float r
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithUTF8String:anchorName] transform:transform_matrix];
     
-    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+    HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
     [ar_session_handler.session addAnchor:anchor];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetHandTrackingInterval(int val) {
-    ARSessionDelegateController* ar_session_handler = [ARSessionDelegateController sharedARSessionDelegateController];
+    HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
     [ar_session_handler setHandPosePredictionInterval:val];
 }
 
@@ -986,96 +662,14 @@ UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerInit(const char* serviceType, const char* peerID, const char* identityString) {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    [ar_session_delegate_controller initMultipeerSessionWithServiceType:[NSString stringWithUTF8String:serviceType] peerID:[NSString stringWithUTF8String:peerID] identityString:[NSString stringWithUTF8String:identityString]];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback) {
-    PeerDataReceivedForMLAPIDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetAppleWatchMessageReceivedDelegate(AppleWatchMessageReceived callback) {
-    AppleWatchMessageReceivedDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDoctorStrangeMessageReceivedDelegate(DoctorStrangeMessageReceived callback) {
-    DoctorStrangeMessageReceivedDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetMagicSwitchMessageReceivedDelegate(MagicSwitchMessageReceived callback) {
-    MagicSwitchMessageReceivedDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetAppleWatchReachabilityDidChangeDelegate(AppleWatchReachabilityDidChange callback) {
-    AppleWatchReachabilityDidChangeDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_ActivateWatchConnectivitySession() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    // Watch Connectivity session
-    if ([WCSession isSupported]) {
-        [ar_session_delegate_controller.wcSession activateSession];
-    }
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SendMessageToAppleWatch(int messageIndex) {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    if (ar_session_delegate_controller.wcSession.isReachable) {
-        NSDictionary<NSString *, id> *message = @{ @"iPhone" : [NSNumber numberWithInt:messageIndex] };
-        [ar_session_delegate_controller.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
-    }
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(MultipeerPongMessageReceived callback) {
-    MultipeerPongMessageReceivedDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_InitLocationManager() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    [ar_session_delegate_controller initLocationManager];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StartUpdatingLocation() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    [ar_session_delegate_controller startUpdatingLocation];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidUpdateLocationDelegate(DidUpdateLocation callback) {
-    DidUpdateLocationDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StartUpdatingHeading() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
-    [ar_session_delegate_controller startUpdatingHeading];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidUpdateHeadingDelegate(DidUpdateHeading callback) {
-    DidUpdateHeadingDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_StartRecording() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession getSingletonInstance];
     ar_session_delegate_controller.isRecording = YES;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_FinishRecording() {
-    ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession getSingletonInstance];
     ar_session_delegate_controller.isRecording = NO;
     [ar_session_delegate_controller.recorder end];
 }

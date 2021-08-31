@@ -218,7 +218,7 @@ public:
                 // get the MediaPipe handtracking data
                 if(arSessionDelegateController == nullptr) {
                     std::cout << "Fetch arSessionDelegateController" << std::endl;
-                    arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+                    arSessionDelegateController = [HoloKitARSession getSingletonInstance];
                 }
                 
                 if([arSessionDelegateController.leftHandLandmarkPositions count] != 21){
@@ -339,7 +339,7 @@ public:
                 // get the MediaPipe handtracking data
                 if(arSessionDelegateController == nullptr) {
                     std::cout << "Fetch arSessionDelegateController" << std::endl;
-                    arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+                    arSessionDelegateController = [HoloKitARSession getSingletonInstance];
                 }
                 
                 if([arSessionDelegateController.rightHandLandmarkPositions count] != 21){
@@ -496,7 +496,7 @@ private:
                                                        kUnityXRInputDeviceCharacteristicsHeldInHand |
                                                        kUnityXRInputDeviceCharacteristicsTrackedDevice);
     
-    ARSessionDelegateController *arSessionDelegateController;
+    HoloKitARSession *arSessionDelegateController;
     
     IUnityXRTrace* trace_ = nullptr;
     

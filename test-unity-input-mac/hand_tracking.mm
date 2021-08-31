@@ -35,7 +35,7 @@
 
 static const float kMaxLandmarkDistance = 0.8f;
 
-@interface ARSessionDelegateController : NSObject <ARSessionDelegate, TrackerDelegate>
+@interface HoloKitARSession : NSObject <ARSessionDelegate, TrackerDelegate>
 
 @property (nonatomic, strong) NSOperationQueue* handTrackingQueue;
 @property (nonatomic, strong) NSOperationQueue* accelQueue;
@@ -56,7 +56,7 @@ static const float kMaxLandmarkDistance = 0.8f;
 
 @end
 
-@implementation ARSessionDelegateController
+@implementation HoloKitARSession
 
 - (instancetype)init {
     if(self = [super init]) {
@@ -117,7 +117,7 @@ static const float kMaxLandmarkDistance = 0.8f;
     }
 }
 
-+ (id) sharedARSessionDelegateController {
++ (id) getSingletonInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -351,8 +351,8 @@ void SetARSession(UnityXRNativeSession* ar_native_session) {
 //
     NSLog(@"before session.delegate=%zu\n", reinterpret_cast<size_t>((__bridge void *)(session.delegate)));
     
-    [session setDelegate:ARSessionDelegateController.sharedARSessionDelegateController];
-    //session.delegate = ARSessionDelegateController.sharedARSessionDelegateController;
+    [session setDelegate:HoloKitARSession.sharedARSessionDelegateController];
+    //session.delegate = ARSessionDelegateController.getSingletonInstance;
     
     //ARWorldTrackingConfiguration *newConfiguration = [ARWorldTrackingConfiguration new];
     //newConfiguration.frameSemantics = ARFrameSemanticSceneDepth;

@@ -17,7 +17,6 @@
 #include "load.h"
 #include "math_helpers.h"
 #include "holokit_api.h"
-#include "profiling_data.h"
 #include "ar_recorder.h"
 
 #if __APPLE__
@@ -253,7 +252,7 @@ public:
 //          //  RenderToSecondDisplay();
 //        }
         
-        ARSessionDelegateController* ar_session_delegate_controller = [ARSessionDelegateController sharedARSessionDelegateController];
+        HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession getSingletonInstance];
         //NSLog(@"[ar_recorder]: writer status %ld", (long)ar_session_delegate_controller.recorder.writer.status);
         if (ar_session_delegate_controller.isRecording) {
             //CVPixelBufferRef pixelBuffer = [ARRecorder convertIOSurfaceRefToCVPixelBufferRef:metal_color_textures_[0].iosurface];
