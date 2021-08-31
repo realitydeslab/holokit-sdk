@@ -39,8 +39,13 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
     return self;
 }
 
-- (void)close {
-    
+- (void)sendMessage2WatchWithMessageType:(NSString *)messageType messageIndex:(int)index {
+    if (self.wcSession.isReachable) {
+        NSDictionary<NSString *, id> *message = @{ messageType : [NSNumber numberWithInt:index] };
+        [self.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
+    } else {
+        NSLog(@"[wc_session]: The Apple Watch is not reachable.");
+    }
 }
 
 + (id)getSingletonInstance {
@@ -101,20 +106,16 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
 
 extern "C" {
 
+// You need to manually init WCSession in Unity.
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_InitWatchConnectivitySession() {
     [HoloKitWatchConnectivity getSingletonInstance];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SendMessage2Watch(NSString *messageType, int messageIndex) {
+UnityHoloKit_SendMessage2Watch(NSString *messageType, int index) {
     HoloKitWatchConnectivity *instance = [HoloKitWatchConnectivity getSingletonInstance];
-    if (instance.wcSession.isReachable) {
-        NSDictionary<NSString *, id> *message = @{ messageType : [NSNumber numberWithInt:messageIndex] };
-        [instance.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
-    } else {
-        NSLog(@"[wc_session]: The Apple Watch is not reachable.");
-    }
+    [instance sendMessage2WatchWithMessageType:messageType messageIndex:index];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

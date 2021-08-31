@@ -12,8 +12,6 @@
 
 @interface HoloKitWatchConnectivity: NSObject
 
-- (void)close;
-
 + (id)getSingletonInstance;
 
 @end

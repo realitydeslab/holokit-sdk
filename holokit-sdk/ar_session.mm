@@ -43,7 +43,7 @@ static const float kMaxLandmark1Interval = 0.05f;
 static const float kMaxLandmark2Interval = 0.03f;
 static const float kMaxLandmarkEndInterval = 0.024f;
 
-static const float kLostHandTrackingInterval = 1.5f;
+//static const float kLostHandTrackingInterval = 1.5f;
 
 typedef void (*ARWorldMapSynced)();
 ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
