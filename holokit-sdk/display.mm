@@ -36,17 +36,6 @@
 #define SIDE_BY_SIDE 1
 #define NUM_RENDER_PASSES 2
 
-// BEGIN WORKAROUND: skip first frame since we get invalid data.  Fix coming to trunk.
-static bool s_SkipFrame = true;
-#define WORKAROUND_SKIP_FIRST_FRAME()           \
-    if (s_SkipFrame)                            \
-    {                                           \
-        s_SkipFrame = false;                    \
-        return kUnitySubsystemErrorCodeSuccess; \
-    }
-#define WORKAROUND_RESET_SKIP_FIRST_FRAME() s_SkipFrame = true;
-// END WORKAROUND
-
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, message, ...)                \
   XR_TRACE_LOG(trace, "[HoloKitDisplayProvider]: " message "\n", \
@@ -188,21 +177,8 @@ public:
         
         // Register for callbacks on display provider.
         UnityXRDisplayProvider provider{NULL, NULL, NULL};
-//        provider.UpdateDisplayState = [](UnitySubsystemHandle, void*, UnityXRDisplayState* state) -> UnitySubsystemErrorCode {
-//            os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-//            os_signpost_id_t spid = os_signpost_id_generate(log);
-//            os_signpost_interval_begin(log, spid, "UpdateDisplayState");
-//            state->reprojectionMode = kUnityXRReprojectionModeOrientationOnly;
-//            NSLog(@"ReprojectionMode: %d", state->reprojectionMode);
-//            os_signpost_interval_end(log, spid, "UpdateDisplayState");
-//            return kUnitySubsystemErrorCodeSuccess;
-//            //return GetInstance()->UpdateDisplayState(state);
-//        };
         provider.QueryMirrorViewBlitDesc = [](UnitySubsystemHandle, void*, const UnityXRMirrorViewBlitInfo, UnityXRMirrorViewBlitDesc*) -> UnitySubsystemErrorCode {
-            //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-            //os_signpost_id_t spid = os_signpost_id_generate(log);
-            //os_signpost_interval_begin(log, spid, "QueryMirrorViewBlitDesc", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
-            //os_signpost_interval_end(log, spid, "QueryMirrorViewBlitDesc");
+            
             return kUnitySubsystemErrorCodeFailure;
         };
         GetInstance()->GetDisplay()->RegisterProvider(handle, &provider);
@@ -241,10 +217,6 @@ public:
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
-        //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-        //os_signpost_id_t spid = os_signpost_id_generate(log);
-        //os_signpost_interval_begin(log, spid, "SubmitCurrentFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
-        
         RenderContent();
         RenderAlignmentMarker();
         
@@ -262,7 +234,6 @@ public:
             CVPixelBufferRelease(pixelBuffer);
         }
         
-        //os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -379,15 +350,9 @@ public:
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
             
         // Stop the display subsystem before the splash screen.
-        if (before_splash_screen_) {
-            before_splash_screen_ = false;
+        if (initial_shutdown_) {
             return kUnitySubsystemErrorCodeFailure;
         }
-        
-        // Reference: https://stackoverflow.com/questions/62667953/can-i-set-signposts-before-and-after-a-call-in-objective-c
-        //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-        //os_signpost_id_t spid = os_signpost_id_generate(log);
-        //os_signpost_interval_begin(log, spid, "PopulateNextFrame", "frame_count: %d, last_frame_time: %f, system_uptime: %f", frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
         
 //        bool reallocate_textures = (unity_textures_.size() == 0);
 //        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0) {
@@ -496,13 +461,13 @@ public:
             culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             culling_pass.projection.data.matrix = next_frame->renderPasses[0].renderParams[0].projection.data.matrix;
         }
-        //os_signpost_interval_end(log, spid, "PopulateNextFrame");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
     UnitySubsystemErrorCode GfxThread_Stop() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
 
+        initial_shutdown_ = false;
         holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(false);
         
         return kUnitySubsystemErrorCodeSuccess;
@@ -646,7 +611,7 @@ private:
     /// @brief The render pipeline state for rendering alignment marker.
     id <MTLRenderPipelineState> second_render_pipeline_state_;
     
-    bool before_splash_screen_ = true;
+    bool initial_shutdown_ = true;
     
     bool is_first_frame_ = true;
     
@@ -706,29 +671,6 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
 void UnloadDisplay() { holokit::HoloKitDisplayProvider::GetInstance().reset(); }
 
 extern "C" {
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetUnityProjectionMatrix(float column0[4], float column1[4], float column2[4], float column3[4]) {
-    unity_projection_matrix.columns[0].x = column0[0];
-    unity_projection_matrix.columns[0].y = column0[1];
-    unity_projection_matrix.columns[0].z = column0[2];
-    unity_projection_matrix.columns[0].w = column0[3];
-    
-    unity_projection_matrix.columns[1].x = column1[0];
-    unity_projection_matrix.columns[1].y = column1[1];
-    unity_projection_matrix.columns[1].z = column1[2];
-    unity_projection_matrix.columns[1].w = column1[3];
-    
-    unity_projection_matrix.columns[2].x = column2[0];
-    unity_projection_matrix.columns[2].y = column2[1];
-    unity_projection_matrix.columns[2].z = column2[2];
-    unity_projection_matrix.columns[2].w = column2[3];
-    
-    unity_projection_matrix.columns[3].x = column3[0];
-    unity_projection_matrix.columns[3].y = column3[1];
-    unity_projection_matrix.columns[3].z = column3[2];
-    unity_projection_matrix.columns[3].w = column3[3];
-}
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(UnityRenderBuffer unity_render_buffer) {

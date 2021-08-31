@@ -352,7 +352,7 @@ UnityHoloKit_MultipeerStopAdvertising(void) {
 // 3 for disconnection message
 // https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerSendData(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
+UnityHoloKit_MultipeerSendDataForMLAPI(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
     MultipeerSession *multipeerSession = ar_session_instance.multipeerSession;
     for (MCPeerID *peerId in multipeerSession.connectedPeersForMLAPI) {

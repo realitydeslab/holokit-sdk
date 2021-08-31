@@ -20,13 +20,6 @@ namespace UnityEngine.XR.HoloKit
 
         [SerializeField] private bool m_CollaborationEnabled = false;
 
-        private bool m_HasStarted = false;
-
-        public bool HasStarted
-        {
-            get => m_HasStarted;
-        }
-
         private XRDisplaySubsystem m_DisplaySubsystem;
 
         public XRDisplaySubsystem DisplaySubsystem
@@ -118,11 +111,6 @@ namespace UnityEngine.XR.HoloKit
             }
 
             m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
-        }
-
-        private void Start()
-        {
-            m_HasStarted = true;
         }
 
         public void EnableMeshing(bool enabled)

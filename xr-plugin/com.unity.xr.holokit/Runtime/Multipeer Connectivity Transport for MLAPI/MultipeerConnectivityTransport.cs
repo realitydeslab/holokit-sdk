@@ -42,13 +42,13 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// Is there a new connection request to be sent?
         /// This variable is only used by clients.
         /// </summary>
-        private bool m_SentConnectionRequest = false;
+        private bool m_WillSendConnectionRequest = false;
 
         /// <summary>
         /// Is there is new disconnection message to be handled?
         /// This variable is only used by the server.
         /// </summary>
-        private bool m_ReceivedDisconnectionMessage = false;
+        private bool m_DidReceiveDisconnectionMessage = false;
 
         /// <summary>
         /// The client Id of the pending disconnection mesasge.
@@ -72,14 +72,25 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// Manually set this value before calling init().
         /// This is usually the scene name.
         /// </summary>
-        private string m_IdentityString = null;
+        private string m_GameName = null;
 
-        public string IdentityString
+        public string GameName
         {
-            get => m_IdentityString;
+            get => m_GameName;
             set
             {
-                m_IdentityString = value;
+                m_GameName = value;
+            }
+        }
+
+        private string m_SessionName = null;
+
+        public string SessionName
+        {
+            get => m_SessionName;
+            set
+            {
+                m_SessionName = value;
             }
         }
 
@@ -113,16 +124,10 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// <summary>
         /// Initialize the MultipeerSession instance on Objective-C side.
         /// </summary>
+        /// <param name="peerName"></param>
         /// <param name="serviceType"></param>
-        /// <param name="peerID"></param>
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerInit(string serviceType, string peerID, string identityString);
-
-        /// <summary>
-        /// Release the MultipeerSession instance on Objective-C side.
-        /// </summary>
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerShutdown();
+        private static extern void UnityHoloKit_MultipeerInit(string peerName, string serviceType, string gameName, string sessionName);
 
         /// <summary>
         /// Start to browse other peers through the multipeer connectivity network.
@@ -143,39 +148,6 @@ namespace MLAPI.Transports.MultipeerConnectivity
         public static extern void UnityHoloKit_MultipeerStopAdvertising();
 
         /// <summary>
-        /// Send connection request message to the server.
-        /// This delegate function is only called by a client.
-        /// </summary>
-        delegate void MultipeerSendConnectionRequestForMLAPI(ulong serverId);
-        [AOT.MonoPInvokeCallback(typeof(MultipeerSendConnectionRequestForMLAPI))]
-        static void OnMultipeerConnectionRequestSentForMLAPI(ulong serverId)
-        {
-            Debug.Log("[MultipeerConnectivityTransport]: send multipeer connection request to MLAPI.");
-
-            Instance.m_ServerId = serverId;
-            Instance.m_SentConnectionRequest = true;
-        }
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(MultipeerSendConnectionRequestForMLAPI callback);
-
-        /// <summary>
-        /// This delegate function is only called on the server.
-        /// This function gets called when the server notices that a client is
-        /// disconnected through multipeer connectivity network.
-        /// </summary>
-        delegate void MultipeerDisconnectionMessageReceivedForMLAPI(ulong clientId);
-        [AOT.MonoPInvokeCallback(typeof(MultipeerDisconnectionMessageReceivedForMLAPI))]
-        static void OnMultipeerDisconnectionMessageReceivedForMLAPI(ulong clientId)
-        {
-            Debug.Log($"[MultipeerConnectivityTransport]: received a disconnection message from client {clientId}.");
-
-            Instance.m_ReceivedDisconnectionMessage = true;
-            Instance.m_LastDisconnectedClientId = clientId;
-        }
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetMultipeerDisconnectionMessageReceivedForMLAPIDelegate(MultipeerDisconnectionMessageReceivedForMLAPI callback);
-
-        /// <summary>
         /// Send MLAPI data to a peer through multipeer connectivity.
         /// </summary>
         /// <param name="clientId">The client Id of the recipient</param>
@@ -186,15 +158,58 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_MultipeerSendDataForMLAPI(ulong clientId, byte[] data, int dataArrayLength, int channel);
 
         /// <summary>
+        /// Send a Ping message to a specific client.
+        /// </summary>
+        /// <param name="clientId">The client Id</param>
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_MultipeerSendPingMessage(ulong clientId);
+
+        /// <summary>
+        /// Disconnect from the multipeer connectivity network.
+        /// This function should only be called by a client.
+        /// </summary>
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_MultipeerDisconnectForMLAPI();
+
+        /// <summary>
+        /// Notify a peer to disconnect.
+        /// This function should only be called on the server side.
+        /// </summary>
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_MultipeerDisconnectPeerForMLAPI(ulong clientId);
+
+        /// <summary>
+        /// Release the MultipeerSession instance on Objective-C side.
+        /// </summary>
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_MultipeerShutdown();
+
+        /// <summary>
+        /// Send connection request message to the server.
+        /// This delegate function is only called by a client.
+        /// </summary>
+        delegate void SendConnectionRequest2Server(ulong serverId);
+        [AOT.MonoPInvokeCallback(typeof(SendConnectionRequest2Server))]
+        static void OnSendConnectionRequest2Server(ulong serverId)
+        {
+            Debug.Log("[MultipeerConnectivityTransport]: send multipeer connection request to MLAPI.");
+
+            Instance.m_ServerId = serverId;
+            Instance.m_WillSendConnectionRequest = true;
+        }
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetSendConnectionRequest2ServerDelegate(SendConnectionRequest2Server callback);
+
+        /// <summary>
         /// The delegate called when peer data is received through multipeer connectivity network.
         /// </summary>
         /// <param name="clientId">The peerId who sends the data</param>
         /// <param name="data">The raw data</param>
         /// <param name="dataArrayLength">The length of the data array</param>
         /// <param name="channel">MLAPI NetworkChannel</param>
-        delegate void PeerDataReceivedForMLAPI(ulong clientId, IntPtr dataPtr, int dataArrayLength, int channel);
-        [AOT.MonoPInvokeCallback(typeof(PeerDataReceivedForMLAPI))]
-        static void OnPeerDataReceivedForMLAPI(ulong clientId, IntPtr dataPtr, int dataArrayLength, int channel)
+        delegate void DidReceivePeerData(ulong clientId, IntPtr dataPtr, int dataArrayLength, int channel);
+        [AOT.MonoPInvokeCallback(typeof(DidReceivePeerData))]
+        static void OnDidReceivePeerData(ulong clientId, IntPtr dataPtr, int dataArrayLength, int channel)
         {
             //Debug.Log($"[MultipeerConnectivityTransport]: did receive a new peer data packet from {clientId}, {(NetworkChannel)channel}");
             // https://stackoverflow.com/questions/25572221/callback-byte-from-native-c-to-c-sharp
@@ -206,46 +221,39 @@ namespace MLAPI.Transports.MultipeerConnectivity
             Instance.m_PeerDataPacketQueue.Enqueue(newPeerDataPacket);
         }
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(PeerDataReceivedForMLAPI callback);
-
-        /// <summary>
-        /// Notify a peer to disconnect.
-        /// This function should only be called on the server side.
-        /// </summary>
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerDisconnectPeerForMLAPI(ulong clientId);
-
-        /// <summary>
-        /// Disconnect from the multipeer connectivity network.
-        /// This function should only be called by a client.
-        /// </summary>
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerDisconnectForMLAPI();
-
-        /// <summary>
-        /// Send a Ping message to a specific client.
-        /// </summary>
-        /// <param name="clientId">The client Id</param>
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerSendPingMessage(ulong clientId);
+        private static extern void UnityHoloKit_SetDidReceivePeerDataDelegate(DidReceivePeerData callback);
 
         /// <summary>
         /// This delegate function is called when a Pong message is received.
         /// </summary>
         /// <param name="clientId">The sender of the Pong message</param>
-        delegate void MultipeerPongMessageReceived(ulong clientId, double rtt);
-        [AOT.MonoPInvokeCallback(typeof(MultipeerPongMessageReceived))]
-        static void OnMultipeerPongMessageReceived(ulong clientId, double rtt)
+        delegate void DidReceivePongMessage(ulong clientId, double rtt);
+        [AOT.MonoPInvokeCallback(typeof(DidReceivePongMessage))]
+        static void OnDidReceivePongMessage(ulong clientId, double rtt)
         {
             // The unit is millisecond.
             Instance.CurrentRtt = rtt;
             //Debug.Log($"[MultipeerConnectivityTransport]: Current Rtt {Instance.CurrentRtt}");
         }
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(MultipeerPongMessageReceived callback);
+        private static extern void UnityHoloKit_SetDidReceivePongMessageDelegate(DidReceivePongMessage callback);
 
+        /// <summary>
+        /// This delegate function is only called on the server.
+        /// This function gets called when the server notices that a client is
+        /// disconnected through multipeer connectivity network.
+        /// </summary>
+        delegate void DidReceiveDisconnectionMessageFromClient(ulong clientId);
+        [AOT.MonoPInvokeCallback(typeof(DidReceiveDisconnectionMessageFromClient))]
+        static void OnDidReceiveDisconnectionMessageFromClient(ulong clientId)
+        {
+            Debug.Log($"[MultipeerConnectivityTransport]: received a disconnection message from client {clientId}.");
+
+            Instance.m_DidReceiveDisconnectionMessage = true;
+            Instance.m_LastDisconnectedClientId = clientId;
+        }
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MultipeerSendPingMessageViaStream(ulong clientId);
+        private static extern void UnityHoloKit_SetDidReceiveDisconnectionMessageFromClientDelegate(DidReceiveDisconnectionMessageFromClient callback);
 
         private void Awake()
         {
@@ -262,10 +270,10 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private void OnEnable()
         {
             // Register delegates
-            UnityHoloKit_SetMultipeerSendConnectionRequestForMLAPIDelegate(OnMultipeerConnectionRequestSentForMLAPI);
-            UnityHoloKit_SetMultipeerDisconnectionMessageReceivedForMLAPIDelegate(OnMultipeerDisconnectionMessageReceivedForMLAPI);
-            UnityHoloKit_SetPeerDataReceivedForMLAPIDelegate(OnPeerDataReceivedForMLAPI);
-            UnityHoloKit_SetMultipeerPongMessageReceivedDelegate(OnMultipeerPongMessageReceived);
+            UnityHoloKit_SetSendConnectionRequest2ServerDelegate(OnSendConnectionRequest2Server);
+            UnityHoloKit_SetDidReceivePeerDataDelegate(OnDidReceivePeerData);
+            UnityHoloKit_SetDidReceivePongMessageDelegate(OnDidReceivePongMessage);
+            UnityHoloKit_SetDidReceiveDisconnectionMessageFromClientDelegate(OnDidReceiveDisconnectionMessageFromClient);
         }
 
         public override void Init()
@@ -281,15 +289,20 @@ namespace MLAPI.Transports.MultipeerConnectivity
             // Init the multipeer session on objective-c++ side.
             if (m_ServiceType == null)
             {
-                Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because the service type is null.");
+                Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because property service type is null.");
                 return;
             }
-            if (m_IdentityString == null)
+            if (m_GameName == null)
             {
-                Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because the identity string is null.");
+                Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because property game name is null.");
                 return;
             }
-            UnityHoloKit_MultipeerInit(m_ServiceType, newClientId.ToString(), m_IdentityString);
+            if (m_SessionName == null)
+            {
+                Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because property session name is null.");
+                return;
+            }
+            UnityHoloKit_MultipeerInit(m_ServiceType, newClientId.ToString(), m_GameName, m_SessionName);
         }
 
         public override SocketTasks StartServer()
@@ -325,9 +338,9 @@ namespace MLAPI.Transports.MultipeerConnectivity
             //Debug.Log($"[MultipeerConnectivityTransport]: PollEvent() {Time.time}");
 
             // Send a connection request to the server as a client.
-            if (m_SentConnectionRequest && !NetworkManager.Singleton.IsServer)
+            if (m_WillSendConnectionRequest && !NetworkManager.Singleton.IsServer)
             {
-                m_SentConnectionRequest = false;
+                m_WillSendConnectionRequest = false;
                 clientId = m_ServerId;
                 networkChannel = NetworkChannel.DefaultMessage;
                 payload = new ArraySegment<byte>();
@@ -336,9 +349,9 @@ namespace MLAPI.Transports.MultipeerConnectivity
             }
 
             // Send a disconnection message to the server as a client.
-            if (m_ReceivedDisconnectionMessage && NetworkManager.Singleton.IsServer)
+            if (m_DidReceiveDisconnectionMessage && NetworkManager.Singleton.IsServer)
             {
-                m_ReceivedDisconnectionMessage = false;
+                m_DidReceiveDisconnectionMessage = false;
                 clientId = m_LastDisconnectedClientId;
                 networkChannel = NetworkChannel.DefaultMessage;
                 payload = new ArraySegment<byte>();
