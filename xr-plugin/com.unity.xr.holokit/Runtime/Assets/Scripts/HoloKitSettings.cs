@@ -54,6 +54,18 @@ namespace UnityEngine.XR.HoloKit
         private static extern bool UnityHoloKit_StereoscopicRendering();
 
         [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetStereoscopicRendering(bool value);
+
+        delegate void SetARCameraBackground(bool value);
+        [AOT.MonoPInvokeCallback(typeof(SetARCameraBackground))]
+        private static void OnSetARCameraBackground(bool value)
+        {
+            Instance.m_ARCameraBackground.enabled = value;
+        }
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetSetARCameraBackgroundDelegate(SetARCameraBackground callback);
+
+        [DllImport("__Internal")]
         private static extern IntPtr UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
 
         [DllImport("__Internal")]
@@ -111,6 +123,8 @@ namespace UnityEngine.XR.HoloKit
             }
 
             m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
+
+            UnityHoloKit_SetSetARCameraBackgroundDelegate(OnSetARCameraBackground);
         }
 
         public void EnableMeshing(bool enabled)
@@ -139,7 +153,7 @@ namespace UnityEngine.XR.HoloKit
             {
                 if (UnityHoloKit_StartNfcSession())
                 {
-                    m_ARCameraBackground.enabled = false;
+                    UnityHoloKit_SetStereoscopicRendering(true);
                     m_DisplaySubsystem.Start();
                     return true;
                 }
@@ -150,8 +164,8 @@ namespace UnityEngine.XR.HoloKit
             }
             else
             {
+                UnityHoloKit_SetStereoscopicRendering(false);
                 m_DisplaySubsystem.Stop();
-                m_ARCameraBackground.enabled = true;
                 return true;
             }
         }

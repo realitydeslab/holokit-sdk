@@ -185,6 +185,11 @@ UnityHoloKit_StereoscopicRendering() {
     return holokit::HoloKitApi::GetInstance()->StereoscopicRendering();
 }
 
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetStereoscopicRendering(bool value) {
+    return holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(value);
+}
+
 float* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetCameraToCenterEyeOffsetPtr() {
     simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();

@@ -136,7 +136,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_MultipeerStartBrowsing();
 
         [DllImport("__Internal")]
-        public static extern void UnityHoloKit_MultipeerStopBrowsing();
+        private static extern void UnityHoloKit_MultipeerStopBrowsing();
 
         /// <summary>
         /// Expose the device to other browsers in the multipeer connectivity network.
@@ -145,7 +145,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         private static extern void UnityHoloKit_MultipeerStartAdvertising();
 
         [DllImport("__Internal")]
-        public static extern void UnityHoloKit_MultipeerStopAdvertising();
+        private static extern void UnityHoloKit_MultipeerStopAdvertising();
 
         /// <summary>
         /// Send MLAPI data to a peer through multipeer connectivity.
@@ -417,6 +417,16 @@ namespace MLAPI.Transports.MultipeerConnectivity
         {
             Debug.Log($"[MultipeerConnectivityTransport]: Shutdown() {Time.time}");
             UnityHoloKit_MultipeerShutdown();
+        }
+
+        public void StopAdvertising()
+        {
+            UnityHoloKit_MultipeerStopAdvertising();
+        }
+
+        public void StopBrowsing()
+        {
+            UnityHoloKit_MultipeerStopBrowsing();
         }
     }
 }

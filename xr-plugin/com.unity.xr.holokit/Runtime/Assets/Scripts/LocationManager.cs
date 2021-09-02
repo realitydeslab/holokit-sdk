@@ -50,8 +50,6 @@ public class LocationManager : MonoBehaviour
         get => m_CurrentHeadingAccuracy;
     }
 
-    [DllImport("__Internal")]
-    private static extern int UnityHoloKit_InitLocationManager();
 
     [DllImport("__Internal")]
     private static extern int UnityHoloKit_StartUpdatingLocation();
@@ -99,11 +97,6 @@ public class LocationManager : MonoBehaviour
     {
         UnityHoloKit_SetDidUpdateLocationDelegate(OnDidUpdateLocation);
         UnityHoloKit_SetDidUpdateHeadingDelegate(OnDidUpdateHeading);
-    }
-
-    public void InitLocationManager()
-    {
-        UnityHoloKit_InitLocationManager();
     }
 
     public void StartUpdatingLocation()

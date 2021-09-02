@@ -119,7 +119,8 @@ NSString* content_shader = @
         return float4(colorTexture.sample(textureSampler, in.tex_coords));
     })msl";
 
-simd_float4x4 unity_projection_matrix;
+typedef void (*SetARCameraBackground)(bool value);
+SetARCameraBackground SetARCameraBackgroundDelegate = NULL;
 
 namespace holokit {
 class HoloKitDisplayProvider {
@@ -208,7 +209,10 @@ public:
         
         allocate_new_textures_ = true;
         is_first_frame_ = true;
-        holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(true);
+        //holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(true);
+        if (SetARCameraBackgroundDelegate) {
+            SetARCameraBackgroundDelegate(false);
+        }
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -349,24 +353,10 @@ public:
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
             
-        // Stop the display subsystem before the splash screen.
-        if (initial_shutdown_) {
+        // We interrupt the graphics thread if it is not manually opened by SDK.
+        if (!holokit::HoloKitApi::GetInstance()->StereoscopicRendering()) {
             return kUnitySubsystemErrorCodeFailure;
         }
-        
-//        bool reallocate_textures = (unity_textures_.size() == 0);
-//        if ((kUnityXRFrameSetupHintsChangedSinglePassRendering & frame_hints->changedFlags) != 0) {
-//            //NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedSinglePassRendering");
-//            reallocate_textures = true;
-//        }
-//        if ((kUnityXRFrameSetupHintsChangedTextureResolutionScale & frame_hints->changedFlags) != 0) {
-//            NSLog(@"FUCK::kUnityXRFrameSetupHintsChangedTextureResolutionScale");
-//            //reallocate_textures = true;
-//        }
-//        if ((kUnityXRFrameSetuphintsChangedReprojectionMode & frame_hints->changedFlags) != 0) {
-//            NSLog(@"FUCK::kUnityXRFrameSetuphintsChangedReprojectionMode");
-//            // App wants different reprojection mode, configure compositor if possible.
-//        }
         
         // If this is the first frame for stereoscopic rendering mode.
         if (allocate_new_textures_) {
@@ -467,8 +457,10 @@ public:
     UnitySubsystemErrorCode GfxThread_Stop() {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
 
-        initial_shutdown_ = false;
-        holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(false);
+        //holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(false);
+        if (SetARCameraBackgroundDelegate) {
+            SetARCameraBackgroundDelegate(true);
+        }
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -611,8 +603,6 @@ private:
     /// @brief The render pipeline state for rendering alignment marker.
     id <MTLRenderPipelineState> second_render_pipeline_state_;
     
-    bool initial_shutdown_ = true;
-    
     bool is_first_frame_ = true;
     
     bool allocate_new_textures_ = true;
@@ -675,6 +665,11 @@ extern "C" {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(UnityRenderBuffer unity_render_buffer) {
     holokit::HoloKitDisplayProvider::GetInstance()->SetSecondDisplayColorBuffer(unity_render_buffer);
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetSetARCameraBackgroundDelegate(SetARCameraBackground callback) {
+    SetARCameraBackgroundDelegate = callback;
 }
 
 } // extern "C"

@@ -8,12 +8,12 @@
 #import "watch_connectivity.h"
 #import "core_motion.h"
 #import "math_helpers.h"
-#include "IUnityInterface.h"
+#import "IUnityInterface.h"
 
 typedef void (*DidReceiveWatchSystemMessage)(int messageIndex);
 DidReceiveWatchSystemMessage DidReceiveWatchSystemMessageDelegate = NULL;
 
-typedef void (*DidReceiveWatchActionMessage)(int messageIndex, int watchYaw, int iphoneYaw);
+typedef void (*DidReceiveWatchActionMessage)(int messageIndex, int watchPitch, int watchRoll, int watchYaw, int iphoneYaw);
 DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
 
 @interface HoloKitWatchConnectivity() <WCSessionDelegate>
@@ -31,7 +31,7 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
             self.wcSession.delegate = self;
             // We let Unity manually activate the session when needed.
             [self.wcSession activateSession];
-            
+   
             HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion getSingletonInstance];
             [coreMotionInstance startDeviceMotion];
         }
@@ -79,11 +79,17 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
 
 - (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *,id> *)message {
     if (id watchActionValue = [message objectForKey:@"WatchAction"]) {
-        if (id watchYawValue = [message objectForKey:@"WatchYaw"]) {
-            NSInteger watchActionIndex = [watchActionValue integerValue];
-            NSInteger watchYaw = [watchYawValue integerValue];
-            HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion getSingletonInstance];
-            DidReceiveWatchActionMessageDelegate((int)watchActionIndex, (int)watchYaw, (int)Radians2Degrees(coreMotionInstance.currentDeviceMotion.attitude.yaw));
+        if (id watchPitchValue = [message objectForKey:@"WatchPitch"]) {
+            if (id watchRollValue = [message objectForKey:@"WatchRoll"]) {
+                if (id watchYawValue = [message objectForKey:@"WatchYaw"]) {
+                    NSInteger watchActionIndex = [watchActionValue integerValue];
+                    NSInteger watchPitch = [watchPitchValue integerValue];
+                    NSInteger watchRoll = [watchRollValue integerValue];
+                    NSInteger watchYaw = [watchYawValue integerValue];
+                    HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion getSingletonInstance];
+                    DidReceiveWatchActionMessageDelegate((int)watchActionIndex, (int)watchPitch, (int)watchRoll, (int)watchYaw, (int)Radians2Degrees(coreMotionInstance.currentDeviceMotion.attitude.yaw));
+                }
+            }
         }
     } else if (id watchSystemValue = [message objectForKey:@"WatchSystem"]) {
         NSInteger watchSystemIndex = [watchSystemValue integerValue];
@@ -113,9 +119,9 @@ UnityHoloKit_InitWatchConnectivitySession() {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SendMessage2Watch(NSString *messageType, int index) {
+UnityHoloKit_SendMessage2Watch(const char *messageType, int index) {
     HoloKitWatchConnectivity *instance = [HoloKitWatchConnectivity getSingletonInstance];
-    [instance sendMessage2WatchWithMessageType:messageType messageIndex:index];
+    [instance sendMessage2WatchWithMessageType:[NSString stringWithUTF8String:messageType] messageIndex:index];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
