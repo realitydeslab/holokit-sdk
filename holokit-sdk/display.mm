@@ -210,7 +210,7 @@ public:
         allocate_new_textures_ = true;
         is_first_frame_ = true;
         //holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(true);
-        if (SetARCameraBackgroundDelegate) {
+        if (holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(false);
         }
         
@@ -392,7 +392,7 @@ public:
                     UnityXRPose pose = { position, rotation };
                     render_params.deviceAnchorToEyePose = pose;
                     render_params.projection.type = kUnityXRProjectionTypeMatrix;
-                    simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().session.currentFrame.camera.projectionMatrix;
+                    simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().arSession.currentFrame.camera.projectionMatrix;
                     render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
                     render_params.viewportRect = {
                         0.0f,                    // x
@@ -458,7 +458,7 @@ public:
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
 
         //holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(false);
-        if (SetARCameraBackgroundDelegate) {
+        if (holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(true);
         }
         

@@ -25,12 +25,12 @@
 {}
 
 
-- (instancetype) init {
+- (instancetype)init {
     handTracker = [[HandTracker alloc] init];
     handTracker.delegate = self;
 }
 
-+ (id) getSingletonInstance {
++ (id)getSingletonInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{

@@ -169,8 +169,8 @@ bool HoloKitApi::StartNfcSession() {
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
-    if (ar_session_handler_ != nullptr && ar_session_handler_.session != NULL) {
-        return ar_session_handler_.session.currentFrame.camera.transform;
+    if (ar_session_handler_ != nullptr && ar_session_handler_.arSession != NULL) {
+        return ar_session_handler_.arSession.currentFrame.camera.transform;
     } else {
         return matrix_identity_float4x4;
     }

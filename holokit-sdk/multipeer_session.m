@@ -218,7 +218,6 @@ typedef enum {
 }
 
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
-    
     // We only handle data that was sent from a connected MLAPI peer.
     if (![self.connectedPeersForMLAPI containsObject:peerID]) {
         return;
@@ -227,8 +226,7 @@ typedef enum {
     // First try to decode the received data as ARCollaboration data.
     ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
     if (collaborationData != nil) {
-        //NSLog(@"[ar_session]: did receive ARCollaboration data.");
-        [[HoloKitARSession getSingletonInstance] updateWithCollaborationData:collaborationData];
+        [[HoloKitARSession getSingletonInstance] updateWithHoloKitCollaborationData:collaborationData];
         return;
     }
 
@@ -263,7 +261,7 @@ typedef enum {
         case 2: {
             // Did receive a Pong message
             double rtt = ([[NSProcessInfo processInfo] systemUptime] - self.lastPingTime) * 1000;
-            NSLog(@"[mc_session]: curernt rtt is %f", rtt);
+            //NSLog(@"[mc_session]: curernt rtt is %f", rtt);
             unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
             DidReceivePongMessageDelegate(clientId, rtt);
             break;

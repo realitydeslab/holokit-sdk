@@ -124,6 +124,10 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
     return _sharedObject;
 }
 
+- (void)updateWithHoloKitCollaborationData:(ARCollaborationData *) collaborationData {
+    [self.arSession updateWithCollaborationData:collaborationData];
+}
+
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
@@ -132,9 +136,9 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
     
-    if(self.session == NULL) {
+    if(self.arSession == NULL) {
         NSLog(@"[ar_session]: AR session started.");
-        self.session = session;
+        self.arSession = session;
         
         //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
@@ -228,11 +232,11 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 - (simd_float3)unprojectScreenPoint:(CGPoint)screenPoint depth:(float)z {
     simd_float4x4 translation = matrix_identity_float4x4;
     translation.columns[3].z = -z;
-    simd_float4x4 planeOrigin = simd_mul(self.session.currentFrame.camera.transform, translation);
+    simd_float4x4 planeOrigin = simd_mul(self.arSession.currentFrame.camera.transform, translation);
     simd_float3 xAxis = simd_make_float3(1, 0, 0);
     simd_float4x4 rotation = simd_matrix4x4(simd_quaternion(0.5 * M_PI, xAxis));
     simd_float4x4 plane = simd_mul(planeOrigin, rotation);
-    simd_float3 unprojectedPoint = [self.session.currentFrame.camera unprojectPoint:screenPoint ontoPlaneWithTransform:plane orientation:UIInterfaceOrientationLandscapeRight viewportSize:self.session.currentFrame.camera.imageResolution];
+    simd_float3 unprojectedPoint = [self.arSession.currentFrame.camera unprojectPoint:screenPoint ontoPlaneWithTransform:plane orientation:UIInterfaceOrientationLandscapeRight viewportSize:self.arSession.currentFrame.camera.imageResolution];
     
     return unprojectedPoint;
 }
@@ -493,15 +497,15 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         bool isHand = true;
         for(Landmark *landmark in landmarks) {
             
-            int x = (CGFloat)landmark.x * self.session.currentFrame.camera.imageResolution.width;
-            int y = (CGFloat)landmark.y * self.session.currentFrame.camera.imageResolution.height;
+            int x = (CGFloat)landmark.x * self.arSession.currentFrame.camera.imageResolution.width;
+            int y = (CGFloat)landmark.y * self.arSession.currentFrame.camera.imageResolution.height;
             CGPoint screenPoint = CGPointMake(x, y);
             
             //NSLog(@"landmark [%f, %f]", landmark.x, landmark.y);
             size_t depthBufferWidth;
             size_t depthBufferHeight;
             Float32* depthBufferBaseAddress;
-            ARDepthData* sceneDepth = self.session.currentFrame.sceneDepth;
+            ARDepthData* sceneDepth = self.arSession.currentFrame.sceneDepth;
             if(!sceneDepth) {
                 NSLog(@"[ar_session]: Failed to acquire scene depth.");
                 return;
@@ -638,7 +642,7 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     
     HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
-    [ar_session_handler.session setWorldOrigin:(transform_matrix)];
+    [ar_session_handler.arSession setWorldOrigin:(transform_matrix)];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -647,7 +651,7 @@ UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float r
     ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithUTF8String:anchorName] transform:transform_matrix];
     
     HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
-    [ar_session_handler.session addAnchor:anchor];
+    [ar_session_handler.arSession addAnchor:anchor];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

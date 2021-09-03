@@ -14,7 +14,7 @@
 
 @interface HoloKitARSession : NSObject
 
-@property (nonatomic, strong, nullable) ARSession* session;
+@property (nonatomic, strong, nullable) ARSession* arSession;
 @property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
 @property (nonatomic, strong, nullable) NSMutableArray<LandmarkPosition *> *leftHandLandmarkPositions;
 @property (nonatomic, strong, nullable) NSMutableArray<LandmarkPosition *> *rightHandLandmarkPositions;
@@ -35,5 +35,6 @@
 @property (nonatomic, strong, nullable) CADisplayLink *aDisplayLink;
 
 + (id)getSingletonInstance;
+- (void)updateWithHoloKitCollaborationData:(ARCollaborationData *) collaborationData;
 
 @end
