@@ -56,7 +56,6 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 @property (nonatomic, strong) VNDetectHumanHandPoseRequest *handPoseRequest;
 // Used to count the interval.
 @property (assign) int frameCount;
-@property (assign) bool isARWorldMapSynced;
  
 @end
 

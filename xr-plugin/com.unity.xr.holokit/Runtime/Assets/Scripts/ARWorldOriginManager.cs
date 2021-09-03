@@ -18,9 +18,9 @@ namespace UnityEngine.XR.HoloKit
         /// Has my AR world map been synced with others in the network?
         /// This variable is set to true when the local AR collaboration sessino begins.
         /// </summary>
-        private bool m_IsARWorldMapSynced = false;
+        private bool m_IsSynced = false;
 
-        public bool IsARWorldMapSynced => m_IsARWorldMapSynced;
+        public bool IsSynced => m_IsSynced;
 
         /// <summary>
         /// The time interval between two AR world origin resettings.
@@ -58,7 +58,7 @@ namespace UnityEngine.XR.HoloKit
         static void OnARWorldMapSynced()
         {
             //Debug.Log("[ARWorldOriginManager]: AR collaboration session started.");
-            ARWorldOriginManager.Instance.m_IsARWorldMapSynced = true;
+            ARWorldOriginManager.Instance.m_IsSynced = true;
             if (NetworkManager.Singleton.IsServer)
             {
                 Instance.m_SyncedClientsNum++;
@@ -87,7 +87,7 @@ namespace UnityEngine.XR.HoloKit
 
         public void Update()
         {
-            if (!m_IsARWorldMapSynced) return;
+            if (!m_IsSynced) return;
 
             if (NetworkManager.Singleton.IsServer && Time.time - m_LastResettingTime > m_ResettingInterval)
             {

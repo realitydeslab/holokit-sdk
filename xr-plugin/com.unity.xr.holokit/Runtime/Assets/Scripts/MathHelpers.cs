@@ -11,9 +11,9 @@ namespace UnityEngine.XR.HoloKit
             return camera.position + camera.TransformVector(HoloKitSettings.CameraToCenterEyeOffset);
         }
 
-        public static Quaternion GetCameraVerticalRotation(Transform camera)
+        public static Quaternion GetVerticalRotation(Quaternion rotation)
         {
-            Vector3 cameraEuler = camera.rotation.eulerAngles;
+            Vector3 cameraEuler = rotation.eulerAngles;
             return Quaternion.Euler(new Vector3(0f, cameraEuler.y, 0f));
         }
     }

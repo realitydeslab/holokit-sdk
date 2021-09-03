@@ -66,7 +66,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
         /// Only devices with the same service type get connected.
         /// </summary>
         //[SerializeField]
-        private string m_ServiceType = "holo-official";
+        private string m_ServiceType = "quantum-magic";
 
         /// <summary>
         /// Manually set this value before calling init().
@@ -302,7 +302,7 @@ namespace MLAPI.Transports.MultipeerConnectivity
                 Debug.Log("[MultipeerConnectivityTransport]: failed to init multipeer session because property session name is null.");
                 return;
             }
-            UnityHoloKit_MultipeerInit(m_ServiceType, newClientId.ToString(), m_GameName, m_SessionName);
+            UnityHoloKit_MultipeerInit(newClientId.ToString(), m_ServiceType, m_GameName, m_SessionName);
         }
 
         public override SocketTasks StartServer()

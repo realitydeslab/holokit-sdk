@@ -164,8 +164,8 @@ namespace UnityEngine.XR.HoloKit
             }
             else
             {
-                UnityHoloKit_SetStereoscopicRendering(false);
                 m_DisplaySubsystem.Stop();
+                UnityHoloKit_SetStereoscopicRendering(false);
                 return true;
             }
         }
