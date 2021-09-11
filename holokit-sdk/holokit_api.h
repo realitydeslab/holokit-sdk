@@ -20,12 +20,6 @@
 
 namespace holokit {
 
-enum RenderingMode {
-    UIMode = 0,
-    ARMode = 1,
-    XRMode = 2
-};
-
 /// Wrapper of HoloKit SDK
 class HoloKitApi {
     

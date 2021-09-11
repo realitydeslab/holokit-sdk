@@ -22,7 +22,7 @@ void HoloKitApi::Initialize() {
     
     InitOpticalParameters();
     
-    ar_session_handler_ = [HoloKitARSession getSingletonInstance];
+    ar_session_handler_ = [HoloKitARSession sharedARSession];
     
     if ([device_name_ isEqualToString:@"iPhone13,3"] == NO &&
         [device_name_ isEqualToString:@"iPhone13,4"] == NO) {

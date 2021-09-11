@@ -33,7 +33,7 @@ bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& po
         return false;
     }
     
-    double last_time = target_timestamp;
+    double last_time = last_arkit_data_.sensor_timestamp;
     IMUFilter imu_filter;
     
     Eigen::Quaterniond q = last_arkit_data_.rotation;
@@ -56,6 +56,7 @@ bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& po
         } else {
             q *= LowLatencyTrackingApi::ConvertToEigenQuaterniond((data.sensor_timestamp - last_time) * R_I2C * data.rotationRate);
         }
+        last_time = data.sensor_timestamp;
     }
     
     Eigen::Vector3d p = last_arkit_data_.position;
@@ -146,5 +147,16 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetIsFilteringAcc(bool value) {
     holokit::LowLatencyTrackingApi::GetInstance()->SetIsFilteringAcc(value);
 }
+
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetIsLltOpen() {
+    return holokit::LowLatencyTrackingApi::GetInstance()->GetIsLltOpen();
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetIsLltOpen(bool value) {
+    holokit::LowLatencyTrackingApi::GetInstance()->SetIsLltOpen(value);
+}
+
 
 }

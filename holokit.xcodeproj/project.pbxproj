@@ -63,12 +63,12 @@
 		4B8A529C26CE3FA7005D55C5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B8A529B26CE3FA7005D55C5 /* Assets.xcassets */; };
 		4B8A529F26CE3FA7005D55C5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B8A529D26CE3FA7005D55C5 /* LaunchScreen.storyboard */; };
 		4B921B0526DCE6D600EC359F /* watch_connectivity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0426DCE6D600EC359F /* watch_connectivity.mm */; };
-		4B921B0926DCF07800EC359F /* core_motion.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0826DCF07800EC359F /* core_motion.m */; };
+		4B921B0926DCF07800EC359F /* core_motion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0826DCF07800EC359F /* core_motion.mm */; };
 		4B921B0C26DDE4B400EC359F /* core_location.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0B26DDE4B400EC359F /* core_location.m */; };
 		4B9304D32625A4AA005D9975 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
 		4B99658F25F715E3006AF9A5 /* hand_tracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDD2B725F36C0300070CB4 /* hand_tracking.mm */; };
 		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
-		4BA0DBF626B401360097C1F5 /* low_latency_tracking_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */; };
+		4BB1781E26EC845E008B6894 /* low_latency_tracking_api_naive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B16B10C26DB9EFC0016FFA0 /* low_latency_tracking_api_naive.mm */; };
 		4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* nfc_session.m */; };
 		4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		4BBDD2F025F397D200070CB4 /* test_input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B38244025E757D100B39EEB /* test_input.mm */; };
@@ -401,7 +401,7 @@
 		4B921B0326DCE6C600EC359F /* watch_connectivity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = watch_connectivity.h; sourceTree = "<group>"; };
 		4B921B0426DCE6D600EC359F /* watch_connectivity.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = watch_connectivity.mm; sourceTree = "<group>"; };
 		4B921B0726DCF06C00EC359F /* core_motion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_motion.h; sourceTree = "<group>"; };
-		4B921B0826DCF07800EC359F /* core_motion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = core_motion.m; sourceTree = "<group>"; };
+		4B921B0826DCF07800EC359F /* core_motion.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = core_motion.mm; sourceTree = "<group>"; };
 		4B921B0A26DDE4A600EC359F /* core_location.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_location.h; sourceTree = "<group>"; };
 		4B921B0B26DDE4B400EC359F /* core_location.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = core_location.m; sourceTree = "<group>"; };
 		4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = holokit_profile.mm; sourceTree = "<group>"; };
@@ -939,7 +939,7 @@
 				4B921B0326DCE6C600EC359F /* watch_connectivity.h */,
 				4B921B0426DCE6D600EC359F /* watch_connectivity.mm */,
 				4B921B0726DCF06C00EC359F /* core_motion.h */,
-				4B921B0826DCF07800EC359F /* core_motion.m */,
+				4B921B0826DCF07800EC359F /* core_motion.mm */,
 				4B921B0A26DDE4A600EC359F /* core_location.h */,
 				4B921B0B26DDE4B400EC359F /* core_location.m */,
 			);
@@ -2164,11 +2164,11 @@
 				4B260C9926368C280004B771 /* multipeer_session.m in Sources */,
 				4B8A528826CCDF96005D55C5 /* imu_process.cpp in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
-				4BA0DBF626B401360097C1F5 /* low_latency_tracking_api.mm in Sources */,
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
 				4B6C943B2614B69700CBDFB4 /* LandmarkPosition.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
-				4B921B0926DCF07800EC359F /* core_motion.m in Sources */,
+				4BB1781E26EC845E008B6894 /* low_latency_tracking_api_naive.mm in Sources */,
+				4B921B0926DCF07800EC359F /* core_motion.mm in Sources */,
 				4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,

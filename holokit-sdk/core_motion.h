@@ -23,7 +23,7 @@
 - (void)startDeviceMotion;
 - (void)stopDeviceMotion;
 
-+ (id)getSingletonInstance;
++ (id)sharedCoreMotion;
 
 @end
 

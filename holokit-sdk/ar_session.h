@@ -34,7 +34,7 @@
 @property (nonatomic, assign) simd_double3 appleWatchAngularVelocity;
 @property (nonatomic, strong, nullable) CADisplayLink *aDisplayLink;
 
-+ (id)getSingletonInstance;
++ (id)sharedARSession;
 - (void)updateWithHoloKitCollaborationData:(ARCollaborationData *) collaborationData;
 
 @end

@@ -77,6 +77,8 @@ void read_arkit_data() {
         
         arkit_data_queue.push_back(*data_ptr);
         data_queue.push_back(*data_ptr);
+        
+        std::cout << "ARKit data position: (" << arkit_data_ptr->position.x() << ", " << arkit_data_ptr->position.y() << ", " << arkit_data_ptr->position.z() << ") rotation: (" <<  arkit_data_ptr->rotation.w() << ", " << arkit_data_ptr->rotation.x() << ", " << arkit_data_ptr->rotation.y() << ", " << arkit_data_ptr->rotation.z() << ")" << std::endl;
     }
 }
 

@@ -238,7 +238,7 @@ public:
             }};
             
             if (device_id == kDeviceIdHoloKitHandLeft) {
-                HoloKitARSession* arSessionDelegateController = [HoloKitARSession getSingletonInstance];
+                HoloKitARSession* arSessionDelegateController = [HoloKitARSession sharedARSession];
 
                 if ([arSessionDelegateController.leftHandLandmarkPositions count] != 21){
                    //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
@@ -271,7 +271,7 @@ public:
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isRingFingerOpen);
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isPinkyFingerOpen);
             } else if (device_id == kDeviceIdHoloKitHandRight) {
-                HoloKitARSession* arSessionDelegateController = [HoloKitARSession getSingletonInstance];
+                HoloKitARSession* arSessionDelegateController = [HoloKitARSession sharedARSession];
 
                 if ([arSessionDelegateController.rightHandLandmarkPositions count] != 21){
                    //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
@@ -304,7 +304,7 @@ public:
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isPinkyFingerOpen);
             } else if (device_id == kDeviceIdHoloKitAppleWatch) {
                 
-                HoloKitARSession* arSessionDelegateController = [HoloKitARSession getSingletonInstance];
+                HoloKitARSession* arSessionDelegateController = [HoloKitARSession sharedARSession];
                 
                 bool is_tracked = arSessionDelegateController.appleWatchIsTracked;
                 input_->DeviceState_SetBinaryValue(state, feature_index++, is_tracked);
@@ -337,7 +337,7 @@ public:
                 //os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
                 
                 // TODO: low latency tracking - get predicted camera transform
-                HoloKitARSession* arSessionDelegateController = [HoloKitARSession getSingletonInstance];
+                HoloKitARSession* arSessionDelegateController = [HoloKitARSession sharedARSession];
                 //double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp];
                 double vsync_time_stamp = [[NSProcessInfo processInfo] systemUptime];
                 UnityXRVector3 position;

@@ -32,7 +32,7 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
             // We let Unity manually activate the session when needed.
             [self.wcSession activateSession];
    
-            HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion getSingletonInstance];
+            HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion sharedCoreMotion];
             [coreMotionInstance startDeviceMotion];
         }
     }
@@ -78,7 +78,7 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
 }
 
 - (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *,id> *)message {
-    if (id watchActionValue = [message objectForKey:@"WatchAction"]) {
+    if (id watchActionValue = [message objectForKey:@"WatchInput"]) {
         if (id watchPitchValue = [message objectForKey:@"WatchPitch"]) {
             if (id watchRollValue = [message objectForKey:@"WatchRoll"]) {
                 if (id watchYawValue = [message objectForKey:@"WatchYaw"]) {
@@ -86,7 +86,7 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
                     NSInteger watchPitch = [watchPitchValue integerValue];
                     NSInteger watchRoll = [watchRollValue integerValue];
                     NSInteger watchYaw = [watchYawValue integerValue];
-                    HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion getSingletonInstance];
+                    HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion sharedCoreMotion];
                     DidReceiveWatchActionMessageDelegate((int)watchActionIndex, (int)watchPitch, (int)watchRoll, (int)watchYaw, (int)Radians2Degrees(coreMotionInstance.currentDeviceMotion.attitude.yaw));
                 }
             }
@@ -134,4 +134,43 @@ UnityHoloKit_SetDidReceiveWatchActionMessageDelegate(DidReceiveWatchActionMessag
     DidReceiveWatchActionMessageDelegate = callback;
 }
 
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetIsReachable() {
+    return [[HoloKitWatchConnectivity getSingletonInstance] wcSession].isReachable;
+}
+
+/// This function is used for The Magic.
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SendMagicInfoMessage2Watch(int magicNum, const char **actionType, const char **gatherType, float gatherTime[]) {
+    WCSession *wcSession = [[HoloKitWatchConnectivity getSingletonInstance] wcSession];
+    if (wcSession.activationState != WCSessionActivationStateActivated) {
+        NSLog(@"[wc_session]: session is not activated.");
+        return;
+    }
+    for (int i = 0; i < magicNum; i++) {
+        
+    }
+    NSDictionary<NSString *, id> *message = @{ @"MagicInfo": @"3",
+                                               @"Magic1-ActionType": [NSString stringWithUTF8String:actionType[0]],
+                                               @"Magic1-GatherType": [NSString stringWithUTF8String:gatherType[0]],
+                                               @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTime[0]],
+                                               
+                                               @"Magic2-ActionType": [NSString stringWithUTF8String:actionType[1]],
+                                               @"Magic2-GatherType": [NSString stringWithUTF8String:gatherType[1]],
+                                               @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTime[1]],
+                                               
+                                               @"Magic3-ActionType": [NSString stringWithUTF8String:actionType[2]],
+                                               @"Magic3-GatherType": [NSString stringWithUTF8String:gatherType[2]],
+                                               @"Magic3-GatherTime": [NSString stringWithFormat:@"%f", gatherTime[2]]
+                                            };
+    
+    __block bool success = YES;
+    void (^errorHandler)(NSError *error) = ^void(NSError *error) {
+        NSLog(@"[wc_session]: Failed to send the watch reset message.");
+        success = NO;
+    };
+
+    // TODO: Should I also pass the replyHandler?
+    [wcSession sendMessage:message replyHandler:nil errorHandler:errorHandler];
+}
 } // extern "C"

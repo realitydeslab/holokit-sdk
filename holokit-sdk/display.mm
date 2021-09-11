@@ -137,8 +137,6 @@ public:
     
     void SetMtlInterface(IUnityGraphicsMetal* mtl_interface) { metal_interface_ = mtl_interface; }
     
-    void SetSecondDisplayColorBuffer(UnityRenderBuffer unity_render_buffer) { second_display_native_render_buffer_ptr_ = unity_render_buffer; }
-    
     ///@return A reference to the static instance of this singleton class.
     static std::unique_ptr<HoloKitDisplayProvider>& GetInstance();
 
@@ -224,17 +222,13 @@ public:
         RenderContent();
         RenderAlignmentMarker();
         
-//        if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable() && second_display_native_render_buffer_ptr_ != nullptr) {
-//          //  RenderToSecondDisplay();
-//        }
-        
-        HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession getSingletonInstance];
+        HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
         //NSLog(@"[ar_recorder]: writer status %ld", (long)ar_session_delegate_controller.recorder.writer.status);
-        if (ar_session_delegate_controller.isRecording) {
+        if (ar_session_instance.isRecording) {
             //CVPixelBufferRef pixelBuffer = [ARRecorder convertIOSurfaceRefToCVPixelBufferRef:metal_color_textures_[0].iosurface];
             CVPixelBufferRef pixelBuffer = [HoloKitARRecorder convertMTLTextureToCVPixelBufferRef:metal_color_textures_[1]];
             CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
-            [ar_session_delegate_controller.recorder insert:pixelBuffer with:time];
+            [ar_session_instance.recorder insert:pixelBuffer with:time];
             CVPixelBufferRelease(pixelBuffer);
         }
         
@@ -295,25 +289,6 @@ public:
         [mtl_render_command_encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip
                                        vertexStart:0
                                        vertexCount:4];
-    }
-
-    void RenderToSecondDisplay() {
-        NSLog(@"[display]: render to second display");
-        id<MTLRenderCommandEncoder> mtl_render_command_encoder =
-            (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        
-        MTLRenderPassDescriptor *mtl_render_pass_descriptor = metal_interface_->CurrentRenderPassDescriptor();
-        id<MTLTexture> original_texture = mtl_render_pass_descriptor.colorAttachments[0].texture;
-        // Force Metal to draw to the second display's color buffer.
-        mtl_render_pass_descriptor.colorAttachments[0].texture = metal_interface_->TextureFromRenderBuffer(second_display_native_render_buffer_ptr_);
-        
-        [mtl_render_command_encoder setRenderPipelineState:main_render_pipeline_state_];
-        [mtl_render_command_encoder setVertexBytes:main_vertices length:sizeof(main_vertices) atIndex:VertexInputIndexPosition];
-        [mtl_render_command_encoder setVertexBytes:main_uvs length:sizeof(main_uvs) atIndex:VertexInputIndexTexCoords];
-        [mtl_render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:FragmentInputIndexTexture];
-        //[mtl_render_command_encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
-        
-        mtl_render_pass_descriptor.colorAttachments[0].texture = original_texture;
     }
     
     void RenderAlignmentMarker() {
@@ -566,12 +541,6 @@ private:
     ///@brief Opaque Unity pointer type passed between plugins.
     UnitySubsystemHandle handle_;
     
-    ///@brief Tracks HoloKit API initialization status.
-    bool is_holokit_api_initialized_ = false;
-    
-    /// @brief HoloKit SDK API wrapper.
-    std::unique_ptr<holokit::HoloKitApi> holokit_api_;
-    
     /// @brief An array of UnityXRRenderTextureId.
     std::vector<UnityXRRenderTextureId> unity_textures_;
     
@@ -609,8 +578,6 @@ private:
     
     /// @brief Points to Metal interface.
     IUnityGraphicsMetal* metal_interface_;
-    
-    UnityRenderBuffer second_display_native_render_buffer_ptr_ = nullptr;
     
     static std::unique_ptr<HoloKitDisplayProvider> display_provider_;
 };
@@ -661,11 +628,6 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
 void UnloadDisplay() { holokit::HoloKitDisplayProvider::GetInstance().reset(); }
 
 extern "C" {
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(UnityRenderBuffer unity_render_buffer) {
-    holokit::HoloKitDisplayProvider::GetInstance()->SetSecondDisplayColorBuffer(unity_render_buffer);
-}
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetSetARCameraBackgroundDelegate(SetARCameraBackground callback) {

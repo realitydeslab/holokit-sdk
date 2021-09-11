@@ -226,7 +226,7 @@ typedef enum {
     // First try to decode the received data as ARCollaboration data.
     ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
     if (collaborationData != nil) {
-        [[HoloKitARSession getSingletonInstance] updateWithHoloKitCollaborationData:collaborationData];
+        [[HoloKitARSession sharedARSession] updateWithHoloKitCollaborationData:collaborationData];
         return;
     }
 
@@ -316,31 +316,31 @@ typedef enum {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerInit(const char* peerName, const char* serviceType, const char* gameName, const char* sessionName) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     ar_session_instance.multipeerSession = [[MultipeerSession alloc] initWithPeerName:[NSString stringWithUTF8String:peerName] serviceType:[NSString stringWithUTF8String:serviceType] gameName:[NSString stringWithUTF8String:gameName] sessionName:[NSString stringWithUTF8String:sessionName]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerStartBrowsing(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession startBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerStartAdvertising(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession startAdvertising];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerStopBrowsing(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession stopBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerStopAdvertising(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession stopAdvertising];
 }
 
@@ -351,7 +351,7 @@ UnityHoloKit_MultipeerStopAdvertising(void) {
 // https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerSendDataForMLAPI(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeerSession = ar_session_instance.multipeerSession;
     for (MCPeerID *peerId in multipeerSession.connectedPeersForMLAPI) {
         if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
@@ -379,7 +379,7 @@ UnityHoloKit_MultipeerSendDataForMLAPI(unsigned long clientId, unsigned char *da
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerSendPingMessage(unsigned long clientId) {
     //NSLog(@"send %@", [NSThread currentThread]);
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeerSession = ar_session_instance.multipeerSession;
     for (MCPeerID *peerId in multipeerSession.connectedPeersForMLAPI) {
         if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
@@ -396,7 +396,7 @@ UnityHoloKit_MultipeerSendPingMessage(unsigned long clientId) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerDisconnectForMLAPI(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeer_session = ar_session_instance.multipeerSession;
     
     [multipeer_session.mcSession disconnect];
@@ -405,7 +405,7 @@ UnityHoloKit_MultipeerDisconnectForMLAPI(void) {
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerDisconnectPeerForMLAPI(unsigned long clientId) {
-    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeer_session = ar_session_delegate_controller.multipeerSession;
     if (![multipeer_session isHost]) {
         return;
@@ -426,7 +426,7 @@ UnityHoloKit_MultipeerDisconnectPeerForMLAPI(unsigned long clientId) {
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeer_session = ar_session_instance.multipeerSession;
     if (![multipeer_session isHost]) {
         return;
@@ -443,7 +443,7 @@ UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI(void) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MultipeerShutdown(void) {
     UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI();
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession.mcSession disconnect];
     ar_session_instance.multipeerSession = nil;
 }

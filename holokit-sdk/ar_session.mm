@@ -28,6 +28,7 @@
 
 #import "low-latency-tracking/low_latency_tracking_api.h"
 #import "holokit_api.h"
+#import "core_motion.h"
 
 #define CLAMP(x, low, high) ({\
 __typeof__(x) __x = (x); \
@@ -114,7 +115,7 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
     //NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
 }
 
-+ (id) getSingletonInstance {
++ (id)sharedARSession {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -123,7 +124,7 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
     return _sharedObject;
 }
 
-- (void)updateWithHoloKitCollaborationData:(ARCollaborationData *) collaborationData {
+- (void)updateWithHoloKitCollaborationData:(ARCollaborationData *)collaborationData {
     [self.arSession updateWithCollaborationData:collaborationData];
 }
 
@@ -139,7 +140,10 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         NSLog(@"[ar_session]: AR session started.");
         self.arSession = session;
         
-        //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
+        holokit::LowLatencyTrackingApi::GetInstance()->Activate();
+        //[[HoloKitCoreMotion sharedCoreMotion] startAccelerometer];
+        //[[HoloKitCoreMotion sharedCoreMotion] startGyroscope];
+        [[HoloKitCoreMotion sharedCoreMotion] startDeviceMotion];
     }
     
     holokit::ARKitData data = { frame.timestamp,
@@ -622,7 +626,7 @@ UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
     }
     
     ARSession* sessionPtr = (__bridge ARSession*) ar_native_session->sessionPtr;
-    HoloKitARSession* ar_session_instance = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     ar_session_instance.unityARSessionDelegate = sessionPtr.delegate;
     
     //[session setDelegate:HoloKitARSession.getSingletonInstance];
@@ -631,7 +635,7 @@ UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_EnableHandTracking(bool enabled) {
-    HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_handler = [HoloKitARSession sharedARSession];
     ar_session_handler.isHandTrackingEnabled = enabled;
     NSLog(@"[ar_session]: EnableHandTracking(%d)", enabled);
 }
@@ -640,7 +644,7 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     
-    HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_handler = [HoloKitARSession sharedARSession];
     [ar_session_handler.arSession setWorldOrigin:(transform_matrix)];
 }
 
@@ -649,13 +653,13 @@ UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float r
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithUTF8String:anchorName] transform:transform_matrix];
     
-    HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_handler = [HoloKitARSession sharedARSession];
     [ar_session_handler.arSession addAnchor:anchor];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetHandTrackingInterval(int val) {
-    HoloKitARSession* ar_session_handler = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_handler = [HoloKitARSession sharedARSession];
     [ar_session_handler setHandPosePredictionInterval:val];
 }
 
@@ -666,13 +670,13 @@ UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_StartRecording() {
-    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession sharedARSession];
     ar_session_delegate_controller.isRecording = YES;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_FinishRecording() {
-    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession getSingletonInstance];
+    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession sharedARSession];
     ar_session_delegate_controller.isRecording = NO;
     [ar_session_delegate_controller.recorder end];
 }

@@ -6,6 +6,8 @@
 //
 
 #import "core_motion.h"
+#import "low-latency-tracking/low_latency_tracking_api.h"
+#import "math_helpers.h"
 
 @interface HoloKitCoreMotion()
 
@@ -35,7 +37,7 @@
     return self;
 }
 
-+ (id)getSingletonInstance {
++ (id)sharedCoreMotion {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -49,6 +51,9 @@
         self.motionManager.accelerometerUpdateInterval = self.accelUpdateInterval;
         [self.motionManager startAccelerometerUpdatesToQueue:self.accelGyroQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
             self.currentAccelData = accelerometerData;
+            
+            holokit::AccelerometerData data = { accelerometerData.timestamp, CMAccelerationToEigenVector3d(accelerometerData.acceleration) };
+            holokit::LowLatencyTrackingApi::GetInstance()->OnAccelerometerDataUpdated(data);
         }];
     }
 }
@@ -64,6 +69,9 @@
         self.motionManager.gyroUpdateInterval = self.gyroUpdateInterval;
         [self.motionManager startGyroUpdatesToQueue:self.accelGyroQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
             self.currentGyroData = gyroData;
+            
+            holokit::GyroData data = { gyroData.timestamp,  CMRotationRateToEigenVector3d(gyroData.rotationRate) };
+            holokit::LowLatencyTrackingApi::GetInstance()->OnGyroDataUpdated(data);
         }];
     }
 }
@@ -79,6 +87,9 @@
         self.motionManager.deviceMotionUpdateInterval = self.deviceMotionUpdateInterval;
         [self.motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXMagneticNorthZVertical toQueue:self.deviceMotionQueue withHandler:^(CMDeviceMotion *deviceMotion, NSError *error) {
             self.currentDeviceMotion = deviceMotion;
+            
+            holokit::GyroData data = { deviceMotion.timestamp,  CMRotationRateToEigenVector3d(deviceMotion.rotationRate) };
+            holokit::LowLatencyTrackingApi::GetInstance()->OnGyroDataUpdated(data);
         }];
     }
 }

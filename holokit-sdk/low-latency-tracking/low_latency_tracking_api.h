@@ -92,13 +92,13 @@ private:
     
     std::mutex arkit_mtx_;
     
-    bool is_active_ = false;
+    bool is_active_ = true;
     
     bool is_filtering_gyro_ = true;
     
     bool is_filtering_acc_ = true;
 
-    bool is_llt_open_ = false;
+    bool is_llt_open_ = true;
 
     // for Interpolation
     AccelerometerData cur_acc;
