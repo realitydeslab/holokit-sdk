@@ -336,19 +336,14 @@ public:
         // If this is the first frame for stereoscopic rendering mode.
         if (allocate_new_textures_) {
             DestroyTextures();
-            int num_textures = 1 + 1;
+            int num_textures = 1;
             CreateTextures(num_textures);
             allocate_new_textures_ = false;
         }
         
         if (!holokit::HoloKitApi::GetInstance()->SinglePassRendering())
         {
-            
-            if (holokit::HoloKitApi::GetInstance()->IsSecondDisplayAvailable()) {
-                next_frame->renderPassesCount = NUM_RENDER_PASSES + 1;
-            } else {
-                next_frame->renderPassesCount = NUM_RENDER_PASSES;
-            }
+            next_frame->renderPassesCount = NUM_RENDER_PASSES;
             
             for (int pass = 0; pass < next_frame->renderPassesCount; ++pass)
             {

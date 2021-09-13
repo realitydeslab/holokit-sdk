@@ -87,9 +87,6 @@
         self.motionManager.deviceMotionUpdateInterval = self.deviceMotionUpdateInterval;
         [self.motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXMagneticNorthZVertical toQueue:self.deviceMotionQueue withHandler:^(CMDeviceMotion *deviceMotion, NSError *error) {
             self.currentDeviceMotion = deviceMotion;
-            
-            holokit::GyroData data = { deviceMotion.timestamp,  CMRotationRateToEigenVector3d(deviceMotion.rotationRate) };
-            holokit::LowLatencyTrackingApi::GetInstance()->OnGyroDataUpdated(data);
         }];
     }
 }
