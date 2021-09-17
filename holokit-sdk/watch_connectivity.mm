@@ -150,7 +150,7 @@ UnityHoloKit_SendMagicInfoMessage2Watch(int magicNum, const char **actionType, c
     for (int i = 0; i < magicNum; i++) {
         
     }
-    NSDictionary<NSString *, id> *message = @{ @"MagicInfo": @"3",
+    NSDictionary<NSString *, id> *message = @{ @"MagicInfo": @"2",
                                                @"Magic1-ActionType": [NSString stringWithUTF8String:actionType[0]],
                                                @"Magic1-GatherType": [NSString stringWithUTF8String:gatherType[0]],
                                                @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTime[0]],
@@ -158,10 +158,6 @@ UnityHoloKit_SendMagicInfoMessage2Watch(int magicNum, const char **actionType, c
                                                @"Magic2-ActionType": [NSString stringWithUTF8String:actionType[1]],
                                                @"Magic2-GatherType": [NSString stringWithUTF8String:gatherType[1]],
                                                @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTime[1]],
-                                               
-                                               @"Magic3-ActionType": [NSString stringWithUTF8String:actionType[2]],
-                                               @"Magic3-GatherType": [NSString stringWithUTF8String:gatherType[2]],
-                                               @"Magic3-GatherTime": [NSString stringWithFormat:@"%f", gatherTime[2]]
                                             };
     
     __block bool success = YES;

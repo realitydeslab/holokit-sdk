@@ -5,19 +5,20 @@
 //  Created by Yuchen on 2021/3/29.
 //
 
-#include <memory>
-#include <iostream>
+#import <memory>
+#import <iostream>
 
 #import <os/log.h>
 #import <os/signpost.h>
 
-#include "load.h"
-#include "IUnityInterface.h"
-#include "IUnityXRTrace.h"
-#include "IUnityXRInput.h"
-#include "math_helpers.h"
-#include "holokit_api.h"
-#include "low-latency-tracking/low_latency_tracking_api.h"
+#import "load.h"
+#import "IUnityInterface.h"
+#import "IUnityXRTrace.h"
+#import "IUnityXRInput.h"
+#import "math_helpers.h"
+#import "holokit_api.h"
+#import "low-latency-tracking/low_latency_tracking_api.h"
+#import "hand_tracking.h"
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_INPUT_XR_TRACE_LOG(trace, message, ...)                \
@@ -238,26 +239,26 @@ public:
             }};
             
             if (device_id == kDeviceIdHoloKitHandLeft) {
-                HoloKitARSession* arSessionDelegateController = [HoloKitARSession sharedARSession];
+                HoloKitHandTracker* hand_tracker = [HoloKitHandTracker sharedHandTracker];
 
-                if ([arSessionDelegateController.leftHandLandmarkPositions count] != 21){
+                if ([hand_tracker.leftHandLandmarkPositions count] != 21){
                    //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
                    return kUnitySubsystemErrorCodeSuccess;
                 }
 
                 for (int i = 0; i < 21; i++) {
-                  UnityXRVector3 position = {arSessionDelegateController.leftHandLandmarkPositions[i].x, arSessionDelegateController.leftHandLandmarkPositions[i].y, arSessionDelegateController.leftHandLandmarkPositions[i].z};
+                  UnityXRVector3 position = {hand_tracker.leftHandLandmarkPositions[i].x, hand_tracker.leftHandLandmarkPositions[i].y, hand_tracker.leftHandLandmarkPositions[i].z};
                   input_->DeviceState_SetBoneValue(state, feature_index++, UnityXRBone {.parentBoneIndex = parent_bone_index[i], .position = position, .rotation = {0, 0, 0, 1}});
                 }
 
                 input_->DeviceState_SetHandValue(state, feature_index++, hand);
 
                 // Is Tracked
-                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.isLeftHandTracked);
+                input_->DeviceState_SetBinaryValue(state, feature_index++, hand_tracker.isLeftHandTracked);
                 input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
                 // Primary button
                 //NSLog(@"hahaha: %d", arSessionDelegateController.primaryButtonValues[0]);
-                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.primaryButtonLeft);
+                input_->DeviceState_SetBinaryValue(state, feature_index++, hand_tracker.primaryButtonLeft);
                 
                 bool isThumbFingerOpen = false;
                 bool isIndexFingerOpen = true;
@@ -271,25 +272,25 @@ public:
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isRingFingerOpen);
                 input_->DeviceState_SetBinaryValue(state, feature_index++, isPinkyFingerOpen);
             } else if (device_id == kDeviceIdHoloKitHandRight) {
-                HoloKitARSession* arSessionDelegateController = [HoloKitARSession sharedARSession];
+                HoloKitHandTracker* hand_tracker = [HoloKitHandTracker sharedHandTracker];
 
-                if ([arSessionDelegateController.rightHandLandmarkPositions count] != 21){
+                if ([hand_tracker.rightHandLandmarkPositions count] != 21){
                    //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
                    return kUnitySubsystemErrorCodeSuccess;
                 }
 
                 for (int i = 0; i < 21; i++) {
-                  UnityXRVector3 position = {arSessionDelegateController.rightHandLandmarkPositions[i].x, arSessionDelegateController.rightHandLandmarkPositions[i].y, arSessionDelegateController.rightHandLandmarkPositions[i].z};
+                  UnityXRVector3 position = {hand_tracker.rightHandLandmarkPositions[i].x, hand_tracker.rightHandLandmarkPositions[i].y, hand_tracker.rightHandLandmarkPositions[i].z};
                   input_->DeviceState_SetBoneValue(state, feature_index++, UnityXRBone {.parentBoneIndex = parent_bone_index[i], .position = position, .rotation = {0, 0, 0, 1}});
                 }
 
                 input_->DeviceState_SetHandValue(state, feature_index++, hand);
 
                 //Is Tracked
-                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.isRightHandTracked);
+                input_->DeviceState_SetBinaryValue(state, feature_index++, hand_tracker.isRightHandTracked);
                 input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
                 // Primary button
-                input_->DeviceState_SetBinaryValue(state, feature_index++, arSessionDelegateController.primaryButtonRight);
+                input_->DeviceState_SetBinaryValue(state, feature_index++, hand_tracker.primaryButtonRight);
                 
                 bool isThumbFingerOpen = false;
                 bool isIndexFingerOpen = false;

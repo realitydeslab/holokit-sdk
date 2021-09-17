@@ -5,10 +5,11 @@
 //  Created by Yuchen on 2021/3/29.
 //
 
-#include "holokit_api.h"
-#include "IUnityInterface.h"
-#include <sys/utsname.h>
+#import "holokit_api.h"
+#import "IUnityInterface.h"
+#import <sys/utsname.h>
 #import "display.mm"
+#import "hand_tracking.h"
 
 const float kUserInterpupillaryDistance = 0.064;
 
@@ -27,7 +28,7 @@ void HoloKitApi::Initialize() {
     if ([device_name_ isEqualToString:@"iPhone13,3"] == NO &&
         [device_name_ isEqualToString:@"iPhone13,4"] == NO) {
         NSLog(@"[HoloKitApi]: the phone type does not support hand tracking.");
-        ar_session_handler_.isHandTrackingEnabled = NO;
+        [[HoloKitHandTracker sharedHandTracker] setIsHandTrackingEnabled:NO];
     } else {
         NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
     }

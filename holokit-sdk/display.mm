@@ -201,13 +201,11 @@ public:
         // Does the system use multi-pass rendering?
         rendering_caps->noSinglePassRenderingSupport = false;
         rendering_caps->invalidateRenderStateAfterEachCallback = true;
-        // Unity will swap buffers for us after GfxThread_SubmitCurrentFrame()
-        // is executed.
+        // Unity will swap buffers for us after GfxThread_SubmitCurrentFrame() is executed.
         rendering_caps->skipPresentToMainScreen = false;
         
         allocate_new_textures_ = true;
         is_first_frame_ = true;
-        //holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(true);
         if (holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(false);
         }
@@ -330,6 +328,7 @@ public:
             
         // We interrupt the graphics thread if it is not manually opened by SDK.
         if (!holokit::HoloKitApi::GetInstance()->StereoscopicRendering()) {
+            NSLog(@"[display]: Manually shut down display subsystem.");
             return kUnitySubsystemErrorCodeFailure;
         }
         
@@ -345,11 +344,41 @@ public:
         {
             next_frame->renderPassesCount = NUM_RENDER_PASSES;
             
+            // Iterate through each render pass.
             for (int pass = 0; pass < next_frame->renderPassesCount; ++pass)
             {
                 auto& render_pass = next_frame->renderPasses[pass];
                 
-                if (pass == 2) {
+                if (pass < 2) {
+                    // The first two passes for stereo rendering.
+                    render_pass.textureId = unity_textures_[0];
+
+                    render_pass.renderParamsCount = 1;
+                    // Both passes share the same set of culling parameters.
+                    render_pass.cullingPassIndex = pass;
+
+                    auto& render_params = render_pass.renderParams[0];
+                    // Render a black image in the first frame to avoid left viewport glitch.
+                    if (is_first_frame_) {
+                        UnityXRVector3 sky_position = UnityXRVector3 { 0, 999, 0 };
+                        UnityXRVector4 sky_rotation = UnityXRVector4 { 0, 0, 0, 1 };
+                        UnityXRPose sky_pose = { sky_position, sky_rotation };
+                        render_params.deviceAnchorToEyePose = sky_pose;
+                        is_first_frame_ = false;
+                    } else {
+                        render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
+                    }
+                    render_params.projection.type = kUnityXRProjectionTypeMatrix;
+                    render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
+                    render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
+                    
+                    // Do culling for each eye seperately.
+                    auto& culling_pass = next_frame->cullingPasses[pass];
+                    culling_pass.separation = 0.064f;
+                    culling_pass.deviceAnchorToCullingPose = next_frame->renderPasses[pass].renderParams[0].deviceAnchorToEyePose;
+                    culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
+                    culling_pass.projection.data.matrix = next_frame->renderPasses[pass].renderParams[0].projection.data.matrix;
+                } else {
                     // The extra pass for the invisible AR camera.
                     render_pass.textureId = unity_textures_[1];
                     //NSLog(@"texture id: %u", unity_textures_[1]);
@@ -370,35 +399,8 @@ public:
                         1.0f,                    // width
                         1.0f                     // height
                     };
-                } else {
-                    // The first two passes for stereo rendering.
-                    render_pass.textureId = unity_textures_[0];
-
-                    render_pass.renderParamsCount = 1;
-                    // Both passes share the same set of culling parameters.
-                    render_pass.cullingPassIndex = 0;
-
-                    auto& render_params = render_pass.renderParams[0];
-                    // Render a black image in the first frame to avoid left viewport glitch.
-                    if (is_first_frame_) {
-                        UnityXRVector3 sky_position = UnityXRVector3 { 0, 999, 0 };
-                        UnityXRVector4 sky_rotation = UnityXRVector4 { 0, 0, 0, 1 };
-                        UnityXRPose sky_pose = { sky_position, sky_rotation };
-                        render_params.deviceAnchorToEyePose = sky_pose;
-                        is_first_frame_ = false;
-                    } else {
-                        render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
-                    }
-                    render_params.projection.type = kUnityXRProjectionTypeMatrix;
-                    render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
-                    render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
                 }
             }
-            auto& culling_pass = next_frame->cullingPasses[0];
-            culling_pass.separation = 0.064f;
-            culling_pass.deviceAnchorToCullingPose = next_frame->renderPasses[0].renderParams[0].deviceAnchorToEyePose;
-            culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-            culling_pass.projection.data.matrix = next_frame->renderPasses[0].renderParams[0].projection.data.matrix;
         }
         else
         {
