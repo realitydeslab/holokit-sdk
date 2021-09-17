@@ -40,9 +40,6 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         //[aDisplayLink setFrameInterval:animationFrameInterval];
         [self.aDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
-        self.recorder = [[HoloKitARRecorder alloc] init];
-        self.isRecording = NO;
-        
         self.appleWatchIsTracked = NO;
     }
     return self;
@@ -208,19 +205,6 @@ UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float r
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
     ARWorldMapSyncedDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StartRecording() {
-    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession sharedARSession];
-    ar_session_delegate_controller.isRecording = YES;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_FinishRecording() {
-    HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession sharedARSession];
-    ar_session_delegate_controller.isRecording = NO;
-    [ar_session_delegate_controller.recorder end];
 }
 
 } // extern "C"

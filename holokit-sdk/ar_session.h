@@ -15,8 +15,6 @@
 @property (nonatomic, strong, nullable) ARSession* arSession;
 @property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
 @property (nonatomic, strong, nullable) MultipeerSession *multipeerSession;
-@property (nonatomic, strong, nullable) HoloKitARRecorder *recorder;
-@property (assign) bool isRecording;
 // For Apple Watch input device
 @property (assign) bool appleWatchIsTracked;
 @property (nonatomic, assign) simd_quatd appleWatchRotation;

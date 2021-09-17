@@ -14,6 +14,7 @@
 @property (nonatomic, strong) AVAssetWriterInput *writerInput;
 @property (nonatomic, strong) AVAssetWriterInputPixelBufferAdaptor *writerInputPixelBufferAdaptor;
 
++ (id)sharedARRecorder;
 - (NSURL *)newVideoPath;
 - (void)insert:(CVPixelBufferRef)buffer with:(CMTime)time;
 - (void)end;

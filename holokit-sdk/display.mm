@@ -220,15 +220,15 @@ public:
         RenderContent();
         RenderAlignmentMarker();
         
-        HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
+//        HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
         //NSLog(@"[ar_recorder]: writer status %ld", (long)ar_session_delegate_controller.recorder.writer.status);
-        if (ar_session_instance.isRecording) {
-            //CVPixelBufferRef pixelBuffer = [ARRecorder convertIOSurfaceRefToCVPixelBufferRef:metal_color_textures_[0].iosurface];
-            CVPixelBufferRef pixelBuffer = [HoloKitARRecorder convertMTLTextureToCVPixelBufferRef:metal_color_textures_[1]];
-            CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
-            [ar_session_instance.recorder insert:pixelBuffer with:time];
-            CVPixelBufferRelease(pixelBuffer);
-        }
+//        if (ar_session_instance.isRecording) {
+//            //CVPixelBufferRef pixelBuffer = [ARRecorder convertIOSurfaceRefToCVPixelBufferRef:metal_color_textures_[0].iosurface];
+//            CVPixelBufferRef pixelBuffer = [HoloKitARRecorder convertMTLTextureToCVPixelBufferRef:metal_color_textures_[1]];
+//            CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
+//            [ar_session_instance.recorder insert:pixelBuffer with:time];
+//            CVPixelBufferRelease(pixelBuffer);
+//        }
         
         return kUnitySubsystemErrorCodeSuccess;
     }

@@ -46,31 +46,31 @@ static const float kMaxLandmarkEndInterval = 0.024f;
         //        [self.handTracker startGraph];
         //        self.handTrackingQueue = [[NSOperationQueue alloc] init];
         //        self.handTrackingQueue.qualityOfService = NSQualityOfServiceUserInteractive;
-                
-                // Vision hand tracking
-                //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
-                // TODO: This value can be changed to one to save performance.
-                //self.handPoseRequest.maximumHandCount = 2;
-                //self.handPoseRequest.revision = VNDetectHumanHandPoseRequestRevision1;
-                
-                self.frameCount = 0;
-                self.handPosePredictionInterval = 8;
-                
-                self.leftHandLandmarkPositions = [[NSMutableArray alloc] init];
-                self.rightHandLandmarkPositions = [[NSMutableArray alloc] init];
-                for(int i = 0; i < 21; i++){
-                    LandmarkPosition *position = [[LandmarkPosition alloc] initWithX:0.0 y:0.0 z:0.0];
-                    [self.leftHandLandmarkPositions addObject:position];
-                    [self.rightHandLandmarkPositions addObject:position];
-                }
-                
-                self.isLeftHandTracked = false;
-                self.isRightHandTracked = false;
-                self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
-                // MODIFY HERE
-                self.isHandTrackingEnabled = YES;
-                self.primaryButtonLeft = NO;
-                self.primaryButtonRight = NO;
+        
+        // Vision hand tracking
+        //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
+        // TODO: This value can be changed to one to save performance.
+        //self.handPoseRequest.maximumHandCount = 2;
+        //self.handPoseRequest.revision = VNDetectHumanHandPoseRequestRevision1;
+        
+        self.frameCount = 0;
+        self.handPosePredictionInterval = 8;
+        
+        self.leftHandLandmarkPositions = [[NSMutableArray alloc] init];
+        self.rightHandLandmarkPositions = [[NSMutableArray alloc] init];
+        for(int i = 0; i < 21; i++){
+            LandmarkPosition *position = [[LandmarkPosition alloc] initWithX:0.0 y:0.0 z:0.0];
+            [self.leftHandLandmarkPositions addObject:position];
+            [self.rightHandLandmarkPositions addObject:position];
+        }
+        
+        self.isLeftHandTracked = false;
+        self.isRightHandTracked = false;
+        self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
+        // MODIFY HERE
+        self.isHandTrackingEnabled = YES;
+        self.primaryButtonLeft = NO;
+        self.primaryButtonRight = NO;
     }
     return self;
 }

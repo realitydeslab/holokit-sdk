@@ -7,6 +7,7 @@
 
 #import "ar_recorder.h"
 #import "holokit_api.h"
+#import "IUnityInterface.h"
 
 @interface HoloKitARRecorder()
 
@@ -62,6 +63,15 @@
         self.isRecordingFinished = NO;
     }
     return self;
+}
+
++ (id)sharedARRecorder {
+    static dispatch_once_t onceToken = 0;
+    static id _sharedObject = nil;
+    dispatch_once(&onceToken, ^{
+        _sharedObject = [[self alloc] init];
+    });
+    return _sharedObject;
 }
 
 - (NSURL *)newVideoPath {
@@ -158,3 +168,20 @@
 }
 
 @end
+
+extern "C" {
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_StartRecording() {
+    HoloKitARRecorder* ar_recorder = [HoloKitARRecorder sharedARRecorder];
+//    ar_recorder.isRecording = YES;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_FinishRecording() {
+    HoloKitARRecorder* ar_recorder = [HoloKitARRecorder sharedARRecorder];
+//    ar_recorder.isRecording = NO;
+    [ar_recorder end];
+}
+
+}
