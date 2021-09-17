@@ -64,6 +64,15 @@
     return self;
 }
 
++ (id)sharedSpeechRecognizer {
+    static dispatch_once_t onceToken = 0;
+    static id _sharedObject = nil;
+    dispatch_once(&onceToken, ^{
+        _sharedObject = [[self alloc] init];
+    });
+    return _sharedObject;
+}
+
 - (void)startRecording {
     if (!self.isReadyToRecord) {
         NSLog(@"[speech_recognizer]: speech recognition is not ready.");

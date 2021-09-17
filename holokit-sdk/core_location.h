@@ -20,7 +20,7 @@
 
 - (void)stopUpdatingHeading;
 
-+ (id)getSingletonInstance;
++ (id)sharedCoreLocation;
 
 @end
 

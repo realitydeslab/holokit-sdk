@@ -11,6 +11,7 @@
 
 @property(nonatomic, assign) BOOL isReadyToRecord;
 
++ (id)sharedSpeechRecognizer;
 - (void)startRecording;
 - (void)stopRecording;
 

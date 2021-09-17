@@ -48,7 +48,7 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
     }
 }
 
-+ (id)getSingletonInstance {
++ (id)sharedWatchConnectivity {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -115,12 +115,12 @@ extern "C" {
 // You need to manually init WCSession in Unity.
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_InitWatchConnectivitySession() {
-    [HoloKitWatchConnectivity getSingletonInstance];
+    [HoloKitWatchConnectivity sharedWatchConnectivity];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendMessage2Watch(const char *messageType, int index) {
-    HoloKitWatchConnectivity *instance = [HoloKitWatchConnectivity getSingletonInstance];
+    HoloKitWatchConnectivity *instance = [HoloKitWatchConnectivity sharedWatchConnectivity];
     [instance sendMessage2WatchWithMessageType:[NSString stringWithUTF8String:messageType] messageIndex:index];
 }
 
@@ -136,13 +136,13 @@ UnityHoloKit_SetDidReceiveWatchActionMessageDelegate(DidReceiveWatchActionMessag
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetIsReachable() {
-    return [[HoloKitWatchConnectivity getSingletonInstance] wcSession].isReachable;
+    return [[HoloKitWatchConnectivity sharedWatchConnectivity] wcSession].isReachable;
 }
 
 /// This function is used for The Magic.
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendMagicInfoMessage2Watch(int magicNum, const char **actionType, const char **gatherType, float gatherTime[]) {
-    WCSession *wcSession = [[HoloKitWatchConnectivity getSingletonInstance] wcSession];
+    WCSession *wcSession = [[HoloKitWatchConnectivity sharedWatchConnectivity] wcSession];
     if (wcSession.activationState != WCSessionActivationStateActivated) {
         NSLog(@"[wc_session]: session is not activated.");
         return;
