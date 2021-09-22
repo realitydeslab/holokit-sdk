@@ -33,6 +33,7 @@
 		4B38248225E77F8500B39EEB /* MathHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6AD99B25E34404008F9911 /* MathHelper.h */; };
 		4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */; };
 		4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B4431F926B7A1A000869815 /* ar_recorder.mm */; };
+		4B610F0B26F5C6CA00CB2AEA /* core_haptics.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */; };
 		4B66159525F39F9000CC4E81 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
 		4B6615A225F39FE000CC4E81 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		4B6615A425F39FED00CC4E81 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
@@ -352,6 +353,8 @@
 		4B4431F826B7A19000869815 /* ar_recorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_recorder.h; sourceTree = "<group>"; };
 		4B4431F926B7A1A000869815 /* ar_recorder.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_recorder.mm; sourceTree = "<group>"; };
 		4B46940926B3C56C00DC960E /* low_latency_tracking_api.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = low_latency_tracking_api.h; sourceTree = "<group>"; };
+		4B610F0926F5C6BA00CB2AEA /* core_haptics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_haptics.h; sourceTree = "<group>"; };
+		4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = core_haptics.m; sourceTree = "<group>"; };
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		4B69FF3E26C611D200843FCF /* low-latency-tracking-api-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "low-latency-tracking-api-test"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -912,6 +915,8 @@
 				4B921B0B26DDE4B400EC359F /* core_location.m */,
 				4B188ACE26F432A4001FD67D /* hand_tracking.h */,
 				4B188ACF26F432B4001FD67D /* hand_tracking.mm */,
+				4B610F0926F5C6BA00CB2AEA /* core_haptics.h */,
+				4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -2129,6 +2134,7 @@
 				4B8A528826CCDF96005D55C5 /* imu_process.cpp in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
+				4B610F0B26F5C6CA00CB2AEA /* core_haptics.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4B188AD026F432B4001FD67D /* hand_tracking.mm in Sources */,
 				4BB1781E26EC845E008B6894 /* low_latency_tracking_api_naive.mm in Sources */,

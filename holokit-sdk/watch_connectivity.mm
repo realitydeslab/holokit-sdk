@@ -141,31 +141,51 @@ UnityHoloKit_GetIsReachable() {
 
 /// This function is used for The Magic.
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SendMagicInfoMessage2Watch(int magicNum, const char **actionType, const char **gatherType, float gatherTime[]) {
+UnityHoloKit_SendSetupMessage2Watch(int magicNum, const char **actionTypes, const char **gatherTypes, float gatherTimes[], float coolingDowns[]) {
     WCSession *wcSession = [[HoloKitWatchConnectivity sharedWatchConnectivity] wcSession];
     if (wcSession.activationState != WCSessionActivationStateActivated) {
         NSLog(@"[wc_session]: session is not activated.");
         return;
     }
-    for (int i = 0; i < magicNum; i++) {
-        
+    
+    NSDictionary<NSString *, id> *message = [[NSDictionary alloc] init];
+    if (magicNum == 2) {
+        message = @{ @"Setup": @"2",
+                     @"Magic1-ActionType": [NSString stringWithUTF8String:actionTypes[0]],
+                     @"Magic1-GatherType": [NSString stringWithUTF8String:gatherTypes[0]],
+                     @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[0]],
+                     @"Magic1-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[0]],
+                     
+                     @"Magic2-ActionType": [NSString stringWithUTF8String:actionTypes[1]],
+                     @"Magic2-GatherType": [NSString stringWithUTF8String:gatherTypes[1]],
+                     @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[1]],
+                     @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]]
+        };
+    } else if (magicNum == 3) {
+        message = @{ @"Setup": @"3",
+                     @"Magic1-ActionType": [NSString stringWithUTF8String:actionTypes[0]],
+                     @"Magic1-GatherType": [NSString stringWithUTF8String:gatherTypes[0]],
+                     @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[0]],
+                     @"Magic1-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[0]],
+                     
+                     @"Magic2-ActionType": [NSString stringWithUTF8String:actionTypes[1]],
+                     @"Magic2-GatherType": [NSString stringWithUTF8String:gatherTypes[1]],
+                     @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[1]],
+                     @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]],
+                     
+                     @"Magic3-ActionType": [NSString stringWithUTF8String:actionTypes[2]],
+                     @"Magic3-GatherType": [NSString stringWithUTF8String:gatherTypes[2]],
+                     @"Magic3-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[2]],
+                     @"Magic3-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[2]]
+        };
     }
-    NSDictionary<NSString *, id> *message = @{ @"MagicInfo": @"2",
-                                               @"Magic1-ActionType": [NSString stringWithUTF8String:actionType[0]],
-                                               @"Magic1-GatherType": [NSString stringWithUTF8String:gatherType[0]],
-                                               @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTime[0]],
-                                               
-                                               @"Magic2-ActionType": [NSString stringWithUTF8String:actionType[1]],
-                                               @"Magic2-GatherType": [NSString stringWithUTF8String:gatherType[1]],
-                                               @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTime[1]],
-                                            };
     
     __block bool success = YES;
     void (^errorHandler)(NSError *error) = ^void(NSError *error) {
         NSLog(@"[wc_session]: Failed to send the watch reset message.");
         success = NO;
     };
-
+    
     // TODO: Should I also pass the replyHandler?
     [wcSession sendMessage:message replyHandler:nil errorHandler:errorHandler];
 }

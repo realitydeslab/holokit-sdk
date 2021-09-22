@@ -142,7 +142,7 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
     }
     //NSLog(@"[ar_session]: didUpdateAnchors()");
 }
-
+    
 - (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didRemoveAnchors:anchors];
@@ -162,6 +162,54 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
     }
     NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:YES error:nil];
     [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+    
+//    if (data.priority == ARCollaborationDataPriorityCritical) {
+//        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+//    } else {
+//        //[self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+//    }
+    
+}
+
+#pragma mark - ARSessionObserver
+
+- (void)session:(ARSession *)session cameraDidChangeTrackingState:(ARCamera *)camera {
+    switch (camera.trackingState) {
+        case ARTrackingStateNotAvailable:
+            NSLog(@"[ar_session]: AR tracking state changed to not available.");
+            break;
+        case ARTrackingStateLimited:
+            NSLog(@"[ar_session]: AR tracking state changed to limited, and the reason is:");
+            switch(camera.trackingStateReason) {
+                case ARTrackingStateReasonNone:
+                    NSLog(@"[ar_session]: None");
+                    break;
+                case ARTrackingStateReasonInitializing:
+                    NSLog(@"[ar_session]: Initializing");
+                    break;
+                case ARTrackingStateReasonExcessiveMotion:
+                    NSLog(@"[ar_session]: Excessive motion");
+                    break;
+                case ARTrackingStateReasonInsufficientFeatures:
+                    NSLog(@"[ar_session]: Insufficient features");
+                    break;
+                case ARTrackingStateReasonRelocalizing:
+                    NSLog(@"[ar_session]: Relocalizing");
+                    break;
+            }
+            break;
+        case ARTrackingStateNormal:
+            NSLog(@"[ar_session]: AR tracking state changed to normal.");
+            break;
+    }
+}
+
+- (void)sessionWasInterrupted:(ARSession *)session {
+    NSLog(@"[ar_session]: session was interrupted.");
+}
+
+- (void)sessionInterruptionEnded:(ARSession *)session {
+    NSLog(@"[ar_session]: session interruption ended.");
 }
 
 @end
@@ -178,11 +226,10 @@ UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
     }
     
     ARSession* sessionPtr = (__bridge ARSession*) ar_native_session->sessionPtr;
-    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
-    ar_session_instance.unityARSessionDelegate = sessionPtr.delegate;
+    HoloKitARSession* ar_session = [HoloKitARSession sharedARSession];
+    ar_session.unityARSessionDelegate = sessionPtr.delegate;
     
-    //[session setDelegate:HoloKitARSession.getSingletonInstance];
-    [sessionPtr setDelegate:ar_session_instance];
+    [sessionPtr setDelegate:ar_session];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -198,8 +245,8 @@ UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float r
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithUTF8String:anchorName] transform:transform_matrix];
     
-    HoloKitARSession* ar_session_handler = [HoloKitARSession sharedARSession];
-    [ar_session_handler.arSession addAnchor:anchor];
+    HoloKitARSession* ar_session = [HoloKitARSession sharedARSession];
+    [ar_session.arSession addAnchor:anchor];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

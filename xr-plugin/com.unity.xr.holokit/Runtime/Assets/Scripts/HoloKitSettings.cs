@@ -50,6 +50,36 @@ namespace UnityEngine.XR.HoloKit
             get => UnityHoloKit_StereoscopicRendering();
         }
 
+        private int m_CurrentRenderPass = 0;
+
+        public int CurrentRenderPass
+        {
+            get => m_CurrentRenderPass;
+            set
+            {
+                m_CurrentRenderPass = value;
+            }
+        }
+
+        [SerializeField] private Transform m_CenterEyePoint;
+
+        [SerializeField] private GameObject m_SecondARReplayCamera;
+
+        public Camera ReplayCamera
+        {
+            get
+            {
+                if (StereoscopicRendering)
+                {
+                    return m_SecondARReplayCamera.GetComponent<Camera>();
+                }
+                else
+                {
+                    return Camera.main;
+                }
+            }
+        }
+
         [DllImport("__Internal")]
         private static extern bool UnityHoloKit_StereoscopicRendering();
 
@@ -73,12 +103,6 @@ namespace UnityEngine.XR.HoloKit
 
         [DllImport("__Internal")]
         private static extern bool UnityHoloKit_StartNfcSession();
-
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetSecondDisplayAvailable(bool value);
-
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetSecondDisplayNativeRenderBufferPtr(IntPtr nativeRenderBufferPtr);
 
         private void Awake()
         {
@@ -127,6 +151,12 @@ namespace UnityEngine.XR.HoloKit
             UnityHoloKit_SetSetARCameraBackgroundDelegate(OnSetARCameraBackground);
         }
 
+        private void Update()
+        {
+            // Reset this value at the beginning of each frame.
+            m_CurrentRenderPass = 0;
+        }
+
         public void EnableMeshing(bool enabled)
         {
             // We can only enable one of them at the same time.
@@ -155,8 +185,11 @@ namespace UnityEngine.XR.HoloKit
                 {
                     UnityHoloKit_SetStereoscopicRendering(true);
                     m_DisplaySubsystem.Start();
+
+                    m_CenterEyePoint.localPosition = m_CameraToCenterEyeOffset;
+                    //m_SecondARReplayCamera.SetActive(true);
                     return true;
-                }
+                }       
                 else
                 {
                     return false;
@@ -166,6 +199,9 @@ namespace UnityEngine.XR.HoloKit
             {
                 m_DisplaySubsystem.Stop();
                 UnityHoloKit_SetStereoscopicRendering(false);
+
+                m_CenterEyePoint.localPosition = Vector3.zero;
+                //m_SecondARReplayCamera.SetActive(false);
                 return true;
             }
         }
