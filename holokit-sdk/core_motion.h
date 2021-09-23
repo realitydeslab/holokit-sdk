@@ -16,11 +16,11 @@
 @property (nonatomic, strong) CMGyroData *currentGyroData;
 @property (nonatomic, strong) CMDeviceMotion *currentDeviceMotion;
 
-- (void)startAccelerometer;
+- (void)startAccelerometer:(void (^)(CMAccelerometerData *))handler;
 - (void)stopAccelerometer;
-- (void)startGyroscope;
+- (void)startGyroscope:(void (^)(CMGyroData *))handler;
 - (void)stopGyroscope;
-- (void)startDeviceMotion;
+- (void)startDeviceMotion:(void (^)(CMDeviceMotion *))handler;
 - (void)stopDeviceMotion;
 
 + (id)sharedCoreMotion;

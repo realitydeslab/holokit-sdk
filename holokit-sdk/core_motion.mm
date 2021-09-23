@@ -46,14 +46,12 @@
     return _sharedObject;
 }
 
-- (void)startAccelerometer {
+- (void)startAccelerometer:(void (^)(CMAccelerometerData *))handler {
     if ([self.motionManager isAccelerometerAvailable] && ![self.motionManager isAccelerometerActive]) {
         self.motionManager.accelerometerUpdateInterval = self.accelUpdateInterval;
         [self.motionManager startAccelerometerUpdatesToQueue:self.accelGyroQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
             self.currentAccelData = accelerometerData;
-            
-            holokit::AccelerometerData data = { accelerometerData.timestamp, CMAccelerationToEigenVector3d(accelerometerData.acceleration) };
-            holokit::LowLatencyTrackingApi::GetInstance()->OnAccelerometerDataUpdated(data);
+            handler(accelerometerData);
         }];
     }
 }
@@ -64,14 +62,12 @@
     }
 }
 
-- (void)startGyroscope {
+- (void)startGyroscope:(void (^)(CMGyroData *))handler {
     if ([self.motionManager isGyroAvailable] && ![self.motionManager isGyroActive]) {
         self.motionManager.gyroUpdateInterval = self.gyroUpdateInterval;
         [self.motionManager startGyroUpdatesToQueue:self.accelGyroQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
             self.currentGyroData = gyroData;
-            
-            holokit::GyroData data = { gyroData.timestamp,  CMRotationRateToEigenVector3d(gyroData.rotationRate) };
-            holokit::LowLatencyTrackingApi::GetInstance()->OnGyroDataUpdated(data);
+            handler(gyroData);
         }];
     }
 }
@@ -82,11 +78,12 @@
     }
 }
 
-- (void)startDeviceMotion {
+- (void)startDeviceMotion:(void (^)(CMDeviceMotion *))handler {
     if ([self.motionManager isDeviceMotionAvailable] && ![self.motionManager isDeviceMotionActive]) {
         self.motionManager.deviceMotionUpdateInterval = self.deviceMotionUpdateInterval;
         [self.motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXMagneticNorthZVertical toQueue:self.deviceMotionQueue withHandler:^(CMDeviceMotion *deviceMotion, NSError *error) {
             self.currentDeviceMotion = deviceMotion;
+            handler(deviceMotion);
         }];
     }
 }

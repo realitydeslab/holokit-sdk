@@ -338,7 +338,6 @@ public:
                 //os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
                 
                 // TODO: low latency tracking - get predicted camera transform
-                HoloKitARSession* arSessionDelegateController = [HoloKitARSession sharedARSession];
                 //double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp];
                 double vsync_time_stamp = [[NSProcessInfo processInfo] systemUptime];
                 UnityXRVector3 position;
@@ -346,9 +345,7 @@ public:
                 
                 Eigen::Vector3d eigen_position;
                 Eigen::Quaterniond eigen_rotation;
-                if(holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && holokit::LowLatencyTrackingApi::GetInstance()->IsActive() && holokit::LowLatencyTrackingApi::GetInstance()->GetPose(vsync_time_stamp, eigen_position, eigen_rotation) &&
-                    holokit::LowLatencyTrackingApi::GetInstance()->GetIsLltOpen()) {
-                    
+                if(holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && holokit::LowLatencyTrackingApi::GetInstance()->IsActive() && holokit::LowLatencyTrackingApi::GetInstance()->GetPose(vsync_time_stamp, eigen_position, eigen_rotation)) {
                     position = EigenVector3dToUnityXRVector3(eigen_position);
                     rotation = EigenQuaterniondToUnityXRVector4(eigen_rotation);
                 } else {

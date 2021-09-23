@@ -58,17 +58,13 @@ public:
     
     void InitEKF();
     
-    void Activate() { is_active_ = true; is_filtering_gyro_ = true; is_filtering_acc_ = true; };
+    void Activate();
     
-    void Deactivate() { is_active_ = false; }
+    void Deactivate();
 
     bool IsActive() { return is_active_; }
     
     void Clear();
-    
-    bool GetIsLltOpen() { return is_llt_open_; }
-    
-    void SetIsLltOpen(bool value) { is_llt_open_ = value; }
     
     void SetIsFilteringGyro(bool value) { is_filtering_gyro_ = value; }
     
@@ -93,8 +89,6 @@ private:
     std::mutex arkit_mtx_;
     
     bool is_active_ = false;
-    
-    bool is_llt_open_ = false;
     
     bool is_filtering_gyro_ = true;
     

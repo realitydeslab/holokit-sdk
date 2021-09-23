@@ -9,6 +9,8 @@
 #import <iostream>
 #import <Foundation/Foundation.h>
 #import "IUnityInterface.h"
+#import "core_motion.h"
+#import "math_helpers.h"
 
 namespace holokit {
 
@@ -24,6 +26,29 @@ std::unique_ptr<LowLatencyTrackingApi>& LowLatencyTrackingApi::GetInstance() {
 LowLatencyTrackingApi::LowLatencyTrackingApi()
 {
     
+}
+
+void LowLatencyTrackingApi::Activate() {
+    is_active_ = true;
+    is_filtering_gyro_ = true;
+    is_filtering_acc_ = true;
+    
+//    [[HoloKitCoreMotion sharedCoreMotion] startAccelerometer:^(CMAccelerometerData *accelerometerData) {
+//        holokit::AccelerometerData data = { accelerometerData.timestamp, CMAccelerationToEigenVector3d(accelerometerData.acceleration) };
+//        holokit::LowLatencyTrackingApi::GetInstance()->OnAccelerometerDataUpdated(data);
+//    }];
+    
+    [[HoloKitCoreMotion sharedCoreMotion] startGyroscope:^void (CMGyroData *gyroData) {
+        holokit::GyroData data = { gyroData.timestamp,  CMRotationRateToEigenVector3d(gyroData.rotationRate) };
+        holokit::LowLatencyTrackingApi::GetInstance()->OnGyroDataUpdated(data);
+    }];
+};
+
+void LowLatencyTrackingApi::Deactivate() {
+    is_active_ = false;
+    
+    [[HoloKitCoreMotion sharedCoreMotion] stopAccelerometer];
+    [[HoloKitCoreMotion sharedCoreMotion] stopGyroscope];
 }
 
 bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& position, Eigen::Quaterniond& rotation) {
@@ -129,6 +154,11 @@ void LowLatencyTrackingApi::Clear() {
 
 extern "C" {
 
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetLowLatencyTrackingApiActive() {
+    return holokit::LowLatencyTrackingApi::GetInstance()->IsActive();
+}
+
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetLowLatencyTrackingApiActive(bool value) {
     if (value) {
@@ -147,16 +177,5 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetIsFilteringAcc(bool value) {
     holokit::LowLatencyTrackingApi::GetInstance()->SetIsFilteringAcc(value);
 }
-
-bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetIsLltOpen() {
-    return holokit::LowLatencyTrackingApi::GetInstance()->GetIsLltOpen();
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetIsLltOpen(bool value) {
-    holokit::LowLatencyTrackingApi::GetInstance()->SetIsLltOpen(value);
-}
-
 
 }

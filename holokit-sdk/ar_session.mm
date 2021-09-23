@@ -75,16 +75,15 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         self.arSession = session;
         
         //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
-        //[[HoloKitCoreMotion sharedCoreMotion] startAccelerometer];
-        //[[HoloKitCoreMotion sharedCoreMotion] startGyroscope];
-        //[[HoloKitCoreMotion sharedCoreMotion] startDeviceMotion];
     }
     
-//    holokit::ARKitData data = { frame.timestamp,
-//        TransformToEigenVector3d(frame.camera.transform),
-//        TransformToEigenQuaterniond(frame.camera.transform),
-//        MatrixToEigenMatrix3d(frame.camera.intrinsics) };
-//    holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
+    if (holokit::LowLatencyTrackingApi::GetInstance()->IsActive()) {
+        holokit::ARKitData data = { frame.timestamp,
+            TransformToEigenVector3d(frame.camera.transform),
+            TransformToEigenQuaterniond(frame.camera.transform),
+            MatrixToEigenMatrix3d(frame.camera.intrinsics) };
+        holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
+    }
     
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.
