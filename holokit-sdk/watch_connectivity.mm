@@ -16,6 +16,9 @@ DidReceiveWatchSystemMessage DidReceiveWatchSystemMessageDelegate = NULL;
 typedef void (*DidReceiveWatchActionMessage)(int messageIndex, int watchPitch, int watchRoll, int watchYaw, int iphoneYaw);
 DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
 
+typedef void (*DidChangeReachability)(bool reachable);
+DidChangeReachability DidChangeReachabilityDelegate = NULL;
+
 @interface HoloKitWatchConnectivity() <WCSessionDelegate>
 
 @property (nonatomic, strong) WCSession *wcSession;
@@ -74,6 +77,9 @@ DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
         NSLog(@"[wc_session]: session reachability did change to reachable.");
     } else {
         NSLog(@"[wc_session]: session reachability did change to not reachable.");
+    }
+    if (DidChangeReachabilityDelegate != NULL) {
+        DidChangeReachabilityDelegate(session.isReachable );
     }
 }
 
@@ -139,6 +145,11 @@ UnityHoloKit_GetIsReachable() {
     return [[HoloKitWatchConnectivity sharedWatchConnectivity] wcSession].isReachable;
 }
 
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidChangeReachabilityDelegate(DidChangeReachability callback) {
+    DidChangeReachabilityDelegate = callback;
+}
+
 /// This function is used for The Magic.
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendSetupMessage2Watch(int magicNum, const char **actionTypes, const char **gatherTypes, float gatherTimes[], float coolingDowns[]) {
@@ -148,7 +159,7 @@ UnityHoloKit_SendSetupMessage2Watch(int magicNum, const char **actionTypes, cons
         return;
     }
     
-    NSDictionary<NSString *, id> *message = @{ @"Setup": @"2",
+    NSDictionary<NSString *, id> *message = @{ @"Setup": @"3",
                                                @"Magic1-ActionType": [NSString stringWithUTF8String:actionTypes[0]],
                                                @"Magic1-GatherType": [NSString stringWithUTF8String:gatherTypes[0]],
                                                @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[0]],
@@ -157,38 +168,13 @@ UnityHoloKit_SendSetupMessage2Watch(int magicNum, const char **actionTypes, cons
                                                @"Magic2-ActionType": [NSString stringWithUTF8String:actionTypes[1]],
                                                @"Magic2-GatherType": [NSString stringWithUTF8String:gatherTypes[1]],
                                                @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[1]],
-                                               @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]]
+                                               @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]],
+                                               
+                                               @"Magic3-ActionType": [NSString stringWithUTF8String:actionTypes[2]],
+                                               @"Magic3-GatherType": [NSString stringWithUTF8String:gatherTypes[2]],
+                                               @"Magic3-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[2]],
+                                               @"Magic3-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[2]]
     };
-//    if (magicNum == 2) {
-//        message = @{ @"Setup": @"2",
-//                     @"Magic1-ActionType": [NSString stringWithUTF8String:actionTypes[0]],
-//                     @"Magic1-GatherType": [NSString stringWithUTF8String:gatherTypes[0]],
-//                     @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[0]],
-//                     @"Magic1-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[0]],
-//
-//                     @"Magic2-ActionType": [NSString stringWithUTF8String:actionTypes[1]],
-//                     @"Magic2-GatherType": [NSString stringWithUTF8String:gatherTypes[1]],
-//                     @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[1]],
-//                     @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]]
-//        };
-//    } else if (magicNum == 3) {
-//        message = @{ @"Setup": @"3",
-//                     @"Magic1-ActionType": [NSString stringWithUTF8String:actionTypes[0]],
-//                     @"Magic1-GatherType": [NSString stringWithUTF8String:gatherTypes[0]],
-//                     @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[0]],
-//                     @"Magic1-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[0]],
-//
-//                     @"Magic2-ActionType": [NSString stringWithUTF8String:actionTypes[1]],
-//                     @"Magic2-GatherType": [NSString stringWithUTF8String:gatherTypes[1]],
-//                     @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[1]],
-//                     @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]],
-//
-//                     @"Magic3-ActionType": [NSString stringWithUTF8String:actionTypes[2]],
-//                     @"Magic3-GatherType": [NSString stringWithUTF8String:gatherTypes[2]],
-//                     @"Magic3-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[2]],
-//                     @"Magic3-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[2]]
-//        };
-//    }
     
     __block bool success = YES;
     void (^errorHandler)(NSError *error) = ^void(NSError *error) {

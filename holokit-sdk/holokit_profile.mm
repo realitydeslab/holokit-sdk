@@ -87,6 +87,46 @@ namespace holokit {
                 phone_model.screenResolutionWidth = 2778;
                 phone_model.screenResolutionHeight = 1284;
                 break;
+            case(iPhone13Mini):
+                NSLog(@"Profile::iPhone13Mini");
+                phone_model.screenWidth = 0.12496f;
+                phone_model.screenHeight = 0.05767f;
+                phone_model.screenBottom = 0.00327f;
+                phone_model.centerLineOffset = 0.0f;
+                phone_model.cameraOffset = simd_make_float3(0.06318f, -0.05787f, 0.00988f);
+                phone_model.screenResolutionWidth = 2340;
+                phone_model.screenResolutionHeight = 1080;
+                break;
+            case(iPhone13):
+                NSLog(@"Profile::iPhone13");
+                phone_model.screenWidth = 0.13977f;
+                phone_model.screenHeight = 0.06458f;
+                phone_model.screenBottom = 0.00347f;
+                phone_model.centerLineOffset = 0.0f;
+                phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, 0.00591f);
+                phone_model.screenResolutionWidth = 2532;
+                phone_model.screenResolutionHeight = 1170;
+                break;
+            case(iPhone13Pro):
+                NSLog(@"Profile::iPhone13Pro");
+                phone_model.screenWidth = 0.13977f;
+                phone_model.screenHeight = 0.06458f;
+                phone_model.screenBottom = 0.00347f;
+                phone_model.centerLineOffset = 0.0f;
+                phone_model.cameraOffset = simd_make_float3(0.05996f, -0.02364f - 0.03494f, 0.00591f);
+                phone_model.screenResolutionWidth = 2532;
+                phone_model.screenResolutionHeight = 1170;
+                break;
+            case(iPhone13ProMax):
+                NSLog(@"Profile::iPhone13ProMax");
+                phone_model.screenWidth = 0.15390f;
+                phone_model.screenHeight = 0.07113f;
+                phone_model.screenBottom = 0.00347f;
+                phone_model.centerLineOffset = 0.0f;
+                phone_model.cameraOffset = simd_make_float3(0.0495f, -0.061695f, 0.0091f);
+                phone_model.screenResolutionWidth = 2778;
+                phone_model.screenResolutionHeight = 1284;
+                break;
             case(iPadPro2020):
                 NSLog(@"Profile::iPadPro2020");
                 phone_model.screenWidth = 0.0;
@@ -174,6 +214,22 @@ namespace holokit {
             }
             CASE (@"iPad13,8") {
                 phone_type = iPadPro2021;
+                break;
+            }
+            CASE (@"iPhone14,2") {
+                phone_type = iPhone13Pro;
+                break;
+            }
+            CASE (@"iPhone14,3") {
+                phone_type = iPhone13ProMax;
+                break;
+            }
+            CASE (@"iPhone14,4") {
+                phone_type = iPhone13Mini;
+                break;
+            }
+            CASE (@"iPhone14,5") {
+                phone_type = iPhone13;
                 break;
             }
             DEFAULT {

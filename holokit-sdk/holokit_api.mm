@@ -41,7 +41,7 @@ void HoloKitApi::GetDeviceModel() {
     struct utsname system_info;
     uname(&system_info);
     device_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
-    NSLog(@"[holoki_api]: device name %@", device_name_);
+    NSLog(@"[holoki_api]: device name: %@", device_name_);
 }
 
 void HoloKitApi::InitOpticalParameters() {

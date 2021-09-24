@@ -56,6 +56,10 @@ public:
         iPhone12ProMax,
         iPadPro2020,
         iPadPro2021,
+        iPhone13Mini,
+        iPhone13,
+        iPhone13Pro,
+        iPhone13ProMax,
         UnknownPhoneType
     };
     
