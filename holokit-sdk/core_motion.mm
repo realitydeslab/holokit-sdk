@@ -30,9 +30,9 @@
         self.deviceMotionQueue.qualityOfService = NSQualityOfServiceUserInteractive;
         
         self.motionManager = [[CMMotionManager alloc] init];
-        self.accelUpdateInterval = 1.0 / 100.0;
-        self.gyroUpdateInterval = 1.0 / 100.0;
-        self.deviceMotionUpdateInterval = 1.0 / 100.0;
+        self.accelUpdateInterval = 1.0 / 120.0;
+        self.gyroUpdateInterval = 1.0 / 120.0;
+        self.deviceMotionUpdateInterval = 1.0 / 120.0;
     }
     return self;
 }

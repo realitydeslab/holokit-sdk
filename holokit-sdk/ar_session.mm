@@ -26,6 +26,9 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 
 @interface HoloKitARSession() <ARSessionDelegate>
  
+@property (nonatomic, assign) int frameCount;
+@property (nonatomic, assign) double lastFrameTime;
+
 @end
 
 @implementation HoloKitARSession
@@ -41,12 +44,17 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         [self.aDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
         self.appleWatchIsTracked = NO;
+        self.frameCount = 0;
+        self.lastFrameTime = 0.0;
     }
     return self;
 }
 
 - (void)printNextVsyncTime {
-    //NSLog(@"currentime: %f, vsync time: %f", [[NSProcessInfo processInfo] systemUptime], [self.aDisplayLink targetTimestamp]);
+//    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+//    os_signpost_id_t spid = os_signpost_id_generate(log);
+//    os_signpost_interval_begin(log, spid, "CADisplayLink");
+//    os_signpost_interval_end(log, spid, "CADisplayLink");
 }
 
 + (id)sharedARSession {
@@ -77,6 +85,10 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
     
+    NSLog(@"[ar_session]: last frame time: %f, current time: %f", [[NSProcessInfo processInfo] systemUptime] - self.lastFrameTime, [[NSProcessInfo processInfo] systemUptime]);
+    self.lastFrameTime = [[NSProcessInfo processInfo] systemUptime];
+    //NSLog(@"[arkit update frame]: frame:%d, current time:%f", self.frameCount++, [[NSProcessInfo processInfo] systemUptime]);
+    
     if (holokit::LowLatencyTrackingApi::GetInstance()->IsActive()) {
         holokit::ARKitData data = { frame.timestamp,
             TransformToEigenVector3d(frame.camera.transform),
@@ -84,6 +96,11 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
             MatrixToEigenMatrix3d(frame.camera.intrinsics) };
         holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
     }
+    
+//    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+//    os_signpost_id_t spid = os_signpost_id_generate(log);
+//    os_signpost_interval_begin(log, spid, "ARKit update");
+//    os_signpost_interval_end(log, spid, "ARKit update");
     
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.

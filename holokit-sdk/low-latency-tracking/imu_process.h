@@ -1,7 +1,9 @@
 #pragma once
 
-#include<iostream>
+#include <iostream>
+#include <queue>
 #include "Eigen/Geometry"
+
 using namespace Eigen;
 
 template<typename T>
@@ -45,8 +47,8 @@ class IMUFilter{
   private:
     LowPassFilter acc_lwfilter;
     LowPassFilter gyro_lwfilter;
-    Vector3d gauss_acc[5];
-    Vector3d gauss_gyro[5];
+    std::deque<Vector3d> gauss_acc;
+    std::deque<Vector3d> gauss_gyro;
     double gauss_para_acc[5] = {0.2,0.2,0.2,0.2,0.2};
     double gauss_para_gyro[5] = {0.2,0.2,0.2,0.2,0.2};
     int gauss_filer_cnt = 0;

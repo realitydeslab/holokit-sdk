@@ -329,13 +329,17 @@ public:
                     NSLog(@"[apple_watch_device]: rotation (%f, %f, %f, %f), acceleration (%f, %f, %f) and angular velocity (%f, %f, %f)", rotation.x, rotation.y, rotation.z, rotation.w, acceleration.x, acceleration.y, acceleration.z, angularVelocity.x, angularVelocity.y, angularVelocity.z);
                 }
             }
-        } else {
+        } else if (update_type == kUnityXRInputUpdateTypeBeforeRender) {
             // This kind of update happens right before Unity starts rendering.
             // We update center eye position and rotation here.
             if (device_id == kDeviceIdHoloKitHmd) {
-                //os_log_t log = os_log_create("com.DefaultCompany.Display", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-                //os_signpost_id_t spid = os_signpost_id_generate(log);
-                //os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count, last_frame_time, [[NSProcessInfo processInfo] systemUptime]);
+//                os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+//                os_signpost_id_t spid = os_signpost_id_generate(log);
+//                os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count_, last_frame_time_, [[NSProcessInfo processInfo] systemUptime]);
+                
+//                NSLog(@"[input]: frame:%d, current time:%f", frame_count_++, [[NSProcessInfo processInfo] systemUptime]);
+                NSLog(@"[input]: last frame time: %f, current time: %f", [[NSProcessInfo processInfo] systemUptime] - last_frame_time_, [[NSProcessInfo processInfo] systemUptime]);
+                last_frame_time_ = [[NSProcessInfo processInfo] systemUptime];
                 
                 // TODO: low latency tracking - get predicted camera transform
                 //double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp];
@@ -345,7 +349,9 @@ public:
                 
                 Eigen::Vector3d eigen_position;
                 Eigen::Quaterniond eigen_rotation;
-                if(holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && holokit::LowLatencyTrackingApi::GetInstance()->IsActive() && holokit::LowLatencyTrackingApi::GetInstance()->GetPose(vsync_time_stamp, eigen_position, eigen_rotation)) {
+                if(holokit::HoloKitApi::GetInstance()->StereoscopicRendering()
+                   && holokit::LowLatencyTrackingApi::GetInstance()->IsActive()
+                   && holokit::LowLatencyTrackingApi::GetInstance()->GetPose(vsync_time_stamp, eigen_position, eigen_rotation)) {
                     position = EigenVector3dToUnityXRVector3(eigen_position);
                     rotation = EigenQuaterniondToUnityXRVector4(eigen_rotation);
                 } else {
@@ -436,6 +442,9 @@ private:
     HoloKitARSession* ar_session_handler;
     
     IUnityInterfaces* xr_interfaces_;
+    
+    int frame_count_ = 0;
+    double last_frame_time_ = 0.0;
 };
 
 std::unique_ptr<HoloKitInputProvider> HoloKitInputProvider::input_provider_;

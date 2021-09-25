@@ -34,6 +34,7 @@
 		4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */; };
 		4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B4431F926B7A1A000869815 /* ar_recorder.mm */; };
 		4B610F0B26F5C6CA00CB2AEA /* core_haptics.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */; };
+		4B63298D26FED3D400101B4E /* low_latency_tracking_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */; };
 		4B66159525F39F9000CC4E81 /* printc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 965D7EC9253AECD7000B1B60 /* printc.mm */; };
 		4B6615A225F39FE000CC4E81 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		4B6615A425F39FED00CC4E81 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
@@ -65,7 +66,6 @@
 		4B921B0C26DDE4B400EC359F /* core_location.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0B26DDE4B400EC359F /* core_location.m */; };
 		4B9304D32625A4AA005D9975 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
 		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
-		4BB1781E26EC845E008B6894 /* low_latency_tracking_api_naive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B16B10C26DB9EFC0016FFA0 /* low_latency_tracking_api_naive.mm */; };
 		4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* nfc_session.m */; };
 		4BBDD27E25F36B0400070CB4 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		4BC45AE2262813BD00BA98E4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE1262813BD00BA98E4 /* AppDelegate.swift */; };
@@ -2134,10 +2134,10 @@
 				4B8A528826CCDF96005D55C5 /* imu_process.cpp in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
 				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
+				4B63298D26FED3D400101B4E /* low_latency_tracking_api.mm in Sources */,
 				4B610F0B26F5C6CA00CB2AEA /* core_haptics.m in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4B188AD026F432B4001FD67D /* hand_tracking.mm in Sources */,
-				4BB1781E26EC845E008B6894 /* low_latency_tracking_api_naive.mm in Sources */,
 				4B921B0926DCF07800EC359F /* core_motion.mm in Sources */,
 				4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,

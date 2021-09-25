@@ -29,6 +29,7 @@ LowLatencyTrackingApi::LowLatencyTrackingApi()
 }
 
 void LowLatencyTrackingApi::Activate() {
+    NSLog(@"[low_latency_tracking]: activate");
     is_active_ = true;
     is_filtering_gyro_ = true;
     is_filtering_acc_ = true;
@@ -45,6 +46,7 @@ void LowLatencyTrackingApi::Activate() {
 };
 
 void LowLatencyTrackingApi::Deactivate() {
+    NSLog(@"[low_latency_tracking]: deactivate");
     is_active_ = false;
     
     [[HoloKitCoreMotion sharedCoreMotion] stopAccelerometer];

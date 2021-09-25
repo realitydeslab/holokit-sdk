@@ -13,8 +13,11 @@
 typedef void (*DidReceiveWatchSystemMessage)(int messageIndex);
 DidReceiveWatchSystemMessage DidReceiveWatchSystemMessageDelegate = NULL;
 
-typedef void (*DidReceiveWatchActionMessage)(int messageIndex, int watchPitch, int watchRoll, int watchYaw, int iphoneYaw);
-DidReceiveWatchActionMessage DidReceiveWatchActionMessageDelegate = NULL;
+typedef void (*DidReceiveWatchInputMessage)(int messageIndex, int watchPitch, int watchRoll, int watchYaw, int iphoneYaw);
+DidReceiveWatchInputMessage DidReceiveWatchInputMessageDelegate = NULL;
+
+typedef void (*DidReceiveWatchCalorieMessage)(float calories);
+DidReceiveWatchCalorieMessage DidReceiveWatchCalorieMessageDelegate = NULL;
 
 typedef void (*DidChangeReachability)(bool reachable);
 DidChangeReachability DidChangeReachabilityDelegate = NULL;
@@ -35,8 +38,8 @@ DidChangeReachability DidChangeReachabilityDelegate = NULL;
             // We let Unity manually activate the session when needed.
             [self.wcSession activateSession];
    
-            HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion sharedCoreMotion];
-            [coreMotionInstance startDeviceMotion:^void (CMDeviceMotion *) { }];
+//            HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion sharedCoreMotion];
+//            [coreMotionInstance startDeviceMotion:^void (CMDeviceMotion *) { }];
         }
     }
     return self;
@@ -93,14 +96,23 @@ DidChangeReachability DidChangeReachabilityDelegate = NULL;
                     NSInteger watchRoll = [watchRollValue integerValue];
                     NSInteger watchYaw = [watchYawValue integerValue];
                     HoloKitCoreMotion *coreMotionInstance = [HoloKitCoreMotion sharedCoreMotion];
-                    DidReceiveWatchActionMessageDelegate((int)watchActionIndex, (int)watchPitch, (int)watchRoll, (int)watchYaw, (int)Radians2Degrees(coreMotionInstance.currentDeviceMotion.attitude.yaw));
+                    if (DidReceiveWatchInputMessageDelegate != NULL) {
+                        DidReceiveWatchInputMessageDelegate((int)watchActionIndex, (int)watchPitch, (int)watchRoll, (int)watchYaw, (int)Radians2Degrees(coreMotionInstance.currentDeviceMotion.attitude.yaw));
+                    }
                 }
             }
         }
     } else if (id watchSystemValue = [message objectForKey:@"WatchSystem"]) {
         NSInteger watchSystemIndex = [watchSystemValue integerValue];
-        DidReceiveWatchSystemMessageDelegate((int)watchSystemIndex);
-    }
+        if (DidReceiveWatchSystemMessageDelegate != NULL) {
+            DidReceiveWatchSystemMessageDelegate((int)watchSystemIndex);
+        }
+    } else if (id watchCalorieValue = [message objectForKey:@"WatchSystem"]) {
+        float calories = [watchCalorieValue floatValue];
+        if (DidReceiveWatchSystemMessageDelegate != NULL) {
+            DidReceiveWatchSystemMessageDelegate(calories);
+        }
+     }
 }
 
 - (void)sessionDidBecomeInactive:(nonnull WCSession *)session {
@@ -136,8 +148,13 @@ UnityHoloKit_SetDidReceiveWatchSystemMessageDelegate(DidReceiveWatchSystemMessag
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidReceiveWatchActionMessageDelegate(DidReceiveWatchActionMessage callback) {
-    DidReceiveWatchActionMessageDelegate = callback;
+UnityHoloKit_SetDidReceiveWatchInputMessageDelegate(DidReceiveWatchInputMessage callback) {
+    DidReceiveWatchInputMessageDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidReceiveWatchCalorieMessageDelegate(DidReceiveWatchCalorieMessage callback) {
+    DidReceiveWatchCalorieMessageDelegate = callback;
 }
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -159,30 +176,43 @@ UnityHoloKit_SendSetupMessage2Watch(int magicNum, const char **actionTypes, cons
         return;
     }
     
-    NSDictionary<NSString *, id> *message = @{ @"Setup": @"3",
-                                               @"Magic1-ActionType": [NSString stringWithUTF8String:actionTypes[0]],
-                                               @"Magic1-GatherType": [NSString stringWithUTF8String:gatherTypes[0]],
-                                               @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[0]],
-                                               @"Magic1-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[0]],
-                                               
-                                               @"Magic2-ActionType": [NSString stringWithUTF8String:actionTypes[1]],
-                                               @"Magic2-GatherType": [NSString stringWithUTF8String:gatherTypes[1]],
-                                               @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[1]],
-                                               @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]],
-                                               
-                                               @"Magic3-ActionType": [NSString stringWithUTF8String:actionTypes[2]],
-                                               @"Magic3-GatherType": [NSString stringWithUTF8String:gatherTypes[2]],
-                                               @"Magic3-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[2]],
-                                               @"Magic3-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[2]]
-    };
-    
     __block bool success = YES;
     void (^errorHandler)(NSError *error) = ^void(NSError *error) {
         NSLog(@"[wc_session]: Failed to send the watch reset message.");
         success = NO;
     };
+    if (magicNum == 2) {
+        NSDictionary<NSString *, id> *message = @{ @"Setup": @"2",
+                                                   @"Magic1-ActionType": [NSString stringWithUTF8String:actionTypes[0]],
+                                                   @"Magic1-GatherType": [NSString stringWithUTF8String:gatherTypes[0]],
+                                                   @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[0]],
+                                                   @"Magic1-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[0]],
+                                                   
+                                                   @"Magic2-ActionType": [NSString stringWithUTF8String:actionTypes[1]],
+                                                   @"Magic2-GatherType": [NSString stringWithUTF8String:gatherTypes[1]],
+                                                   @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[1]],
+                                                   @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]]
+        };
+        [wcSession sendMessage:message replyHandler:nil errorHandler:errorHandler];
+    } else if (magicNum == 3) {
+        NSDictionary<NSString *, id> *message = @{ @"Setup": @"3",
+                                                   @"Magic1-ActionType": [NSString stringWithUTF8String:actionTypes[0]],
+                                                   @"Magic1-GatherType": [NSString stringWithUTF8String:gatherTypes[0]],
+                                                   @"Magic1-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[0]],
+                                                   @"Magic1-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[0]],
+                                                   
+                                                   @"Magic2-ActionType": [NSString stringWithUTF8String:actionTypes[1]],
+                                                   @"Magic2-GatherType": [NSString stringWithUTF8String:gatherTypes[1]],
+                                                   @"Magic2-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[1]],
+                                                   @"Magic2-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[1]],
+                                                   
+                                                   @"Magic3-ActionType": [NSString stringWithUTF8String:actionTypes[2]],
+                                                   @"Magic3-GatherType": [NSString stringWithUTF8String:gatherTypes[2]],
+                                                   @"Magic3-GatherTime": [NSString stringWithFormat:@"%f", gatherTimes[2]],
+                                                   @"Magic3-CoolingDown": [NSString stringWithFormat:@"%f", coolingDowns[2]]
+        };
+        [wcSession sendMessage:message replyHandler:nil errorHandler:errorHandler];
+    }
     
-    // TODO: Should I also pass the replyHandler?
-    [wcSession sendMessage:message replyHandler:nil errorHandler:errorHandler];
 }
 } // extern "C"

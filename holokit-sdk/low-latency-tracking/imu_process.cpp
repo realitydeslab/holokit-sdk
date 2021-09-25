@@ -1,6 +1,6 @@
 #include "imu_process.h"
 #include "utility.h"
-#include<math.h>
+#include <math.h>
 
 LowPassFilter::LowPassFilter(double _sample_freq, double _cutoff_freq):
 sample_freq(_sample_freq),
@@ -87,19 +87,20 @@ void IMUFilter::get_filted_acc(const Vector3d &_acc, Vector3d &_filted_acc)
     Vector3d lwf_acc(0,0,0);
     acc_lwfilter.lowpass_filter(_acc, lwf_acc);
 
-    gauss_acc[gauss_acc_filer_cnt] = lwf_acc;
-    gauss_acc_filer_cnt++;
+    gauss_acc.push_back(lwf_acc);
+//    gauss_acc_filer_cnt++;
 
     Vector3d filted_acc(0,0,0);
-    for(int i=0; i<gauss_acc_filer_cnt; i++)
+    int acc_size = gauss_acc.size();
+    for(int i=0; i<acc_size; i++)
     {
-        double para = 1.0/gauss_acc_filer_cnt;
+        double para = 1.0/acc_size;
         filted_acc += gauss_acc[i] * para;
     }
 
-    if(gauss_acc_filer_cnt >= 5)
+    if(acc_size >= 5)
     {
-        gauss_acc_filer_cnt = 0;
+        gauss_acc.pop_front();
     }
     _filted_acc = filted_acc;
 }
@@ -115,19 +116,20 @@ void IMUFilter::get_filted_gyro(const Vector3d &_gyro, Vector3d &_filted_gyro)
 //        lwf_gyro(2) = 0;
 //    }
 
-    gauss_gyro[gauss_gyro_filer_cnt] = lwf_gyro;
-    gauss_gyro_filer_cnt++;
+    gauss_gyro.push_back(lwf_gyro);
+//    gauss_gyro_filer_cnt++;
 
     Vector3d filted_gyro(0,0,0);
-    for(int i=0; i<gauss_gyro_filer_cnt; i++)
+    int gyro_size = gauss_gyro.size();
+    for(int i=0; i<gauss_gyro.size(); i++)
     {
-        double para = 1.0/gauss_gyro_filer_cnt;
+        double para = 1.0/gyro_size;
         filted_gyro += gauss_gyro[i] * para;
     }
 
-    if(gauss_gyro_filer_cnt >= 5)
+    if(gyro_size >= 5)
     {
-        gauss_gyro_filer_cnt = 0;
+        gauss_gyro.pop_front();
     }
     _filted_gyro = filted_gyro;
 }
@@ -414,4 +416,3 @@ Vector3d IMUProcessor::get_ypr()
 {
     return ypr*180/M_PI;
 }
-

@@ -16,6 +16,11 @@
 #include "imu_process.h"
 #include "pose_ekf.h"
 
+#define NO_EKF
+#define GYRO_INTEGRATE
+#define DELAY_TIME 0.01666
+//#define PREDICT
+
 namespace holokit {
 
 struct AccelerometerData {
@@ -39,6 +44,11 @@ struct ARKitData {
     Eigen::Vector3d position;
     Eigen::Quaterniond rotation;
     Eigen::Matrix3d intrinsics;
+};
+
+struct VelData {
+    double sensor_timestamp;
+    Eigen::Vector3d vel;
 };
 
 class LowLatencyTrackingApi {
@@ -70,6 +80,8 @@ public:
     
     void SetIsFilteringAcc(bool value) { is_filtering_acc_ = value; }
     
+    void UpdateLastRenderTime();
+    
 private:
     Eigen::Quaterniond ConvertToEigenQuaterniond(Eigen::Vector3d euler) const;
     
@@ -79,6 +91,10 @@ private:
     std::deque<AccelerometerData> accelerometer_data_;
     
     std::deque<GyroData> gyro_data_;
+    
+    std::deque<ARKitData> pos_;
+    
+    std::deque<VelData> vel_;
     
     ARKitData last_arkit_data_;
     
@@ -107,6 +123,8 @@ private:
 
     bool ekf_init_flag = false;
     bool imu_good_flag = false;
+    
+    double last_render_time_ = 0.0;
 
 }; // class LowLatencyTrackingApi
 
