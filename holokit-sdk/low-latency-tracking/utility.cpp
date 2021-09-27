@@ -136,3 +136,50 @@ Eigen::Quaterniond Utility::toQuaterniond(const Eigen::Vector3d &v3d)
                               imag_factor * v3d.y(),
                               imag_factor * v3d.z());
 }
+
+Quaterniond Utility::averageQuaternion(Quaterniond &sum, const Quaterniond &new_q, const Quaterniond &first_q, int num)
+{
+
+    double w = 0.0;
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
+    Quaterniond tmp_q;
+    double dot = new_q.dot(first_q);
+    std::cout << "dot" << dot << std::endl;
+    if(dot < 0)
+    {
+        tmp_q.w() = -new_q.w();
+        tmp_q.x() = -new_q.x();
+        tmp_q.y() = -new_q.y();
+        tmp_q.z() = -new_q.z();
+
+    }else
+    {
+        tmp_q.w() = new_q.w();
+        tmp_q.x() = new_q.x();
+        tmp_q.y() = new_q.y();
+        tmp_q.z() = new_q.z();
+    }
+    std::cout << "tmp_q" << tmp_q.coeffs().transpose() << std::endl;
+    //Average the values
+    double addDet = 1/(double)num;
+    std::cout << "addDet " << addDet << std::endl;
+    std::cout << "sum " << sum.coeffs().transpose() << std::endl;
+    sum.w() += tmp_q.w();
+    w = sum.w() * addDet;
+    sum.x() += tmp_q.x();
+    x = sum.x() * addDet;
+    sum.y() += tmp_q.y();
+    y = sum.y() * addDet;
+    sum.z() += tmp_q.z();
+    z = sum.z() * addDet;
+    std::cout << "sum z" << sum.z() << std::endl;
+    std::cout << "z" << z << std::endl;
+    Quaterniond average_q(w,x,y,z);
+    std::cout << "average_q" << average_q.coeffs().transpose() << std::endl;
+    average_q.normalize();
+
+    //note: if speed is an issue, you can skip the normalization step
+    return average_q;
+}

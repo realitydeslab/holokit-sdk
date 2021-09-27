@@ -179,6 +179,7 @@ public:
     static double safe_acos(double v);
 
     static Eigen::Quaterniond toQuaterniond(const Eigen::Vector3d& v3d);
+    static Quaterniond averageQuaternion(Quaterniond &sum, const Quaterniond &new_q, const Quaterniond &first_q, int num);
 
     template <size_t N>
     struct uint_

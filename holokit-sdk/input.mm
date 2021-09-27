@@ -337,9 +337,7 @@ public:
 //                os_signpost_id_t spid = os_signpost_id_generate(log);
 //                os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count_, last_frame_time_, [[NSProcessInfo processInfo] systemUptime]);
                 
-//                NSLog(@"[input]: frame:%d, current time:%f", frame_count_++, [[NSProcessInfo processInfo] systemUptime]);
-                NSLog(@"[input]: last frame time: %f, current time: %f", [[NSProcessInfo processInfo] systemUptime] - last_frame_time_, [[NSProcessInfo processInfo] systemUptime]);
-                last_frame_time_ = [[NSProcessInfo processInfo] systemUptime];
+                NSLog(@"[input]: update pose time: %f", [[NSProcessInfo processInfo] systemUptime]);
                 
                 // TODO: low latency tracking - get predicted camera transform
                 //double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp];

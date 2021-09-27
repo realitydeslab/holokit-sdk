@@ -142,6 +142,7 @@ bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& po
            q.normalize();
            //std::cout <<std::fixed << std::setprecision(6) <<  "imu sensor time " << data.sensor_timestamp << std::endl;
            last_gyro = filtered_gyro;
+           q_buf_.push_back(q);
        } else {
            q *= LowLatencyTrackingApi::ConvertToEigenQuaterniond((data.sensor_timestamp - last_time) * R_I2C * data.rotationRate);
            q.normalize();
@@ -179,6 +180,22 @@ bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& po
    std::cout << "filtered_gyro " << filtered_gyro*57.3 << std::endl;
    q *= LowLatencyTrackingApi::ConvertToEigenQuaterniond(DELAY_TIME * R_I2C * 0.5*(filtered_gyro + predict_gyro));
    q.normalize();
+    q_buf_.push_back(q);
+       Eigen::Quaterniond average_q(1,0,0,0);
+
+       Eigen::Quaterniond sum_q = q_buf_[0];
+       Eigen::Quaterniond first_q = q_buf_[0];
+
+       for(int i=1; i<q_buf_.size(); i++)
+       {
+           std::cout << "q " << q_buf_[i].coeffs().transpose() << std::endl;
+           std::cout << "ypr" << Utility::R2ypr(q_buf_[i].toRotationMatrix()).transpose() << std::endl;
+           double anger_dis = first_q.angularDistance(q_buf_[i]);
+           std::cout << "anger_dis " << anger_dis*57.3 << std::endl;
+           average_q = Utility::averageQuaternion(sum_q,q_buf_[i],first_q, i+1);
+       }
+       q_buf_.clear();
+    
   //std::cout << "" << Utility::R2ypr(q.toRotationMatrix()) << std::endl;
 #endif
    Eigen::Vector3d p = last_arkit_data_.position;

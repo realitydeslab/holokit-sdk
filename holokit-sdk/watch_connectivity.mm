@@ -82,7 +82,7 @@ DidChangeReachability DidChangeReachabilityDelegate = NULL;
         NSLog(@"[wc_session]: session reachability did change to not reachable.");
     }
     if (DidChangeReachabilityDelegate != NULL) {
-        DidChangeReachabilityDelegate(session.isReachable );
+        DidChangeReachabilityDelegate(session.isReachable);
     }
 }
 
@@ -107,10 +107,10 @@ DidChangeReachability DidChangeReachabilityDelegate = NULL;
         if (DidReceiveWatchSystemMessageDelegate != NULL) {
             DidReceiveWatchSystemMessageDelegate((int)watchSystemIndex);
         }
-    } else if (id watchCalorieValue = [message objectForKey:@"WatchSystem"]) {
+    } else if (id watchCalorieValue = [message objectForKey:@"WatchCalorie"]) {
         float calories = [watchCalorieValue floatValue];
-        if (DidReceiveWatchSystemMessageDelegate != NULL) {
-            DidReceiveWatchSystemMessageDelegate(calories);
+        if (DidReceiveWatchCalorieMessageDelegate != NULL) {
+            DidReceiveWatchCalorieMessageDelegate(calories);
         }
      }
 }

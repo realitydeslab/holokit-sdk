@@ -96,6 +96,8 @@ private:
     
     std::deque<VelData> vel_;
     
+    std::deque<Quaterniond> q_buf_;
+    
     ARKitData last_arkit_data_;
     
     std::mutex accel_mtx_;

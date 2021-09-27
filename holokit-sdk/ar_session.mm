@@ -25,9 +25,6 @@ typedef void (*ARWorldMapSynced)();
 ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 
 @interface HoloKitARSession() <ARSessionDelegate>
- 
-@property (nonatomic, assign) int frameCount;
-@property (nonatomic, assign) double lastFrameTime;
 
 @end
 
@@ -36,18 +33,23 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 #pragma mark - init
 - (instancetype)init {
     if (self = [super init]) {
-        // Metal Vsync
-        //NSLog(@"number of screens: %lu", (unsigned long)[[UIScreen screens] count]);
-        //NSLog(@"Maximum FPS = %ld", [UIScreen mainScreen].maximumFramesPerSecond);
-        self.aDisplayLink = [[UIScreen mainScreen] displayLinkWithTarget:self selector:@selector(printNextVsyncTime)];
-        //[aDisplayLink setFrameInterval:animationFrameInterval];
-        [self.aDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        // https://developer.apple.com/videos/play/wwdc2021/10147/
+        CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self
+                                                          selector:@selector(displayLinkCallback:)];
+        [link setPreferredFramesPerSecond:60];
+        [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
-        self.appleWatchIsTracked = NO;
-        self.frameCount = 0;
-        self.lastFrameTime = 0.0;
+//        self.aDisplayLink = [[UIScreen mainScreen] displayLinkWithTarget:self selector:@selector(printNextVsyncTime)];
+//        [self.aDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        
+        //self.appleWatchIsTracked = NO;
     }
     return self;
+}
+
+// https://developer.apple.com/videos/play/wwdc2021/10147/
+- (void)displayLinkCallback:(CADisplayLink *)link {
+    NSLog(@"[displaylink]: current time: %f, last frame time: %f, next frame time: %f", [[NSProcessInfo processInfo] systemUptime], link.timestamp, link.targetTimestamp);
 }
 
 - (void)printNextVsyncTime {
@@ -85,9 +87,7 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
     
-    NSLog(@"[ar_session]: last frame time: %f, current time: %f", [[NSProcessInfo processInfo] systemUptime] - self.lastFrameTime, [[NSProcessInfo processInfo] systemUptime]);
-    self.lastFrameTime = [[NSProcessInfo processInfo] systemUptime];
-    //NSLog(@"[arkit update frame]: frame:%d, current time:%f", self.frameCount++, [[NSProcessInfo processInfo] systemUptime]);
+    NSLog(@"[ar_session]: session update time: %f", [[NSProcessInfo processInfo] systemUptime]);
     
     if (holokit::LowLatencyTrackingApi::GetInstance()->IsActive()) {
         holokit::ARKitData data = { frame.timestamp,
@@ -178,13 +178,6 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
     }
     NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:YES error:nil];
     [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
-    
-//    if (data.priority == ARCollaborationDataPriorityCritical) {
-//        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
-//    } else {
-//        //[self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
-//    }
-    
 }
 
 #pragma mark - ARSessionObserver
