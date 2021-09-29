@@ -58,9 +58,13 @@ public:
     
     bool StartNfcSession();
     
-    bool IsSecondDisplayAvailable() { return is_second_display_available_; }
+    double GetLastSubmitCurrentFrameTime() { return last_submit_current_frame_time_; }
     
-    void SetSecondDisplayAvailable(bool value) { is_second_display_available_ = value; }
+    void SetLastSubmitCurrentFrameTime(double time) { last_submit_current_frame_time_ = time; }
+    
+    double GetLastPopulateNextFrameTime() { return last_populate_next_frame_time_; }
+    
+    void SetLastPopulateNextFrameTime(double time) { last_populate_next_frame_time_ = time; }
     
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
@@ -109,7 +113,10 @@ private:
     
     bool single_pass_rendering_ = false;
     
-    bool is_second_display_available_ = true;
+    double last_submit_current_frame_time_ = 0.0;
+    
+    double last_populate_next_frame_time_ = 0.0;
+
 }; // class HoloKitApi
 
 std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;

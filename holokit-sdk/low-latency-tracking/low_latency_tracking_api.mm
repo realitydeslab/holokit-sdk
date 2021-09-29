@@ -384,11 +384,6 @@ void LowLatencyTrackingApi::Clear() {
     // arkit_mtx_.unlock();
 }
 
-void LowLatencyTrackingApi::UpdateLastRenderTime() {
-    NSLog(@"[last_frame_time]: %f, current time: %f", [[NSProcessInfo processInfo] systemUptime] - last_render_time_, [[NSProcessInfo processInfo] systemUptime]);
-    last_render_time_ = [[NSProcessInfo processInfo] systemUptime];
-}
-
 } // namespace holokit
 
 extern "C" {
@@ -418,12 +413,19 @@ UnityHoloKit_SetIsFilteringAcc(bool value) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_UpdateLastRenderTime() {
-//    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-//    os_signpost_id_t spid = os_signpost_id_generate(log);
-//    os_signpost_interval_begin(log, spid, "EndFrame");
-//    holokit::LowLatencyTrackingApi::GetInstance()->UpdateLastRenderTime();
-//    os_signpost_interval_end(log, spid, "EndFrame");
+UnityHoloKit_UnityBeginFrameRendering() {
+    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+    os_signpost_id_t spid = os_signpost_id_generate(log);
+    os_signpost_interval_begin(log, spid, "UnityBeginFrameRendering");
+    os_signpost_interval_end(log, spid, "UnityBeginFrameRendering");
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_UnityEndFrameRendering() {
+    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+    os_signpost_id_t spid = os_signpost_id_generate(log);
+    os_signpost_interval_begin(log, spid, "UnityEndFrameRendering");
+    os_signpost_interval_end(log, spid, "UnityEndFrameRendering");
 }
 
 }

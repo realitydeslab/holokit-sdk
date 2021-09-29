@@ -170,15 +170,12 @@ public:
         gfx_thread_provider.Stop = [](UnitySubsystemHandle, void*) -> UnitySubsystemErrorCode {
             return GetInstance()->GfxThread_Stop();
         };
-
-        GetInstance()->GetDisplay()->RegisterProviderForGraphicsThread(
-            handle, &gfx_thread_provider);
+        GetInstance()->GetDisplay()->RegisterProviderForGraphicsThread(handle, &gfx_thread_provider);
         
         // Register for callbacks on display provider.
         UnityXRDisplayProvider provider{NULL, NULL, NULL};
         provider.QueryMirrorViewBlitDesc = [](UnitySubsystemHandle, void*, const UnityXRMirrorViewBlitInfo, UnityXRMirrorViewBlitDesc*) -> UnitySubsystemErrorCode {
-            
-            return kUnitySubsystemErrorCodeFailure;
+            return kUnitySubsystemErrorCodeFailure; 
         };
         GetInstance()->GetDisplay()->RegisterProvider(handle, &provider);
         
@@ -217,18 +214,17 @@ public:
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         
+        double currentTime = [[NSProcessInfo processInfo] systemUptime];
+        //NSLog(@"[submitCurrentFrame]: current time: %f, time from last populate next frame: %f", currentTime, currentTime - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
+        holokit::HoloKitApi::GetInstance()->SetLastSubmitCurrentFrameTime(currentTime);
+        
+        os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+        os_signpost_id_t spid = os_signpost_id_generate(log);
+        os_signpost_interval_begin(log, spid, "SubmitCurrentFrame");
+        os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
+        
         RenderContent();
         RenderAlignmentMarker();
-        
-//        HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
-        //NSLog(@"[ar_recorder]: writer status %ld", (long)ar_session_delegate_controller.recorder.writer.status);
-//        if (ar_session_instance.isRecording) {
-//            //CVPixelBufferRef pixelBuffer = [ARRecorder convertIOSurfaceRefToCVPixelBufferRef:metal_color_textures_[0].iosurface];
-//            CVPixelBufferRef pixelBuffer = [HoloKitARRecorder convertMTLTextureToCVPixelBufferRef:metal_color_textures_[1]];
-//            CMTime time = CMTimeMakeWithSeconds(CACurrentMediaTime(), 1000000);
-//            [ar_session_instance.recorder insert:pixelBuffer with:time];
-//            CVPixelBufferRelease(pixelBuffer);
-//        }
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -273,9 +269,6 @@ public:
                 return;
             }
             main_metal_setup_ = true;
-            
-//            ARRecorder *ar_recorder = [[ARRecorder alloc] init];
-//            NSLog(@"fuck %@", [ar_recorder newVideoPath]);
         }
         
         id<MTLRenderCommandEncoder> mtl_render_command_encoder =
@@ -325,10 +318,19 @@ public:
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
-            
+        
+        double currentTime = [[NSProcessInfo processInfo] systemUptime];
+        holokit::HoloKitApi::GetInstance()->SetLastPopulateNextFrameTime(currentTime);
+        //NSLog(@"[populateNextFrame]: current time: %f", [[NSProcessInfo processInfo] systemUptime]);
+        
+        os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+        os_signpost_id_t spid = os_signpost_id_generate(log);
+        os_signpost_interval_begin(log, spid, "PopulateNextFrame");
+        os_signpost_interval_end(log, spid, "PopulateNextFrame");
+        
         // We interrupt the graphics thread if it is not manually opened by SDK.
         if (!holokit::HoloKitApi::GetInstance()->StereoscopicRendering()) {
-            NSLog(@"[display]: Manually shut down display subsystem.");
+            NSLog(@"[display]: Manually shut down the display subsystem.");
             return kUnitySubsystemErrorCodeFailure;
         }
         

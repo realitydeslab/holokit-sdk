@@ -80,8 +80,6 @@ public:
     
     void SetIsFilteringAcc(bool value) { is_filtering_acc_ = value; }
     
-    void UpdateLastRenderTime();
-    
 private:
     Eigen::Quaterniond ConvertToEigenQuaterniond(Eigen::Vector3d euler) const;
     
@@ -125,8 +123,6 @@ private:
 
     bool ekf_init_flag = false;
     bool imu_good_flag = false;
-    
-    double last_render_time_ = 0.0;
 
 }; // class LowLatencyTrackingApi
 
