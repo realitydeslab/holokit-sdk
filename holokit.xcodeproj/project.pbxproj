@@ -10,6 +10,7 @@
 		4B04D8A8260CCC9C0055020F /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B04D8AA260CCCA20055020F /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B04D8A9260CCCA20055020F /* MetalKit.framework */; };
 		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
+		4B14CB3F2712C6A800C1DBC1 /* pose_predictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B14CB3D2712C6A800C1DBC1 /* pose_predictor.cpp */; };
 		4B16B10826DB99E40016FFA0 /* imu_process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A528626CCDF96005D55C5 /* imu_process.cpp */; };
 		4B16B10926DB99E70016FFA0 /* pose_ekf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */; };
 		4B16B10A26DB99EC0016FFA0 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC826D9ECAD00CC0197 /* state.cpp */; };
@@ -326,6 +327,8 @@
 		4B04D8A9260CCCA20055020F /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B0606CB25F5CA08006DF0B0 /* libtest-unity-plugin-display-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtest-unity-plugin-display-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B06977225ECADA3009D51BD /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = System/Library/Frameworks/Vision.framework; sourceTree = SDKROOT; };
+		4B14CB3D2712C6A800C1DBC1 /* pose_predictor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pose_predictor.cpp; sourceTree = "<group>"; };
+		4B14CB3E2712C6A800C1DBC1 /* pose_predictor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pose_predictor.h; sourceTree = "<group>"; };
 		4B16B10C26DB9EFC0016FFA0 /* low_latency_tracking_api_naive.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = low_latency_tracking_api_naive.mm; sourceTree = "<group>"; };
 		4B188ACE26F432A4001FD67D /* hand_tracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hand_tracking.h; sourceTree = "<group>"; };
 		4B188ACF26F432B4001FD67D /* hand_tracking.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hand_tracking.mm; sourceTree = "<group>"; };
@@ -815,6 +818,8 @@
 				4BD62BCA26D9ECB800CC0197 /* state.h */,
 				4BD62BCB26D9ECC500CC0197 /* utility.cpp */,
 				4BD62BCD26D9ECD100CC0197 /* utility.h */,
+				4B14CB3D2712C6A800C1DBC1 /* pose_predictor.cpp */,
+				4B14CB3E2712C6A800C1DBC1 /* pose_predictor.h */,
 			);
 			path = "low-latency-tracking";
 			sourceTree = "<group>";
@@ -2126,6 +2131,7 @@
 				4BD62BCC26D9ECC500CC0197 /* utility.cpp in Sources */,
 				4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */,
 				4BD62BC926D9ECAD00CC0197 /* state.cpp in Sources */,
+				4B14CB3F2712C6A800C1DBC1 /* pose_predictor.cpp in Sources */,
 				4B921B0C26DDE4B400EC359F /* core_location.m in Sources */,
 				4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */,
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,

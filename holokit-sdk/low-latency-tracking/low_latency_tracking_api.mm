@@ -9,6 +9,7 @@
 #import <iostream>
 #import "IUnityInterface.h"
 #import "core_motion.h"
+#import "ar_session.h"
 #import "math_helpers.h"
 #import "utility.h"
 #import <os/log.h>
@@ -100,160 +101,29 @@ void LowLatencyTrackingApi::InitEKF()
 
 bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& position, Eigen::Quaterniond& rotation) {
     if (!is_active_) return false;
-    
-    if (target_timestamp < last_arkit_data_.sensor_timestamp) {
-        return false;
-    }
-#ifdef NO_EKF
-   double last_time = last_arkit_data_.sensor_timestamp;
-   IMUFilter imu_filter;
-
-   Eigen::Quaterniond q = last_arkit_data_.rotation;
-   // Convert from IMU space to camera space
-   Eigen::Matrix3d R_I2C;
-   R_I2C << 0, -1, 0, 1, 0, 0, 0, 0, 1;
-
-//   std::cout << "[time lag arkit]: " << target_timestamp - last_arkit_data_.sensor_timestamp << std::endl;
-//   std::cout << "[time lag]: " << target_timestamp - gyro_data_.back().sensor_timestamp << std::endl;
-//   std::cout << "gyro_data_" << gyro_data_.size() << std::endl;
-#ifdef GYRO_INTEGRATE
-   Vector3d filtered_gyro;
-   Vector3d last_gyro(0,0,0);
-   vector<Vector3d> gyro_ratio;
-   for (auto it = gyro_data_.begin(); it != gyro_data_.end(); ++it) {
-       GyroData data = *it;
-//       std::cout << "" << Utility::R2ypr(q.toRotationMatrix()) << std::endl;
-       if (is_filtering_gyro_) {
-
-//           imu_filter.get_filted_gyro(data.rotationRate, filtered_gyro);
-           filtered_gyro = data.rotationRate;
-           //std::cout << std::endl;
-           //std::cout << "[before filtered]: (" << data.rotationRate(0) << ", " << data.rotationRate(1) << ", " << data.rotationRate(2) << ")" << std::endl;
-           //std::cout << "[after filtered]: (" << filtered_gyro(0) << ", " << filtered_gyro(1) << ", " << filtered_gyro(2) << ")" << std::endl;
-           q *= LowLatencyTrackingApi::ConvertToEigenQuaterniond((data.sensor_timestamp - last_time) * R_I2C * filtered_gyro);
-           if(last_gyro.norm() > 0)
-           {
-               Vector3d ratio = (filtered_gyro - last_gyro)/(data.sensor_timestamp - last_time);
-               gyro_ratio.push_back(ratio);
-               std::cout << "gyro_ratio " << ratio.norm() << std::endl;
-           }
-
-           //std::cout << "data.sensor_timestamp - last_time" << data.sensor_timestamp - last_time << std::endl;
-           q.normalize();
-           //std::cout <<std::fixed << std::setprecision(6) <<  "imu sensor time " << data.sensor_timestamp << std::endl;
-           last_gyro = filtered_gyro;
-           q_buf_.push_back(q);
-       } else {
-           q *= LowLatencyTrackingApi::ConvertToEigenQuaterniond((data.sensor_timestamp - last_time) * R_I2C * data.rotationRate);
-           q.normalize();
-       }
-       last_time = data.sensor_timestamp;
-   }
-   Vector3d predict_ratio(0,0,0);
-   for(int i=0; i<gyro_ratio.size();i++)
-   {
-       predict_ratio += gyro_ratio[i];
-   }
-   if(gyro_ratio.size() > 0)
-   {
-       //predict_ratio = predict_ratio/gyro_ratio.size();
-       predict_ratio = gyro_ratio[gyro_ratio.size()-1];
-   }
-
-   if(predict_ratio.norm() > 50)
-   {
-       predict_ratio << 0,0,0;
-   }
-
-   Vector3d predict_gyro;
-#ifdef PREDICT
-    //NSLog(@"[last gyro to current]: %f", [[NSProcessInfo processInfo] systemUptime] - gyro_data_.back().sensor_timestamp);
-    
-   //predict_gyro = filtered_gyro + predict_ratio * DELAY_TIME;
-    
-    double delay_time = [[NSProcessInfo processInfo] systemUptime] - gyro_data_.back().sensor_timestamp;
-    predict_gyro = filtered_gyro + predict_ratio * DELAY_TIME;
-#else
-   predict_gyro = filtered_gyro;
-#endif
-   std::cout << "filtered_gyro_ratio " << predict_ratio * 57.3 << std::endl;
-   std::cout << "filtered_gyro " << filtered_gyro*57.3 << std::endl;
-   q *= LowLatencyTrackingApi::ConvertToEigenQuaterniond(DELAY_TIME * R_I2C * 0.5*(filtered_gyro + predict_gyro));
-   q.normalize();
-    q_buf_.push_back(q);
-       Eigen::Quaterniond average_q(1,0,0,0);
-
-       Eigen::Quaterniond sum_q = q_buf_[0];
-       Eigen::Quaterniond first_q = q_buf_[0];
-
-       for(int i=1; i<q_buf_.size(); i++)
-       {
-           std::cout << "q " << q_buf_[i].coeffs().transpose() << std::endl;
-           std::cout << "ypr" << Utility::R2ypr(q_buf_[i].toRotationMatrix()).transpose() << std::endl;
-           double anger_dis = first_q.angularDistance(q_buf_[i]);
-           std::cout << "anger_dis " << anger_dis*57.3 << std::endl;
-           average_q = Utility::averageQuaternion(sum_q,q_buf_[i],first_q, i+1);
-       }
-       q_buf_.clear();
-    
-  //std::cout << "" << Utility::R2ypr(q.toRotationMatrix()) << std::endl;
-#endif
-   Eigen::Vector3d p = last_arkit_data_.position;
-
-   pos_.push_back(last_arkit_data_);
-   //predit vel
-   int pos_size = pos_.size();
-   double delta_pos_t = 0;
-   VelData cur_vel;
-   if(pos_size >= 2)
-   {
-       delta_pos_t = (pos_[pos_size-1].sensor_timestamp - pos_[pos_size-2].sensor_timestamp);
-       cur_vel.sensor_timestamp = last_arkit_data_.sensor_timestamp;
-       cur_vel.vel = (pos_[pos_size-1].position - pos_[pos_size-2].position)/delta_pos_t;
-       vel_.push_back(cur_vel);
-   }
-   Vector3d predict_vel;
-   int vel_size = vel_.size();
-   if(delta_pos_t > 0.1)
-   {
-        predict_vel = cur_vel.vel;
-        vel_.clear();
-   }else
-   {
-
-        for(int i=0; i < vel_size; i++)
-        {
-            predict_vel = 1/vel_size * vel_[i].vel;
+        
+        if (target_timestamp < last_arkit_data_.sensor_timestamp || last_arkit_data_.sensor_timestamp == 0) {
+            return false;
         }
-   }
+       arkit_mtx_.lock();
+       pose_predictor.setArkitPose(last_arkit_data_);
+       arkit_mtx_.unlock();
 
-   if(vel_size>=10)
-   {
-        vel_.pop_front();
-   }
+       accel_mtx_.lock();
+       pose_predictor.setAcc(accelerometer_data_);
+       accel_mtx_.unlock();
 
-    Vector3d filtered_acc;
-    last_time = last_arkit_data_.sensor_timestamp;
-#ifdef PREDICT
-    for (auto it = accelerometer_data_.begin(); it != accelerometer_data_.end(); ++it)
-    {
-        AccelerometerData data = *it;
+       gyro_mtx_.lock();
+       pose_predictor.setGyro(gyro_data_);
+       gyro_mtx_.unlock();
 
-        imu_filter.get_filted_acc(data.acceleration, filtered_acc);
-        double dt = data.sensor_timestamp - last_time;
-        p += predict_vel * dt +  q * R_I2C * pow(dt, 2) * filtered_acc / 2 * 9.8;
-        last_time = data.sensor_timestamp;
-    }
-
-   p += predict_vel * DELAY_TIME /*+  q * R_I2C * pow(DELAY_TIME, 2) * filtered_acc / 2 * 9.8*/;
-#endif
-   position = p;
-   rotation = q;
-#else
-    pose_ekf.getRealPose(position, rotation);
-    std::cout << "ekf_sum " << pose_ekf.ekf_sum << std::endl;
-#endif
-    return true;
+       HoloKitARSession* arSession = [HoloKitARSession sharedARSession];
+    double lastFrameTime = arSession.nextVsyncTimestamp - arSession.lastVsyncTimestamp;
+    double nextVsyncTime = arSession.nextVsyncTimestamp + 2 * lastFrameTime;
+    double lastGyroTime = [[HoloKitCoreMotion sharedCoreMotion] currentGyroData].timestamp;
+    NSLog(@"[low_latency]: prediction time: %f and interval: %f", nextVsyncTime - lastGyroTime, lastFrameTime);
+       pose_predictor.getPredcitPose(position, rotation, nextVsyncTime - lastGyroTime);
+       return true;
 }
 
 Eigen::Quaterniond LowLatencyTrackingApi::ConvertToEigenQuaterniond(Eigen::Vector3d euler) const {

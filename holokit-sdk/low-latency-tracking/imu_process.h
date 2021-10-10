@@ -1,9 +1,8 @@
 #pragma once
 
-#include <iostream>
-#include <queue>
+#include<iostream>
+#include<queue>
 #include "Eigen/Geometry"
-
 using namespace Eigen;
 
 template<typename T>

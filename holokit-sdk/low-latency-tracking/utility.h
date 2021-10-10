@@ -8,7 +8,7 @@
 #include <numeric>
 #include <functional>
 #include <iostream>
-
+#include <iomanip>
 using namespace Eigen;
 using namespace std;
 #define PI                 3.141592653589793f
@@ -177,48 +177,6 @@ public:
     static Matrix3d matrix_rotate(Matrix3d m,Vector3d g);
     static double safe_asin(double v);
     static double safe_acos(double v);
-
-    static Eigen::Quaterniond toQuaterniond(const Eigen::Vector3d& v3d);
     static Quaterniond averageQuaternion(Quaterniond &sum, const Quaterniond &new_q, const Quaterniond &first_q, int num);
-
-    template <size_t N>
-    struct uint_
-    {
-    };
-
-    template<size_t N, typename Lambda, typename IterT>
-    void unroller(const Lambda &f, const IterT &iter, uint_<N>)
-    {
-        unroller(f, iter, uint_<N - 1>());
-        f(iter + N);
-    }
-
-    template<typename Lambda, typename IterT>
-    void unroller(const Lambda &f, const IterT &iter, uint_<0>)
-    {
-        f(iter);
-    }
-
-    template<typename T>
-    static T normalizeAngle(const T &angle_degrees)
-    {
-        T two_pi(2.0 * 180);
-        if (angle_degrees > 0)
-            return angle_degrees -
-                two_pi * std::floor((angle_degrees + T(180)) / two_pi);
-        else
-            return angle_degrees +
-                two_pi * std::floor((-angle_degrees + T(180)) / two_pi);
-    };
-    template <class type>
-    type stringToNum(const string str)
-    {
-        istringstream is(str);
-        type num;
-        is >> num;
-
-        return num;
-    }
-
+    static Quaterniond ConvertToEigenQuaterniond(Eigen::Vector3d euler);
 };
-

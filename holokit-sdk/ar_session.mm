@@ -44,8 +44,11 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 
 // https://developer.apple.com/videos/play/wwdc2021/10147/
 - (void)displayLinkCallback:(CADisplayLink *)link {
-    double currentTime = [[NSProcessInfo processInfo] systemUptime];
+    //double currentTime = [[NSProcessInfo processInfo] systemUptime];
     //NSLog(@"[CADisplayLinkCallback]: %f\n", currentTime);
+    
+    self.lastVsyncTimestamp = link.timestamp;
+    self.nextVsyncTimestamp = link.targetTimestamp;
     
     //NSLog(@"[displaylink]: current time: %f, last vsync time: %f, next vsync time: %f", [[NSProcessInfo processInfo] systemUptime], link.timestamp, link.targetTimestamp);
     //NSLog(@"[displaylink]: time from last vsync: %f, time to next vsync: %f", currentTime - link.timestamp, link.targetTimestamp - currentTime);

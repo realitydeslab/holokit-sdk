@@ -21,6 +21,8 @@
 @property (nonatomic, assign) simd_double3 appleWatchAcceleration;
 @property (nonatomic, assign) simd_double3 appleWatchAngularVelocity;
 @property (nonatomic, strong, nullable) CADisplayLink *aDisplayLink;
+@property (nonatomic, assign) double lastVsyncTimestamp;
+@property (nonatomic, assign) double nextVsyncTimestamp;
 
 + (id)sharedARSession;
 - (void)updateWithHoloKitCollaborationData:(ARCollaborationData *) collaborationData;

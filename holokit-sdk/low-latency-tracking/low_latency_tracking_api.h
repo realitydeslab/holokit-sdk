@@ -15,41 +15,39 @@
 #include <memory>
 #include "imu_process.h"
 #include "pose_ekf.h"
+#include "pose_predictor.h"
 
 #define NO_EKF
-#define GYRO_INTEGRATE
-#define DELAY_TIME 0.01666
-//#define PREDICT
 
 namespace holokit {
 
-struct AccelerometerData {
-    double sensor_timestamp;
-    Eigen::Vector3d acceleration;
-};
-
-struct GyroData {
-    double sensor_timestamp;
-    Eigen::Vector3d rotationRate;
-};
-
-struct IMUData {
-    double sensor_timestamp;
-    Eigen::Vector3d acceleration;
-    Eigen::Vector3d rotationRate;
-};
-
-struct ARKitData {
-    double sensor_timestamp;
-    Eigen::Vector3d position;
-    Eigen::Quaterniond rotation;
-    Eigen::Matrix3d intrinsics;
-};
-
-struct VelData {
-    double sensor_timestamp;
-    Eigen::Vector3d vel;
-};
+//struct AccelerometerData {
+//    double sensor_timestamp;
+//    Eigen::Vector3d acceleration;
+//};
+//
+//struct GyroData {
+//    double sensor_timestamp;
+//    Eigen::Vector3d rotationRate;
+//};
+//
+//struct IMUData {
+//    double sensor_timestamp;
+//    Eigen::Vector3d acceleration;
+//    Eigen::Vector3d rotationRate;
+//};
+//
+//struct ARKitData {
+//    double sensor_timestamp;
+//    Eigen::Vector3d position;
+//    Eigen::Quaterniond rotation;
+//    Eigen::Matrix3d intrinsics;
+//};
+//
+//struct VelData {
+//    double sensor_timestamp;
+//    Eigen::Vector3d vel;
+//};
 
 class LowLatencyTrackingApi {
     
@@ -117,7 +115,8 @@ private:
     int imu_prepare = 0;
 
     PoseEKF pose_ekf;
-    IMUFilter imu_filter;
+    
+    PosePredictor pose_predictor;
     
     Vector3d gyro_bias;
 

@@ -109,34 +109,6 @@ double Utility::safe_acos(double v)
     return acosf(v);
 }
 
-
-
-Eigen::Quaterniond Utility::toQuaterniond(const Eigen::Vector3d &v3d)
-{
-    double theta = v3d.norm();
-    double half_theta = 0.5 * theta;
-
-    double imag_factor;
-    double real_factor = cos(half_theta);
-    const double SMALL_EPS = 1e-10;
-    if (theta < SMALL_EPS)
-    {
-        double theta_sq = theta * theta;
-        double theta_po4 = theta_sq * theta_sq;
-        imag_factor = 0.5 - 0.0208333 * theta_sq + 0.000260417 * theta_po4;
-    }
-    else
-    {
-        double sin_half_theta = sin(half_theta);
-        imag_factor = sin_half_theta / theta;
-    }
-
-    return Eigen::Quaterniond(real_factor,
-                              imag_factor * v3d.x(),
-                              imag_factor * v3d.y(),
-                              imag_factor * v3d.z());
-}
-
 Quaterniond Utility::averageQuaternion(Quaterniond &sum, const Quaterniond &new_q, const Quaterniond &first_q, int num)
 {
 
@@ -146,7 +118,7 @@ Quaterniond Utility::averageQuaternion(Quaterniond &sum, const Quaterniond &new_
     double z = 0.0;
     Quaterniond tmp_q;
     double dot = new_q.dot(first_q);
-    std::cout << "dot" << dot << std::endl;
+//    std::cout << "dot" << dot << std::endl;
     if(dot < 0)
     {
         tmp_q.w() = -new_q.w();
@@ -161,11 +133,11 @@ Quaterniond Utility::averageQuaternion(Quaterniond &sum, const Quaterniond &new_
         tmp_q.y() = new_q.y();
         tmp_q.z() = new_q.z();
     }
-    std::cout << "tmp_q" << tmp_q.coeffs().transpose() << std::endl;
+//    std::cout << "tmp_q" << tmp_q.coeffs().transpose() << std::endl;
     //Average the values
     double addDet = 1/(double)num;
-    std::cout << "addDet " << addDet << std::endl;
-    std::cout << "sum " << sum.coeffs().transpose() << std::endl;
+//    std::cout << "addDet " << addDet << std::endl;
+//    std::cout << "sum " << sum.coeffs().transpose() << std::endl;
     sum.w() += tmp_q.w();
     w = sum.w() * addDet;
     sum.x() += tmp_q.x();
@@ -174,12 +146,19 @@ Quaterniond Utility::averageQuaternion(Quaterniond &sum, const Quaterniond &new_
     y = sum.y() * addDet;
     sum.z() += tmp_q.z();
     z = sum.z() * addDet;
-    std::cout << "sum z" << sum.z() << std::endl;
-    std::cout << "z" << z << std::endl;
+//    std::cout << "sum z" << sum.z() << std::endl;
+//    std::cout << "z" << z << std::endl;
     Quaterniond average_q(w,x,y,z);
-    std::cout << "average_q" << average_q.coeffs().transpose() << std::endl;
+//    std::cout << "average_q" << average_q.coeffs().transpose() << std::endl;
     average_q.normalize();
 
     //note: if speed is an issue, you can skip the normalization step
     return average_q;
+}
+
+Quaterniond Utility::ConvertToEigenQuaterniond(Eigen::Vector3d euler)
+{
+    return Eigen::AngleAxisd(euler[0], ::Eigen::Vector3d::UnitX()) *
+    Eigen::AngleAxisd(euler[1], ::Eigen::Vector3d::UnitY()) *
+    Eigen::AngleAxisd(euler[2], ::Eigen::Vector3d::UnitZ());
 }

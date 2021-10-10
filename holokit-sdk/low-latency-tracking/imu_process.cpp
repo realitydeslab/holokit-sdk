@@ -1,6 +1,6 @@
 #include "imu_process.h"
 #include "utility.h"
-#include <math.h>
+#include<math.h>
 
 LowPassFilter::LowPassFilter(double _sample_freq, double _cutoff_freq):
 sample_freq(_sample_freq),
@@ -88,7 +88,6 @@ void IMUFilter::get_filted_acc(const Vector3d &_acc, Vector3d &_filted_acc)
     acc_lwfilter.lowpass_filter(_acc, lwf_acc);
 
     gauss_acc.push_back(lwf_acc);
-//    gauss_acc_filer_cnt++;
 
     Vector3d filted_acc(0,0,0);
     int acc_size = gauss_acc.size();
@@ -117,7 +116,6 @@ void IMUFilter::get_filted_gyro(const Vector3d &_gyro, Vector3d &_filted_gyro)
 //    }
 
     gauss_gyro.push_back(lwf_gyro);
-//    gauss_gyro_filer_cnt++;
 
     Vector3d filted_gyro(0,0,0);
     int gyro_size = gauss_gyro.size();
@@ -263,7 +261,7 @@ void IMUProcessor::check_matrix()
             // normalisation didn't fix the problem! We're
             // in real trouble. All we can do is reset
             //Serial.printf("ERROR: DCM matrix error. _dcm_matrix.c.x=%f\n",
-            //       _dcm_matrix.c.x);
+            //	   _dcm_matrix.c.x);
             reset_dcm();
         }
     }
@@ -416,3 +414,4 @@ Vector3d IMUProcessor::get_ypr()
 {
     return ypr*180/M_PI;
 }
+

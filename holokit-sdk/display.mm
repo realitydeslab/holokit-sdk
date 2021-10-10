@@ -215,7 +215,7 @@ public:
     
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
         NSLog(@"[time_interval]: %f", GetCurrentTime() - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
         
         os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
@@ -226,7 +226,7 @@ public:
         //NSLog(@"[submitCurrentFrame]: current time: %f, time from last populate next frame: %f", currentTime, currentTime - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
         holokit::HoloKitApi::GetInstance()->SetLastSubmitCurrentFrameTime(currentTime);
         
-        //RenderContent();
+        RenderContent();
         RenderAlignmentMarker();
         
         if (RenderCallbackDelegate != NULL) {
@@ -325,8 +325,8 @@ public:
 
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
-        NSLog(@" ");
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
+        //NSLog(@" ");
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
         
         os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
         os_signpost_id_t spid = os_signpost_id_generate(log);
