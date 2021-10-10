@@ -27,8 +27,6 @@
 
 namespace {
 
-static int s_FrameCount = 0;
-
 class HoloKitInputProvider {
 public:
     HoloKitInputProvider(IUnityXRTrace* trace, IUnityXRInputInterface* input)

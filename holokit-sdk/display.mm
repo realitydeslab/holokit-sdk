@@ -122,6 +122,9 @@ NSString* content_shader = @
 typedef void (*SetARCameraBackground)(bool value);
 SetARCameraBackground SetARCameraBackgroundDelegate = NULL;
 
+typedef void (*RenderCallback)(void);
+RenderCallback RenderCallbackDelegate = NULL;
+
 namespace holokit {
 class HoloKitDisplayProvider {
 public:
@@ -175,7 +178,7 @@ public:
         // Register for callbacks on display provider.
         UnityXRDisplayProvider provider{NULL, NULL, NULL};
         provider.QueryMirrorViewBlitDesc = [](UnitySubsystemHandle, void*, const UnityXRMirrorViewBlitInfo, UnityXRMirrorViewBlitDesc*) -> UnitySubsystemErrorCode {
-            return kUnitySubsystemErrorCodeFailure; 
+            return kUnitySubsystemErrorCodeFailure;
         };
         GetInstance()->GetDisplay()->RegisterProvider(handle, &provider);
         
@@ -196,8 +199,8 @@ public:
             UnityXRRenderingCapabilities* rendering_caps) {
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Start()", GetCurrentTime());
         // Does the system use multi-pass rendering?
-        rendering_caps->noSinglePassRenderingSupport = false;
-        rendering_caps->invalidateRenderStateAfterEachCallback = true;
+        rendering_caps->noSinglePassRenderingSupport = true;
+        rendering_caps->invalidateRenderStateAfterEachCallback = false;
         // Unity will swap buffers for us after GfxThread_SubmitCurrentFrame() is executed.
         rendering_caps->skipPresentToMainScreen = false;
         
@@ -212,20 +215,25 @@ public:
     
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
+        NSLog(@"[time_interval]: %f", GetCurrentTime() - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
+        
+        os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+        os_signpost_id_t spid = os_signpost_id_generate(log);
+        os_signpost_interval_begin(log, spid, "SubmitCurrentFrame");
         
         double currentTime = [[NSProcessInfo processInfo] systemUptime];
         //NSLog(@"[submitCurrentFrame]: current time: %f, time from last populate next frame: %f", currentTime, currentTime - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
         holokit::HoloKitApi::GetInstance()->SetLastSubmitCurrentFrameTime(currentTime);
         
-        os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-        os_signpost_id_t spid = os_signpost_id_generate(log);
-        os_signpost_interval_begin(log, spid, "SubmitCurrentFrame");
-        os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
-        
-        RenderContent();
+        //RenderContent();
         RenderAlignmentMarker();
         
+        if (RenderCallbackDelegate != NULL) {
+            RenderCallbackDelegate();
+        }
+        
+        os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -317,16 +325,16 @@ public:
 
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
-        
-        double currentTime = [[NSProcessInfo processInfo] systemUptime];
-        holokit::HoloKitApi::GetInstance()->SetLastPopulateNextFrameTime(currentTime);
-        //NSLog(@"[populateNextFrame]: current time: %f", [[NSProcessInfo processInfo] systemUptime]);
+        NSLog(@" ");
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
         
         os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
         os_signpost_id_t spid = os_signpost_id_generate(log);
         os_signpost_interval_begin(log, spid, "PopulateNextFrame");
-        os_signpost_interval_end(log, spid, "PopulateNextFrame");
+        
+        double currentTime = [[NSProcessInfo processInfo] systemUptime];
+        holokit::HoloKitApi::GetInstance()->SetLastPopulateNextFrameTime(currentTime);
+        //NSLog(@"[populateNextFrame]: current time: %f", [[NSProcessInfo processInfo] systemUptime]);
         
         // We interrupt the graphics thread if it is not manually opened by SDK.
         if (!holokit::HoloKitApi::GetInstance()->StereoscopicRendering()) {
@@ -425,6 +433,7 @@ public:
             culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             culling_pass.projection.data.matrix = next_frame->renderPasses[0].renderParams[0].projection.data.matrix;
         }
+        os_signpost_interval_end(log, spid, "PopulateNextFrame");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -631,6 +640,11 @@ extern "C" {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetSetARCameraBackgroundDelegate(SetARCameraBackground callback) {
     SetARCameraBackgroundDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetRenderCallbackDelegate(RenderCallback callback) {
+    RenderCallbackDelegate = callback;
 }
 
 } // extern "C"

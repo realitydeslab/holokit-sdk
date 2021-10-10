@@ -45,6 +45,8 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 // https://developer.apple.com/videos/play/wwdc2021/10147/
 - (void)displayLinkCallback:(CADisplayLink *)link {
     double currentTime = [[NSProcessInfo processInfo] systemUptime];
+    //NSLog(@"[CADisplayLinkCallback]: %f\n", currentTime);
+    
     //NSLog(@"[displaylink]: current time: %f, last vsync time: %f, next vsync time: %f", [[NSProcessInfo processInfo] systemUptime], link.timestamp, link.targetTimestamp);
     //NSLog(@"[displaylink]: time from last vsync: %f, time to next vsync: %f", currentTime - link.timestamp, link.targetTimestamp - currentTime);
     
@@ -71,6 +73,10 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
     
+    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+    os_signpost_id_t spid = os_signpost_id_generate(log);
+    os_signpost_interval_begin(log, spid, "Update ARKit");
+    
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
@@ -92,11 +98,8 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
     }
     
-    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-    os_signpost_id_t spid = os_signpost_id_generate(log);
-    os_signpost_interval_begin(log, spid, "Update ARKit");
     os_signpost_interval_end(log, spid, "Update ARKit");
-    
+
     // If hands are lost.
     // This is only useful for Google Mediapipe hand tracking.
 //    if (self.isLeftHandTracked || self.isRightHandTracked) {
