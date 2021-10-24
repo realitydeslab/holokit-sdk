@@ -216,7 +216,12 @@ public:
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
-        NSLog(@"[time_interval]: %f", GetCurrentTime() - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
+        //NSLog(@"[time_interval]: %f", GetCurrentTime() - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
+        if (GetCurrentTime() - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime() > 0.014) {
+            holokit::HoloKitApi::GetInstance()->SetIsSkippingFrame(true);
+        } else {
+            holokit::HoloKitApi::GetInstance()->SetIsSkippingFrame(false);
+        }
         
         os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
         os_signpost_id_t spid = os_signpost_id_generate(log);

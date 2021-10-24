@@ -14,6 +14,7 @@
 #import "utility.h"
 #import <os/log.h>
 #import <os/signpost.h>
+#import "../holokit_api.h"
 
 namespace holokit {
 
@@ -120,8 +121,11 @@ bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& po
        HoloKitARSession* arSession = [HoloKitARSession sharedARSession];
     double lastFrameTime = arSession.nextVsyncTimestamp - arSession.lastVsyncTimestamp;
     double nextVsyncTime = arSession.nextVsyncTimestamp + 2 * lastFrameTime;
+    if (holokit::HoloKitApi::GetInstance()->GetIsSkippingFrame()) {
+        nextVsyncTime += lastFrameTime;
+    }
     double lastGyroTime = [[HoloKitCoreMotion sharedCoreMotion] currentGyroData].timestamp;
-    NSLog(@"[low_latency]: prediction time: %f and interval: %f", nextVsyncTime - lastGyroTime, lastFrameTime);
+    //NSLog(@"[low_latency]: prediction time: %f and interval: %f", nextVsyncTime - lastGyroTime, lastFrameTime);
        pose_predictor.getPredcitPose(position, rotation, nextVsyncTime - lastGyroTime);
        return true;
 }
@@ -134,66 +138,16 @@ Eigen::Quaterniond LowLatencyTrackingApi::ConvertToEigenQuaterniond(Eigen::Vecto
 
 void LowLatencyTrackingApi::OnAccelerometerDataUpdated(const AccelerometerData& data) {
     if (!is_active_) return;
-#ifdef NO_EKF
    accel_mtx_.lock();
-    
    accelerometer_data_.push_back(data);
    accel_mtx_.unlock();
-#else
-    cur_acc.acceleration = data.acceleration * 9.81f;
-    cur_acc.sensor_timestamp = data.sensor_timestamp;
-    if(imu_prepare<10)
-     {
-//        std::cout << "imu_prepare" <<  imu_prepare << std::endl;
-        imu_prepare++;
-     }
-#endif
 }
 
 void LowLatencyTrackingApi::OnGyroDataUpdated(const GyroData& data) {
     if (!is_active_) return;
-#ifdef NO_EKF
     gyro_mtx_.lock();
-
     gyro_data_.push_back(data);
     gyro_mtx_.unlock();
-#else
-    if(data.sensor_timestamp <= 0) return;
-    if(imu_prepare < 10) return;
-
-    if(gyro_buf.size() == 0)
-     {
-         gyro_buf.push_back(data);
-         gyro_buf.push_back(data);
-         return;
-     }
-     else
-     {
-         gyro_buf[0] = gyro_buf[1];
-        // std::cout << std::fixed << std::setprecision(6)<< "data" << data.sensor_timestamp << std::endl;
-         gyro_buf[1] = data;
-     }
-     //interpolation
-     if(cur_acc.sensor_timestamp >= gyro_buf[0].sensor_timestamp && cur_acc.sensor_timestamp < gyro_buf[1].sensor_timestamp)
-     {
-         imu_data.sensor_timestamp = cur_acc.sensor_timestamp;
-         imu_data.acceleration = cur_acc.acceleration;
-         imu_data.rotationRate = gyro_buf[0].rotationRate + (cur_acc.sensor_timestamp - gyro_buf[0].sensor_timestamp)*(gyro_buf[1].rotationRate - gyro_buf[0].rotationRate)/(gyro_buf[1].sensor_timestamp - gyro_buf[0].sensor_timestamp);
-         imu_good_flag = true;
-         //printf("imu gyro update %lf %lf %lf\n", gyro_buf[0].header, imu_msg->header, gyro_buf[1].header);
-         //printf("imu inte update %lf %lf %lf %lf\n", imu_msg->header, gyro_buf[0].gyr.x(), imu_msg->gyr.x(), gyro_buf[1].gyr.x());
-     }
-     else
-     {
-         printf("imu error %lf %lf %lf\n", gyro_buf[0].sensor_timestamp, cur_acc.sensor_timestamp, gyro_buf[1].sensor_timestamp);
-         return;
-     }
-
-    if(ekf_init_flag)
-    {
-        pose_ekf.imuCallback(imu_data.acceleration, imu_data.rotationRate + gyro_bias, imu_data.sensor_timestamp);
-    }
-#endif
 }
 
 void LowLatencyTrackingApi::OnARKitDataUpdated(const ARKitData& data) {
@@ -202,32 +156,24 @@ void LowLatencyTrackingApi::OnARKitDataUpdated(const ARKitData& data) {
     arkit_mtx_.lock();
     last_arkit_data_ = data;
     arkit_mtx_.unlock();
-
-#ifdef NO_EKF
+   AccelerometerData accel;
    accel_mtx_.lock();
-   while (!accelerometer_data_.empty() && data.sensor_timestamp > accelerometer_data_.front().sensor_timestamp) {
+   while (!accelerometer_data_.empty() && data.sensor_timestamp > accelerometer_data_.front().sensor_timestamp)
+   {
+       accel = accelerometer_data_.front();
        accelerometer_data_.pop_front();
    }
+   accelerometer_data_.push_front(accel);  //save one frame before arkit data
    accel_mtx_.unlock();
+   GyroData gyro;
    gyro_mtx_.lock();
-   while (!gyro_data_.empty() && data.sensor_timestamp > gyro_data_.front().sensor_timestamp) {
+   while (!gyro_data_.empty() && data.sensor_timestamp > gyro_data_.front().sensor_timestamp)
+   {
+       gyro = gyro_data_.front();
        gyro_data_.pop_front();
    }
+   gyro_data_.push_front(gyro); //save one frame before arkit data
    gyro_mtx_.unlock();
-#else
-//    std::cout << "first frame arkit: " << last_arkit_data_.position;
-
-    if(ekf_init_flag)
-    {
-        pose_ekf.measurementCallback(data.position, data.rotation, data.sensor_timestamp);
-    }
-
-    if(imu_good_flag && !ekf_init_flag)
-    {
-        InitEKF();
-        ekf_init_flag = true;
-    }
-#endif
 }
 
 void LowLatencyTrackingApi::Clear() {

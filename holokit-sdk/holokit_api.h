@@ -66,6 +66,10 @@ public:
     
     void SetLastPopulateNextFrameTime(double time) { last_populate_next_frame_time_ = time; }
     
+    bool GetIsSkippingFrame() { return is_skipping_frame_; }
+    
+    void SetIsSkippingFrame(bool val) { is_skipping_frame_ = val; }
+    
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
 private:
@@ -116,6 +120,8 @@ private:
     double last_submit_current_frame_time_ = 0.0;
     
     double last_populate_next_frame_time_ = 0.0;
+    
+    bool is_skipping_frame_ = false;
 
 }; // class HoloKitApi
 

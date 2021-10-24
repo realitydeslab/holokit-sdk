@@ -33,6 +33,32 @@ struct CameraParam
 class Utility
 {
 public:
+
+    static bool interpolation(double t1, const Vector3d &data1, double t2, const Vector3d &data2, double t ,Vector3d &data)
+    {
+        if(t1 <= t2)
+        {
+            return false;
+        }
+
+        if(fabs(t1-t) < 0.000001)
+        {
+            data =  data1;
+        }
+
+        if(fabs(t2-t) < 0.000001)
+        {
+            data =  data2;
+        }
+
+        double dt1 = t - t1;
+        double dt2 = t2 - t;
+        data = dt2/(t2-t1)*data1 + dt1/(t2-t1) * data2;
+        
+        return true;
+    }
+
+
     template<typename Derived>
     static Eigen::Quaternion<typename Derived::Scalar> deltaQ(const Eigen::MatrixBase<Derived> &theta)
     {
@@ -179,4 +205,5 @@ public:
     static double safe_acos(double v);
     static Quaterniond averageQuaternion(Quaterniond &sum, const Quaterniond &new_q, const Quaterniond &first_q, int num);
     static Quaterniond ConvertToEigenQuaterniond(Eigen::Vector3d euler);
+    static Quaterniond averageQuaternionNew(Quaterniond &aver_q, const Quaterniond &new_q, const Quaterniond &first_q, int num);
 };

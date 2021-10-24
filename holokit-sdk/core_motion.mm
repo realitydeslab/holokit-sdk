@@ -50,6 +50,7 @@
     if ([self.motionManager isAccelerometerAvailable] && ![self.motionManager isAccelerometerActive]) {
         self.motionManager.accelerometerUpdateInterval = self.accelUpdateInterval;
         [self.motionManager startAccelerometerUpdatesToQueue:self.accelGyroQueue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
+            //NSLog(@"[core_motion]: accelerometer sensor time: %f", accelerometerData.timestamp);
             self.currentAccelData = accelerometerData;
             handler(accelerometerData);
         }];
@@ -66,6 +67,7 @@
     if ([self.motionManager isGyroAvailable] && ![self.motionManager isGyroActive]) {
         self.motionManager.gyroUpdateInterval = self.gyroUpdateInterval;
         [self.motionManager startGyroUpdatesToQueue:self.accelGyroQueue withHandler:^(CMGyroData *gyroData, NSError *error) {
+            //NSLog(@"[core_motion]: gyroscope sensor time: %f", gyroData.timestamp);
             self.currentGyroData = gyroData;
             handler(gyroData);
         }];

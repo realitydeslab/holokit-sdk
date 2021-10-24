@@ -42,8 +42,8 @@ void LowPassFilter::lowpass_filter(const Vector3d &_sample, Vector3d& _out_put)
 }
 
 IMUFilter::IMUFilter():
-acc_lwfilter(100,50),
-gyro_lwfilter(100,50)
+acc_lwfilter(100,40),
+gyro_lwfilter(100,40)
 {
 
 }
@@ -108,13 +108,13 @@ void IMUFilter::get_filted_acc(const Vector3d &_acc, Vector3d &_filted_acc)
 void IMUFilter::get_filted_gyro(const Vector3d &_gyro, Vector3d &_filted_gyro)
 {
     Vector3d lwf_gyro(0,0,0);
-    gyro_lwfilter.lowpass_filter(_gyro, lwf_gyro);
+//    gyro_lwfilter.lowpass_filter(_gyro, lwf_gyro);
 
-//    if(fabs(lwf_gyro.z()) <= 0.002)
-//    {
-//        lwf_gyro(2) = 0;
-//    }
-
+////    if(fabs(lwf_gyro.z()) <= 0.002)
+////    {
+////        lwf_gyro(2) = 0;
+////    }
+    lwf_gyro = _gyro;
     gauss_gyro.push_back(lwf_gyro);
 
     Vector3d filted_gyro(0,0,0);
@@ -125,7 +125,7 @@ void IMUFilter::get_filted_gyro(const Vector3d &_gyro, Vector3d &_filted_gyro)
         filted_gyro += gauss_gyro[i] * para;
     }
 
-    if(gyro_size >= 5)
+    if(gyro_size >= 2)
     {
         gauss_gyro.pop_front();
     }
@@ -261,7 +261,7 @@ void IMUProcessor::check_matrix()
             // normalisation didn't fix the problem! We're
             // in real trouble. All we can do is reset
             //Serial.printf("ERROR: DCM matrix error. _dcm_matrix.c.x=%f\n",
-            //	   _dcm_matrix.c.x);
+            //       _dcm_matrix.c.x);
             reset_dcm();
         }
     }
@@ -414,4 +414,3 @@ Vector3d IMUProcessor::get_ypr()
 {
     return ypr*180/M_PI;
 }
-

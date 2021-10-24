@@ -156,6 +156,46 @@ Quaterniond Utility::averageQuaternion(Quaterniond &sum, const Quaterniond &new_
     return average_q;
 }
 
+Quaterniond Utility::averageQuaternionNew(Quaterniond &aver_q, const Quaterniond &new_q, const Quaterniond &first_q, int num)
+{
+
+    double w = 0.0;
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
+    Quaterniond tmp_q;
+    double dot = new_q.dot(first_q);
+    //std::cout << "dot" << dot << std::endl;
+    if(dot < 0)
+    {
+        tmp_q.w() = -new_q.w();
+        tmp_q.x() = -new_q.x();
+        tmp_q.y() = -new_q.y();
+        tmp_q.z() = -new_q.z();
+
+    }else
+    {
+        tmp_q.w() = new_q.w();
+        tmp_q.x() = new_q.x();
+        tmp_q.y() = new_q.y();
+        tmp_q.z() = new_q.z();
+    }
+
+    //Average the values
+    double addDet = 1/(double)num;
+    w = (2*tmp_q.w() + (num-1)*aver_q.w())/(num+1);
+    x = (2*tmp_q.x() + (num-1)*aver_q.x())/(num+1);
+    y = (2*tmp_q.y() + (num-1)*aver_q.y())/(num+1);
+    z = (2*tmp_q.z() + (num-1)*aver_q.z())/(num+1);
+
+    Quaterniond average_q(w,x,y,z);
+//    std::cout << "average_q" << average_q.coeffs().transpose() << std::endl;
+    average_q.normalize();
+
+    //note: if speed is an issue, you can skip the normalization step
+    return average_q;
+}
+
 Quaterniond Utility::ConvertToEigenQuaterniond(Eigen::Vector3d euler)
 {
     return Eigen::AngleAxisd(euler[0], ::Eigen::Vector3d::UnitX()) *
