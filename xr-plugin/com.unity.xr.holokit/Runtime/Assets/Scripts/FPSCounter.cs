@@ -14,7 +14,7 @@ public class FPSCounter : MonoBehaviour
 
     [SerializeField]
     [Tooltip("Sets the application's target frame rate.")]
-    int m_TargetFrameRate = 60;
+    int m_TargetFrameRate = 120;
 
     public int targetFrameRate
     {

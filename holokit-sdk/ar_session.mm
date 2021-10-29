@@ -264,4 +264,23 @@ UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
     ARWorldMapSyncedDelegate = callback;
 }
 
+int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetThermalState() {
+    NSProcessInfoThermalState thermalState = [[NSProcessInfo processInfo] thermalState];
+    switch(thermalState) {
+        case NSProcessInfoThermalStateNominal:
+            return 0;
+            break;
+        case NSProcessInfoThermalStateFair:
+            return 1;
+            break;
+        case NSProcessInfoThermalStateSerious:
+            return 2;
+            break;
+        case NSProcessInfoThermalStateCritical:
+            return 3;
+            break;
+    }
+}
+
 } // extern "C"

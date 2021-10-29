@@ -74,7 +74,7 @@ PluginImporter:
         AddToEmbeddedBinaries: false
         CPU: AnyCPU
         CompileFlags: 
-        FrameworkDependencies: 
+        FrameworkDependencies: WatchConnectivity;
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARKit;
 using System;
+using UnityEngine.Rendering;
 
 namespace UnityEngine.XR.HoloKit
 {
@@ -80,6 +81,11 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
+        public bool LowLatencyTrackingActive
+        {
+            get => UnityHoloKit_GetLowLatencyTrackingApiActive();
+        }
+
         [DllImport("__Internal")]
         private static extern bool UnityHoloKit_StereoscopicRendering();
 
@@ -104,6 +110,15 @@ namespace UnityEngine.XR.HoloKit
         [DllImport("__Internal")]
         private static extern bool UnityHoloKit_StartNfcSession();
 
+        [DllImport("__Internal")]
+        private static extern bool UnityHoloKit_GetLowLatencyTrackingApiActive();
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetLowLatencyTrackingApiActive(bool value);
+
+        [DllImport("__Internal")]
+        private static extern int UnityHoloKit_GetThermalState();
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -126,9 +141,6 @@ namespace UnityEngine.XR.HoloKit
                 subsystem.collaborationRequested = true;
             }
 
-            // Set the screen brightness to the maximum.
-            Screen.brightness = 1.0f;
-
             // Retrive camera to center eye offset from objective-c side.
             // https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
             IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
@@ -149,12 +161,31 @@ namespace UnityEngine.XR.HoloKit
             m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
 
             UnityHoloKit_SetSetARCameraBackgroundDelegate(OnSetARCameraBackground);
+
+            RenderPipelineManager.beginFrameRendering += OnBeginFrameRendering;
+            RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
+        }
+
+        private void OnDisable()
+        {
+            RenderPipelineManager.beginFrameRendering -= OnBeginFrameRendering;
+            RenderPipelineManager.endFrameRendering -= OnEndFrameRendering;
+        }
+
+        private void Start()
+        {
+            // Let it be bright.
+            Screen.brightness = 1.0f;
+
+            // Do not sleep.
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+            iOS.Device.hideHomeButton = true;
         }
 
         private void Update()
         {
-            // Reset this value at the beginning of each frame.
-            m_CurrentRenderPass = 0;
+            
         }
 
         public void EnableMeshing(bool enabled)
@@ -204,6 +235,26 @@ namespace UnityEngine.XR.HoloKit
                 //m_SecondARReplayCamera.SetActive(false);
                 return true;
             }
+        }
+
+        public void SetLowLatencyTrackingActive(bool value)
+        {
+            UnityHoloKit_SetLowLatencyTrackingApiActive(value);
+        }
+
+        private void OnBeginFrameRendering(ScriptableRenderContext context, Camera[] cameras)
+        {
+
+        }
+
+        private void OnEndFrameRendering(ScriptableRenderContext context, Camera[] cameras)
+        {
+            //UnityHoloKit_UpdateLastRenderTime();
+        }
+
+        public iOSThermalState GetThermalState()
+        {
+            return (iOSThermalState)UnityHoloKit_GetThermalState();
         }
     }
 }
