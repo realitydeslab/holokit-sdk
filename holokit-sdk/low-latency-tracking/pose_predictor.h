@@ -63,6 +63,7 @@ class PosePredictor
     void smoothAndPredict();
     void predictFutureGyro();
     Quaterniond smoothQ(double deg);
+    Quaterniond smoothQ_ema(double deg);
     Vector3d smoothP();
     // Convert from IMU space to camera space
     Eigen::Matrix3d R_I2C;

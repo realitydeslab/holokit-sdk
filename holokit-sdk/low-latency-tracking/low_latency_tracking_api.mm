@@ -121,6 +121,7 @@ bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& po
        HoloKitARSession* arSession = [HoloKitARSession sharedARSession];
     double lastFrameTime = arSession.nextVsyncTimestamp - arSession.lastVsyncTimestamp;
     double nextVsyncTime = arSession.nextVsyncTimestamp + 2 * lastFrameTime;
+    //double nextVsyncTime = arSession.nextVsyncTimestamp + lastFrameTime;
     if (holokit::HoloKitApi::GetInstance()->GetIsSkippingFrame()) {
         nextVsyncTime += lastFrameTime;
     }

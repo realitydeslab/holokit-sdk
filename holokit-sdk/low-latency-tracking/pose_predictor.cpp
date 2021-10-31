@@ -220,7 +220,7 @@ void PosePredictor::predictFutureGyro()
     }
 }
 
-Quaterniond PosePredictor::smoothQ(double deg)
+Quaterniond PosePredictor::smoothQ_ema(double deg)
 {
     Eigen::Quaterniond average_q = q_buf_.back();
     int q_size = q_buf_.size();
@@ -237,8 +237,33 @@ Quaterniond PosePredictor::smoothQ(double deg)
             break;
         }else
         {
-            //average_q = Utility::averageQuaternion(sum_q,q_buf_[i],first_q, q_size-i);
             average_q = Utility::averageQuaternionNew(average_q, q_buf_[i], first_q,q_size-i);
+//            std::cout << "average ypr" << Utility::R2ypr(average_q.toRotationMatrix()).transpose() << std::endl;
+        }
+    }
+
+    return average_q;
+
+}
+
+Quaterniond PosePredictor::smoothQ(double deg)
+{
+    Eigen::Quaterniond average_q = q_buf_.back();
+    int q_size = q_buf_.size();
+    Eigen::Quaterniond sum_q = average_q;
+    Eigen::Quaterniond first_q = average_q;
+    for(int i=q_size-2; i>= q_size-3; i--)    //先对有imu的姿态做平滑
+    {
+//        std::cout << "q " << i << " " << q_buf_[i].coeffs().transpose() << std::endl;
+//        std::cout << "ypr" << Utility::R2ypr(q_buf_[i].toRotationMatrix()).transpose() << std::endl;
+        double angel_dis = first_q.angularDistance(q_buf_[i]);
+//        std::cout << "anger_dis " << angel_dis*57.3 << std::endl;
+        if(angel_dis*57.3 > deg)
+        {
+            break;
+        }else
+        {
+            average_q = Utility::averageQuaternion(sum_q,q_buf_[i],first_q, q_size-i);
 //            std::cout << "average ypr" << Utility::R2ypr(average_q.toRotationMatrix()).transpose() << std::endl;
         }
     }
@@ -259,8 +284,8 @@ Vector3d PosePredictor::smoothP()
 
 void PosePredictor::smoothAndPredict()
 {
-//    Quaterniond average_q = smoothQ(0.1);
-    Quaterniond average_q = q_buf_.back();
+    Quaterniond average_q = smoothQ_ema(10);
+    //Quaterniond average_q = q_buf_.back();
     predictFutureGyro();
     //predict future q
     average_q *= Utility::ConvertToEigenQuaterniond(predict_dt * R_I2C * predict_future_gyro);
@@ -268,7 +293,7 @@ void PosePredictor::smoothAndPredict()
     q_buf_.push_back(average_q);
 
     //再次平滑
-    average_q = smoothQ(0.3); // TODO: KE YI TIAO! Increasing this value will cause better smoothness and higher latency. Vice versa. The range should between 0 and 0.5. 0 means no smoothness.
+    average_q = smoothQ(10); // TODO: KE YI TIAO! Increasing this value will cause better smoothness and higher latency. Vice versa. The range should between 0 and 0.5. 0 means no smoothness.
     rotation = average_q;
 
     position += predict_last_vel_ * predict_dt;
