@@ -67,12 +67,12 @@ fragment float4 capturedImageFragmentShader(ImageColorInOut in [[stage_in]],
     float4 ycbcr = float4(capturedImageTextureY.sample(colorSampler, in.texCoord).r,
                           capturedImageTextureCbCr.sample(colorSampler, in.texCoord).rg, 1.0);
     
-    constexpr sampler depthSampler(address::clamp_to_edge, filter::linear);
-    float depth = arDepthTexture.sample(depthSampler, in.texCoord);
-    return float4(depth, depth, depth, 1.0);
+//    constexpr sampler depthSampler(address::clamp_to_edge, filter::linear);
+//    float depth = arDepthTexture.sample(depthSampler, in.texCoord);
+//    return float4(depth, depth, depth, 1.0);
     
     // Return converted RGB color
-    return ycbcrToRGBTransform * ycbcr;
+    //return ycbcrToRGBTransform * ycbcr;
     
     // render black background
     return float4(0.0, 0.0, 0.0, 1.0);

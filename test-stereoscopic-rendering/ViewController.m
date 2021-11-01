@@ -55,12 +55,12 @@
     self.session = [ARSession new];
     self.session.delegate = self;
     
-    // Set hand tracker
-    _landmarkZMin = 1000;
-    _landmarkZMax = -1000;
-    self.handTracker = [[HandTracker alloc] init];
-    self.handTracker.delegate = self;
-    [self.handTracker startGraph];
+//    // Set hand tracker
+//    _landmarkZMin = 1000;
+//    _landmarkZMax = -1000;
+//    self.handTracker = [[HandTracker alloc] init];
+//    self.handTracker.delegate = self;
+//    [self.handTracker startGraph];
     
     // apple hand detection
     //self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
@@ -96,7 +96,7 @@
     // for scene depth
     //configuration.frameSemantics = ARFrameSemanticSmoothedSceneDepth;
     configuration.frameSemantics = ARFrameSemanticSceneDepth;
-    configuration.supportedVideoFormats;
+    //configuration.supportedVideoFormats;
 
     [self.session runWithConfiguration:configuration];
 }
@@ -109,18 +109,20 @@
 
 - (void)handleTap:(UIGestureRecognizer*)gestureRecognize {
     ARFrame *currentFrame = [self.session currentFrame];
-    
+    NSLog(@"fuck");
     // Create anchor using the camera's current position
     if (currentFrame) {
         
-        // Create a transform with a translation of 0.2 meters in front of the camera
+        // Create a transform with a translation of 3 meters in front of the camera
         matrix_float4x4 translation = matrix_identity_float4x4;
         // TODO: place the geometry on a physical plane
-        translation.columns[3].z = -0.2;
+        translation.columns[3].z = -3;
+        
         matrix_float4x4 transform = matrix_multiply(currentFrame.camera.transform, translation);
         
         // Add a new anchor to the session
-        ARAnchor *anchor = [[ARAnchor alloc] initWithTransform:transform];
+        //ARAnchor *anchor = [[ARAnchor alloc] initWithTransform:transform];
+        ARAnchor *anchor = [[ARAnchor alloc] initWithName:@"handtracking" transform:transform];
         [self.session addAnchor:anchor];
     }
 }
@@ -148,69 +150,73 @@
     //NSLog(@"new configuration set.");
     
     //NSLog(@"handTracker.processVideoFrame is called");
-    [self.handTracker processVideoFrame: frame.capturedImage];
-    return;
+//    [self.handTracker processVideoFrame: frame.capturedImage];
+//    return;
     
     // for apple hand detection
-    NSLog(@"Apple Vision Hand Detection is running");
-    VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCVPixelBuffer: frame.capturedImage orientation:kCGImagePropertyOrientationUp options:[NSMutableDictionary dictionary]];
-    @try {
-        // perform hand detection algorithm
-        NSArray<VNRequest *> * requests = [[NSArray alloc] initWithObjects:_handPoseRequest, nil];
-        [handler performRequests:requests error:nil];
-        // TODO: check if hand detection is run in this frame
-        
-        VNHumanHandPoseObservation *observation = _handPoseRequest.results.firstObject;
-        if(observation == nil) {
-            //NSLog(@"observation is nil...");
-            return;
-        }
-        
-        // an array of all landmarks
-        NSDictionary<VNRecognizedPointKey, VNRecognizedPoint*>* landmarks = [observation recognizedPointsForGroupKey:VNRecognizedPointGroupKeyAll error:nil];
-        
-        ARDepthData* sceneDepth = _session.currentFrame.sceneDepth;
-        if (!sceneDepth){
-            NSLog(@"ViewController");
-            NSLog(@"Failed to acquire scene depth.");
-            return;
-        }
-        CVPixelBufferRef pixelBuffer = sceneDepth.depthMap;
-        CVPixelBufferLockBaseAddress(pixelBuffer, 0);
-        size_t bufferWidth = CVPixelBufferGetWidth(pixelBuffer);
-        size_t bufferHeight = CVPixelBufferGetHeight(pixelBuffer);
-        Float32* baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
-        
-        // remove all handtracking anchors from last frame
-        for(ARAnchor *anchor in frame.anchors){
-            if([anchor.name isEqual:@"handtracking"]) {
-                [_session removeAnchor:anchor];
-            }
-        }
+//    NSLog(@"Apple Vision Hand Detection is running");
+//    VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCVPixelBuffer: frame.capturedImage orientation:kCGImagePropertyOrientationUp options:[NSMutableDictionary dictionary]];
+//    @try {
+//        // perform hand detection algorithm
+//        NSArray<VNRequest *> * requests = [[NSArray alloc] initWithObjects:_handPoseRequest, nil];
+//        [handler performRequests:requests error:nil];
+//        // TODO: check if hand detection is run in this frame
+//
+//        VNHumanHandPoseObservation *observation = _handPoseRequest.results.firstObject;
+//        if(observation == nil) {
+//            //NSLog(@"observation is nil...");
+//            return;
+//        }
+//
+//        // an array of all landmarks
+//        NSDictionary<VNRecognizedPointKey, VNRecognizedPoint*>* landmarks = [observation recognizedPointsForGroupKey:VNRecognizedPointGroupKeyAll error:nil];
+//
+//        ARDepthData* sceneDepth = _session.currentFrame.sceneDepth;
+//        if (!sceneDepth){
+//            NSLog(@"ViewController");
+//            NSLog(@"Failed to acquire scene depth.");
+//            return;
+//        }
+//        CVPixelBufferRef pixelBuffer = sceneDepth.depthMap;
+//        CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+//        size_t bufferWidth = CVPixelBufferGetWidth(pixelBuffer);
+//        size_t bufferHeight = CVPixelBufferGetHeight(pixelBuffer);
+//        Float32* baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
+//
+//        // remove all handtracking anchors from last frame
+//        for(ARAnchor *anchor in frame.anchors){
+//            if([anchor.name isEqual:@"handtracking"]) {
+//                [_session removeAnchor:anchor];
+//            }
+//        }
+//
+//        //NSLog(@"dictionary size: %d", landmarks.count);
+//        for(id key in landmarks) {
+//            VNRecognizedPoint *landmark = [landmarks objectForKey:key];
+//            int x = (CGFloat)landmark.location.x * frame.camera.imageResolution.width;
+//            int y = (CGFloat)(1 - landmark.location.y) * frame.camera.imageResolution.height;
+//            CGPoint screenPoint = CGPointMake(x, y);
+//            //NSLog(@"[%f, f%]", landmark.location.x, landmark.location.y);
+//
+//            int depthX = landmark.x * bufferWidth;
+//            int depthY = (1 - landmark.y) * bufferHeight;
+//            float landmarkDepth = baseAddress[depthY * bufferWidth + depthX];
+//
+//            simd_float4x4 anchorTransform = [self unprojectScreenPointToTransform:screenPoint depth:landmarkDepth currentFrame:frame];
+//            ARAnchor *anchor = [[ARAnchor alloc] initWithName:@"handtracking" transform:anchorTransform];
+//            [_session addAnchor:anchor];
+//
+//        }
+//        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+//
+//    } @catch(NSException * e) {
+//        NSLog(@"Apple hand detection not working...");
+//    }
     
-        //NSLog(@"dictionary size: %d", landmarks.count);
-        for(id key in landmarks) {
-            VNRecognizedPoint *landmark = [landmarks objectForKey:key];
-            int x = (CGFloat)landmark.location.x * frame.camera.imageResolution.width;
-            int y = (CGFloat)(1 - landmark.location.y) * frame.camera.imageResolution.height;
-            CGPoint screenPoint = CGPointMake(x, y);
-            //NSLog(@"[%f, f%]", landmark.location.x, landmark.location.y);
-            
-            int depthX = landmark.x * bufferWidth;
-            int depthY = (1 - landmark.y) * bufferHeight;
-            float landmarkDepth = baseAddress[depthY * bufferWidth + depthX];
-            
-            simd_float4x4 anchorTransform = [self unprojectScreenPointToTransform:screenPoint depth:landmarkDepth currentFrame:frame];
-            ARAnchor *anchor = [[ARAnchor alloc] initWithName:@"handtracking" transform:anchorTransform];
-            [_session addAnchor:anchor];
-             
-        }
-        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
-        
-    } @catch(NSException * e) {
-        NSLog(@"Apple hand detection not working...");
-    }
-    
+}
+
+- (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor *> *)anchors {
+    NSLog(@"an anchor was added");
 }
 
 - (void)session:(ARSession *)session didFailWithError:(NSError *)error {
@@ -312,8 +318,5 @@
 - (void)handTracker: (HandTracker*)handTracker didOutputPixelBuffer: (CVPixelBufferRef)pixelBuffer {
     
 }
-
-#pragma mark - Apple Hand Detection
-
 
 @end

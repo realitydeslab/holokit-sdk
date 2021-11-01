@@ -472,7 +472,7 @@ const float kUserInterpupillaryDistance = 0.064;
     const double widthInPixel = (double)(width / phone.screenWidth * (float)_drawableSize.width);
     const double heightInPixel = (double)(height / phone.screenHeight * (float)_drawableSize.height);
     
-    NSLog(@"drawable width %f and height %f", _drawableSize.width, _drawableSize.height);
+    //NSLog(@"drawable width %f and height %f", _drawableSize.width, _drawableSize.height);
     
     MTLViewport rightViewport;
     rightViewport.originX = xMinRightInPixel;
@@ -488,8 +488,8 @@ const float kUserInterpupillaryDistance = 0.064;
     leftViewport.height = heightInPixel;
     leftViewport.znear = 0;
     leftViewport.zfar = 1;
-    NSLog(@"leftViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", leftViewport.originX, leftViewport.originY, leftViewport.width, leftViewport.height, leftViewport.znear, leftViewport.zfar);
-    NSLog(@"rightViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", rightViewport.originX, rightViewport.originY, rightViewport.width, rightViewport.height, rightViewport.znear, rightViewport.zfar);
+    //NSLog(@"leftViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", leftViewport.originX, leftViewport.originY, leftViewport.width, leftViewport.height, leftViewport.znear, leftViewport.zfar);
+    //NSLog(@"rightViewport originX: %f, originY: %f, width: %f, height: %f, znear: %f, zfar: %f", rightViewport.originX, rightViewport.originY, rightViewport.width, rightViewport.height, rightViewport.znear, rightViewport.zfar);
     
     _viewportPerEye[0] = leftViewport;
     _viewportPerEye[1] = rightViewport;
@@ -505,8 +505,8 @@ const float kUserInterpupillaryDistance = 0.064;
     const simd_float3 offset = hme.mrOffset + phone.cameraOffset;
     // the world coordinate of the camera
     const simd_float4x4 cameraTransform = frame.camera.transform;
-    NSLog(@"come on lalalalalalla");
-    [Renderer logMatrix4x4:cameraTransform];
+
+    //[Renderer logMatrix4x4:cameraTransform];
     const simd_float4 translation_left = [Renderer matrixVectorMultiplication:cameraTransform vector:simd_make_float4(offset.x - ipd / 2, offset.y, offset.z, 1)];
     // test the accuracy of the matrix vector multiplication function
     //[Renderer logVector4:translation_left];

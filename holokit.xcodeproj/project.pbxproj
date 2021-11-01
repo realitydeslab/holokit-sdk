@@ -55,13 +55,6 @@
 		4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27925D42C2D0068CB66 /* LaunchScreen.storyboard */; };
 		4B6CC27E25D42C2D0068CB66 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC27D25D42C2D0068CB66 /* main.m */; };
 		4B8A528826CCDF96005D55C5 /* imu_process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A528626CCDF96005D55C5 /* imu_process.cpp */; };
-		4B8A529026CE3FA6005D55C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A528F26CE3FA6005D55C5 /* AppDelegate.swift */; };
-		4B8A529226CE3FA6005D55C5 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A529126CE3FA6005D55C5 /* Shaders.metal */; };
-		4B8A529526CE3FA6005D55C5 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A529426CE3FA6005D55C5 /* Renderer.swift */; };
-		4B8A529726CE3FA6005D55C5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A529626CE3FA6005D55C5 /* ViewController.swift */; };
-		4B8A529A26CE3FA6005D55C5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B8A529826CE3FA6005D55C5 /* Main.storyboard */; };
-		4B8A529C26CE3FA7005D55C5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B8A529B26CE3FA7005D55C5 /* Assets.xcassets */; };
-		4B8A529F26CE3FA7005D55C5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B8A529D26CE3FA7005D55C5 /* LaunchScreen.storyboard */; };
 		4B921B0526DCE6D600EC359F /* watch_connectivity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0426DCE6D600EC359F /* watch_connectivity.mm */; };
 		4B921B0926DCF07800EC359F /* core_motion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0826DCF07800EC359F /* core_motion.mm */; };
 		4B921B0C26DDE4B400EC359F /* core_location.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0B26DDE4B400EC359F /* core_location.m */; };
@@ -383,16 +376,6 @@
 		4B6CC27D25D42C2D0068CB66 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4B8A528626CCDF96005D55C5 /* imu_process.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = imu_process.cpp; sourceTree = "<group>"; };
 		4B8A528726CCDF96005D55C5 /* imu_process.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = imu_process.h; sourceTree = "<group>"; };
-		4B8A528D26CE3FA6005D55C5 /* test-headtracking3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-headtracking3.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B8A528F26CE3FA6005D55C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		4B8A529126CE3FA6005D55C5 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
-		4B8A529326CE3FA6005D55C5 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
-		4B8A529426CE3FA6005D55C5 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
-		4B8A529626CE3FA6005D55C5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		4B8A529926CE3FA6005D55C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		4B8A529B26CE3FA7005D55C5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		4B8A529E26CE3FA7005D55C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		4B8A52A026CE3FA7005D55C5 /* test_headtracking3-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "test_headtracking3-Bridging-Header.h"; sourceTree = "<group>"; };
 		4B921B0326DCE6C600EC359F /* watch_connectivity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = watch_connectivity.h; sourceTree = "<group>"; };
 		4B921B0426DCE6D600EC359F /* watch_connectivity.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = watch_connectivity.mm; sourceTree = "<group>"; };
 		4B921B0726DCF06C00EC359F /* core_motion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_motion.h; sourceTree = "<group>"; };
@@ -665,13 +648,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4B8A528A26CE3FA6005D55C5 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4BC45ADC262813BD00BA98E4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -854,22 +830,6 @@
 			path = "test-stereoscopic-rendering";
 			sourceTree = "<group>";
 		};
-		4B8A528E26CE3FA6005D55C5 /* test-headtracking3 */ = {
-			isa = PBXGroup;
-			children = (
-				4B8A528F26CE3FA6005D55C5 /* AppDelegate.swift */,
-				4B8A529126CE3FA6005D55C5 /* Shaders.metal */,
-				4B8A529326CE3FA6005D55C5 /* ShaderTypes.h */,
-				4B8A529426CE3FA6005D55C5 /* Renderer.swift */,
-				4B8A529626CE3FA6005D55C5 /* ViewController.swift */,
-				4B8A529826CE3FA6005D55C5 /* Main.storyboard */,
-				4B8A529B26CE3FA7005D55C5 /* Assets.xcassets */,
-				4B8A529D26CE3FA7005D55C5 /* LaunchScreen.storyboard */,
-				4B8A52A026CE3FA7005D55C5 /* test_headtracking3-Bridging-Header.h */,
-			);
-			path = "test-headtracking3";
-			sourceTree = "<group>";
-		};
 		4BC45AE0262813BD00BA98E4 /* factory-app-nfc */ = {
 			isa = PBXGroup;
 			children = (
@@ -986,7 +946,6 @@
 				4B2B2FF725E23E94002AC24F /* test-monocular-handtracking */,
 				4BC45AE0262813BD00BA98E4 /* factory-app-nfc */,
 				4B69FF3F26C611D200843FCF /* low-latency-tracking-api-test */,
-				4B8A528E26CE3FA6005D55C5 /* test-headtracking3 */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -1014,7 +973,6 @@
 				4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */,
 				4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */,
 				4B69FF3E26C611D200843FCF /* low-latency-tracking-api-test */,
-				4B8A528D26CE3FA6005D55C5 /* test-headtracking3.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1454,23 +1412,6 @@
 			productReference = 4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */;
 			productType = "com.apple.product-type.application";
 		};
-		4B8A528C26CE3FA6005D55C5 /* test-headtracking3 */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4B8A52A126CE3FA7005D55C5 /* Build configuration list for PBXNativeTarget "test-headtracking3" */;
-			buildPhases = (
-				4B8A528926CE3FA6005D55C5 /* Sources */,
-				4B8A528A26CE3FA6005D55C5 /* Frameworks */,
-				4B8A528B26CE3FA6005D55C5 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "test-headtracking3";
-			productName = "test-headtracking3";
-			productReference = 4B8A528D26CE3FA6005D55C5 /* test-headtracking3.app */;
-			productType = "com.apple.product-type.application";
-		};
 		4BC45ADE262813BD00BA98E4 /* factory-app-nfc */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4BC45AF4262813BE00BA98E4 /* Build configuration list for PBXNativeTarget "factory-app-nfc" */;
@@ -1729,9 +1670,6 @@
 					4B6CC26525D42C2C0068CB66 = {
 						CreatedOnToolsVersion = 12.3;
 					};
-					4B8A528C26CE3FA6005D55C5 = {
-						CreatedOnToolsVersion = 13.0;
-					};
 					4BC45ADE262813BD00BA98E4 = {
 						CreatedOnToolsVersion = 12.4;
 					};
@@ -1802,7 +1740,6 @@
 				4BE7B60A261104ED001F39F2 /* holokit-sdk */,
 				4BC45ADE262813BD00BA98E4 /* factory-app-nfc */,
 				4B69FF3D26C611D200843FCF /* low-latency-tracking-api-test */,
-				4B8A528C26CE3FA6005D55C5 /* test-headtracking3 */,
 			);
 		};
 /* End PBXProject section */
@@ -1825,16 +1762,6 @@
 				4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */,
 				4B6CC27825D42C2D0068CB66 /* Assets.xcassets in Resources */,
 				4B6CC27625D42C2C0068CB66 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B8A528B26CE3FA6005D55C5 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4B8A529F26CE3FA7005D55C5 /* LaunchScreen.storyboard in Resources */,
-				4B8A529C26CE3FA7005D55C5 /* Assets.xcassets in Resources */,
-				4B8A529A26CE3FA6005D55C5 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2095,17 +2022,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4B8A528926CE3FA6005D55C5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4B8A529226CE3FA6005D55C5 /* Shaders.metal in Sources */,
-				4B8A529526CE3FA6005D55C5 /* Renderer.swift in Sources */,
-				4B8A529726CE3FA6005D55C5 /* ViewController.swift in Sources */,
-				4B8A529026CE3FA6005D55C5 /* AppDelegate.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4BC45ADB262813BD00BA98E4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2333,22 +2249,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				4B6CC27A25D42C2D0068CB66 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		4B8A529826CE3FA6005D55C5 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4B8A529926CE3FA6005D55C5 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		4B8A529D26CE3FA7005D55C5 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4B8A529E26CE3FA7005D55C5 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -2662,14 +2562,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
+				DEVELOPMENT_TEAM = P9TVSH3F53;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/sdk/third_party",
 				);
 				INFOPLIST_FILE = "test-stereoscopic-rendering/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2686,94 +2586,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
+				DEVELOPMENT_TEAM = P9TVSH3F53;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/sdk/third_party",
 				);
 				INFOPLIST_FILE = "test-stereoscopic-rendering/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-stereoscopic-rendering";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		4B8A52A226CE3FA7005D55C5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arkit metal";
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
-				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.test-headtracking3";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "test-headtracking3/test_headtracking3-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		4B8A52A326CE3FA7005D55C5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arkit metal";
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
-				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.test-headtracking3";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "test-headtracking3/test_headtracking3-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -3535,15 +3361,6 @@
 			buildConfigurations = (
 				4B6CC27F25D42C2D0068CB66 /* Debug */,
 				4B6CC28025D42C2D0068CB66 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4B8A52A126CE3FA7005D55C5 /* Build configuration list for PBXNativeTarget "test-headtracking3" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4B8A52A226CE3FA7005D55C5 /* Debug */,
-				4B8A52A326CE3FA7005D55C5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -1,7 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement style="background-color: rgb(255, 255, 255); width: 100%; height: 100%;">
-        <ui:Label text="Please rotate your iPhone" display-tooltip-when-elided="true" name="Notification" style="-unity-text-align: middle-center; left: 10%; width: 80%; height: 20%; top: 30%; -unity-font-style: bold; color: rgb(0, 0, 0); font-size: 16%;" />
-        <ui:Button text="XR Mode&#10;" display-tooltip-when-elided="true" name="xr-mode-button" style="width: 20%; height: 10%; left: 20%; top: 60%; position: absolute; background-color: rgb(6, 0, 0); color: rgb(255, 254, 254);" />
-        <ui:Button text="AR Mode" display-tooltip-when-elided="true" name="ar-mode-button" enable-rich-text="true" style="-unity-background-image-tint-color: rgb(56, 56, 56); background-color: rgb(0, 0, 0); color: rgb(248, 248, 248); width: 20%; height: 10%; left: auto; top: 60%; position: absolute; right: 20%;" />
-    </ui:VisualElement>
-</ui:UXML>
