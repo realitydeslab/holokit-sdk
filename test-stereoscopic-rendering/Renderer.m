@@ -33,6 +33,12 @@ static const float kImagePlaneVertexData[16] = {
     1.0,  1.0,  1.0, 0.0,
 };
 
+// Vertex data for the alignment marker
+static const float kAlignmentMarkerVertexData[8] = {
+    0.829760, 1, 0.0, 1.0,
+    0.829760, 0.7, 0.0, 1.0
+};
+
 // for SR
 const float kUserInterpupillaryDistance = 0.064;
 
@@ -53,10 +59,13 @@ const float kUserInterpupillaryDistance = 0.064;
     id <MTLBuffer> _sharedUniformBuffer;
     id <MTLBuffer> _anchorUniformBuffer;
     id <MTLBuffer> _imagePlaneVertexBuffer;
+    id <MTLBuffer> _alignmentMarkerVertexBuffer;
     id <MTLRenderPipelineState> _capturedImagePipelineState;
     id <MTLDepthStencilState> _capturedImageDepthState;
     id <MTLRenderPipelineState> _anchorPipelineState;
     id <MTLDepthStencilState> _anchorDepthState;
+    id <MTLRenderPipelineState> _alignmentMarkerPipelineState;
+    id <MTLDepthStencilState> _alignmentMarkerDepthState;
     CVMetalTextureRef _capturedImageTextureYRef;
     CVMetalTextureRef _capturedImageTextureCbCrRef;
     // for depth data
@@ -231,6 +240,10 @@ const float kUserInterpupillaryDistance = 0.064;
     _imagePlaneVertexBuffer = [_device newBufferWithBytes:&kImagePlaneVertexData length:sizeof(kImagePlaneVertexData) options:MTLResourceCPUCacheModeDefaultCache];
     
     _imagePlaneVertexBuffer.label = @"ImagePlaneVertexBuffer";
+    
+    // Create a vertex buffer with our alignment marker vertex data.
+    _alignmentMarkerVertexBuffer = [_device newBufferWithBytes:&kAlignmentMarkerVertexData length:sizeof(kAlignmentMarkerVertexData) options:MTLResourceCPUCacheModeDefaultCache];
+    _alignmentMarkerVertexBuffer.label = @"AlignmentMarkerVertexBuffer";
     
     // Load all the shader files with a metal file extension in the project
     id <MTLLibrary> defaultLibrary = [_device newDefaultLibrary];
@@ -651,6 +664,11 @@ const float kUserInterpupillaryDistance = 0.064;
         vertexData[textureCoordIndex] = transformedCoord.x;
         vertexData[textureCoordIndex + 1] = transformedCoord.y;
     }
+}
+
+- (void)_drawAlignmentMarkerWithCommandEncoder:(id<MTLRenderCommandEncoder>)renderEncoder {
+    [renderEncoder pushDebugGroup:@"DrawAlignmentMarker"];
+    
 }
 
 - (void)_drawCapturedImageWithCommandEncoder:(id<MTLRenderCommandEncoder>)renderEncoder {

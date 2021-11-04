@@ -117,8 +117,8 @@
         matrix_float4x4 translation = matrix_identity_float4x4;
         // TODO: place the geometry on a physical plane
         translation.columns[3].z = -3;
-        
         matrix_float4x4 transform = matrix_multiply(currentFrame.camera.transform, translation);
+        //transform = matrix_scale(100, transform);
         
         // Add a new anchor to the session
         //ARAnchor *anchor = [[ARAnchor alloc] initWithTransform:transform];

@@ -19,6 +19,10 @@ public class GameTimer : MonoBehaviour
     void Update()
     {
         float currentTime = Time.time - m_StartTime;
-        txt.text = currentTime.ToString("F2");
+        //txt.text = currentTime.ToString("F2");
+
+        string minutes = Mathf.Floor(currentTime / 60f).ToString("00");
+        string seconds = (currentTime % 60f).ToString("00");
+        txt.text = $"{minutes}:{seconds}";
     }
 }

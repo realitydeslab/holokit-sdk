@@ -114,9 +114,9 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     float4x4 modelMatrix = instanceUniforms[iid].modelMatrix;
     // use this matrix to scale down the anchor size
     float4x4 scaleMatrix = float4x4(0);
-    scaleMatrix.columns[0].x = 0.1;
-    scaleMatrix.columns[1].y = 0.1;
-    scaleMatrix.columns[2].z = 0.1;
+    scaleMatrix.columns[0].x = 3;
+    scaleMatrix.columns[1].y = 3;
+    scaleMatrix.columns[2].z = 3;
     scaleMatrix.columns[3].w = 1;
     // the order matters
     modelMatrix = modelMatrix * scaleMatrix;
