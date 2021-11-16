@@ -351,7 +351,7 @@ public:
                 
                 Eigen::Vector3d eigen_position;
                 Eigen::Quaterniond eigen_rotation;
-                if(holokit::HoloKitApi::GetInstance()->StereoscopicRendering()
+                if(holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering()
                    && holokit::LowLatencyTrackingApi::GetInstance()->IsActive()
                    && holokit::LowLatencyTrackingApi::GetInstance()->GetPose(vsync_time_stamp, eigen_position, eigen_rotation)) {
                     position = EigenVector3dToUnityXRVector3(eigen_position);

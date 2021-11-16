@@ -20,11 +20,20 @@
 #import "low-latency-tracking/low_latency_tracking_api.h"
 #import "holokit_api.h"
 #import "core_motion.h"
+#import "math_helpers.h"
 
 typedef void (*ARWorldMapSynced)();
 ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 
+typedef void (*DidUpdateARParticipantAnchor)(float *position, float *rotation);
+DidUpdateARParticipantAnchor DidUpdateARParticipantAnchorDelegate = NULL;
+
 @interface HoloKitARSession() <ARSessionDelegate>
+
+@property (nonatomic, assign) bool isSynced;
+@property (nonatomic, assign) bool shareARCollaborationData;
+@property (nonatomic, assign) int criticalDataCount;
+@property (nonatomic, assign) int optionalDataCount;
 
 @end
 
@@ -38,25 +47,30 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
                                                           selector:@selector(displayLinkCallback:)];
         //[link setPreferredFramesPerSecond:60];
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        
+        self.isSynced = NO;
+        self.shareARCollaborationData = YES;
+        self.criticalDataCount = 0;
+        self.optionalDataCount = 0;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
     return self;
 }
 
 // https://developer.apple.com/videos/play/wwdc2021/10147/
 - (void)displayLinkCallback:(CADisplayLink *)link {
-    //double currentTime = [[NSProcessInfo processInfo] systemUptime];
-    //NSLog(@"[CADisplayLinkCallback]: %f\n", currentTime);
-    
     self.lastVsyncTimestamp = link.timestamp;
     self.nextVsyncTimestamp = link.targetTimestamp;
+
+//    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+//    os_signpost_id_t spid = os_signpost_id_generate(log);
+//    os_signpost_interval_begin(log, spid, "CADisplayLink");
+//    os_signpost_interval_end(log, spid, "CADisplayLink");
+}
+
+- (void)thermalStateDidChange {
     
-    //NSLog(@"[displaylink]: current time: %f, last vsync time: %f, next vsync time: %f", [[NSProcessInfo processInfo] systemUptime], link.timestamp, link.targetTimestamp);
-    //NSLog(@"[displaylink]: time from last vsync: %f, time to next vsync: %f", currentTime - link.timestamp, link.targetTimestamp - currentTime);
-    
-    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-    os_signpost_id_t spid = os_signpost_id_generate(log);
-    os_signpost_interval_begin(log, spid, "CADisplayLink");
-    os_signpost_interval_end(log, spid, "CADisplayLink");
 }
 
 + (id)sharedARSession {
@@ -75,23 +89,18 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
-    
-    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-    os_signpost_id_t spid = os_signpost_id_generate(log);
-    os_signpost_interval_begin(log, spid, "Update ARKit");
-    
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
     
+    //    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
+    //    os_signpost_id_t spid = os_signpost_id_generate(log);
+    //    os_signpost_interval_begin(log, spid, "Update ARKit");
+    
     if(self.arSession == NULL) {
         NSLog(@"[ar_session]: AR session started.");
         self.arSession = session;
-        
-        //holokit::LowLatencyTrackingApi::GetInstance()->Activate();
     }
-    
-    //NSLog(@"[ar_session]: session update time: %f", [[NSProcessInfo processInfo] systemUptime]);
     
     if (holokit::LowLatencyTrackingApi::GetInstance()->IsActive()) {
         holokit::ARKitData data = { frame.timestamp,
@@ -101,42 +110,28 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
         holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
     }
     
-    os_signpost_interval_end(log, spid, "Update ARKit");
-
-    // If hands are lost.
-    // This is only useful for Google Mediapipe hand tracking.
-//    if (self.isLeftHandTracked || self.isRightHandTracked) {
-//        float currentTimestamp = [[NSProcessInfo processInfo] systemUptime];
-//        if((currentTimestamp - self.lastHandTrackingTimestamp) > kLostHandTrackingInterval) {
-//            NSLog(@"[ar_session]: hand tracking lost.");
-//            self.isLeftHandTracked = false;
-//            self.isRightHandTracked = false;
-//        }
-//    }
+    //NSLog(@"[ar_session]: current number of anchors %lu", (unsigned long)frame.anchors.count);
     
-    // Hand tracking
-//    self.frameCount++;
-//    if (self.isHandTrackingEnabled && self.frameCount % self.handPosePredictionInterval == 0) {
-//
-//        [self.handTrackingQueue addOperationWithBlock:^{
-//            [self.handTracker processVideoFrame: frame.capturedImage];
-//        }];
-//
-//        [self performHumanHandPoseRequest:frame];
-//    }
+    //os_signpost_interval_end(log, spid, "Update ARKit");
 }
 
 - (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
+    //NSLog(@"[ar_session]: did add anchors");
     for (ARAnchor *anchor in anchors) {
         // Check if this anchor is a new peer
         //NSLog(@"[ar_session]: received an anchor with name %@", anchor.name);
+        LogMatrix4x4(anchor.transform);
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"[ar_session]: a new peer is connected to the AR collaboration session.");
             // Let the ARWorldOriginManager know that AR collaboration session has started.
-            ARWorldMapSyncedDelegate();
+            if (ARWorldMapSyncedDelegate != NULL) {
+                ARWorldMapSyncedDelegate();
+            }
+            NSLog(@"[ar_session]: ar participant anchor transform %f, %f, %f", [(ARParticipantAnchor*)anchor transform].columns[3].x, anchor.transform.columns[3].y, anchor.transform.columns[3].z);
+            self.isSynced = YES;
             continue;
         }
         if (anchor.name != nil) {
@@ -144,8 +139,8 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
                 // This is an origin anchor.
                 // If this is a client, reset the world origin.
                 NSLog(@"[ar_session]: Did receive an origin anchor, reset the world origin.");
-                std::vector<float> position = TransformToUnityPosition(anchor.transform);
-                std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
+//                std::vector<float> position = TransformToUnityPosition(anchor.transform);
+//                std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
                 [session setWorldOrigin:anchor.transform];
                 continue;
             }
@@ -157,28 +152,38 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateAnchors:anchors];
     }
-    //NSLog(@"[ar_session]: didUpdateAnchors()");
 }
     
 - (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didRemoveAnchors:anchors];
     }
+    //NSLog(@"[ar_session]: did remove anchoors");
 }
 
 - (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data {
-    //NSLog(@"[ar_session]: did output ARCollaboration data.");
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
+    }
+    
+    if (!self.shareARCollaborationData) {
+        return;
     }
     if (self.multipeerSession == nil) {
         return;
     }
-    if (self.multipeerSession.connectedPeersForMLAPI.count == 0) {
+    if (self.multipeerSession.connectedPeersForUnity.count == 0) {
         return;
     }
-    NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:YES error:nil];
-    [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+    // TEST: 'requiringSecureCoding' used to be YES.
+    NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
+    if (data.priority == ARCollaborationDataPriorityCritical) {
+        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+        //NSLog(@"[ar_session]: critical ar collaboration data %d", ++self.criticalDataCount);
+    } else {
+        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+        //NSLog(@"[ar_session]: optional ar collaboration data %d", ++self.optionalDataCount);
+    }
 }
 
 #pragma mark - ARSessionObserver
@@ -222,6 +227,10 @@ ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
     NSLog(@"[ar_session]: session interruption ended.");
 }
 
+- (BOOL)sessionShouldAttemptRelocalization:(ARSession *)session {
+    return true;
+}
+
 @end
 
 #pragma mark - extern "C"
@@ -246,8 +255,8 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
     
-    HoloKitARSession* ar_session_handler = [HoloKitARSession sharedARSession];
-    [ar_session_handler.arSession setWorldOrigin:(transform_matrix)];
+    HoloKitARSession* ar_session = [HoloKitARSession sharedARSession];
+    [ar_session.arSession setWorldOrigin:(transform_matrix)];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -281,6 +290,16 @@ UnityHoloKit_GetThermalState() {
             return 3;
             break;
     }
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_EnableShareARCollaborationData(bool val) {
+    [[HoloKitARSession sharedARSession] setShareARCollaborationData:val];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidUpdateARParticipantAnchorDelegate(DidUpdateARParticipantAnchor callback) {
+    DidUpdateARParticipantAnchorDelegate = callback;
 }
 
 } // extern "C"

@@ -206,7 +206,7 @@ public:
         
         allocate_new_textures_ = true;
         is_first_frame_ = true;
-        if (holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && SetARCameraBackgroundDelegate) {
+        if (holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(false);
         }
         
@@ -342,7 +342,7 @@ public:
         //NSLog(@"[populateNextFrame]: current time: %f", [[NSProcessInfo processInfo] systemUptime]);
         
         // We interrupt the graphics thread if it is not manually opened by SDK.
-        if (!holokit::HoloKitApi::GetInstance()->StereoscopicRendering()) {
+        if (!holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering()) {
             NSLog(@"[display]: Manually shut down the display subsystem.");
             return kUnitySubsystemErrorCodeFailure;
         }
@@ -355,7 +355,7 @@ public:
             allocate_new_textures_ = false;
         }
         
-        if (!holokit::HoloKitApi::GetInstance()->SinglePassRendering())
+        if (!holokit::HoloKitApi::GetInstance()->IsSinglePassRendering())
         {
             next_frame->renderPassesCount = NUM_RENDER_PASSES;
             
@@ -406,7 +406,7 @@ public:
                     UnityXRPose pose = { position, rotation };
                     render_params.deviceAnchorToEyePose = pose;
                     render_params.projection.type = kUnityXRProjectionTypeMatrix;
-                    simd_float4x4 projection_matrix = holokit::HoloKitApi::GetInstance()->GetArSessionHandler().arSession.currentFrame.camera.projectionMatrix;
+                    simd_float4x4 projection_matrix = [[HoloKitARSession sharedARSession] arSession].currentFrame.camera.projectionMatrix;
                     render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
                     render_params.viewportRect = {
                         0.0f,                    // x
@@ -446,7 +446,7 @@ public:
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
 
         //holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(false);
-        if (holokit::HoloKitApi::GetInstance()->StereoscopicRendering() && SetARCameraBackgroundDelegate) {
+        if (holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(true);
         }
         

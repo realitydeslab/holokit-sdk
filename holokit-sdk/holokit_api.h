@@ -6,21 +6,20 @@
 //
 #pragma once
 
-#include <vector>
-#include <memory>
+#import <vector>
+#import <memory>
 
-#include <Metal/Metal.h>
-#include <MetalKit/MetalKit.h>
-#include <simd/simd.h>
-#include "UnityXRTypes.h"
-#include "ar_session.h"
-#include "math_helpers.h"
-#include "holokit_profile.h"
-#include "nfc_session.h"
+#import <Metal/Metal.h>
+#import <MetalKit/MetalKit.h>
+#import <simd/simd.h>
+#import "UnityXRTypes.h"
+#import "ar_session.h"
+#import "math_helpers.h"
+#import "holokit_profile.h"
+#import "nfc_session.h"
 
 namespace holokit {
 
-/// Wrapper of HoloKit SDK
 class HoloKitApi {
     
 public:
@@ -40,21 +39,19 @@ public:
     
     simd_float3 GetCameraToCenterEyeOffset() { return camera_to_center_eye_offset_; }
     
-    HoloKitARSession* GetArSessionHandler() { return ar_session_handler_; }
-    
     bool GetIsInitialized() { return is_initialized_; }
     
     int GetScreenWidth() { return screen_width_; }
     
     int GetScreenHeight() { return screen_height_; }
     
-    bool StereoscopicRendering() { return stereoscopic_rendering_; }
+    bool IsStereoscopicRendering() { return is_stereoscopic_rendering_; }
     
-    void SetStereoscopicRendering(bool value) { stereoscopic_rendering_ = value; }
+    void EnableStereoscopicRendering(bool value) { is_stereoscopic_rendering_ = value; }
     
-    bool SinglePassRendering() { return single_pass_rendering_; }
+    bool IsSinglePassRendering() { return is_single_pass_rendering_; }
     
-    void SetSinglePassRendering(bool value) { single_pass_rendering_ = value; }
+    void EnableSinglePassRendering(bool value) { is_single_pass_rendering_ = value; }
     
     bool StartNfcSession();
     
@@ -70,6 +67,10 @@ public:
     
     void SetIsSkippingFrame(bool val) { is_skipping_frame_ = val; }
     
+    NSString* GetDeviceName() { return device_name_; }
+
+    NSString* GetModelName() { return model_name_; }
+    
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
 private:
@@ -77,12 +78,12 @@ private:
     /// @brief Initializes view matrix, projection matrix and viewport rectangles.
     void InitOpticalParameters();
     
-    /// @brief Gets the phone model of the device.
-    void GetDeviceModel();
-    
 private:
     
-    /// @brief The device name of the phone.
+    /// @brief The model name of the machine.
+    NSString* model_name_;
+    
+    /// @brief The device name of the machine.
     NSString* device_name_;
     
     /// @brief Stores left and right eye projection matrices.
@@ -113,9 +114,9 @@ private:
     bool is_initialized_ = false;
     
     /// @brief Whether stereoscopic rendering is open.
-    bool stereoscopic_rendering_ = false;
+    bool is_stereoscopic_rendering_ = false;
     
-    bool single_pass_rendering_ = false;
+    bool is_single_pass_rendering_ = false;
     
     double last_submit_current_frame_time_ = 0.0;
     

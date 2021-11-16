@@ -17,35 +17,31 @@ namespace holokit {
 
 #pragma mark - Initialize()
 void HoloKitApi::Initialize() {
-    NSLog(@"[HoloKitApi]: Initialize()");
+    // Get the model of the machine.
+    struct utsname system_info;
+    uname(&system_info);
+    model_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
     
-    GetDeviceModel();
+    // Get the device name.
+    device_name_ = [UIDevice currentDevice].name;
     
     InitOpticalParameters();
     
     ar_session_handler_ = [HoloKitARSession sharedARSession];
     
-    if ([device_name_ isEqualToString:@"iPhone13,3"] == NO &&
-        [device_name_ isEqualToString:@"iPhone13,4"] == NO) {
-        NSLog(@"[HoloKitApi]: the phone type does not support hand tracking.");
-        [[HoloKitHandTracker sharedHandTracker] setIsHandTrackingEnabled:NO];
-    } else {
-        NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
-    }
+//    if ([model_name_ isEqualToString:@"iPhone13,3"] == NO &&
+//        [model_name_ isEqualToString:@"iPhone13,4"] == NO) {
+//        NSLog(@"[HoloKitApi]: the phone type does not support hand tracking.");
+//        [[HoloKitHandTracker sharedHandTracker] setIsHandTrackingEnabled:NO];
+//    } else {
+//        NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
+//    }
     
     is_initialized_ = true;
 }
 
-void HoloKitApi::GetDeviceModel() {
-    // see: https://stackoverflow.com/questions/9617301/how-to-print-out-string-constant-with-nslog-on-ios
-    struct utsname system_info;
-    uname(&system_info);
-    device_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
-    NSLog(@"[holoki_api]: device name: %@", device_name_);
-}
-
 void HoloKitApi::InitOpticalParameters() {
-    auto phone = Profile::GetPhoneModel(Profile::DeviceNameToPhoneType(device_name_));
+    auto phone = Profile::GetPhoneModel(Profile::ModelNameToPhoneType(model_name_));
     auto model = Profile::GetHoloKitModel(Profile::HoloKitX);
     screen_width_ = phone.screenResolutionWidth;
     screen_height_ = phone.screenResolutionHeight;
@@ -182,13 +178,13 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
 extern "C" {
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StereoscopicRendering() {
-    return holokit::HoloKitApi::GetInstance()->StereoscopicRendering();
+UnityHoloKit_IsStereoscopicRendering() {
+    return holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering();
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetStereoscopicRendering(bool value) {
-    return holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(value);
+UnityHoloKit_EnableStereoscopicRendering(bool value) {
+    return holokit::HoloKitApi::GetInstance()->EnableStereoscopicRendering(value);
 }
 
 float* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -213,6 +209,21 @@ UnityHoloKit_StartNfcSession() {
     // TEMPORARY
     return true;
     return holokit::HoloKitApi::GetInstance()->StartNfcSession();
+}
+
+char* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetDeviceName() {
+    return convertNSStringToCString(holokit::HoloKitApi::GetInstance()->GetDeviceName());
+}
+
+int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetDeviceScreenWidth() {
+    return holokit::HoloKitApi::GetInstance()->GetScreenWidth();
+}
+
+int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetDeviceScreenHeight() {
+    return holokit::HoloKitApi::GetInstance()->GetScreenHeight();
 }
 
 } // extern "C"

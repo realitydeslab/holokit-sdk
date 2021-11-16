@@ -18,7 +18,7 @@ namespace holokit {
         PhoneModel phone_model;
         switch(type) {
             case(iPhone11):
-                NSLog(@"Profile::iPhone11");
+                //NSLog(@"Profile::iPhone11");
                 phone_model.screenWidth = 0.13978f;
                 phone_model.screenHeight = 0.06458f;
                 phone_model.screenBottom = 0.00557f;
@@ -28,7 +28,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 828;
                 break;
             case(iPhone11Pro):
-                NSLog(@"Profile::iPhone11Pro");
+                //NSLog(@"Profile::iPhone11Pro");
                 phone_model.screenWidth = 0.13495f;
                 phone_model.screenHeight = 0.06233f;
                 phone_model.screenBottom = 0.00452f;
@@ -38,7 +38,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1125;
                 break;
             case(iPhone11ProMax):
-                NSLog(@"Profile::iPhone11ProMax");
+                //NSLog(@"Profile::iPhone11ProMax");
                 phone_model.screenWidth = 0.14891f;
                 phone_model.screenHeight = 0.06881f;
                 phone_model.screenBottom = 0.00452f;
@@ -48,7 +48,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1242;
                 break;
             case(iPhone12Mini):
-                NSLog(@"Profile::iPhone12Mini");
+                //NSLog(@"Profile::iPhone12Mini");
                 phone_model.screenWidth = 0.12496f;
                 phone_model.screenHeight = 0.05767f;
                 phone_model.screenBottom = 0.00327f;
@@ -58,7 +58,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1080;
                 break;
             case(iPhone12):
-                NSLog(@"Profile::iPhone12");
+                //NSLog(@"Profile::iPhone12");
                 phone_model.screenWidth = 0.13977f;
                 phone_model.screenHeight = 0.06458f;
                 phone_model.screenBottom = 0.00347f;
@@ -68,7 +68,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1170;
                 break;
             case(iPhone12Pro):
-                NSLog(@"Profile::iPhone12Pro");
+                //NSLog(@"Profile::iPhone12Pro");
                 phone_model.screenWidth = 0.13977f;
                 phone_model.screenHeight = 0.06458f;
                 phone_model.screenBottom = 0.00347f;
@@ -78,7 +78,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1170;
                 break;
             case(iPhone12ProMax):
-                NSLog(@"Profile::iPhone12ProMax");
+                //NSLog(@"Profile::iPhone12ProMax");
                 phone_model.screenWidth = 0.15390f;
                 phone_model.screenHeight = 0.07113f;
                 phone_model.screenBottom = 0.00347f;
@@ -88,7 +88,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1284;
                 break;
             case(iPhone13Mini):
-                NSLog(@"Profile::iPhone13Mini");
+                //NSLog(@"Profile::iPhone13Mini");
                 phone_model.screenWidth = 0.12496f;
                 phone_model.screenHeight = 0.05767f;
                 phone_model.screenBottom = 0.00327f;
@@ -98,7 +98,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1080;
                 break;
             case(iPhone13):
-                NSLog(@"Profile::iPhone13");
+                //NSLog(@"Profile::iPhone13");
                 phone_model.screenWidth = 0.13977f;
                 phone_model.screenHeight = 0.06458f;
                 phone_model.screenBottom = 0.00347f;
@@ -108,7 +108,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1170;
                 break;
             case(iPhone13Pro):
-                NSLog(@"Profile::iPhone13Pro");
+                //NSLog(@"Profile::iPhone13Pro");
                 phone_model.screenWidth = 0.13977f;
                 phone_model.screenHeight = 0.06458f;
                 phone_model.screenBottom = 0.00347f;
@@ -118,7 +118,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1170;
                 break;
             case(iPhone13ProMax):
-                NSLog(@"Profile::iPhone13ProMax");
+                //NSLog(@"Profile::iPhone13ProMax");
                 phone_model.screenWidth = 0.15390f;
                 phone_model.screenHeight = 0.07113f;
                 phone_model.screenBottom = 0.00347f;
@@ -128,7 +128,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1284;
                 break;
             case(iPadPro2020):
-                NSLog(@"Profile::iPadPro2020");
+                //NSLog(@"Profile::iPadPro2020");
                 phone_model.screenWidth = 0.0;
                 phone_model.screenHeight = 0.0f;
                 phone_model.screenBottom = 0.0;
@@ -138,7 +138,7 @@ namespace holokit {
                 phone_model.screenResolutionHeight = 1668;
                 break;
             case(iPadPro2021):
-                NSLog(@"Profile::iPadPro2021");
+                //NSLog(@"Profile::iPadPro2021");
                 phone_model.screenWidth = 0.0;
                 phone_model.screenHeight = 0.0f;
                 phone_model.screenBottom = 0.0;
@@ -177,9 +177,9 @@ namespace holokit {
         return holokit_model;
     }
     
-    Profile::PhoneType Profile::DeviceNameToPhoneType(NSString* device_name) {
+    Profile::PhoneType Profile::ModelNameToPhoneType(NSString* model_name) {
         PhoneType phone_type;
-        SWITCH (device_name) {
+        SWITCH (model_name) {
             CASE (@"iPhone12,1") {
                 phone_type = iPhone11;
                 break;

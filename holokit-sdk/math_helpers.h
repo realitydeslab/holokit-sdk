@@ -45,3 +45,7 @@ UnityXRVector3 EigenVector3dToUnityXRVector3(Eigen::Vector3d vector3);
 UnityXRVector4 EigenQuaterniondToUnityXRVector4(Eigen::Quaterniond quaternion);
 
 double Radians2Degrees(double radians);
+
+char* convertNSStringToCString(const NSString* nsString);
+
+unsigned long hash(unsigned char *str);

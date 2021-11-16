@@ -156,3 +156,28 @@ UnityXRVector4 EigenQuaterniondToUnityXRVector4(Eigen::Quaterniond quaternion) {
 double Radians2Degrees(double radians) {
     return radians * 180.0 / M_PI;
 }
+
+char* convertNSStringToCString(const NSString* nsString)
+{
+    if (nsString == NULL)
+        return NULL;
+
+    const char* nsStringUtf8 = [nsString UTF8String];
+    //create a null terminated C string on the heap so that our string's memory isn't wiped out right after method's return
+    char* cString = (char*)malloc(strlen(nsStringUtf8) + 1);
+    strcpy(cString, nsStringUtf8);
+
+    return cString;
+}
+
+// From https://stackoverflow.com/questions/2535284/how-can-i-hash-a-string-to-an-int-using-c
+unsigned long hash(unsigned char *str) {
+    unsigned long hash = 5381;
+    int c;
+
+    while (c = *str++) {
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    }
+
+    return hash;
+}

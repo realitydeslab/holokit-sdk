@@ -22,7 +22,7 @@ namespace UnityEngine.XR.HoloKit
         /// <summary>
         /// The invisible button that toggles system debug info.
         /// </summary>
-        protected Button m_InvisibleButton;
+        protected Button m_InvisibleSystemStatusButton;
 
         protected Text m_FPS;
 
@@ -44,6 +44,14 @@ namespace UnityEngine.XR.HoloKit
 
         [SerializeField] protected AudioClip m_TapSound;
 
+        private GameObject m_LogWindow;
+
+        private Button m_InvisibleLogButton;
+
+        private Button m_InvisibleControlsButton;
+
+        [SerializeField] private Text m_LogText;
+
         protected virtual void Awake()
         {
             if (_instance != null && _instance != this)
@@ -54,6 +62,16 @@ namespace UnityEngine.XR.HoloKit
             {
                 _instance = this;
             }
+        }
+
+        protected virtual void OnEnable()
+        {
+            Application.logMessageReceived += HandleLog;
+        }
+
+        protected virtual void OnDisable()
+        {
+            Application.logMessageReceived -= HandleLog;
         }
 
         protected virtual void Start()
@@ -86,17 +104,23 @@ namespace UnityEngine.XR.HoloKit
                 m_XRButton.onClick.AddListener(ToggleXR);
             }
 
-            Transform invisibleButton = transform.Find("Invisible Button");
+            Transform invisibleButton = transform.Find("Invisible Status Button");
             if (invisibleButton)
             {
-                m_InvisibleButton = invisibleButton.GetComponent<Button>();
-                m_InvisibleButton.onClick.AddListener(ToggleSystemDebugInfo);
+                m_InvisibleSystemStatusButton = invisibleButton.GetComponent<Button>();
+                m_InvisibleSystemStatusButton.onClick.AddListener(ToggleSystemStatus);
             }
 
             m_FPS = transform.Find("FPS").GetComponent<Text>();
             m_Timer = transform.Find("Timer").GetComponent<Text>();
             m_Ping = transform.Find("Ping").GetComponent<Text>();
             m_ThermalStatus = transform.Find("Thermal Status").GetComponent<Text>();
+
+            m_LogWindow = transform.Find("Log Window").gameObject;
+            m_InvisibleLogButton = transform.Find("Invisible Log Button").GetComponent<Button>();
+            m_InvisibleLogButton.onClick.AddListener(ToggleLog);
+            m_InvisibleControlsButton = transform.Find("Invisible Controls Button").GetComponent<Button>();
+            m_InvisibleControlsButton.onClick.AddListener(ToggleButtons);
         }
 
         protected virtual void Update()
@@ -110,14 +134,14 @@ namespace UnityEngine.XR.HoloKit
                     var currentThermalState = UnityEngine.XR.HoloKit.HoloKitSettings.Instance.GetThermalState();
                     switch (currentThermalState)
                     {
-                        case UnityEngine.XR.HoloKit.iOSThermalState.ThermalStateNominal:
+                        case iOSThermalState.ThermalStateNominal:
                             m_ThermalStatus.text = "Normal";
-                            m_ThermalStatus.color = Color.green;
+                            m_ThermalStatus.color = Color.blue;
                             m_CurrentThermalState = iOSThermalState.ThermalStateNominal;
                             break;
-                        case UnityEngine.XR.HoloKit.iOSThermalState.ThermalStateFair:
+                        case iOSThermalState.ThermalStateFair:
                             m_ThermalStatus.text = "Fair";
-                            m_ThermalStatus.color = Color.blue;
+                            m_ThermalStatus.color = Color.green;
                             if (m_CurrentThermalState == iOSThermalState.ThermalStateNominal)
                             {
                                 if (m_ThermalFairSound)
@@ -129,7 +153,7 @@ namespace UnityEngine.XR.HoloKit
                             }
                             m_CurrentThermalState = iOSThermalState.ThermalStateFair;
                             break;
-                        case UnityEngine.XR.HoloKit.iOSThermalState.ThermalStateSerious:
+                        case iOSThermalState.ThermalStateSerious:
                             m_ThermalStatus.text = "Serious";
                             m_ThermalStatus.color = Color.yellow;
                             if (m_CurrentThermalState == iOSThermalState.ThermalStateFair)
@@ -143,7 +167,7 @@ namespace UnityEngine.XR.HoloKit
                             }
                             m_CurrentThermalState = iOSThermalState.ThermalStateSerious;
                             break;
-                        case UnityEngine.XR.HoloKit.iOSThermalState.ThermalStateCritical:
+                        case iOSThermalState.ThermalStateCritical:
                             m_ThermalStatus.text = "Critical";
                             m_ThermalStatus.color = Color.red;
                             m_CurrentThermalState = iOSThermalState.ThermalStateCritical;
@@ -195,7 +219,7 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        private void ToggleSystemDebugInfo()
+        private void ToggleSystemStatus()
         {
             if (m_ThermalStatus.enabled)
             {
@@ -210,6 +234,46 @@ namespace UnityEngine.XR.HoloKit
                 m_Timer.gameObject.SetActive(true);
                 m_Ping.gameObject.SetActive(true);
                 m_ThermalStatus.gameObject.SetActive(true);
+            }
+        }
+
+        private void ToggleButtons()
+        {
+            if (m_BackButton.gameObject.activeSelf)
+            {
+                m_BackButton.gameObject.SetActive(false);
+                m_LLTButton.gameObject.SetActive(false);
+                m_XRButton.gameObject.SetActive(false);
+            }
+            else
+            {
+                m_BackButton.gameObject.SetActive(true);
+                m_LLTButton.gameObject.SetActive(true);
+                m_XRButton.gameObject.SetActive(true);
+            }
+        }
+
+        private void ToggleLog()
+        {
+            if (m_LogWindow.activeSelf)
+            {
+                m_LogWindow.SetActive(false);
+            }
+            else
+            {
+                m_LogWindow.SetActive(true);
+            }
+        }
+
+        private void HandleLog(string logString, string stackTrace, LogType type)
+        {
+            string currentLog = "\n[" + type + "]: " + logString + "\n" + stackTrace;
+
+            m_LogText.text += currentLog;
+            // The max length is 25990 or something.
+            if (m_LogText.text.Length > 10000)
+            {
+                m_LogText.text = m_LogText.text.Substring(5000);
             }
         }
     }

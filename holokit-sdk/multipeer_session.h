@@ -10,10 +10,10 @@
 NS_ASSUME_NONNULL_BEGIN
 @interface MultipeerSession: NSObject
 
-@property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeersForMLAPI;
+@property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeersForUnity;
 @property (assign) double lastPingTime;
 
-- (instancetype)initWithPeerName:(NSString *)peerName serviceType:(NSString *)serviceType gameName:(NSString *) gameName sessionName:(NSString *) sessionName;
+- (instancetype)initWithServiceType:(NSString *)serviceType;
 - (void)sendToAllPeers:(NSData *)data sendDataMode:(MCSessionSendDataMode)sendDataMode;
 - (void)sendToPeer:(NSData *)data peer:(MCPeerID *)peerId sendDataMode:(MCSessionSendDataMode)sendDataMode;
 - (bool)isHost;

@@ -73,7 +73,7 @@ public:
     // Currently there is only one HoloKit model.
     static HoloKitModel GetHoloKitModel(HoloKitType type);
     
-    static PhoneType DeviceNameToPhoneType(NSString* device_name);
+    static PhoneType ModelNameToPhoneType(NSString* device_name);
     
 }; // class
 } // namespace

@@ -24,7 +24,7 @@
 @property (nonatomic, assign) double lastVsyncTimestamp;
 @property (nonatomic, assign) double nextVsyncTimestamp;
 
-+ (id)sharedARSession;
-- (void)updateWithHoloKitCollaborationData:(ARCollaborationData *) collaborationData;
++ (id _Nonnull )sharedARSession;
+- (void)updateWithHoloKitCollaborationData:(ARCollaborationData *_Nullable) collaborationData;
 
 @end

@@ -119,6 +119,9 @@ namespace UnityEngine.XR.HoloKit
         [DllImport("__Internal")]
         private static extern int UnityHoloKit_GetThermalState();
 
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_EnableShareARCollaborationData(bool val);
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -255,6 +258,11 @@ namespace UnityEngine.XR.HoloKit
         public iOSThermalState GetThermalState()
         {
             return (iOSThermalState)UnityHoloKit_GetThermalState();
+        }
+
+        public void EnableShareARCollaborationData(bool val)
+        {
+            UnityHoloKit_EnableShareARCollaborationData(val);
         }
     }
 }

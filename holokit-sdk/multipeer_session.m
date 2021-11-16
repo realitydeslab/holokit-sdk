@@ -6,8 +6,11 @@
 //
 
 #import "multipeer_session.h"
-#include "IUnityInterface.h"
-#include "ar_session.h"
+#import "IUnityInterface.h"
+#import "ar_session.h"
+
+typedef void (*InitializeClientId)(unsigned long clientId);
+InitializeClientId InitializeClientIdDelegate = NULL;
 
 typedef void (*SendConnectionRequest2Server)(unsigned long serverId);
 SendConnectionRequest2Server SendConnectionRequest2ServerDelegate = NULL;
@@ -31,41 +34,43 @@ typedef enum {
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
 @property (nonatomic, strong) NSString *serviceType;
-@property (nonatomic, strong) MCPeerID *myPeerID;
+@property (nonatomic, strong) MCPeerID *localPeerID;
 @property (nonatomic, strong) MCSession *mcSession;
-@property (nonatomic, strong) NSString *gameName;
-@property (nonatomic, strong) NSString *sessionName;
 @property (nonatomic, strong, nullable) MCNearbyServiceAdvertiser *serviceAdvertiser;
 @property (nonatomic, strong, nullable) MCNearbyServiceBrowser *serviceBrowser;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *peerClientIds;
 
 @end
 
 @implementation MultipeerSession
 
-- (instancetype)initWithPeerName:(NSString *)peerName serviceType:(NSString *)serviceType gameName:(NSString *)gameName sessionName:(NSString *)sessionName {
+- (instancetype)initWithServiceType:(NSString *)serviceType {
     self = [super init];
     if (self) {
         self.serviceType = serviceType;
-        self.myPeerID = [[MCPeerID alloc] initWithDisplayName:peerName];
-        self.gameName = gameName;
-        self.sessionName = sessionName;
+        NSString *deviceName = [UIDevice currentDevice].name;
+        NSString *systemUptime = [[NSNumber numberWithDouble:[[NSProcessInfo processInfo] systemUptime]] stringValue];
+        NSString *displayNameBeforeHash = [NSString stringWithFormat:@"%@%@", deviceName, systemUptime];
+        NSString *displayName = [NSString stringWithFormat:@"%lu", [displayNameBeforeHash hash]];
+        self.localPeerID = [[MCPeerID alloc] initWithDisplayName:displayName];
         
         // If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
-        self.mcSession = [[MCSession alloc] initWithPeer:self.myPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
+        self.mcSession = [[MCSession alloc] initWithPeer:self.localPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
         self.mcSession.delegate = self;
         
-        self.connectedPeersForMLAPI = [[NSMutableArray alloc] init];
+        self.connectedPeersForUnity = [[NSMutableArray alloc] init];
+        self.peerClientIds = [[NSMutableDictionary alloc] init];
     }
 
     return self;
 }
 
 - (void)sendToAllPeers: (NSData *)data sendDataMode:(MCSessionSendDataMode)sendDataMode {
-    if (self.connectedPeersForMLAPI.count == 0) {
+    if (self.connectedPeersForUnity.count == 0) {
         NSLog(@"[multipeer_session]: There is no connected MLAPI peer.");
         return;
     }
-    bool success = [self.mcSession sendData:data toPeers:self.connectedPeersForMLAPI withMode:sendDataMode error:nil];
+    bool success = [self.mcSession sendData:data toPeers:self.connectedPeersForUnity withMode:sendDataMode error:nil];
     if (!success) {
         NSLog(@"[multipeer_session]: Failed to send data to all peers.");
     }
@@ -80,28 +85,25 @@ typedef enum {
 }
 
 - (void)startBrowsing {
-    self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.myPeerID serviceType:self.serviceType];
+    self.serviceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.localPeerID serviceType:self.serviceType];
     self.serviceBrowser.delegate = self;
     [self.serviceBrowser startBrowsingForPeers];
-    NSLog(@"[multipeer_session]: Start browsing...");
+
 }
 
 - (void)stopBrowsing {
     [self.serviceBrowser stopBrowsingForPeers];
-    NSLog(@"[multipeer_session]: Stop browsing.");
 }
 
 - (void)startAdvertising {
-    NSDictionary<NSString *, NSString *> *identityInfo = @{ @"gameName": self.gameName, @"sessionName": self.sessionName };
-    self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.myPeerID discoveryInfo:identityInfo serviceType:self.serviceType];
+    NSDictionary<NSString *, NSString *> *discoveryInfo = @{ @"PeerName": self.localPeerID.displayName, @"Password": @"No" };
+    self.serviceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.localPeerID discoveryInfo:discoveryInfo serviceType:self.serviceType];
     self.serviceAdvertiser.delegate = self;
     [self.serviceAdvertiser startAdvertisingPeer];
-    NSLog(@"[multipeer_session]: Start advertising...");
 }
 
 - (void)stopAdvertising {
     [self.serviceAdvertiser stopAdvertisingPeer];
-    NSLog(@"[multipeer_session]: Stop advertising.");
 }
 
 - (bool)isHost {
@@ -189,37 +191,47 @@ typedef enum {
     return result;
 }
 
++ (NSNumber *)convertNSString2NSNumber:(NSString *)str {
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+    formatter.numberStyle = NSNumberFormatterDecimalStyle;
+    return [formatter numberFromString:str];
+}
+
 #pragma mark - MCSessionDelegate
 
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
-    if (state == MCSessionStateNotConnected) {
-        NSLog(@"[multipeer_session]: Disconnected with peer %@.", peerID.displayName);
-        [self.connectedPeersForMLAPI removeObject:peerID];
-        // Notify MLAPI that a client is disconnected.
-        if (self.serviceAdvertiser != nil) {
-            unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-            DidReceiveDisconnectionMessageFromClientDelegate(clientId);
-        }
-    } else if (state == MCSessionStateConnecting) {
-        NSLog(@"[multipeer_session]: Connecting with peer %@.", peerID.displayName);
-    } else if (state == MCSessionStateConnected) {
-        NSLog(@"[multipeer_session]: Connected with peer %@.", peerID.displayName);
-        if (self.serviceAdvertiser != nil) {
-            [self.connectedPeersForMLAPI addObject:peerID];
-        } else {
-            // As a client, we only need to connect to the server.
-            if (self.connectedPeersForMLAPI.count == 0) {
-                [self.connectedPeersForMLAPI addObject:peerID];
-                unsigned long serverId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-                SendConnectionRequest2ServerDelegate(serverId);
+    switch(state) {
+        case MCSessionStateConnecting:
+            NSLog(@"[multipeer_session]: Connecting with peer %@.", peerID.displayName);
+            break;
+        case MCSessionStateConnected:
+            NSLog(@"[multipeer_session]: Connected with peer %@.", peerID.displayName);
+            if ([self isHost]) {
+                [self.connectedPeersForUnity addObject:peerID];
+                [self.peerClientIds setObject:[MultipeerSession convertNSString2NSNumber:peerID.displayName] forKey:peerID.displayName];
+            } else {
+                if (self.connectedPeersForUnity.count == 0) {
+                    [self.connectedPeersForUnity addObject:peerID];
+                    [self.peerClientIds setObject:[MultipeerSession convertNSString2NSNumber:peerID.displayName] forKey:peerID.displayName];
+                    SendConnectionRequest2ServerDelegate([self.peerClientIds[peerID.displayName] unsignedLongValue]);
+                }
             }
-        }
+            break;
+        case MCSessionStateNotConnected:
+            NSLog(@"[multipeer_session]: Disconnected with peer %@.", peerID.displayName);
+            [self.connectedPeersForUnity removeObject:peerID];
+            // Notify MLAPI that a client is disconnected.
+            if (self.serviceAdvertiser != nil) {
+                unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+                DidReceiveDisconnectionMessageFromClientDelegate(clientId);
+            }
+            break;
     }
 }
 
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
     // We only handle data that was sent from a connected MLAPI peer.
-    if (![self.connectedPeersForMLAPI containsObject:peerID]) {
+    if (![self.connectedPeersForUnity containsObject:peerID]) {
         return;
     }
     
@@ -301,9 +313,7 @@ typedef enum {
 
 - (void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary<NSString *,NSString *> *)info {
     NSLog(@"[multipeer_session]: Browsed a peer %@.", peerID.displayName);
-    if ([self.gameName isEqualToString:info[@"gameName"]] && [self.sessionName isEqualToString:info[@"sessionName"]]) {
-        [browser invitePeer:peerID toSession:self.mcSession withContext:nil timeout:10];
-    }
+    [browser invitePeer:peerID toSession:self.mcSession withContext:nil timeout:30];
 }
 
 - (void)browser:(nonnull MCNearbyServiceBrowser *)browser lostPeer:(nonnull MCPeerID *)peerID {
@@ -315,31 +325,31 @@ typedef enum {
 #pragma mark - extern "C"
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerInit(const char* peerName, const char* serviceType, const char* gameName, const char* sessionName) {
+UnityHoloKit_MCInitialize(const char* serviceType) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
-    ar_session_instance.multipeerSession = [[MultipeerSession alloc] initWithPeerName:[NSString stringWithUTF8String:peerName] serviceType:[NSString stringWithUTF8String:serviceType] gameName:[NSString stringWithUTF8String:gameName] sessionName:[NSString stringWithUTF8String:sessionName]];
+    ar_session_instance.multipeerSession = [[MultipeerSession alloc] initWithServiceType:[NSString stringWithUTF8String:serviceType]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerStartBrowsing(void) {
+UnityHoloKit_MCStartBrowsing(void) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession startBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerStartAdvertising(void) {
+UnityHoloKit_MCStartAdvertising(void) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession startAdvertising];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerStopBrowsing(void) {
+UnityHoloKit_MCStopBrowsing(void) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession stopBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerStopAdvertising(void) {
+UnityHoloKit_MCStopAdvertising(void) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession stopAdvertising];
 }
@@ -350,10 +360,10 @@ UnityHoloKit_MultipeerStopAdvertising(void) {
 // 3 for disconnection message
 // https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerSendDataForMLAPI(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
+UnityHoloKit_MCSendData(unsigned long clientId, unsigned char *data, int dataArrayLength, int channel) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeerSession = ar_session_instance.multipeerSession;
-    for (MCPeerID *peerId in multipeerSession.connectedPeersForMLAPI) {
+    for (MCPeerID *peerId in multipeerSession.connectedPeersForUnity) {
         if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
             unsigned char structuredData[dataArrayLength + 3];
             // Append the data type at the beginning of the data array
@@ -377,11 +387,11 @@ UnityHoloKit_MultipeerSendDataForMLAPI(unsigned long clientId, unsigned char *da
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerSendPingMessage(unsigned long clientId) {
+UnityHoloKit_MCSendPingMessage(unsigned long clientId) {
     //NSLog(@"send %@", [NSThread currentThread]);
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeerSession = ar_session_instance.multipeerSession;
-    for (MCPeerID *peerId in multipeerSession.connectedPeersForMLAPI) {
+    for (MCPeerID *peerId in multipeerSession.connectedPeersForUnity) {
         if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
             // Prepare the Ping message
             unsigned char pingMessageData[1];
@@ -395,7 +405,7 @@ UnityHoloKit_MultipeerSendPingMessage(unsigned long clientId) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerDisconnectForMLAPI(void) {
+UnityHoloKit_MCDisconnectLocalClient(void) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeer_session = ar_session_instance.multipeerSession;
     
@@ -404,14 +414,14 @@ UnityHoloKit_MultipeerDisconnectForMLAPI(void) {
 
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerDisconnectPeerForMLAPI(unsigned long clientId) {
+UnityHoloKit_MCDisconnectRemoteClient(unsigned long clientId) {
     HoloKitARSession* ar_session_delegate_controller = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeer_session = ar_session_delegate_controller.multipeerSession;
     if (![multipeer_session isHost]) {
         return;
     }
     
-    for (MCPeerID *peerId in multipeer_session.connectedPeersForMLAPI) {
+    for (MCPeerID *peerId in multipeer_session.connectedPeersForUnity) {
         if (clientId == [[NSNumber numberWithInteger:[peerId.displayName integerValue]] unsignedLongValue]) {
             // Prepare the disconnection message
             unsigned char disconnectionData[1];
@@ -425,7 +435,7 @@ UnityHoloKit_MultipeerDisconnectPeerForMLAPI(unsigned long clientId) {
 
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI(void) {
+UnityHoloKit_MCDisconnectAllClients(void) {
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     MultipeerSession *multipeer_session = ar_session_instance.multipeerSession;
     if (![multipeer_session isHost]) {
@@ -441,8 +451,8 @@ UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI(void) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MultipeerShutdown(void) {
-    UnityHoloKit_MultipeerDisconnectAllPeersForMLAPI();
+UnityHoloKit_MCShutdown(void) {
+    UnityHoloKit_MCDisconnectAllClients();
     HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     [ar_session_instance.multipeerSession.mcSession disconnect];
     ar_session_instance.multipeerSession = nil;
