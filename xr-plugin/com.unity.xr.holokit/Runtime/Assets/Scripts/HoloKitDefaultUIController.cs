@@ -11,38 +11,38 @@ namespace UnityEngine.XR.HoloKit
 
         public static HoloKitDefaultUIController Instance { get { return _instance; } }
 
-        protected Button m_BackButton;
+        private Button m_BackButton;
 
-        protected Button m_RecordButton;
+        private Button m_RecordButton;
 
-        protected Button m_LLTButton;
+        private Button m_LLTButton;
 
-        protected Button m_XRButton;
+        private Button m_XRButton;
 
         /// <summary>
         /// The invisible button that toggles system debug info.
         /// </summary>
-        protected Button m_InvisibleSystemStatusButton;
+        private Button m_InvisibleSystemStatusButton;
 
-        protected Text m_FPS;
+        private Text m_FPS;
 
-        protected Text m_Timer;
+        private Text m_Timer;
 
-        protected Text m_Ping;
+        private Text m_Ping;
 
-        protected Text m_ThermalStatus;
+        private Text m_ThermalStatus;
 
-        protected const float k_ThermalFetchInterval = 3f;
+        private const float k_ThermalFetchInterval = 3f;
 
-        protected float m_LastThermalFetchTime = 0f;
+        private float m_LastThermalFetchTime = 0f;
 
-        protected iOSThermalState m_CurrentThermalState = iOSThermalState.ThermalStateNominal;
+        private iOSThermalState m_CurrentThermalState = iOSThermalState.ThermalStateNominal;
 
-        [SerializeField] protected AudioClip m_ThermalFairSound;
+        [SerializeField] private AudioClip m_ThermalFairSound;
 
-        [SerializeField] protected AudioClip m_ThermalSeriousSound;
+        [SerializeField] private AudioClip m_ThermalSeriousSound;
 
-        [SerializeField] protected AudioClip m_TapSound;
+        [SerializeField] private AudioClip m_TapSound;
 
         private GameObject m_LogWindow;
 
@@ -52,7 +52,7 @@ namespace UnityEngine.XR.HoloKit
 
         [SerializeField] private Text m_LogText;
 
-        protected virtual void Awake()
+        private void Awake()
         {
             if (_instance != null && _instance != this)
             {
@@ -64,17 +64,17 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        protected virtual void OnEnable()
+        private void OnEnable()
         {
             Application.logMessageReceived += HandleLog;
         }
 
-        protected virtual void OnDisable()
+        private void OnDisable()
         {
             Application.logMessageReceived -= HandleLog;
         }
 
-        protected virtual void Start()
+        private void Start()
         {
             Transform backButton = transform.Find("Back Button");
             if (backButton)
@@ -123,7 +123,7 @@ namespace UnityEngine.XR.HoloKit
             m_InvisibleControlsButton.onClick.AddListener(ToggleButtons);
         }
 
-        protected virtual void Update()
+        private void Update()
         {
             // Display current thermal status
             if (m_ThermalStatus.enabled)
@@ -177,17 +177,17 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        protected virtual void Back()
+        private void Back()
         {
 
         }
 
-        protected virtual void ToggleRecord()
+        private void ToggleRecord()
         {
 
         }
 
-        protected virtual void ToggleLLT()
+        private void ToggleLLT()
         {
             if (HoloKitSettings.Instance.LowLatencyTrackingActive)
             {
@@ -201,9 +201,9 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        protected virtual void ToggleXR()
+        private void ToggleXR()
         {
-            if (!HoloKitSettings.Instance.StereoscopicRendering)
+            if (!HoloKitSettings.Instance.IsStereoscopicRendering)
             {
                 if (HoloKitSettings.Instance.SetStereoscopicRendering(true))
                 {
@@ -221,7 +221,7 @@ namespace UnityEngine.XR.HoloKit
 
         private void ToggleSystemStatus()
         {
-            if (m_ThermalStatus.enabled)
+            if (m_FPS.gameObject.activeSelf)
             {
                 m_FPS.gameObject.SetActive(false);
                 m_Timer.gameObject.SetActive(false);

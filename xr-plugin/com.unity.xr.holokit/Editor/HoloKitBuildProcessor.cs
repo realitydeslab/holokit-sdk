@@ -110,8 +110,8 @@ namespace UnityEditor.XR.HoloKit
                 // For AR collaboration
                 rootDict.SetString("NSLocalNetworkUsageDescription", "For HoloKit to enable nearby AR collaboration.");
                 PlistElementArray array = rootDict.CreateArray("NSBonjourServices");
-                array.AddString("_quantum-magic._tcp");
-                array.AddString("_quantum-magic._udp");
+                array.AddString("_holokit-collab._tcp");
+                array.AddString("_holokit-collab._udp");
 
                 // For CoreLocation
                 rootDict.SetString("NSLocationWhenInUseUsageDescription", "For thatReality to locate your current location.");

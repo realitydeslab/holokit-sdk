@@ -153,7 +153,7 @@ public:
     ///         successful. Otherwise, a value in UnitySubsystemErrorCode flagging
     ///         the error.
     UnitySubsystemErrorCode Initialize(UnitySubsystemHandle handle) {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Initialize()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Initialize()", GetCurrentTime());
         
         SetHandle(handle);
         
@@ -186,7 +186,7 @@ public:
     }
     
     UnitySubsystemErrorCode Start() {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -197,7 +197,7 @@ public:
     
     UnitySubsystemErrorCode GfxThread_Start(
             UnityXRRenderingCapabilities* rendering_caps) {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Start()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Start()", GetCurrentTime());
         // Does the system use multi-pass rendering?
         rendering_caps->noSinglePassRenderingSupport = true;
         rendering_caps->invalidateRenderStateAfterEachCallback = false;
@@ -343,7 +343,7 @@ public:
         
         // We interrupt the graphics thread if it is not manually opened by SDK.
         if (!holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering()) {
-            NSLog(@"[display]: Manually shut down the display subsystem.");
+            //NSLog(@"[display]: Manually shut down the display subsystem.");
             return kUnitySubsystemErrorCodeFailure;
         }
         
@@ -443,7 +443,7 @@ public:
     }
     
     UnitySubsystemErrorCode GfxThread_Stop() {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
 
         //holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(false);
         if (holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
@@ -468,7 +468,7 @@ private:
     
     /// @brief Allocate unity textures.
     void CreateTextures(int num_textures) {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f CreateTextures()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f CreateTextures()", GetCurrentTime());
         
         id<MTLDevice> mtl_device = metal_interface_->MetalDevice();
         
@@ -525,7 +525,7 @@ private:
     
     /// @brief Deallocate textures.
     void DestroyTextures() {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f DestroyTextures()", GetCurrentTime());
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f DestroyTextures()", GetCurrentTime());
         
         for (int i = 0; i < unity_textures_.size(); i++) {
             if(unity_textures_[i] != 0) {

@@ -46,9 +46,9 @@ namespace UnityEngine.XR.HoloKit
 
         private ARCameraBackground m_ARCameraBackground;
 
-        public bool StereoscopicRendering
+        public bool IsStereoscopicRendering
         {
-            get => UnityHoloKit_StereoscopicRendering();
+            get => UnityHoloKit_IsStereoscopicRendering();
         }
 
         private int m_CurrentRenderPass = 0;
@@ -70,7 +70,7 @@ namespace UnityEngine.XR.HoloKit
         {
             get
             {
-                if (StereoscopicRendering)
+                if (IsStereoscopicRendering)
                 {
                     return m_SecondARReplayCamera.GetComponent<Camera>();
                 }
@@ -87,10 +87,10 @@ namespace UnityEngine.XR.HoloKit
         }
 
         [DllImport("__Internal")]
-        private static extern bool UnityHoloKit_StereoscopicRendering();
+        private static extern bool UnityHoloKit_IsStereoscopicRendering();
 
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetStereoscopicRendering(bool value);
+        private static extern void UnityHoloKit_EnableStereoscopicRendering(bool value);
 
         delegate void SetARCameraBackground(bool value);
         [AOT.MonoPInvokeCallback(typeof(SetARCameraBackground))]
@@ -217,7 +217,7 @@ namespace UnityEngine.XR.HoloKit
             {
                 if (UnityHoloKit_StartNfcSession())
                 {
-                    UnityHoloKit_SetStereoscopicRendering(true);
+                    UnityHoloKit_EnableStereoscopicRendering(true);
                     m_DisplaySubsystem.Start();
 
                     m_CenterEyePoint.localPosition = m_CameraToCenterEyeOffset;
@@ -232,7 +232,7 @@ namespace UnityEngine.XR.HoloKit
             else
             {
                 m_DisplaySubsystem.Stop();
-                UnityHoloKit_SetStereoscopicRendering(false);
+                UnityHoloKit_EnableStereoscopicRendering(false);
 
                 m_CenterEyePoint.localPosition = Vector3.zero;
                 //m_SecondARReplayCamera.SetActive(false);
