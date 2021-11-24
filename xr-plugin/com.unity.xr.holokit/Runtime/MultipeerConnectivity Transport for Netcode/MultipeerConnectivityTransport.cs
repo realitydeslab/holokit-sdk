@@ -17,7 +17,7 @@ namespace Netcode.Transports.MultipeerConnectivity
     }
     
     public class MultipeerConnectivityTransport : NetworkTransport
-    {
+    {       
         // This class is a singleton.
         private static MultipeerConnectivityTransport _instance;
 
@@ -26,28 +26,32 @@ namespace Netcode.Transports.MultipeerConnectivity
         /// <summary>
         /// The serverId of the local network.
         /// </summary>
-        private ulong m_ServerClientId = 0;
+        private ulong m_ServerTransportId = 0;
 
-        public override ulong ServerClientId => m_ServerClientId;
+        public override ulong ServerClientId => m_ServerTransportId;
+
+        private string m_DeviceName;
+
+        public string DeviceName => m_DeviceName;
 
         /// <summary>
         /// Is there a new connection request to be sent?
         /// This variable is only used by clients.
         /// </summary>
-        private bool m_DidNewPeerConnect = false;
+        private bool m_PeerDidConnect = false;
 
-        private ulong m_NewConnectedPeerClientId = 0;
+        private ulong m_ConnectedPeerTransportId = 0;
 
         /// <summary>
         /// Is there is new disconnection message to be handled?
         /// This variable is only used by the server.
         /// </summary>
-        private bool m_DidReceiveDisconnectionMessage = false;
+        private bool m_PeerDidDisconnect = false;
 
         /// <summary>
         /// The client Id of the pending disconnection mesasge.
         /// </summary>
-        private ulong m_LastDisconnectedClientId;
+        private ulong m_DisconnectedPeerTransportId = 0;
 
         /// <summary>
         /// The queue storing all peer data packets received through the network so that
@@ -89,7 +93,15 @@ namespace Netcode.Transports.MultipeerConnectivity
         /// </summary>
         private const float k_PingInterval = 2f;
 
-        private Dictionary<ulong, string> m_ClientId2DeviceNameMap = new();
+        private Dictionary<ulong, string> m_TransportId2DeviceNameMap = new();
+
+        public Dictionary<ulong, string> TransportId2DeviceNameMap => m_TransportId2DeviceNameMap;
+
+        private List<ulong> m_CurrentAvailableServers = new();
+
+        public List<ulong> CurrentAvailableHosts => m_CurrentAvailableServers;
+
+        private List<ulong> m_ConnectedPeerTransportIds = new();
 
         /// <summary>
         /// Initialize the MultipeerSession instance on native iOS side.
@@ -123,19 +135,19 @@ namespace Netcode.Transports.MultipeerConnectivity
         /// <summary>
         /// Send MLAPI data to a peer through multipeer connectivity.
         /// </summary>
-        /// <param name="clientId">The client Id of the recipient</param>
+        /// <param name="transportId">The client Id of the recipient</param>
         /// <param name="data">Raw data to be sent</param>
         /// <param name="dataArrayLength">The length of the data array</param>
         /// <param name="channel">MLAPI NetworkChannel</param>
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MCSendData(ulong clientId, byte[] data, int dataArrayLength, int channel);
+        private static extern void UnityHoloKit_MCSendData(ulong transportId, byte[] data, int dataArrayLength, int channel);
 
         /// <summary>
         /// Send a Ping message to a specific client.
         /// </summary>
-        /// <param name="clientId">The client Id</param>
+        /// <param name="transportId">The client Id</param>
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MCSendPingMessage(ulong clientId);
+        private static extern void UnityHoloKit_MCSendPingMessage(ulong transportId);
 
         /// <summary>
         /// Disconnect from the multipeer connectivity network.
@@ -149,7 +161,7 @@ namespace Netcode.Transports.MultipeerConnectivity
         /// This function should only be called on the server side.
         /// </summary>
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_MCDisconnectRemoteClient(ulong clientId);
+        private static extern void UnityHoloKit_MCDisconnectRemoteClient(ulong transportId);
 
         /// <summary>
         /// Release the MultipeerSession instance on Objective-C side.
@@ -163,61 +175,66 @@ namespace Netcode.Transports.MultipeerConnectivity
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_MCSendConnectionMessage2Client(ulong clientId);
 
-        delegate void BrowserDidFindPeer(string deviceName, ulong clientId);
+        delegate void BrowserDidFindPeer(ulong transportId, string deviceName);
         [AOT.MonoPInvokeCallback(typeof(BrowserDidFindPeer))]
-        static void OnBrowserDidFindPeer(string deviceName, ulong clientId)
+        static void OnBrowserDidFindPeer(ulong transportId, string deviceName)
         {
-            Instance.BrowserDidFindPeerEvent?.Invoke(deviceName, clientId);
-            Instance.m_ClientId2DeviceNameMap.Add(clientId, deviceName);
+            if (!Instance.m_TransportId2DeviceNameMap.ContainsKey(transportId))
+            {
+                Instance.m_TransportId2DeviceNameMap[transportId] = deviceName;
+            }
+            if (!Instance.m_CurrentAvailableServers.Contains(transportId))
+            {
+                Instance.m_CurrentAvailableServers.Add(transportId);
+            }
+            Instance.BrowserDidFindPeerEvent?.Invoke(transportId, deviceName);
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetBrowserDidFindPeerDelegate(BrowserDidFindPeer callback);
 
-        delegate void BrowserDidLosePeer(ulong clientId);
+        delegate void BrowserDidLosePeer(ulong transportId);
         [AOT.MonoPInvokeCallback(typeof(BrowserDidLosePeer))]
-        static void OnBrowserDidLosePeer(ulong clientId)
+        static void OnBrowserDidLosePeer(ulong transportId)
         {
-            Instance.BrowserDidLosePeerEvent?.Invoke(clientId);
+            Instance.m_CurrentAvailableServers.Remove(transportId);
+            Instance.BrowserDidLosePeerEvent?.Invoke(transportId);
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetBrowserDidLosePeerDelegate(BrowserDidLosePeer callback);
 
-        /// <summary>
-        /// Send connection request message to the server.
-        /// This delegate function is only called by a client.
-        /// </summary>
-        delegate void NewPeerDidConnect(ulong clientId);
-        [AOT.MonoPInvokeCallback(typeof(NewPeerDidConnect))]
-        static void OnNewPeerDidConnect(ulong clientId)
+        delegate void PeerDidConnect(ulong transportId, string deviceName);
+        [AOT.MonoPInvokeCallback(typeof(PeerDidConnect))]
+        static void OnPeerDidConnect(ulong transportId, string deviceName)
         {
-            Debug.Log($"New peer client id {clientId}");
-            Instance.m_NewConnectedPeerClientId = clientId;
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                Instance.m_ServerClientId = clientId;
-            }
-            Instance.m_DidNewPeerConnect = true;
+            Instance.m_PeerDidConnect = true;
+            Instance.m_ConnectedPeerTransportId = transportId;
+            Instance.m_ServerTransportId = transportId;
+            Instance.NewPeerDidConnectEvent?.Invoke(transportId, deviceName);
         }
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetNewPeerDidConnectDelegate(NewPeerDidConnect callback);
+        private static extern void UnityHoloKit_SetPeerDidConnectDelegate(PeerDidConnect callback);
 
         /// <summary>
         /// The delegate called when peer data is received through multipeer connectivity network.
         /// </summary>
-        /// <param name="clientId">The peerId who sends the data</param>
+        /// <param name="transportId">The peerId who sends the data</param>
         /// <param name="data">The raw data</param>
         /// <param name="dataArrayLength">The length of the data array</param>
         /// <param name="channel">MLAPI NetworkChannel</param>
-        delegate void DidReceivePeerData(ulong clientId, IntPtr dataPtr, int dataArrayLength);
+        delegate void DidReceivePeerData(ulong transportId, IntPtr dataPtr, int dataArrayLength);
         [AOT.MonoPInvokeCallback(typeof(DidReceivePeerData))]
-        static void OnDidReceivePeerData(ulong clientId, IntPtr dataPtr, int dataArrayLength)
-        {
-            // https://stackoverflow.com/questions/25572221/callback-byte-from-native-c-to-c-sharp
+        static void OnDidReceivePeerData(ulong transportId, IntPtr dataPtr, int dataArrayLength)
+        {   
+            if (NetworkManager.Singleton.IsServer && !Instance.m_ConnectedPeerTransportIds.Contains(transportId))
+            {
+                Instance.m_PeerDidConnect = true;
+                Instance.m_ConnectedPeerTransportId = transportId;
+                Instance.m_ConnectedPeerTransportIds.Add(transportId);
+            }
+
             byte[] data = new byte[dataArrayLength];
             Marshal.Copy(dataPtr, data, 0, dataArrayLength);
-
-            // Enqueue this data packet
-            PeerDataPacket newPeerDataPacket = new PeerDataPacket() { clientId = clientId, data = data, dataArrayLength = dataArrayLength };
+            PeerDataPacket newPeerDataPacket = new PeerDataPacket() { clientId = transportId, data = data, dataArrayLength = dataArrayLength };
             Instance.m_PeerDataPacketQueue.Enqueue(newPeerDataPacket);
         }
         [DllImport("__Internal")]
@@ -226,10 +243,10 @@ namespace Netcode.Transports.MultipeerConnectivity
         /// <summary>
         /// This delegate function is called when a Pong message is received. The unit is millisecond.
         /// </summary>
-        /// <param name="clientId">The sender of the Pong message</param>
-        delegate void DidReceivePongMessage(ulong clientId, double rtt);
+        /// <param name="transportId">The sender of the Pong message</param>
+        delegate void DidReceivePongMessage(ulong transportId, double rtt);
         [AOT.MonoPInvokeCallback(typeof(DidReceivePongMessage))]
-        static void OnDidReceivePongMessage(ulong clientId, double rtt)
+        static void OnDidReceivePongMessage(ulong transportId, double rtt)
         {
             //Debug.Log($"[MultipeerConnectivityTransport]: Current Rtt {Instance.CurrentRtt}");
             Instance.CurrentRtt = rtt;
@@ -238,34 +255,27 @@ namespace Netcode.Transports.MultipeerConnectivity
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetDidReceivePongMessageDelegate(DidReceivePongMessage callback);
 
-        /// <summary>
-        /// This delegate function is only called on the server.
-        /// This function gets called when the server notices that a client is
-        /// disconnected through multipeer connectivity network.
-        /// </summary>
-        delegate void DidReceiveDisconnectionMessageFromClient(ulong clientId);
-        [AOT.MonoPInvokeCallback(typeof(DidReceiveDisconnectionMessageFromClient))]
-        static void OnDidReceiveDisconnectionMessageFromClient(ulong clientId)
+        delegate void PeerDidDisconnect(ulong transportId);
+        [AOT.MonoPInvokeCallback(typeof(PeerDidDisconnect))]
+        static void OnPeerDidDisconnect(ulong transportId)
         {
-            Debug.Log($"[MultipeerConnectivityTransport]: received a disconnection message from client {clientId}.");
-
-            Instance.m_DidReceiveDisconnectionMessage = true;
-            Instance.m_LastDisconnectedClientId = clientId;
+            Debug.Log($"[MCTransport] OnPeerDidDisconnect({transportId})");
+            Instance.m_PeerDidDisconnect = true;
+            Instance.m_DisconnectedPeerTransportId = transportId;
         }
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetDidReceiveDisconnectionMessageFromClientDelegate(DidReceiveDisconnectionMessageFromClient callback);
+        private static extern void UnityHoloKit_SetPeerDidDisconnectDelegate(PeerDidDisconnect callback);
 
-        public delegate void BrowserDidFindPeerDelegate(string deviceName, ulong clientId);
-        public event BrowserDidFindPeerDelegate BrowserDidFindPeerEvent;
+        [DllImport("__Internal")]
+        private static extern string UnityHoloKit_GetDeviceName();
 
-        public delegate void BrowserDidLosePeerDelegate(ulong clientId);
-        public event BrowserDidLosePeerDelegate BrowserDidLosePeerEvent;
+        public event Action<ulong, string> BrowserDidFindPeerEvent;
 
-        public delegate void NewPeerDidConnectDelegate(ulong clientId);
-        public event NewPeerDidConnectDelegate NewPeerDidConnectEvent;
+        public event Action<ulong> BrowserDidLosePeerEvent;
 
-        public delegate void RttDidUpdateDelegate(double rtt);
-        public event RttDidUpdateDelegate RttDidUpdateEvent;
+        public event Action<ulong, string> NewPeerDidConnectEvent;
+
+        public event Action<double> RttDidUpdateEvent;
 
         private void Awake()
         {
@@ -284,20 +294,37 @@ namespace Netcode.Transports.MultipeerConnectivity
             // Register delegates
             UnityHoloKit_SetBrowserDidFindPeerDelegate(OnBrowserDidFindPeer);
             UnityHoloKit_SetBrowserDidLosePeerDelegate(OnBrowserDidLosePeer);
-            UnityHoloKit_SetNewPeerDidConnectDelegate(OnNewPeerDidConnect);
+            UnityHoloKit_SetPeerDidConnectDelegate(OnPeerDidConnect);
             UnityHoloKit_SetDidReceivePeerDataDelegate(OnDidReceivePeerData);
             UnityHoloKit_SetDidReceivePongMessageDelegate(OnDidReceivePongMessage);
-            UnityHoloKit_SetDidReceiveDisconnectionMessageFromClientDelegate(OnDidReceiveDisconnectionMessageFromClient);
+            UnityHoloKit_SetPeerDidDisconnectDelegate(OnPeerDidDisconnect);
         }
 
         private void OnDisable()
         {
+            Debug.Log("[MCTransport] OnDisable()");
             // Unregister events
+            if (NetworkManager.Singleton)
+            {
+                NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+                NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            Debug.Log("[MCTransport] OnDestroy()");
+            if (NetworkManager.Singleton)
+            {
+                NetworkManager.Singleton.Shutdown();
+            }
         }
 
         private void Start()
         {
             // Register events
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
         }
 
         /// <summary>
@@ -311,19 +338,21 @@ namespace Netcode.Transports.MultipeerConnectivity
                 Debug.Log("[MultipeerConnectivityTransport]: failed to initialize multipeer session because property service type is null.");
                 return;
             }
-           
             UnityHoloKit_MCInitialize(m_ServiceType);
+            m_DeviceName = UnityHoloKit_GetDeviceName();
         }
 
         public override bool StartServer()
         {
-            m_ServerClientId = UnityHoloKit_MCGetServerClientId();
+            //Debug.Log("[MCTransport]: StartServer");
+            //m_ServerClientId = UnityHoloKit_MCGetServerClientId();
             UnityHoloKit_MCStartAdvertising();
             return true;
         }
 
         public override bool StartClient()
         {
+            //Debug.Log("[MCTransport]: StartClient");
             UnityHoloKit_MCStartBrowsing();
             return true;
         }
@@ -335,25 +364,19 @@ namespace Netcode.Transports.MultipeerConnectivity
                 if (Time.time - m_LastPingTime > k_PingInterval)
                 {
                     m_LastPingTime = Time.time;
-                    UnityHoloKit_MCSendPingMessage(m_ServerClientId);
+                    //UnityHoloKit_MCSendPingMessage(m_ServerClientId);
                 }
             }
         }
 
-        public override NetworkEvent PollEvent(out ulong clientId, out ArraySegment<byte> payload, out float receiveTime)
+        public override NetworkEvent PollEvent(out ulong transportId, out ArraySegment<byte> payload, out float receiveTime)
         {
-            // Send a connection request to the server as a client.
-            if (m_DidNewPeerConnect)
+            if (m_PeerDidConnect)
             {
-                m_DidNewPeerConnect = false;
-                clientId = m_NewConnectedPeerClientId;
+                m_PeerDidConnect = false;
+                transportId = m_ConnectedPeerTransportId;
                 payload = new ArraySegment<byte>();
                 receiveTime = Time.realtimeSinceStartup;
-                NewPeerDidConnectEvent?.Invoke(m_NewConnectedPeerClientId);
-                if (NetworkManager.Singleton.IsServer)
-                {
-                    UnityHoloKit_MCSendConnectionMessage2Client(clientId);
-                }
                 return NetworkEvent.Connect;
             }
 
@@ -361,40 +384,38 @@ namespace Netcode.Transports.MultipeerConnectivity
             if (m_PeerDataPacketQueue.Count > 0)
             {
                 PeerDataPacket dataPacket = m_PeerDataPacketQueue.Dequeue();
-                clientId = dataPacket.clientId;
+                transportId = dataPacket.clientId;
                 payload = new ArraySegment<byte>(dataPacket.data, 0, dataPacket.dataArrayLength);
                 receiveTime = Time.realtimeSinceStartup;
-                // TODO: I don't know if this is correct.
                 return NetworkEvent.Data;
             }
 
-            // Send a disconnection message to the server as a client.
-            if (m_DidReceiveDisconnectionMessage && NetworkManager.Singleton.IsServer)
+            if (m_PeerDidDisconnect)
             {
-                m_DidReceiveDisconnectionMessage = false;
-                clientId = m_LastDisconnectedClientId;
+                m_PeerDidDisconnect = false;
+                transportId = m_DisconnectedPeerTransportId;
                 payload = new ArraySegment<byte>();
                 receiveTime = Time.realtimeSinceStartup;
                 return NetworkEvent.Disconnect;
             }
 
             // We do nothing here if nothing happens.
-            clientId = 0;
+            transportId = 0;
             payload = new ArraySegment<byte>();
             receiveTime = Time.realtimeSinceStartup;
             return NetworkEvent.Nothing;
         }
 
-        public override void Send(ulong clientId, ArraySegment<byte> data, NetworkDelivery networkDelivery)
+        public override void Send(ulong transportId, ArraySegment<byte> data, NetworkDelivery networkDelivery)
         {
             // Convert ArraySegment to Array
             // https://stackoverflow.com/questions/5756692/arraysegment-returning-the-actual-segment-c-sharp
             byte[] newArray = new byte[data.Count];
             Array.Copy(data.Array, data.Offset, newArray, 0, data.Count);
-            UnityHoloKit_MCSendData(clientId, newArray, data.Count, (int)networkDelivery);
+            UnityHoloKit_MCSendData(transportId, newArray, data.Count, (int)networkDelivery);
         }
 
-        public override ulong GetCurrentRtt(ulong clientId)
+        public override ulong GetCurrentRtt(ulong transportId)
         {
             return (ulong)CurrentRtt;
         }
@@ -405,10 +426,10 @@ namespace Netcode.Transports.MultipeerConnectivity
             UnityHoloKit_MCDisconnectLocalClient();
         }
 
-        public override void DisconnectRemoteClient(ulong clientId)
+        public override void DisconnectRemoteClient(ulong transportId)
         {
             // TODO: This is not correct, we should disconnect one client at a time.
-            UnityHoloKit_MCDisconnectRemoteClient(clientId);
+            UnityHoloKit_MCDisconnectRemoteClient(transportId);
         }
 
         public override void Shutdown()
@@ -426,9 +447,19 @@ namespace Netcode.Transports.MultipeerConnectivity
             UnityHoloKit_MCStopBrowsing();
         }
 
-        public void InvitePeer(ulong clientId)
+        public void InvitePeer(ulong transportId)
         {
-            UnityHoloKit_MCInvitePeer(clientId);
+            UnityHoloKit_MCInvitePeer(transportId);
+        }
+
+        private void OnClientConnected(ulong clientId)
+        {
+            Debug.Log($"[MCTransport] OnClientConnectedCallback with clientId {clientId}");
+        }
+
+        private void OnClientDisconnect(ulong clientId)
+        {
+            Debug.Log($"[MCTransport] OnClientDisconnectCallback with clientId {clientId}");
         }
     }
 }

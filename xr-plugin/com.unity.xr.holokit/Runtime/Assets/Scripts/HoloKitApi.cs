@@ -15,5 +15,10 @@ namespace UnityEngine.XR.HoloKit
 
         [DllImport("__Internal")]
         private static extern int UnityHoloKit_GetDeviceScreenHeight();
+
+        public string GetDeviceName()
+        {
+            return UnityHoloKit_GetDeviceName();
+        }
     }
 }

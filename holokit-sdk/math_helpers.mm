@@ -71,7 +71,7 @@ UnityXRPose EyePositionToUnityXRPose(simd_float3 eye_position) {
     return unity_pose;
 }
 
-simd_float4x4 TransformFromUnity(float position[3], float rotation[4]) {
+simd_float4x4 UnityPositionAndRotation2SimdFloat4x4(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = matrix_identity_float4x4;
     float converted_rotation[4];
     // The structure of converted_rotation is { w, x, y, z }
@@ -97,7 +97,7 @@ simd_float4x4 TransformFromUnity(float position[3], float rotation[4]) {
     return transform_matrix;
 }
 
-std::vector<float> TransformToUnityPosition(simd_float4x4 transform_matrix) {
+std::vector<float> SimdFloat4x42UnityPosition(simd_float4x4 transform_matrix) {
     std::vector<float> position;
     position.push_back(transform_matrix.columns[3].x);
     position.push_back(transform_matrix.columns[3].y);
@@ -107,11 +107,11 @@ std::vector<float> TransformToUnityPosition(simd_float4x4 transform_matrix) {
 }
 
 // TODO: I don't know if this will work
-std::vector<float> TransformToUnityRotation(simd_float4x4 transform_matrix) {
+std::vector<float> SimdFloat4x42UnityRotation(simd_float4x4 transform_matrix) {
     std::vector<float> rotation;
     simd_quatf quaternion = simd_quaternion(transform_matrix);
-    rotation.push_back(quaternion.vector.x);
-    rotation.push_back(quaternion.vector.y);
+    rotation.push_back(-quaternion.vector.x);
+    rotation.push_back(-quaternion.vector.y);
     rotation.push_back(quaternion.vector.z);
     rotation.push_back(quaternion.vector.w);
     return rotation;

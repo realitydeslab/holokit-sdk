@@ -24,11 +24,11 @@ UnityXRRectf Float4ToUnityXRRect(simd_float4 in_float4);
 
 UnityXRPose EyePositionToUnityXRPose(simd_float3 eye_position);
 
-simd_float4x4 TransformFromUnity(float position[3], float rotation[4]);
+simd_float4x4 UnityPositionAndRotation2SimdFloat4x4(float position[3], float rotation[4]);
 
-std::vector<float> TransformToUnityPosition(simd_float4x4 transform_matrix);
+std::vector<float> SimdFloat4x42UnityPosition(simd_float4x4 transform_matrix);
 
-std::vector<float> TransformToUnityRotation(simd_float4x4 transform_matrix);
+std::vector<float> SimdFloat4x42UnityRotation(simd_float4x4 transform_matrix);
 
 Eigen::Vector3d CMAccelerationToEigenVector3d(CMAcceleration acceleration);
 

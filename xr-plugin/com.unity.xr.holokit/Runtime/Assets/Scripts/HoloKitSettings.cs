@@ -19,23 +19,12 @@ namespace UnityEngine.XR.HoloKit
 
         public static HoloKitSettings Instance { get { return _instance; } }
 
-        [SerializeField] private bool m_CollaborationEnabled = false;
-
         private XRDisplaySubsystem m_DisplaySubsystem;
 
         public XRDisplaySubsystem DisplaySubsystem
         {
             get => m_DisplaySubsystem;
         }
-
-        private RenderTexture m_SecondCameraRenderTexture;
-
-        public RenderTexture SecondCameraRenderTexture
-        {
-            get => m_SecondCameraRenderTexture;
-        }
-
-        private Display m_SecondDisplay = null;
 
         private static Vector3 m_CameraToCenterEyeOffset;
 
@@ -63,23 +52,6 @@ namespace UnityEngine.XR.HoloKit
         }
 
         [SerializeField] private Transform m_CenterEyePoint;
-
-        [SerializeField] private GameObject m_SecondARReplayCamera;
-
-        public Camera ReplayCamera
-        {
-            get
-            {
-                if (IsStereoscopicRendering)
-                {
-                    return m_SecondARReplayCamera.GetComponent<Camera>();
-                }
-                else
-                {
-                    return Camera.main;
-                }
-            }
-        }
 
         public bool LowLatencyTrackingActive
         {
@@ -119,9 +91,6 @@ namespace UnityEngine.XR.HoloKit
         [DllImport("__Internal")]
         private static extern int UnityHoloKit_GetThermalState();
 
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_EnableShareARCollaborationData(bool val);
-
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -136,26 +105,17 @@ namespace UnityEngine.XR.HoloKit
 
         private void OnEnable()
         {
-            // Set up the collaboration setting.
-            if (m_CollaborationEnabled)
-            {
-                ARSession session = FindObjectOfType<ARSession>();
-                ARKitSessionSubsystem subsystem = session.subsystem as ARKitSessionSubsystem;
-                subsystem.collaborationRequested = true;
-            }
-
             // Retrive camera to center eye offset from objective-c side.
             // https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
             IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
             float[] offset = new float[3];
             Marshal.Copy(offsetPtr, offset, 0, 3);
-            Debug.Log($"[HoloKitSettings]: camera to center eye offset [{offset[0]}, {offset[1]}, {-offset[2]}]");
             m_CameraToCenterEyeOffset = new Vector3(offset[0], offset[1], -offset[2]);
             UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(offsetPtr);
 
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
-            Debug.Log($"Number of display subsystem {displaySubsystems.Count}");
+            //Debug.Log($"Number of display subsystem {displaySubsystems.Count}");
             if (displaySubsystems.Count > 0)
             {
                 m_DisplaySubsystem = displaySubsystems[0];
@@ -164,15 +124,11 @@ namespace UnityEngine.XR.HoloKit
             m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
 
             UnityHoloKit_SetSetARCameraBackgroundDelegate(OnSetARCameraBackground);
-
-            RenderPipelineManager.beginFrameRendering += OnBeginFrameRendering;
-            RenderPipelineManager.endFrameRendering += OnEndFrameRendering;
         }
 
         private void OnDisable()
         {
-            RenderPipelineManager.beginFrameRendering -= OnBeginFrameRendering;
-            RenderPipelineManager.endFrameRendering -= OnEndFrameRendering;
+
         }
 
         private void Start()
@@ -245,24 +201,9 @@ namespace UnityEngine.XR.HoloKit
             UnityHoloKit_SetLowLatencyTrackingApiActive(value);
         }
 
-        private void OnBeginFrameRendering(ScriptableRenderContext context, Camera[] cameras)
-        {
-
-        }
-
-        private void OnEndFrameRendering(ScriptableRenderContext context, Camera[] cameras)
-        {
-            //UnityHoloKit_UpdateLastRenderTime();
-        }
-
         public iOSThermalState GetThermalState()
         {
             return (iOSThermalState)UnityHoloKit_GetThermalState();
-        }
-
-        public void EnableShareARCollaborationData(bool val)
-        {
-            UnityHoloKit_EnableShareARCollaborationData(val);
         }
     }
 }

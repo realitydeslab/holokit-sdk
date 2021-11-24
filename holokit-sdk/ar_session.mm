@@ -22,18 +22,16 @@
 #import "core_motion.h"
 #import "math_helpers.h"
 
-typedef void (*ARWorldMapSynced)();
-ARWorldMapSynced ARWorldMapSyncedDelegate = NULL;
+typedef void (*DidAddARParticipantAnchor)();
+DidAddARParticipantAnchor DidAddARParticipantAnchorDelegate = NULL;
 
-typedef void (*DidUpdateARParticipantAnchor)(float *position, float *rotation);
-DidUpdateARParticipantAnchor DidUpdateARParticipantAnchorDelegate = NULL;
+typedef void (*ARSessionDidStart)();
+ARSessionDidStart ARSessionDidStartDelegate = NULL;
+
+typedef void (*DidReceiveMagicAnchor)(int clientId, int magicIndex, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float rotW);
+DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
 
 @interface HoloKitARSession() <ARSessionDelegate>
-
-@property (nonatomic, assign) bool isSynced;
-@property (nonatomic, assign) bool shareARCollaborationData;
-@property (nonatomic, assign) int criticalDataCount;
-@property (nonatomic, assign) int optionalDataCount;
 
 @end
 
@@ -47,11 +45,6 @@ DidUpdateARParticipantAnchor DidUpdateARParticipantAnchorDelegate = NULL;
                                                           selector:@selector(displayLinkCallback:)];
         //[link setPreferredFramesPerSecond:60];
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-        
-        self.isSynced = NO;
-        self.shareARCollaborationData = YES;
-        self.criticalDataCount = 0;
-        self.optionalDataCount = 0;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -82,7 +75,7 @@ DidUpdateARParticipantAnchor DidUpdateARParticipantAnchorDelegate = NULL;
     return _sharedObject;
 }
 
-- (void)updateWithHoloKitCollaborationData:(ARCollaborationData *)collaborationData {
+- (void)updateWithCollaborationData:(ARCollaborationData *)collaborationData {
     [self.arSession updateWithCollaborationData:collaborationData];
 }
 
@@ -98,8 +91,10 @@ DidUpdateARParticipantAnchor DidUpdateARParticipantAnchorDelegate = NULL;
     //    os_signpost_interval_begin(log, spid, "Update ARKit");
     
     if(self.arSession == NULL) {
-        NSLog(@"[ar_session]: AR session started.");
         self.arSession = session;
+        if (ARSessionDidStartDelegate != NULL) {
+            ARSessionDidStartDelegate();
+        }
     }
     
     if (holokit::LowLatencyTrackingApi::GetInstance()->IsActive()) {
@@ -119,30 +114,27 @@ DidUpdateARParticipantAnchor DidUpdateARParticipantAnchorDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
-    //NSLog(@"[ar_session]: did add anchors");
+
     for (ARAnchor *anchor in anchors) {
-        // Check if this anchor is a new peer
-        //NSLog(@"[ar_session]: received an anchor with name %@", anchor.name);
-        LogMatrix4x4(anchor.transform);
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            NSLog(@"[ar_session]: a new peer is connected to the AR collaboration session.");
             // Let the ARWorldOriginManager know that AR collaboration session has started.
-            if (ARWorldMapSyncedDelegate != NULL) {
-                ARWorldMapSyncedDelegate();
+            if (DidAddARParticipantAnchorDelegate != NULL) {
+                DidAddARParticipantAnchorDelegate();
             }
-            NSLog(@"[ar_session]: ar participant anchor transform %f, %f, %f", [(ARParticipantAnchor*)anchor transform].columns[3].x, anchor.transform.columns[3].y, anchor.transform.columns[3].z);
-            self.isSynced = YES;
             continue;
         }
         if (anchor.name != nil) {
-            if (![self.multipeerSession isHost] && [anchor.name isEqual:@"-1"]) {
-                // This is an origin anchor.
-                // If this is a client, reset the world origin.
-                NSLog(@"[ar_session]: Did receive an origin anchor, reset the world origin.");
-//                std::vector<float> position = TransformToUnityPosition(anchor.transform);
-//                std::vector<float> rotation = TransformToUnityRotation(anchor.transform);
+            if (![self.multipeerSession isHost] && [anchor.name isEqual:@"origin"]) {
+                NSLog(@"[ar_session]: Did receive an origin anchor, reset world origin.");
                 [session setWorldOrigin:anchor.transform];
                 continue;
+            }
+            else if ([[anchor.name substringToIndex:5] isEqual:@"magic"]) {
+                if (DidReceiveMagicAnchorDelegate != NULL) {
+                    std::vector<float> position = SimdFloat4x42UnityPosition(anchor.transform);
+                    std::vector<float> rotation = SimdFloat4x42UnityRotation(anchor.transform);
+                    DidReceiveMagicAnchorDelegate([[anchor.name substringFromIndex:6] intValue] , 1, position[0], position[1], position[2], rotation[0], rotation[1], rotation[2], rotation[3]);
+                }
             }
         }
     }
@@ -166,23 +158,18 @@ DidUpdateARParticipantAnchor DidUpdateARParticipantAnchorDelegate = NULL;
         [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
     }
     
-    if (!self.shareARCollaborationData) {
-        return;
-    }
     if (self.multipeerSession == nil) {
         return;
     }
-    if (self.multipeerSession.connectedPeersForUnity.count == 0) {
+    if (self.multipeerSession.mcSession.connectedPeers.count == 0) {
         return;
     }
     // TEST: 'requiringSecureCoding' used to be YES.
     NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
     if (data.priority == ARCollaborationDataPriorityCritical) {
         [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
-        //NSLog(@"[ar_session]: critical ar collaboration data %d", ++self.criticalDataCount);
     } else {
         [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
-        //NSLog(@"[ar_session]: optional ar collaboration data %d", ++self.optionalDataCount);
     }
 }
 
@@ -253,7 +240,7 @@ UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
-    simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
+    simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
     
     HoloKitARSession* ar_session = [HoloKitARSession sharedARSession];
     [ar_session.arSession setWorldOrigin:(transform_matrix)];
@@ -261,16 +248,26 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float rotation[4]) {
-    simd_float4x4 transform_matrix = TransformFromUnity(position, rotation);
+    simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
+    std::vector<float> rot = SimdFloat4x42UnityRotation(transform_matrix);
     ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithUTF8String:anchorName] transform:transform_matrix];
     
-    HoloKitARSession* ar_session = [HoloKitARSession sharedARSession];
-    [ar_session.arSession addAnchor:anchor];
+    [[[HoloKitARSession sharedARSession] arSession] addAnchor:anchor];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback) {
-    ARWorldMapSyncedDelegate = callback;
+UnityHoloKit_SetDidAddARParticipantAnchorDelegate(DidAddARParticipantAnchor callback) {
+    DidAddARParticipantAnchorDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetARSessionDidStartDelegate(ARSessionDidStart callback) {
+    ARSessionDidStartDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidReceiveMagicAnchorDelegate(DidReceiveMagicAnchor callback) {
+    DidReceiveMagicAnchorDelegate = callback;
 }
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -290,16 +287,6 @@ UnityHoloKit_GetThermalState() {
             return 3;
             break;
     }
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_EnableShareARCollaborationData(bool val) {
-    [[HoloKitARSession sharedARSession] setShareARCollaborationData:val];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidUpdateARParticipantAnchorDelegate(DidUpdateARParticipantAnchor callback) {
-    DidUpdateARParticipantAnchorDelegate = callback;
 }
 
 } // extern "C"

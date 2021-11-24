@@ -49,19 +49,20 @@ namespace UnityEngine.XR.HoloKit
         /// <summary>
         /// This delegate gets called when the AR maps of connected devices merged successfully.
         /// </summary>
-        delegate void ARWorldMapSynced();
-        [AOT.MonoPInvokeCallback(typeof(ARWorldMapSynced))]
-        static void OnARWorldMapSynced()
+        delegate void DidAddARParticipantAnchor();
+        [AOT.MonoPInvokeCallback(typeof(DidAddARParticipantAnchor))]
+        static void OnDidAddARParticipantAnchor()
         {
-            //Debug.Log("[ARWorldOriginManager]: AR collaboration session started.");
-            ARWorldOriginManager.Instance.m_IsSynced = true;
-            if (NetworkManager.Singleton.IsServer)
-            {
-                Instance.m_SyncedClientsNum++;
-            }
+            Debug.Log("[ARWorldOriginManager] did add ARParticipantAnchor");
+            ////Debug.Log("[ARWorldOriginManager]: AR collaboration session started.");
+            //ARWorldOriginManager.Instance.m_IsSynced = true;
+            //if (NetworkManager.Singleton.IsServer)
+            //{
+            //    Instance.m_SyncedClientsNum++;
+            //}
         }
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetARWorldMapSyncedDelegate(ARWorldMapSynced callback);
+        private static extern void UnityHoloKit_SetDidAddARParticipantAnchorDelegate(DidAddARParticipantAnchor callback);
 
         private void Awake()
         {
@@ -78,24 +79,24 @@ namespace UnityEngine.XR.HoloKit
         public void OnEnable()
         {
             // Register delegates
-            UnityHoloKit_SetARWorldMapSyncedDelegate(OnARWorldMapSynced);
+            UnityHoloKit_SetDidAddARParticipantAnchorDelegate(OnDidAddARParticipantAnchor);
         }
 
         public void Update()
         {
-            if (!m_IsSynced) return;
+            //if (!m_IsSynced) return;
 
-            if (NetworkManager.Singleton.IsServer && Time.time - m_LastResettingTime > m_ResettingInterval)
-            {
-                // Add origin anchor
-                float[] position = { 0f, 0f, 0f };
-                float[] rotation = { 0f, 0f, 0f, 1f };
-                UnityHoloKit_AddNativeAnchor("-1", position, rotation);
-                Debug.Log("[ARWorldOriginManager]: added an origin anchor.");
-                m_LastResettingTime = Time.time;
-                // We gradually increase the resetting interval.
-                m_ResettingInterval += k_ResettingIntervalIncreament;
-            }
+            //if (NetworkManager.Singleton.IsServer && Time.time - m_LastResettingTime > m_ResettingInterval)
+            //{
+            //    // Add origin anchor
+            //    float[] position = { 0f, 0f, 0f };
+            //    float[] rotation = { 0f, 0f, 0f, 1f };
+            //    UnityHoloKit_AddNativeAnchor("-1", position, rotation);
+            //    Debug.Log("[ARWorldOriginManager]: added an origin anchor.");
+            //    m_LastResettingTime = Time.time;
+            //    // We gradually increase the resetting interval.
+            //    m_ResettingInterval += k_ResettingIntervalIncreament;
+            //}
         }
     }
 }

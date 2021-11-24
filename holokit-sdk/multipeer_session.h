@@ -10,6 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 @interface MultipeerSession: NSObject
 
+@property (nonatomic, strong, nullable) MCSession *mcSession;
 @property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeersForUnity;
 
 

@@ -9,20 +9,17 @@
 #import "IUnityInterface.h"
 #import "ar_session.h"
 
-typedef void (*InitializeClientId)(unsigned long clientId);
-InitializeClientId InitializeClientIdDelegate = NULL;
-
-typedef void (*BrowserDidFindPeer)(const char *deviceName, unsigned long clientId);
+typedef void (*BrowserDidFindPeer)(unsigned long clientId, const char *deviceName);
 BrowserDidFindPeer BrowserDidFindPeerDelegate = NULL;
 
 typedef void (*BrowserDidLosePeer)(unsigned long clientId);
 BrowserDidLosePeer BrowserDidLosePeerDelegate = NULL;
 
-typedef void (*NewPeerDidConnect)(unsigned long clientId);
-NewPeerDidConnect NewPeerDidConnectDelegate = NULL;
+typedef void (*PeerDidConnect)(unsigned long clientId, const char *deviceName);
+PeerDidConnect PeerDidConnectDelegate = NULL;
 
-typedef void (*DidReceiveDisconnectionMessageFromClient)(unsigned long clientId);
-DidReceiveDisconnectionMessageFromClient DidReceiveDisconnectionMessageFromClientDelegate = NULL;
+typedef void (*PeerDidDisconnect)(unsigned long clientId);
+PeerDidDisconnect PeerDidDisconnectDelegate = NULL;
 
 typedef void (*DidReceivePeerData)(unsigned long clientId, unsigned char *data, int dataArrayLength);
 DidReceivePeerData DidReceivePeerDataDelegate = NULL;
@@ -41,10 +38,11 @@ typedef enum {
 
 @property (nonatomic, strong) NSString *serviceType;
 @property (nonatomic, strong) MCPeerID *localPeerID;
-@property (nonatomic, strong) MCSession *mcSession;
+//@property (nonatomic, strong) MCSession *mcSession;
 @property (nonatomic, strong, nullable) MCNearbyServiceAdvertiser *advertiser;
 @property (nonatomic, strong, nullable) MCNearbyServiceBrowser *browser;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *peerName2ClientIdMap;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *peerName2DeviceNameMap;
 @property (nonatomic, strong) NSMutableArray<MCPeerID *> *browsedPeers;
 @property (assign) double lastPingTime;
 @property (assign) int pingCount;
@@ -64,7 +62,7 @@ typedef enum {
         unsigned long hashedNumber = [displayNameBeforeHash hash];
         NSString *displayName = [NSString stringWithFormat:@"%lu", hashedNumber];
         // To prevent the overflow problem when marshalling.
-        displayName = [displayName substringToIndex:10];
+        displayName = [displayName substringToIndex:11];
         NSLog(@"[mc_session]: local peer display name: %@", displayName);
         self.localPeerID = [[MCPeerID alloc] initWithDisplayName:displayName];
         
@@ -75,6 +73,7 @@ typedef enum {
         self.connectedPeersForUnity = [[NSMutableArray alloc] init];
         self.peerName2ClientIdMap = [[NSMutableDictionary alloc] init];
         self.browsedPeers = [[NSMutableArray alloc] init];
+        self.peerName2DeviceNameMap = [[NSMutableDictionary alloc] init];
         
         self.pingCount = 0;
         self.pongCount = 0;
@@ -123,7 +122,7 @@ typedef enum {
 }
 
 - (void)startAdvertising {
-    NSDictionary<NSString *, NSString *> *discoveryInfo = @{ @"PeerName":[[UIDevice currentDevice] name], @"RequirePassword": @"No" };
+    NSDictionary<NSString *, NSString *> *discoveryInfo = @{ @"DeviceName":[[UIDevice currentDevice] name], @"RequirePassword": @"No" };
     self.advertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.localPeerID discoveryInfo:discoveryInfo serviceType:self.serviceType];
     self.advertiser.delegate = self;
     [self.advertiser startAdvertisingPeer];
@@ -169,10 +168,6 @@ typedef enum {
     return [formatter numberFromString:str];
 }
 
-- (NSString *)getLocalPeerDisplayName {
-    return self.localPeerID.displayName;
-}
-
 - (void)invitePeer:(unsigned long)clientId {
     for (MCPeerID *peerID in self.browsedPeers) {
         if (clientId == [self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue]) {
@@ -188,8 +183,12 @@ typedef enum {
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
     //NSDictionary<NSString *, NSString *> *dict = (NSDictionary *)[NSKeyedUnarchiver unarchiveObjectWithData:context];
     NSDictionary<NSString *, NSString *> *dict = [NSKeyedUnarchiver unarchivedDictionaryWithKeysOfClass:[NSString class] objectsOfClass:[NSString class] fromData:context error:nil];
-    if (dict != nil) {
-        NSLog(@"[mc_session]: inviter device name %@", dict[@"DeviceName"]);
+    NSString *deviceName = dict[@"DeviceName"];
+    if (self.peerName2ClientIdMap[peerID.displayName] == nil) {
+        [self.peerName2ClientIdMap setObject:[MultipeerSession convertNSString2NSNumber:peerID.displayName] forKey:peerID.displayName];
+    }
+    if (self.peerName2DeviceNameMap[peerID.displayName] == nil) {
+        [self.peerName2DeviceNameMap setObject:deviceName forKey:peerID.displayName];
     }
     invitationHandler(true, self.mcSession);
 }
@@ -197,14 +196,17 @@ typedef enum {
 #pragma mark - MCNearbyServiceBrowserDelegate
 
 - (void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary<NSString *,NSString *> *)info {
-    NSString *peerName = info[@"PeerName"];
+    NSString *deviceName = info[@"DeviceName"];
     NSNumber *clientId = [MultipeerSession convertNSString2NSNumber:peerID.displayName];
     if (self.peerName2ClientIdMap[peerID.displayName] == nil) {
         [self.peerName2ClientIdMap setObject:clientId forKey:peerID.displayName];
     }
+    if (self.peerName2DeviceNameMap[peerID.displayName] == nil) {
+        [self.peerName2DeviceNameMap setObject:deviceName forKey:peerID.displayName];
+    }
     [self.browsedPeers addObject:peerID];
     if (BrowserDidFindPeerDelegate != NULL) {
-        BrowserDidFindPeerDelegate([peerName UTF8String], [clientId unsignedLongValue]);
+        BrowserDidFindPeerDelegate([clientId unsignedLongValue], [deviceName UTF8String]);
     }
 }
 
@@ -221,29 +223,27 @@ typedef enum {
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
     switch(state) {
         case MCSessionStateConnecting:
-            NSLog(@"[mc_session]: Connecting with peer %@.", peerID.displayName);
+            NSLog(@"[mc_session]: connecting with peer %@.", peerID.displayName);
             break;
         case MCSessionStateConnected:
-            NSLog(@"[mc_session]: Connected with peer %@.", peerID.displayName);
+            NSLog(@"[mc_session]: connected with peer %@.", peerID.displayName);
             if ([self isHost]) {
                 [self.connectedPeersForUnity addObject:peerID];
-                [self.peerName2ClientIdMap setObject:[MultipeerSession convertNSString2NSNumber:peerID.displayName] forKey:peerID.displayName];
-                NewPeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue]);
+                //NewPeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue], [self.peerName2DeviceNameMap[peerID.displayName] UTF8String]);
             } else {
-//                if (self.connectedPeersForUnity.count == 0) {
-//                    [self.connectedPeersForUnity addObject:peerID];
-//                    [self.peerName2ClientIdMap setObject:[MultipeerSession convertNSString2NSNumber:peerID.displayName] forKey:peerID.displayName];
-//                    NewPeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue]);
-//                }
+                [self.connectedPeersForUnity addObject:peerID];
+                PeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue], [self.peerName2DeviceNameMap[peerID.displayName] UTF8String]);
             }
             break;
         case MCSessionStateNotConnected:
-            NSLog(@"[mc_session]: Disconnected with peer %@.", peerID.displayName);
+            NSLog(@"[mc_session]: disconnected with peer %@.", peerID.displayName);
             [self.connectedPeersForUnity removeObject:peerID];
             // Notify MLAPI that a client is disconnected.
-            if (self.advertiser != nil) {
-                unsigned long clientId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
-                DidReceiveDisconnectionMessageFromClientDelegate(clientId);
+            if ([self isHost]) {
+                unsigned long transportId = [[NSNumber numberWithInteger:[peerID.displayName integerValue]] unsignedLongValue];
+                if (PeerDidDisconnectDelegate != NULL) {
+                    PeerDidDisconnectDelegate(transportId);
+                }
             }
             break;
     }
@@ -253,7 +253,7 @@ typedef enum {
     // First try to decode the received data as ARCollaboration data.
     ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
     if (collaborationData != nil) {
-        [[HoloKitARSession sharedARSession] updateWithHoloKitCollaborationData:collaborationData];
+        [[HoloKitARSession sharedARSession] updateWithCollaborationData:collaborationData];
         return;
     }
 
@@ -264,14 +264,15 @@ typedef enum {
     }
     switch ((int)decodedData[0]) {
         case 0: {
-            //NSLog(@"[ar_session]: did receive Netcode data.");
-            int dataArrayLength = (int)decodedData[1];
-            unsigned char mlapiData[dataArrayLength];
+            int dataArrayLength;
+            memcpy(&dataArrayLength, decodedData + 1, sizeof(int));
+            //NSLog(@"[ar_session]: did receive Netcode data with array length %d", dataArrayLength);
+            unsigned char netcodeData[dataArrayLength];
             for (int i = 0; i < dataArrayLength; i++) {
-                mlapiData[i] = decodedData[i + 2];
+                netcodeData[i] = decodedData[i + 1 + sizeof(int)];
             }
             unsigned long clientId = [self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue];
-            DidReceivePeerDataDelegate(clientId, mlapiData, dataArrayLength);
+            DidReceivePeerDataDelegate(clientId, netcodeData, dataArrayLength);
             break;
         }
         case 1: {
@@ -293,8 +294,7 @@ typedef enum {
         case 3: {
             NSLog(@"[mc_session]: did receive a connection message");
             [self.connectedPeersForUnity addObject:peerID];
-            [self.peerName2ClientIdMap setObject:[MultipeerSession convertNSString2NSNumber:peerID.displayName] forKey:peerID.displayName];
-            NewPeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue]);
+            PeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue], [self.peerName2DeviceNameMap[peerID.displayName] UTF8String]);
             break;
         }
         case 4: {
@@ -362,18 +362,19 @@ UnityHoloKit_MCStopAdvertising(void) {
 // https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCSendData(unsigned long clientId, unsigned char *data, int dataArrayLength, int networkDelivery) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
-    MultipeerSession *multipeerSession = ar_session_instance.multipeerSession;
+    //NSLog(@"[mc_session] send data to client Id %lu and data size %d", clientId, dataArrayLength);
+    MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
     for (MCPeerID *peerID in multipeerSession.connectedPeersForUnity) {
         if (clientId == [multipeerSession.peerName2ClientIdMap[peerID.displayName] unsignedLongValue]) {
-            unsigned char structuredData[dataArrayLength + 3];
+            unsigned char structuredData[dataArrayLength + 1 + sizeof(int)];
             // Append the data type at the beginning of the array
             structuredData[0] = (unsigned char)0;
-            // Append the length of the data array at the third place
-            structuredData[1] = (unsigned char)dataArrayLength;
+            // Append the length of the data array at the second place
+            //structuredData[1] = (unsigned char)dataArrayLength;
+            memcpy(structuredData + 1, &dataArrayLength, sizeof(int));
             // TODO: is there a better way to do this? I mean copying array
-            for (int i = 2; i < dataArrayLength + 2; i++) {
-                structuredData[i] = data[i - 2];
+            for (int i = 0; i < dataArrayLength; i++) {
+                structuredData[i + 1 + sizeof(int)] = data[i];
             }
 
             // Convert the data to NSData format
@@ -458,8 +459,8 @@ UnityHoloKit_MCShutdown(void) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetNewPeerDidConnectDelegate(NewPeerDidConnect callback) {
-    NewPeerDidConnectDelegate = callback;
+UnityHoloKit_SetPeerDidConnectDelegate(PeerDidConnect callback) {
+    PeerDidConnectDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -483,13 +484,13 @@ UnityHoloKit_SetDidReceivePongMessageDelegate(DidReceivePongMessage callback) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidReceiveDisconnectionMessageFromClientDelegate(DidReceiveDisconnectionMessageFromClient callback) {
-    DidReceiveDisconnectionMessageFromClientDelegate = callback;
+UnityHoloKit_SetPeerDidDisconnectDelegate(PeerDidDisconnect callback) {
+    PeerDidDisconnectDelegate = callback;
 }
 
 unsigned long UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCGetServerClientId(void) {
-    return [[MultipeerSession convertNSString2NSNumber:[[[HoloKitARSession sharedARSession] multipeerSession] getLocalPeerDisplayName]] unsignedLongValue];
+    return [[MultipeerSession convertNSString2NSNumber:[[[HoloKitARSession sharedARSession] multipeerSession] localPeerID].displayName] unsignedLongValue];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -499,10 +500,10 @@ UnityHoloKit_MCInvitePeer(unsigned long clientId) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCSendConnectionMessage2Client(unsigned long clientId) {
+    NSLog(@"[mc_session]: send connection message to %lu", clientId);
     MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
     for (MCPeerID *peerID in multipeerSession.connectedPeersForUnity) {
         if (clientId == [multipeerSession.peerName2ClientIdMap[peerID.displayName] unsignedLongValue]) {
-            NSLog(@"[mc_session]: send connection message to client");
             unsigned char connectionMessageData[1];
             connectionMessageData[0] = (unsigned char)3;
             NSData *dataReadyToBeSent = [NSData dataWithBytes:connectionMessageData length:sizeof(connectionMessageData)];
