@@ -11,8 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MultipeerSession: NSObject
 
 @property (nonatomic, strong, nullable) MCSession *mcSession;
-@property (nonatomic, strong, nullable) NSMutableArray<MCPeerID *> *connectedPeersForUnity;
-
 
 - (instancetype)initWithServiceType:(NSString *)serviceType;
 - (void)sendToAllPeers:(NSData *)data sendDataMode:(MCSessionSendDataMode)sendDataMode;
