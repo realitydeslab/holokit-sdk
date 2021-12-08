@@ -183,13 +183,6 @@ typedef enum {
     data[1] = (unsigned char)strlen(str);
     memcpy(data + 2, str, strlen(str));
     NSData *dataReadyToBeSent = [NSData dataWithBytes:data length:(2 + strlen(str))];
-
-    unsigned char *decodedData = (unsigned char *) [dataReadyToBeSent bytes];
-    char *backStr = malloc(decodedData[1]);
-    memcpy(backStr, decodedData + 2, decodedData[1]);
-
-    NSString *back = [[NSString alloc] initWithBytes:backStr length:decodedData[1] encoding:NSUTF8StringEncoding];
-    NSLog(@"[mc_session] back string %@", back);
     [self sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
 }
 
@@ -337,9 +330,7 @@ typedef enum {
             memcpy(str, decodedData + 2, strlen);
             NSString *arSessionId = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
             NSLog(@"[mc_session] Did receive an ARSessionId %@", arSessionId);
-            if (self.peerID2ARSessionIdMap[peerID] == nil) {
-                [self.peerID2ARSessionIdMap setObject:arSessionId forKey:peerID];
-            }
+            [self.peerID2ARSessionIdMap setObject:arSessionId forKey:peerID];
             break;
         }
         default: {
@@ -489,7 +480,6 @@ UnityHoloKit_MCDisconnectAllClients(void) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCShutdown(void) {
-    //UnityHoloKit_MCDisconnectAllClients();
     MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
     if ([multipeerSession isHost]) {
         [multipeerSession.advertiser stopAdvertisingPeer];

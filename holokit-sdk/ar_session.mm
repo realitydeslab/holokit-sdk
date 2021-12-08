@@ -38,6 +38,7 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
 
 @property (assign) BOOL isSynchronizationComplete;
 @property (nonatomic, strong) ARAnchor *originAnchor;
+@property (nonatomic, strong) NSUUID *currentARSessionId;
 
 @end
 
@@ -115,8 +116,10 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
     //    os_signpost_id_t spid = os_signpost_id_generate(log);
     //    os_signpost_interval_begin(log, spid, "Update ARKit");
     
-    if(self.arSession == NULL) {
+    if(![self.currentARSessionId isEqual:session.identifier]) {
+        NSLog(@"[ar_session] ARSession did update");
         self.arSession = session;
+        self.currentARSessionId = session.identifier;
         if (ARSessionDidStartDelegate != NULL) {
             ARSessionDidStartDelegate();
             [self.multipeerSession sendARSessionId2AllPeers];
