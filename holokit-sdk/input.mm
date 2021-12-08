@@ -43,7 +43,7 @@ public:
 #pragma mark - Input Lifecycle Methods
 
     UnitySubsystemErrorCode Initialize(UnitySubsystemHandle handle) {
-        HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Initialize()", GetCurrentTime());
+        //HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Initialize()", GetCurrentTime());
         
         UnityXRInputProvider input_provider;
         input_provider.userData = nullptr;
@@ -81,7 +81,7 @@ public:
     }
     
     UnitySubsystemErrorCode Start(UnitySubsystemHandle handle) {
-        HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
+        //HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
         
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandLeft);
@@ -94,7 +94,7 @@ public:
     }
     
     void Stop(UnitySubsystemHandle handle) {
-        HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Stop()", GetCurrentTime());
+        //HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "%f Stop()", GetCurrentTime());
         
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
         //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandLeft);
@@ -125,7 +125,7 @@ public:
         UnityXRInternalInputDeviceId device_id,
         UnityXRInputDeviceDefinition* definition) {
         
-        HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(), "FillDeviceDefinition(): device id is %d", device_id );
+        //HOLOKIT_INPUT_XR_TRACE_LOG(input_provider_->GetTrace(), "FillDeviceDefinition(): device id is %d", device_id );
         
         switch (device_id) {
             case kDeviceIdHoloKitHmd: {
@@ -468,7 +468,7 @@ UnitySubsystemErrorCode LoadInput(IUnityInterfaces* xr_interfaces) {
     if (trace == NULL) {
         return kUnitySubsystemErrorCodeFailure;
     }
-    HOLOKIT_INPUT_XR_TRACE_LOG(trace, "%f LoadInput()", GetCurrentTime());
+    //HOLOKIT_INPUT_XR_TRACE_LOG(trace, "%f LoadInput()", GetCurrentTime());
     
     HoloKitInputProvider::GetInstance().reset(new HoloKitInputProvider(trace, input));
 

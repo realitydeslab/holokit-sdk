@@ -613,7 +613,7 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
         return kUnitySubsystemErrorCodeFailure;
     }
     holokit::HoloKitDisplayProvider::GetInstance().reset(new holokit::HoloKitDisplayProvider(trace, display));
-    HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, "%f LoadDisplay()", GetCurrentTime());
+    //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, "%f LoadDisplay()", GetCurrentTime());
     
     holokit::HoloKitDisplayProvider::GetInstance()->SetMtlInterface(xr_interfaces->Get<IUnityGraphicsMetal>());
     

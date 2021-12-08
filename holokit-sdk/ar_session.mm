@@ -31,7 +31,13 @@ ARSessionDidStart ARSessionDidStartDelegate = NULL;
 typedef void (*DidReceiveMagicAnchor)(int clientId, int magicIndex, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float rotW);
 DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
 
+typedef void (*ThermalStateDidChange)(int state);
+ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
+
 @interface HoloKitARSession() <ARSessionDelegate>
+
+@property (assign) BOOL isSynchronizationComplete;
+@property (nonatomic, strong) ARAnchor *originAnchor;
 
 @end
 
@@ -45,6 +51,8 @@ DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
                                                           selector:@selector(displayLinkCallback:)];
         //[link setPreferredFramesPerSecond:60];
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        
+        self.isSynchronizationComplete = YES;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -63,7 +71,24 @@ DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
 }
 
 - (void)thermalStateDidChange {
-    
+    if (ThermalStateDidChangeDelegate == NULL) {
+        return;
+    }
+    NSProcessInfoThermalState thermalState = [[NSProcessInfo processInfo] thermalState];
+    switch(thermalState) {
+        case NSProcessInfoThermalStateNominal:
+            ThermalStateDidChangeDelegate(0);
+            break;
+        case NSProcessInfoThermalStateFair:
+            ThermalStateDidChangeDelegate(1);
+            break;
+        case NSProcessInfoThermalStateSerious:
+            ThermalStateDidChangeDelegate(2);
+            break;
+        case NSProcessInfoThermalStateCritical:
+            ThermalStateDidChangeDelegate(3);
+            break;
+    }
 }
 
 + (id)sharedARSession {
@@ -94,6 +119,7 @@ DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
         self.arSession = session;
         if (ARSessionDidStartDelegate != NULL) {
             ARSessionDidStartDelegate();
+            [self.multipeerSession sendARSessionId2AllPeers];
         }
     }
     
@@ -117,24 +143,16 @@ DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
 
     for (ARAnchor *anchor in anchors) {
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            // Let the ARWorldOriginManager know that AR collaboration session has started.
             if (DidAddARParticipantAnchorDelegate != NULL) {
                 DidAddARParticipantAnchorDelegate();
             }
             continue;
         }
         if (anchor.name != nil) {
-            if (![self.multipeerSession isHost] && [anchor.name isEqual:@"origin"]) {
-                NSLog(@"[ar_session]: Did receive an origin anchor, reset world origin.");
+            if (![self.multipeerSession isHost] && [anchor.name isEqualToString:@"origin"]) {
+                NSLog(@"[ar_session]: Did receive an origin anchor.");
                 [session setWorldOrigin:anchor.transform];
                 continue;
-            }
-            else if ([[anchor.name substringToIndex:5] isEqual:@"magic"]) {
-                if (DidReceiveMagicAnchorDelegate != NULL) {
-                    std::vector<float> position = SimdFloat4x42UnityPosition(anchor.transform);
-                    std::vector<float> rotation = SimdFloat4x42UnityRotation(anchor.transform);
-                    DidReceiveMagicAnchorDelegate([[anchor.name substringFromIndex:6] intValue] , 1, position[0], position[1], position[2], rotation[0], rotation[1], rotation[2], rotation[3]);
-                }
             }
         }
     }
@@ -166,10 +184,14 @@ DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
     }
     // TEST: 'requiringSecureCoding' used to be YES.
     NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
-    if (data.priority == ARCollaborationDataPriorityCritical) {
+    if (!self.isSynchronizationComplete) {
         [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
     } else {
-        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+        if (data.priority == ARCollaborationDataPriorityCritical) {
+            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+        } else {
+            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+        }
     }
 }
 
@@ -248,11 +270,21 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float rotation[4]) {
+    HoloKitARSession *session = [HoloKitARSession sharedARSession];
     simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
     std::vector<float> rot = SimdFloat4x42UnityRotation(transform_matrix);
-    ARAnchor* anchor = [[ARAnchor alloc] initWithName:[NSString stringWithUTF8String:anchorName] transform:transform_matrix];
-    
-    [[[HoloKitARSession sharedARSession] arSession] addAnchor:anchor];
+    NSString *name = [NSString stringWithUTF8String:anchorName];
+    if ([name isEqualToString:@"origin"]){
+        // Do not accumulate anchors.
+        if (session.originAnchor != nil) {
+            [session.arSession removeAnchor:session.originAnchor];
+        }
+        session.originAnchor = [[ARAnchor alloc] initWithName:name transform:transform_matrix];
+        [session.arSession addAnchor:session.originAnchor];
+    } else {
+        ARAnchor* anchor = [[ARAnchor alloc] initWithName:name transform:transform_matrix];
+        [session.arSession addAnchor:anchor];
+    }
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -268,6 +300,11 @@ UnityHoloKit_SetARSessionDidStartDelegate(ARSessionDidStart callback) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetDidReceiveMagicAnchorDelegate(DidReceiveMagicAnchor callback) {
     DidReceiveMagicAnchorDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetThermalStateDidChangeDelegate(ThermalStateDidChange callback) {
+    ThermalStateDidChangeDelegate = callback;
 }
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -287,6 +324,11 @@ UnityHoloKit_GetThermalState() {
             return 3;
             break;
     }
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SynchronizationComplete() {
+    [[HoloKitARSession sharedARSession] setIsSynchronizationComplete:YES];
 }
 
 } // extern "C"

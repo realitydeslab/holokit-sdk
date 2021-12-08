@@ -47,6 +47,7 @@ typedef enum {
 @property (nonatomic, strong, nullable) MCNearbyServiceBrowser *browser;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *peerName2ClientIdMap;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *peerName2DeviceNameMap;
+@property (nonatomic, strong) NSMutableDictionary<MCPeerID *, NSString *> *peerID2ARSessionIdMap;
 @property (nonatomic, strong) NSMutableArray<MCPeerID *> *browsedPeers;
 @property (assign) double lastPingTime;
 @property (assign) int pingCount;
@@ -77,6 +78,7 @@ typedef enum {
         self.peerName2ClientIdMap = [[NSMutableDictionary alloc] init];
         self.browsedPeers = [[NSMutableArray alloc] init];
         self.peerName2DeviceNameMap = [[NSMutableDictionary alloc] init];
+        self.peerID2ARSessionIdMap = [[NSMutableDictionary alloc] init];
         
         self.pingCount = 0;
         self.pongCount = 0;
@@ -171,6 +173,36 @@ typedef enum {
     }
 }
 
+- (void)sendARSessionId2AllPeers {
+    NSString* arSessionId = [[HoloKitARSession sharedARSession] arSession].identifier.UUIDString;
+    NSLog(@"[mc_session] send my ARSessionId %@", arSessionId);
+    const char *str = [arSessionId cStringUsingEncoding:NSUTF8StringEncoding];
+    
+    unsigned char *data = malloc(2 + strlen(str));
+    data[0] = (unsigned char)5;
+    data[1] = (unsigned char)strlen(str);
+    memcpy(data + 2, str, strlen(str));
+    NSData *dataReadyToBeSent = [NSData dataWithBytes:data length:(2 + strlen(str))];
+
+    unsigned char *decodedData = (unsigned char *) [dataReadyToBeSent bytes];
+    char *backStr = malloc(decodedData[1]);
+    memcpy(backStr, decodedData + 2, decodedData[1]);
+
+    NSString *back = [[NSString alloc] initWithBytes:backStr length:decodedData[1] encoding:NSUTF8StringEncoding];
+    NSLog(@"[mc_session] back string %@", back);
+    [self sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
+}
+
+- (void)removeAllAnchorsOriginatingFromARSessionWithID:(NSString *)ARSessionId {
+    ARSession *arSession = [[HoloKitARSession sharedARSession] arSession];
+    for (ARAnchor *anchor in arSession.currentFrame.anchors) {
+        NSString *anchorSessionId = anchor.sessionIdentifier.UUIDString;
+        if ([anchorSessionId isEqualToString:ARSessionId]) {
+            [arSession removeAnchor:anchor];
+        }
+    }
+}
+
 #pragma mark - MCNearbyServiceAdvertiserDelegate
 
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
@@ -189,6 +221,7 @@ typedef enum {
 #pragma mark - MCNearbyServiceBrowserDelegate
 
 - (void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary<NSString *,NSString *> *)info {
+    NSLog(@"[mc_session] broswer found peer %@", peerID.displayName);
     NSString *deviceName = info[@"DeviceName"];
     NSNumber *clientId = [MultipeerSession convertNSString2NSNumber:peerID.displayName];
     if (self.peerName2ClientIdMap[peerID.displayName] == nil) {
@@ -236,6 +269,7 @@ typedef enum {
                 if (PeerDidDisconnectDelegate != NULL) {
                     PeerDidDisconnectDelegate(transportId);
                 }
+                [self removeAllAnchorsOriginatingFromARSessionWithID:self.peerID2ARSessionIdMap[peerID]];
             }
             break;
     }
@@ -284,21 +318,32 @@ typedef enum {
             break;
         }
         case 3: {
-            NSLog(@"[mc_session]: did receive a connection message");
+            NSLog(@"[mc_session] did receive a connection message");
 //            [self.connectedPeersForUnity addObject:peerID];
 //            PeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue], [self.peerName2DeviceNameMap[peerID.displayName] UTF8String]);
             break;
         }
         case 4: {
-            NSLog(@"[mc_session]: Did receive a disconnection message.");
+            NSLog(@"[mc_session] Did receive a disconnection message.");
             [self.mcSession disconnect];
             if (DidDisconnectFromServerDelegate != NULL) {
                 DidDisconnectFromServerDelegate();
             }
             break;
         }
+        case 5: {
+            int strlen = (int)decodedData[1];
+            char *str = malloc(strlen);
+            memcpy(str, decodedData + 2, strlen);
+            NSString *arSessionId = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
+            NSLog(@"[mc_session] Did receive an ARSessionId %@", arSessionId);
+            if (self.peerID2ARSessionIdMap[peerID] == nil) {
+                [self.peerID2ARSessionIdMap setObject:arSessionId forKey:peerID];
+            }
+            break;
+        }
         default: {
-            NSLog(@"[mc_session]: Failed to decode the received data.");
+            NSLog(@"[mc_session] Failed to decode the received data.");
             break;
         }
     }
