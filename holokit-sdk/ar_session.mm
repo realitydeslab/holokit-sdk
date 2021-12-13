@@ -105,6 +105,14 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
     [self.arSession updateWithCollaborationData:collaborationData];
 }
 
+- (void)removeAllLocalAnchors {
+    for (ARAnchor *anchor in self.arSession.currentFrame.anchors) {
+        if ([anchor.identifier isEqual:self.arSession.identifier]) {
+            [self.arSession removeAnchor:anchor];
+        }
+    }
+}
+
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
@@ -149,6 +157,10 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
             if (DidAddARParticipantAnchorDelegate != NULL) {
                 DidAddARParticipantAnchorDelegate();
             }
+            else {
+                NSLog(@"[ar_session] DidAddARParticipantAnchorDelegate is NULL");
+            }
+            NSLog(@"[ar_session] did add an ARParticipantAnchor");
             continue;
         }
         if (anchor.name != nil) {
@@ -171,7 +183,11 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didRemoveAnchors:anchors];
     }
-    //NSLog(@"[ar_session]: did remove anchoors");
+    for (ARAnchor *anchor in anchors) {
+        if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
+            NSLog(@"[ar_session] did remove an ARParticipantAnchor");
+        }
+    }
 }
 
 - (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data {
@@ -256,7 +272,7 @@ UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
         return;
     }
     
-    ARSession* sessionPtr = (__bridge ARSession*) ar_native_session->sessionPtr;
+    ARSession* sessionPtr = (__bridge ARSession*)ar_native_session->sessionPtr;
     HoloKitARSession* ar_session = [HoloKitARSession sharedARSession];
     ar_session.unityARSessionDelegate = sessionPtr.delegate;
     
@@ -332,6 +348,11 @@ UnityHoloKit_GetThermalState() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SynchronizationComplete() {
     [[HoloKitARSession sharedARSession] setIsSynchronizationComplete:YES];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_RemoveAllLocalAnchors() {
+    [[HoloKitARSession sharedARSession] removeAllLocalAnchors];
 }
 
 } // extern "C"

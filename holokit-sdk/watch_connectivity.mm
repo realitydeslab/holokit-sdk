@@ -47,7 +47,7 @@ DidChangeReachability DidChangeReachabilityDelegate = NULL;
         NSDictionary<NSString *, id> *message = @{ messageType : [NSNumber numberWithInt:index] };
         [self.wcSession sendMessage:message replyHandler:nil errorHandler:nil];
     } else {
-        NSLog(@"[wc_session]: The Apple Watch is not reachable.");
+        NSLog(@"[wc_session] Watch is currently not reachable.");
     }
 }
 
@@ -125,8 +125,8 @@ UnityHoloKit_InitWatchConnectivitySession() {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendMessage2Watch(const char *messageType, int index) {
-    HoloKitWatchConnectivity *instance = [HoloKitWatchConnectivity sharedWatchConnectivity];
-    [instance sendMessage2WatchWithMessageType:[NSString stringWithUTF8String:messageType] messageIndex:index];
+    HoloKitWatchConnectivity *wc_session = [HoloKitWatchConnectivity sharedWatchConnectivity];
+    [wc_session sendMessage2WatchWithMessageType:[NSString stringWithUTF8String:messageType] messageIndex:index];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

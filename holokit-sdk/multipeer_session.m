@@ -125,6 +125,7 @@ typedef enum {
 - (void)stopBrowsing {
     self.browsedPeers = [[NSMutableArray alloc] init];
     [self.browser stopBrowsingForPeers];
+    NSLog(@"[mc_session] stop browsing");
 }
 
 - (void)startAdvertising {
@@ -136,6 +137,7 @@ typedef enum {
 
 - (void)stopAdvertising {
     [self.advertiser stopAdvertisingPeer];
+    NSLog(@"[mc_session] stop advertising");
 }
 
 - (bool)isHost {
@@ -375,6 +377,18 @@ typedef enum {
             [self.peerID2ARSessionIdMap setObject:arSessionId forKey:peerID];
             break;
         }
+        case 6: {
+            // Did reset ARSession message
+            NSLog(@"[mc_session] did receive DidResetARSession message");
+            NSString *arSessionId = self.peerID2ARSessionIdMap[peerID];
+            ARSession *arSession = [[HoloKitARSession sharedARSession] arSession];
+            for (ARAnchor *anchor in [[arSession currentFrame] anchors]) {
+                if ([anchor.identifier.UUIDString isEqualToString:arSessionId]) {
+                    [arSession removeAnchor:anchor];
+                }
+            }
+            break;
+        }
         default: {
             NSLog(@"[mc_session] Failed to decode the received data.");
             break;
@@ -524,9 +538,9 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCShutdown(void) {
     MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
     if ([multipeerSession isHost]) {
-        [multipeerSession.advertiser stopAdvertisingPeer];
+        [multipeerSession stopAdvertising];
     } else {
-        [multipeerSession.browser stopBrowsingForPeers];
+        [multipeerSession stopBrowsing];
     }
     [multipeerSession.mcSession disconnect];
     [multipeerSession setMcSession:nil];
@@ -610,4 +624,12 @@ UnityHoloKit_SetPeerDidDisconnectTemporarilyDelegate(PeerDidDisconnectTemporaril
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetPeerDidReconnectDelegate(PeerDidReconnect callback) {
     PeerDidReconnectDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SendDidResetARSessionMessage(void) {
+    unsigned char message[1];
+    message[0] = (unsigned char)6;
+    NSData *dataReadyToBeSent = [NSData dataWithBytes:message length:sizeof(message)];
+    [[[HoloKitARSession sharedARSession] multipeerSession] sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
 }
