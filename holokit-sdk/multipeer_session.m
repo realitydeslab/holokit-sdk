@@ -232,7 +232,7 @@ typedef enum {
 
 - (void)sendARSessionId2AllPeers {
     NSString* arSessionId = [[HoloKitARSession sharedARSession] arSession].identifier.UUIDString;
-    NSLog(@"[mc_session] send my ARSessionId %@", arSessionId);
+    //NSLog(@"[mc_session] send my ARSessionId %@", arSessionId);
     const char *str = [arSessionId cStringUsingEncoding:NSUTF8StringEncoding];
     
     unsigned char *data = malloc(2 + strlen(str));
@@ -384,21 +384,21 @@ typedef enum {
         self.receivedARCollaborationDataTotalCount++;
         if (data.length > self.largestARCollaborationData) {
             self.largestARCollaborationData = data.length;
-            NSLog(@"[network] largest ARCollaborationData %lu", self.largestARCollaborationData);
+            //NSLog(@"[network] largest ARCollaborationData %lu", self.largestARCollaborationData);
         }
         if (collaborationData.priority == ARCollaborationDataPriorityCritical) {
             self.receivedCriticalARCollaborationDataTotalLength += data.length;
             self.receivedCriticalARCollaborationDataTotalCount++;
             if (data.length > self.largestCriticalARCollaborationData) {
                 self.largestCriticalARCollaborationData = data.length;
-                NSLog(@"[network] largest Critical ARCollborationData %lu", self.largestCriticalARCollaborationData);
+                //NSLog(@"[network] largest Critical ARCollborationData %lu", self.largestCriticalARCollaborationData);
             }
         } else {
             self.receivedOptionalARCollaborationDataTotalLength += data.length;
             self.receivedOptionalARCollaborationDataTotalCount++;
             if (data.length > self.largestOptionalARCollaborationData) {
                 self.largestOptionalARCollaborationData = data.length;
-                NSLog(@"[network] largest Optional ARCollaborationData %lu", self.largestOptionalARCollaborationData);
+                //NSLog(@"[network] largest Optional ARCollaborationData %lu", self.largestOptionalARCollaborationData);
             }
         }
         
@@ -410,7 +410,7 @@ typedef enum {
     self.receivedNetcodeDataTotalCount++;
     if (data.length > self.largestNetcodeData) {
         self.largestNetcodeData = data.length;
-        NSLog(@"[network] largest NetcodeData %lu", self.largestNetcodeData);
+        //NSLog(@"[network] largest NetcodeData %lu", self.largestNetcodeData);
     }
     
     unsigned char *decodedData = (unsigned char *) [data bytes];
@@ -466,7 +466,7 @@ typedef enum {
             char *str = malloc(strlen);
             memcpy(str, decodedData + 2, strlen);
             NSString *arSessionId = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
-            NSLog(@"[mc_session] Did receive an ARSessionId %@", arSessionId);
+            //NSLog(@"[mc_session] Did receive an ARSessionId %@", arSessionId);
             [self.peerID2ARSessionIdMap setObject:arSessionId forKey:peerID];
             break;
         }

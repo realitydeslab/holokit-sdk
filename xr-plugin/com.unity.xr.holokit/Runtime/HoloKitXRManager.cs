@@ -85,7 +85,7 @@ namespace UnityEngine.XR.HoloKit
 
             foreach (var d in inputProviders)
             {
-                Debug.Log($"[HoloKitXRManager]: input provider {d.id.ToString()}");
+                //Debug.Log($"[HoloKitXRManager]: input provider {d.id.ToString()}");
                 if (d.id.Equals(kHoloKitInputProviderId))
                 {
                     return d;
@@ -150,7 +150,7 @@ namespace UnityEngine.XR.HoloKit
             SubsystemManager.GetSubsystems(displaySubsystems);
             foreach (var d in displaySubsystems)
             {   
-                Debug.Log("[HoloKitXRManager]: Loaded display subsystem " + d.subsystemDescriptor.id);
+                //Debug.Log("[HoloKitXRManager]: Loaded display subsystem " + d.subsystemDescriptor.id);
                 
                 if (d.subsystemDescriptor.id.Equals(kHoloKitDisplayProviderId))
                 {
@@ -195,7 +195,7 @@ namespace UnityEngine.XR.HoloKit
             SubsystemManager.GetSubsystems(inputSubsystems);
             foreach (var d in inputSubsystems)
             {
-                Debug.Log("[HoloKitXRManager]: Loaded input subsystem " + d.subsystemDescriptor.id);
+                //Debug.Log("[HoloKitXRManager]: Loaded input subsystem " + d.subsystemDescriptor.id);
                 
                 if (d.subsystemDescriptor.id.Equals(kHoloKitInputProviderId))
                 {
@@ -232,10 +232,10 @@ namespace UnityEngine.XR.HoloKit
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
             if (xrSessionSubsystem != null)
             {
-                Debug.Log("[HoloKitXRManager]: xrSessionSubsystem sessionId=" + xrSessionSubsystem.sessionId + " xrSessionSubsystem.trackingState=" + xrSessionSubsystem.trackingState + " xrSessionSubsystem.nativePtr=" + xrSessionSubsystem.nativePtr);
+                //Debug.Log("[HoloKitXRManager]: xrSessionSubsystem sessionId=" + xrSessionSubsystem.sessionId + " xrSessionSubsystem.trackingState=" + xrSessionSubsystem.trackingState + " xrSessionSubsystem.nativePtr=" + xrSessionSubsystem.nativePtr);
 #if UNITY_IOS
                 UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
-                Debug.Log("[HoloKitXRManager]: UnityHoloKit_SetARSession()");
+                //Debug.Log("[HoloKitXRManager]: UnityHoloKit_SetARSession()");
 #endif
             }
 
@@ -298,10 +298,10 @@ namespace UnityEngine.XR.HoloKit
                 return;
             }
             // Manually load loaders
-            Debug.Log($"[HoloKitXRManager]: number of loaders: {xrManager.activeLoaders.Count}");
+            //Debug.Log($"[HoloKitXRManager]: number of loaders: {xrManager.activeLoaders.Count}");
             foreach (var loader in xrManager.activeLoaders)
             {
-                Debug.Log($"[HoloKitXRManager]: initialize {loader.name}");
+                //Debug.Log($"[HoloKitXRManager]: initialize {loader.name}");
                 //if (loader.name.Equals("AR Kit Loader"))
                 //{
                    // loader.Initialize();
@@ -316,7 +316,7 @@ namespace UnityEngine.XR.HoloKit
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         static void OnBeforeSplashScreen() {
-            Debug.Log("[HoloKitXRManager]: OnBeforeSplashScreen()");
+            //Debug.Log("[HoloKitXRManager]: OnBeforeSplashScreen()");
 
             if (!isHoloKitInitialized)
             {
@@ -335,10 +335,10 @@ namespace UnityEngine.XR.HoloKit
                 Debug.Log($"XRManagerSettings is null.");
                 return;
             }
-            Debug.Log($"[HoloKitXRManager]: number of loaders: {xrManager.activeLoaders.Count}");
+            //Debug.Log($"[HoloKitXRManager]: number of loaders: {xrManager.activeLoaders.Count}");
             foreach (var loader in xrManager.activeLoaders)
             {
-                Debug.Log($"[HoloKitXRManager]: start {loader.name}");
+                //Debug.Log($"[HoloKitXRManager]: start {loader.name}");
                 if (loader.name.Equals("Holo Kit XR Loader"))
                 {
                     loader.Start();
@@ -348,10 +348,10 @@ namespace UnityEngine.XR.HoloKit
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
             if (xrSessionSubsystem != null)
             {
-                Debug.Log("[HoloKitXRManager]: xrSessionSubsystem sessionId=" + xrSessionSubsystem.sessionId + " xrSessionSubsystem.trackingState=" + xrSessionSubsystem.trackingState + " xrSessionSubsystem.nativePtr=" + xrSessionSubsystem.nativePtr);
+                //Debug.Log("[HoloKitXRManager]: xrSessionSubsystem sessionId=" + xrSessionSubsystem.sessionId + " xrSessionSubsystem.trackingState=" + xrSessionSubsystem.trackingState + " xrSessionSubsystem.nativePtr=" + xrSessionSubsystem.nativePtr);
 #if UNITY_IOS
                 UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
-                Debug.Log("[HoloKitXRManager]: UnityHoloKit_SetARSession()");
+                //Debug.Log("[HoloKitXRManager]: UnityHoloKit_SetARSession()");
 #endif
             }
             /*

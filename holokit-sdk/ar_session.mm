@@ -209,7 +209,10 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
     if (data.priority == ARCollaborationDataPriorityCritical) {
         [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
     } else {
-        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+        // Stop sending optional data after synchronization phase.
+        if (!self.isSynchronizationComplete) {
+            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+        }
     }
     
 //    if (!self.isSynchronizationComplete) {
