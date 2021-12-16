@@ -53,7 +53,7 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
         //[link setPreferredFramesPerSecond:60];
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
-        self.isSynchronizationComplete = YES;
+        self.isSynchronizationComplete = NO;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -165,7 +165,7 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
         }
         if (anchor.name != nil) {
             if (![self.multipeerSession isHost] && [anchor.name isEqualToString:@"origin"]) {
-                NSLog(@"[ar_session]: Did receive an origin anchor.");
+                NSLog(@"[ar_session] did receive an origin anchor.");
                 [session setWorldOrigin:anchor.transform];
                 continue;
             }
@@ -187,6 +187,9 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
         if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
             NSLog(@"[ar_session] did remove an ARParticipantAnchor");
         }
+        if ([anchor.name isEqualToString:@"origin"]) {
+            NSLog(@"[ar_session] did remove an origin anchor");
+        }
     }
 }
 
@@ -203,15 +206,21 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
     }
     // TEST: 'requiringSecureCoding' used to be YES.
     NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
-    if (!self.isSynchronizationComplete) {
+    if (data.priority == ARCollaborationDataPriorityCritical) {
         [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
     } else {
-        if (data.priority == ARCollaborationDataPriorityCritical) {
-            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
-        } else {
-            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
-        }
+        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
     }
+    
+//    if (!self.isSynchronizationComplete) {
+//        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+//    } else {
+//        if (data.priority == ARCollaborationDataPriorityCritical) {
+//            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+//        } else {
+//            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+//        }
+//    }
 }
 
 #pragma mark - ARSessionObserver
@@ -219,40 +228,40 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
 - (void)session:(ARSession *)session cameraDidChangeTrackingState:(ARCamera *)camera {
     switch (camera.trackingState) {
         case ARTrackingStateNotAvailable:
-            NSLog(@"[ar_session]: AR tracking state changed to not available.");
+            NSLog(@"[ar_session] AR tracking state changed to not available.");
             break;
         case ARTrackingStateLimited:
-            NSLog(@"[ar_session]: AR tracking state changed to limited, and the reason is:");
+            NSLog(@"[ar_session] AR tracking state changed to limited, and the reason is:");
             switch(camera.trackingStateReason) {
                 case ARTrackingStateReasonNone:
-                    NSLog(@"[ar_session]: None");
+                    NSLog(@"[ar_session] None");
                     break;
                 case ARTrackingStateReasonInitializing:
-                    NSLog(@"[ar_session]: Initializing");
+                    NSLog(@"[ar_session] Initializing");
                     break;
                 case ARTrackingStateReasonExcessiveMotion:
-                    NSLog(@"[ar_session]: Excessive motion");
+                    NSLog(@"[ar_session] Excessive motion");
                     break;
                 case ARTrackingStateReasonInsufficientFeatures:
-                    NSLog(@"[ar_session]: Insufficient features");
+                    NSLog(@"[ar_session] Insufficient features");
                     break;
                 case ARTrackingStateReasonRelocalizing:
-                    NSLog(@"[ar_session]: Relocalizing");
+                    NSLog(@"[ar_session] Relocalizing");
                     break;
             }
             break;
         case ARTrackingStateNormal:
-            NSLog(@"[ar_session]: AR tracking state changed to normal.");
+            NSLog(@"[ar_session] AR tracking state changed to normal.");
             break;
     }
 }
 
 - (void)sessionWasInterrupted:(ARSession *)session {
-    NSLog(@"[ar_session]: session was interrupted.");
+    NSLog(@"[ar_session] session was interrupted.");
 }
 
 - (void)sessionInterruptionEnded:(ARSession *)session {
-    NSLog(@"[ar_session]: session interruption ended.");
+    NSLog(@"[ar_session] session interruption ended.");
 }
 
 - (BOOL)sessionShouldAttemptRelocalization:(ARSession *)session {
@@ -347,6 +356,7 @@ UnityHoloKit_GetThermalState() {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SynchronizationComplete() {
+    NSLog(@"[ar_session] Synchronization complete");
     [[HoloKitARSession sharedARSession] setIsSynchronizationComplete:YES];
 }
 

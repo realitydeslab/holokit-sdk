@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendToPeer:(NSData *)data peer:(MCPeerID *)peerId sendDataMode:(MCSessionSendDataMode)sendDataMode;
 - (bool)isHost;
 - (void)sendARSessionId2AllPeers;
+- (void)sendToAllPeersThroughStream:(NSData *)data;
 
 @end
 NS_ASSUME_NONNULL_END

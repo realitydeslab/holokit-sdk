@@ -95,6 +95,7 @@ void HoloKitApi::InitOpticalParameters() {
     viewport_rects_.resize(2);
     viewport_rects_[0] = leftRect;
     viewport_rects_[1] = rightRect;
+    //NSLog(@"[holokit_api] single viewport width %f and height %f", leftRect.z, leftRect.w);
     
     // view matrices
     simd_float3 offset = phone.cameraOffset + model.mrOffset;
