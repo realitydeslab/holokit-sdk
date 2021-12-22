@@ -406,7 +406,7 @@ public:
                     UnityXRPose pose = { position, rotation };
                     render_params.deviceAnchorToEyePose = pose;
                     render_params.projection.type = kUnityXRProjectionTypeMatrix;
-                    simd_float4x4 projection_matrix = [[HoloKitARSession sharedARSession] arSession].currentFrame.camera.projectionMatrix;
+                    simd_float4x4 projection_matrix = [[ARSessionManager sharedARSessionManager] arSession].currentFrame.camera.projectionMatrix;
                     render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
                     render_params.viewportRect = {
                         0.0f,                    // x

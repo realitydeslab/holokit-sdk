@@ -10,7 +10,7 @@
 #import "multipeer_session.h"
 #import "ar_recorder.h"
 
-@interface HoloKitARSession : NSObject
+@interface ARSessionManager : NSObject
 
 @property (nonatomic, strong, nullable) ARSession* arSession;
 @property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
@@ -23,8 +23,9 @@
 @property (nonatomic, strong, nullable) CADisplayLink *aDisplayLink;
 @property (nonatomic, assign) double lastVsyncTimestamp;
 @property (nonatomic, assign) double nextVsyncTimestamp;
+@property (assign) BOOL isUsingARWorldMap;
 
-+ (id _Nonnull )sharedARSession;
++ (id _Nonnull )sharedARSessionManager;
 - (void)updateWithCollaborationData:(ARCollaborationData *_Nonnull) collaborationData;
 
 @end

@@ -7,7 +7,7 @@
 
 #import "multipeer_session.h"
 #import "IUnityInterface.h"
-#import "ar_session.h"
+#import "ar_session_manager.h"
 #import "ar_input_stream.h"
 
 typedef void (*BrowserDidFindPeer)(unsigned long transportId, const char *deviceName);
@@ -36,6 +36,9 @@ PeerDidDisconnectTemporarily PeerDidDisconnectTemporarilyDelegate = NULL;
 
 typedef void (*PeerDidReconnect)(unsigned long transportId);
 PeerDidReconnect PeerDidReconnectDelegate = NULL;
+
+typedef void (*DidReceiveARWorldMap)(void);
+DidReceiveARWorldMap DidReceiveARWorldMapDelegate = NULL;
 
 typedef enum {
     MLAPIData,
@@ -76,6 +79,7 @@ typedef enum {
 @property (assign) unsigned long largestNetcodeData;
 @property (assign) unsigned long largestCriticalARCollaborationData;
 @property (assign) unsigned long largestOptionalARCollaborationData;
+@property (assign) BOOL logNetworkData;
 
 @end
 
@@ -125,6 +129,7 @@ typedef enum {
         self.largestNetcodeData = 0;
         self.largestCriticalARCollaborationData = 0;
         self.largestOptionalARCollaborationData = 0;
+        self.logNetworkData = NO;
     }
     return self;
 }
@@ -231,7 +236,7 @@ typedef enum {
 }
 
 - (void)sendARSessionId2AllPeers {
-    NSString* arSessionId = [[HoloKitARSession sharedARSession] arSession].identifier.UUIDString;
+    NSString* arSessionId = [[ARSessionManager sharedARSessionManager] arSession].identifier.UUIDString;
     //NSLog(@"[mc_session] send my ARSessionId %@", arSessionId);
     const char *str = [arSessionId cStringUsingEncoding:NSUTF8StringEncoding];
     
@@ -244,7 +249,7 @@ typedef enum {
 }
 
 - (void)removeAllAnchorsOriginatingFromARSessionWithID:(NSString *)ARSessionId {
-    ARSession *arSession = [[HoloKitARSession sharedARSession] arSession];
+    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
     for (ARAnchor *anchor in arSession.currentFrame.anchors) {
         NSString *anchorSessionId = anchor.sessionIdentifier.UUIDString;
         if ([anchorSessionId isEqualToString:ARSessionId]) {
@@ -374,43 +379,63 @@ typedef enum {
     // First try to decode the received data as ARCollaboration data.
     ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
     if (collaborationData != nil) {
-        [[HoloKitARSession sharedARSession] updateWithCollaborationData:collaborationData];
+        [[ARSessionManager sharedARSessionManager] updateWithCollaborationData:collaborationData];
         
-        // For measurement purpose.
-        if (self.firstARCollaborationDataTimestamp == -1) {
-            self.firstARCollaborationDataTimestamp = [[NSProcessInfo processInfo] systemUptime];
-        }
-        self.receivedARCollaborationDataTotalLength += data.length;
-        self.receivedARCollaborationDataTotalCount++;
-        if (data.length > self.largestARCollaborationData) {
-            self.largestARCollaborationData = data.length;
-            //NSLog(@"[network] largest ARCollaborationData %lu", self.largestARCollaborationData);
-        }
-        if (collaborationData.priority == ARCollaborationDataPriorityCritical) {
-            self.receivedCriticalARCollaborationDataTotalLength += data.length;
-            self.receivedCriticalARCollaborationDataTotalCount++;
-            if (data.length > self.largestCriticalARCollaborationData) {
-                self.largestCriticalARCollaborationData = data.length;
-                //NSLog(@"[network] largest Critical ARCollborationData %lu", self.largestCriticalARCollaborationData);
+        if (self.logNetworkData) {
+            // For measurement purpose.
+            if (self.firstARCollaborationDataTimestamp == -1) {
+                self.firstARCollaborationDataTimestamp = [[NSProcessInfo processInfo] systemUptime];
             }
-        } else {
-            self.receivedOptionalARCollaborationDataTotalLength += data.length;
-            self.receivedOptionalARCollaborationDataTotalCount++;
-            if (data.length > self.largestOptionalARCollaborationData) {
-                self.largestOptionalARCollaborationData = data.length;
-                //NSLog(@"[network] largest Optional ARCollaborationData %lu", self.largestOptionalARCollaborationData);
+            self.receivedARCollaborationDataTotalLength += data.length;
+            self.receivedARCollaborationDataTotalCount++;
+            if (data.length > self.largestARCollaborationData) {
+                self.largestARCollaborationData = data.length;
+                //NSLog(@"[network] largest ARCollaborationData %lu", self.largestARCollaborationData);
+            }
+            if (collaborationData.priority == ARCollaborationDataPriorityCritical) {
+                //NSLog(@"[network] did receive Critical ARCollaborationData with length %f kb", data.length / (float)1024);
+                self.receivedCriticalARCollaborationDataTotalLength += data.length;
+                self.receivedCriticalARCollaborationDataTotalCount++;
+                if (data.length > self.largestCriticalARCollaborationData) {
+                    self.largestCriticalARCollaborationData = data.length;
+                    //NSLog(@"[network] largest Critical ARCollborationData %lu", self.largestCriticalARCollaborationData);
+                }
+            } else {
+                self.receivedOptionalARCollaborationDataTotalLength += data.length;
+                self.receivedOptionalARCollaborationDataTotalCount++;
+                if (data.length > self.largestOptionalARCollaborationData) {
+                    self.largestOptionalARCollaborationData = data.length;
+                    //NSLog(@"[network] largest Optional ARCollaborationData %lu", self.largestOptionalARCollaborationData);
+                }
             }
         }
-        
         return;
     }
 
-    // For measurement purpose.
-    self.receivedNetcodeDataTotalLength += data.length;
-    self.receivedNetcodeDataTotalCount++;
-    if (data.length > self.largestNetcodeData) {
-        self.largestNetcodeData = data.length;
-        //NSLog(@"[network] largest NetcodeData %lu", self.largestNetcodeData);
+    if ([[ARSessionManager sharedARSessionManager] isUsingARWorldMap]) {
+        ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:data error:nil];
+        if (worldMap != nil) {
+            NSLog(@"[world_map] before rerun ARSession");
+            ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
+            ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)arSession.configuration;
+            configuration.initialWorldMap = worldMap;
+            [arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
+            NSLog(@"[world_map] after rerun ARSession");
+            if (DidReceiveARWorldMapDelegate != NULL) {
+                DidReceiveARWorldMapDelegate();
+            }
+            return;
+        }
+    }
+    
+    if (self.logNetworkData) {
+        // For measurement purpose.
+        self.receivedNetcodeDataTotalLength += data.length;
+        self.receivedNetcodeDataTotalCount++;
+        if (data.length > self.largestNetcodeData) {
+            self.largestNetcodeData = data.length;
+            //NSLog(@"[network] largest NetcodeData %lu", self.largestNetcodeData);
+        }
     }
     
     unsigned char *decodedData = (unsigned char *) [data bytes];
@@ -474,7 +499,7 @@ typedef enum {
             // Did reset ARSession message
             NSLog(@"[mc_session] did receive DidResetARSession message");
             NSString *arSessionId = self.peerID2ARSessionIdMap[peerID];
-            ARSession *arSession = [[HoloKitARSession sharedARSession] arSession];
+            ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
             for (ARAnchor *anchor in [[arSession currentFrame] anchors]) {
                 if ([anchor.identifier.UUIDString isEqualToString:arSessionId]) {
                     [arSession removeAnchor:anchor];
@@ -519,30 +544,30 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCInitialize(const char* serviceType) {
     //HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
     //ar_session_instance.multipeerSession = [[MultipeerSession alloc] initWithServiceType:[NSString stringWithUTF8String:serviceType]];
-    [[HoloKitARSession sharedARSession] setMultipeerSession:[[MultipeerSession alloc] initWithServiceType:[NSString stringWithUTF8String:serviceType]]];
+    [[ARSessionManager sharedARSessionManager] setMultipeerSession:[[MultipeerSession alloc] initWithServiceType:[NSString stringWithUTF8String:serviceType]]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCStartBrowsing(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
+    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
     [ar_session_instance.multipeerSession startBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCStartAdvertising(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
+    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
     [ar_session_instance.multipeerSession startAdvertising];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCStopBrowsing(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
+    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
     [ar_session_instance.multipeerSession stopBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCStopAdvertising(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
+    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
     [ar_session_instance.multipeerSession stopAdvertising];
 }
 
@@ -550,7 +575,7 @@ UnityHoloKit_MCStopAdvertising(void) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCSendData(unsigned long transportId, unsigned char *data, int dataArrayLength, int networkDelivery) {
     //NSLog(@"[mc_session] send data to client Id %lu and data size %d", clientId, dataArrayLength);
-    MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
+    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
     for (MCPeerID *peerID in multipeerSession.mcSession.connectedPeers) {
         if (transportId == [multipeerSession.peerID2TransportIdMap[peerID] unsignedLongValue]) {
             unsigned char structuredData[dataArrayLength + 1 + sizeof(int)];
@@ -575,7 +600,7 @@ UnityHoloKit_MCSendData(unsigned long transportId, unsigned char *data, int data
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCSendPingMessage(unsigned long transportId) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
+    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
     MultipeerSession *multipeerSession = ar_session_instance.multipeerSession;
     for (MCPeerID *peerID in multipeerSession.mcSession.connectedPeers) {
         if (transportId == [multipeerSession.peerID2TransportIdMap[peerID] unsignedLongValue]) {
@@ -593,13 +618,13 @@ UnityHoloKit_MCSendPingMessage(unsigned long transportId) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCDisconnectLocalClient(void) {
-    [[[[HoloKitARSession sharedARSession] multipeerSession] mcSession] disconnect];
+    [[[[ARSessionManager sharedARSessionManager] multipeerSession] mcSession] disconnect];
 }
 
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCDisconnectRemoteClient(unsigned long transportId) {
-    MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
+    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
     if (![multipeerSession isHost]) {
         return;
     }
@@ -619,7 +644,7 @@ UnityHoloKit_MCDisconnectRemoteClient(unsigned long transportId) {
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCDisconnectAllClients(void) {
-    HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
+    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
     MultipeerSession *multipeer_session = ar_session_instance.multipeerSession;
     if (![multipeer_session isHost]) {
         return;
@@ -635,7 +660,7 @@ UnityHoloKit_MCDisconnectAllClients(void) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCShutdown(void) {
-    MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
+    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
     if ([multipeerSession isHost]) {
         [multipeerSession stopAdvertising];
     } else {
@@ -683,12 +708,12 @@ UnityHoloKit_SetDidDisconnectFromServerDelegate(DidDisconnectFromServer callback
 
 unsigned long UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCGetServerClientId(void) {
-    return [[MultipeerSession convertNSString2NSNumber:[[[HoloKitARSession sharedARSession] multipeerSession] localPeerID].displayName] unsignedLongValue];
+    return [[MultipeerSession convertNSString2NSNumber:[[[ARSessionManager sharedARSessionManager] multipeerSession] localPeerID].displayName] unsignedLongValue];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCInvitePeer(unsigned long transportId) {
-    MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
+    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
     for (MCPeerID *peerID in multipeerSession.browsedPeers) {
         if (transportId == [multipeerSession.peerID2TransportIdMap[peerID] unsignedLongValue]) {
             [multipeerSession invitePeer:peerID];
@@ -699,7 +724,7 @@ UnityHoloKit_MCInvitePeer(unsigned long transportId) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCSendConnectionMessage2Client(unsigned long transportId) {
     NSLog(@"[mc_session]: send connection message to %lu", transportId);
-    MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
+    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
     for (MCPeerID *peerID in multipeerSession.mcSession.connectedPeers) {
         if (transportId == [multipeerSession.peerID2TransportIdMap[peerID] unsignedLongValue]) {
             unsigned char connectionMessageData[1];
@@ -712,7 +737,7 @@ UnityHoloKit_MCSendConnectionMessage2Client(unsigned long transportId) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetIsInAR(bool value) {
-    [[[HoloKitARSession sharedARSession] multipeerSession]setIsInAR:value];
+    [[[ARSessionManager sharedARSessionManager] multipeerSession]setIsInAR:value];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -730,25 +755,30 @@ UnityHoloKit_SendDidResetARSessionMessage(void) {
     unsigned char message[1];
     message[0] = (unsigned char)6;
     NSData *dataReadyToBeSent = [NSData dataWithBytes:message length:sizeof(message)];
-    [[[HoloKitARSession sharedARSession] multipeerSession] sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
+    [[[ARSessionManager sharedARSessionManager] multipeerSession] sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_LogNetworkData(void) {
-    MultipeerSession *multipeerSession = [[HoloKitARSession sharedARSession] multipeerSession];
+    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
     double timeElapsed = [[NSProcessInfo processInfo] systemUptime] - multipeerSession.firstARCollaborationDataTimestamp;
     NSLog(@"");
     NSLog(@"[network] time elapsed %f", timeElapsed);
     NSLog(@"[network] received ARCollaborationData bytes %f kb per second", multipeerSession.receivedARCollaborationDataTotalLength / timeElapsed / 1024);
     NSLog(@"[network] received ARCollaborationData count %f per second", multipeerSession.receivedARCollaborationDataTotalCount / timeElapsed);
-    NSLog(@"[network] largest ARCollaborationData bytes %lu", multipeerSession.largestARCollaborationData);
+    NSLog(@"[network] largest ARCollaborationData bytes %f kb", multipeerSession.largestARCollaborationData / (float)1024);
     NSLog(@"[network] received Critical ARCollaborationData bytes %f kb per second", multipeerSession.receivedCriticalARCollaborationDataTotalLength / timeElapsed / 1024);
     NSLog(@"[network] received Critical ARCollaborationData count %f per second", multipeerSession.receivedCriticalARCollaborationDataTotalCount / timeElapsed);
-    NSLog(@"[network] largest Critical ARCollaborationData bytes %lu", multipeerSession.largestCriticalARCollaborationData);
+    NSLog(@"[network] largest Critical ARCollaborationData bytes %f kb", multipeerSession.largestCriticalARCollaborationData / (float)1024);
     NSLog(@"[network] received Optional ARCollaborationData bytes %f kb per second", multipeerSession.receivedOptionalARCollaborationDataTotalLength / timeElapsed / 1024);
     NSLog(@"[network] received Optional ARCollaboartionData count %f per second", multipeerSession.receivedOptionalARCollaborationDataTotalCount / timeElapsed);
-    NSLog(@"[network] largest Optional ARCollaborationData bytes %lu", multipeerSession.largestOptionalARCollaborationData);
+    NSLog(@"[network] largest Optional ARCollaborationData bytes %f kb", multipeerSession.largestOptionalARCollaborationData / (float)1024);
     NSLog(@"[network] received NetcodeData bytes %f kb per second", multipeerSession.receivedNetcodeDataTotalLength / timeElapsed / 1024);
     NSLog(@"[network] received NetcodeData count %f per second", multipeerSession.receivedNetcodeDataTotalCount / timeElapsed);
-    NSLog(@"[network] largest Netcode Data bytes %lu", multipeerSession.largestNetcodeData);
+    NSLog(@"[network] largest Netcode Data bytes %f kb", multipeerSession.largestNetcodeData / (float)1024);
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidReceiveARWorldMapDelegate(DidReceiveARWorldMap callback) {
+    DidReceiveARWorldMapDelegate = callback;
 }

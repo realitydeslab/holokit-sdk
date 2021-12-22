@@ -9,7 +9,7 @@
 #import <iostream>
 #import "IUnityInterface.h"
 #import "core_motion.h"
-#import "ar_session.h"
+#import "ar_session_manager.h"
 #import "math_helpers.h"
 #import "utility.h"
 #import <os/log.h>
@@ -118,7 +118,7 @@ bool LowLatencyTrackingApi::GetPose(double target_timestamp, Eigen::Vector3d& po
        pose_predictor.setGyro(gyro_data_);
        gyro_mtx_.unlock();
 
-       HoloKitARSession* arSession = [HoloKitARSession sharedARSession];
+       ARSessionManager* arSession = [ARSessionManager sharedARSessionManager];
     double lastFrameTime = arSession.nextVsyncTimestamp - arSession.lastVsyncTimestamp;
     double nextVsyncTime = arSession.nextVsyncTimestamp + 2 * lastFrameTime;
     //double nextVsyncTime = arSession.nextVsyncTimestamp + lastFrameTime;

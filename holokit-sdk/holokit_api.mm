@@ -27,7 +27,7 @@ void HoloKitApi::Initialize() {
     
     InitOpticalParameters();
     
-    ar_session_handler_ = [HoloKitARSession sharedARSession];
+    ar_session_handler_ = [ARSessionManager sharedARSessionManager];
     
 //    if ([model_name_ isEqualToString:@"iPhone13,3"] == NO &&
 //        [model_name_ isEqualToString:@"iPhone13,4"] == NO) {
@@ -214,7 +214,7 @@ UnityHoloKit_StartNfcSession() {
 
 char* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetDeviceName() {
-    return convertNSStringToCString(holokit::HoloKitApi::GetInstance()->GetDeviceName());
+    return convertNSStringToCString([UIDevice currentDevice].name);
 }
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

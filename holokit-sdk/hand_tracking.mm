@@ -10,7 +10,7 @@
 #import <CoreVideo/CoreVideo.h>
 #import "math_helpers.h"
 #import "holokit_api.h"
-#import "ar_session.h"
+#import "ar_session_manager.h"
 #import "IUnityInterface.h"
 
 #define CLAMP(x, low, high) ({\
@@ -85,7 +85,7 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 }
 
 - (simd_float3)unprojectScreenPoint:(CGPoint)screenPoint depth:(float)z {
-    ARSession *arSession = [[HoloKitARSession sharedARSession] arSession];
+    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
     
     simd_float4x4 translation = matrix_identity_float4x4;
     translation.columns[3].z = -z;
@@ -351,7 +351,7 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 // The uppeer-left corner is the origin of landmark xy coordinates
 - (void)handTracker:(HandTracker *)handTracker didOutputLandmarks:(NSArray<NSArray<Landmark *> *> *)multiLandmarks {
     
-    ARSession *arSession = [[HoloKitARSession sharedARSession] arSession];
+    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
     
     int handIndex = 0;
     for(NSArray<Landmark *> *landmarks in multiLandmarks) {

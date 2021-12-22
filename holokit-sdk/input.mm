@@ -441,7 +441,7 @@ private:
     
     static std::unique_ptr<HoloKitInputProvider> input_provider_;
     
-    HoloKitARSession* ar_session_handler;
+    ARSessionManager* ar_session_handler;
     
     IUnityInterfaces* xr_interfaces_;
     

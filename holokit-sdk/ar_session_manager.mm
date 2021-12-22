@@ -5,7 +5,7 @@
 //  Created by Yuchen on 2021/3/6.
 //
 
-#import "ar_session.h"
+#import "ar_session_manager.h"
 #import "UnityXRNativePtrs.h"
 #import <TargetConditionals.h>
 #import "UnityXRTypes.h"
@@ -34,15 +34,25 @@ DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
 typedef void (*ThermalStateDidChange)(int state);
 ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
 
-@interface HoloKitARSession() <ARSessionDelegate>
+typedef void (*SendARCollaborationData)(unsigned char *data, unsigned long length);
+SendARCollaborationData SendARCollaborationDataDelegate = NULL;
+
+typedef void (*CameraDidChangeTrackingState)(int trackingState);
+CameraDidChangeTrackingState CameraDidChangeTrackingStateDelegate = NULL;
+
+typedef void (*ARWorldMappingStatusDidChange)(int status);
+ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
+
+@interface ARSessionManager() <ARSessionDelegate>
 
 @property (assign) BOOL isSynchronizationComplete;
 @property (nonatomic, strong) ARAnchor *originAnchor;
 @property (nonatomic, strong) NSUUID *currentARSessionId;
+@property (assign) ARWorldMappingStatus currentARWorldMappingStatus;
 
 @end
 
-@implementation HoloKitARSession
+@implementation ARSessionManager
 
 #pragma mark - init
 - (instancetype)init {
@@ -54,6 +64,8 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
         self.isSynchronizationComplete = NO;
+        self.isUsingARWorldMap = NO;
+        self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -92,7 +104,7 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
     }
 }
 
-+ (id)sharedARSession {
++ (id)sharedARSessionManager {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -113,6 +125,23 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
     }
 }
 
+- (void)shareARWorldMap {
+    if (self.currentARWorldMappingStatus != ARWorldMappingStatusMapped) {
+        NSLog(@"[world_map] ARWorldMap is currently not available");
+        return;
+    }
+    
+    [self.arSession getCurrentWorldMapWithCompletionHandler:^(ARWorldMap * _Nullable worldMap, NSError * _Nullable error) {
+        if (error != nil) {
+            NSLog(@"[world_map] Failed to get ARWorldMap");
+            return;
+        }
+        
+        NSData *encodedData = [NSKeyedArchiver archivedDataWithRootObject:worldMap requiringSecureCoding:NO error:nil];
+        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+    }];
+}
+
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
@@ -125,7 +154,7 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
     //    os_signpost_interval_begin(log, spid, "Update ARKit");
     
     if(![self.currentARSessionId isEqual:session.identifier]) {
-        NSLog(@"[ar_session] ARSession did update");
+        //NSLog(@"[ar_session] ARSession did update");
         self.arSession = session;
         self.currentARSessionId = session.identifier;
         if (ARSessionDidStartDelegate != NULL) {
@@ -140,6 +169,35 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
             TransformToEigenQuaterniond(frame.camera.transform),
             MatrixToEigenMatrix3d(frame.camera.intrinsics) };
         holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
+    }
+    
+    if (self.isUsingARWorldMap && [self.multipeerSession isHost]) {
+        //NSLog(@"[world_map] world mapping status %d", frame.worldMappingStatus);
+        if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
+            switch(frame.worldMappingStatus) {
+                case ARWorldMappingStatusNotAvailable:
+                    if (ARWorldMappingStatusDidChangeDelegate != NULL) {
+                        ARWorldMappingStatusDidChangeDelegate(0);
+                    }
+                    break;
+                case ARWorldMappingStatusLimited:
+                    if (ARWorldMappingStatusDidChangeDelegate != NULL) {
+                        ARWorldMappingStatusDidChangeDelegate(1);
+                    }
+                    break;
+                case ARWorldMappingStatusExtending:
+                    if (ARWorldMappingStatusDidChangeDelegate != NULL) {
+                        ARWorldMappingStatusDidChangeDelegate(2);
+                    }
+                    break;
+                case ARWorldMappingStatusMapped:
+                    if (ARWorldMappingStatusDidChangeDelegate != NULL) {
+                        ARWorldMappingStatusDidChangeDelegate(3);
+                    }
+                    break;
+            }
+            self.currentARWorldMappingStatus = frame.worldMappingStatus;
+        }
     }
     
     //NSLog(@"[ar_session]: current number of anchors %lu", (unsigned long)frame.anchors.count);
@@ -157,15 +215,12 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
             if (DidAddARParticipantAnchorDelegate != NULL) {
                 DidAddARParticipantAnchorDelegate();
             }
-            else {
-                NSLog(@"[ar_session] DidAddARParticipantAnchorDelegate is NULL");
-            }
             NSLog(@"[ar_session] did add an ARParticipantAnchor");
             continue;
         }
         if (anchor.name != nil) {
             if (![self.multipeerSession isHost] && [anchor.name isEqualToString:@"origin"]) {
-                NSLog(@"[ar_session] did receive an origin anchor.");
+                NSLog(@"[ar_session] did receive an origin anchor");
                 [session setWorldOrigin:anchor.transform];
                 continue;
             }
@@ -198,32 +253,27 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
         [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
     }
     
-    if (self.multipeerSession == nil) {
-        return;
-    }
-    if (self.multipeerSession.mcSession.connectedPeers.count == 0) {
-        return;
-    }
-    // TEST: 'requiringSecureCoding' used to be YES.
-    NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
-    if (data.priority == ARCollaborationDataPriorityCritical) {
-        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+    if (self.multipeerSession != nil) {
+        if (self.multipeerSession.mcSession.connectedPeers.count > 0) {
+            if (data.priority == ARCollaborationDataPriorityCritical) {
+                NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
+                [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+            } else {
+                // Stop sending optional data after synchronization phase.
+                if (!self.isSynchronizationComplete) {
+                    NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
+                    [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+                }
+            }
+        }
     } else {
-        // Stop sending optional data after synchronization phase.
-        if (!self.isSynchronizationComplete) {
-            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+        // Using Photon-Realtime to send ARCollaborationData
+        NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
+        unsigned char *unityData = (unsigned char *)[encodedData bytes];
+        if (SendARCollaborationDataDelegate != NULL) {
+            SendARCollaborationDataDelegate(unityData, encodedData.length);
         }
     }
-    
-//    if (!self.isSynchronizationComplete) {
-//        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
-//    } else {
-//        if (data.priority == ARCollaborationDataPriorityCritical) {
-//            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
-//        } else {
-//            [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
-//        }
-//    }
 }
 
 #pragma mark - ARSessionObserver
@@ -231,30 +281,50 @@ ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
 - (void)session:(ARSession *)session cameraDidChangeTrackingState:(ARCamera *)camera {
     switch (camera.trackingState) {
         case ARTrackingStateNotAvailable:
-            NSLog(@"[ar_session] AR tracking state changed to not available.");
+            NSLog(@"[ar_session] AR tracking state changed to not available");
+            if (CameraDidChangeTrackingStateDelegate != NULL) {
+                CameraDidChangeTrackingStateDelegate(0);
+            }
             break;
         case ARTrackingStateLimited:
-            NSLog(@"[ar_session] AR tracking state changed to limited, and the reason is:");
             switch(camera.trackingStateReason) {
                 case ARTrackingStateReasonNone:
-                    NSLog(@"[ar_session] None");
+                    NSLog(@"[ar_session] AR tracking state changed to limited, with reason: None");
+                    if (CameraDidChangeTrackingStateDelegate != NULL) {
+                        CameraDidChangeTrackingStateDelegate(1);
+                    }
                     break;
                 case ARTrackingStateReasonInitializing:
-                    NSLog(@"[ar_session] Initializing");
+                    NSLog(@"[ar_session] AR tracking state changed to limited, with reason: Initializing");
+                    if (CameraDidChangeTrackingStateDelegate != NULL) {
+                        CameraDidChangeTrackingStateDelegate(2);
+                    }
                     break;
                 case ARTrackingStateReasonExcessiveMotion:
-                    NSLog(@"[ar_session] Excessive motion");
+                    NSLog(@"[ar_session] AR tracking state changed to limited, with reason: Excessive motion");
+                    if (CameraDidChangeTrackingStateDelegate != NULL) {
+                        CameraDidChangeTrackingStateDelegate(3);
+                    }
                     break;
                 case ARTrackingStateReasonInsufficientFeatures:
-                    NSLog(@"[ar_session] Insufficient features");
+                    NSLog(@"[ar_session] AR tracking state changed to limited, with reason: Insufficient features");
+                    if (CameraDidChangeTrackingStateDelegate != NULL) {
+                        CameraDidChangeTrackingStateDelegate(4);
+                    }
                     break;
                 case ARTrackingStateReasonRelocalizing:
-                    NSLog(@"[ar_session] Relocalizing");
+                    NSLog(@"[ar_session] AR tracking state changed to limited, with reason: Relocalizing");
+                    if (CameraDidChangeTrackingStateDelegate != NULL) {
+                        CameraDidChangeTrackingStateDelegate(5);
+                    }
                     break;
             }
             break;
         case ARTrackingStateNormal:
-            NSLog(@"[ar_session] AR tracking state changed to normal.");
+            NSLog(@"[ar_session] AR tracking state changed to normal");
+            if (CameraDidChangeTrackingStateDelegate != NULL) {
+                CameraDidChangeTrackingStateDelegate(6);
+            }
             break;
     }
 }
@@ -285,23 +355,23 @@ UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
     }
     
     ARSession* sessionPtr = (__bridge ARSession*)ar_native_session->sessionPtr;
-    HoloKitARSession* ar_session = [HoloKitARSession sharedARSession];
-    ar_session.unityARSessionDelegate = sessionPtr.delegate;
+    ARSessionManager* ar_session_manager = [ARSessionManager sharedARSessionManager];
+    ar_session_manager.unityARSessionDelegate = sessionPtr.delegate;
     
-    [sessionPtr setDelegate:ar_session];
+    [sessionPtr setDelegate:ar_session_manager];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
     
-    HoloKitARSession* ar_session = [HoloKitARSession sharedARSession];
+    ARSessionManager* ar_session = [ARSessionManager sharedARSessionManager];
     [ar_session.arSession setWorldOrigin:(transform_matrix)];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float rotation[4]) {
-    HoloKitARSession *session = [HoloKitARSession sharedARSession];
+    ARSessionManager *session = [ARSessionManager sharedARSessionManager];
     simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
     std::vector<float> rot = SimdFloat4x42UnityRotation(transform_matrix);
     NSString *name = [NSString stringWithUTF8String:anchorName];
@@ -358,14 +428,39 @@ UnityHoloKit_GetThermalState() {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SynchronizationComplete() {
-    NSLog(@"[ar_session] Synchronization complete");
-    [[HoloKitARSession sharedARSession] setIsSynchronizationComplete:YES];
+UnityHoloKit_SetIsSynchronizationComplete(BOOL val) {
+    [[ARSessionManager sharedARSessionManager] setIsSynchronizationComplete:val];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_RemoveAllLocalAnchors() {
-    [[HoloKitARSession sharedARSession] removeAllLocalAnchors];
+    [[ARSessionManager sharedARSessionManager] removeAllLocalAnchors];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetSendARCollaborationDataDelegate(SendARCollaborationData callback) {
+    SendARCollaborationDataDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(CameraDidChangeTrackingState callback) {
+    CameraDidChangeTrackingStateDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetARWorldMappingStatusDidChangeDelegate(ARWorldMappingStatusDidChange callback) {
+    ARWorldMappingStatusDidChangeDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetIsUsingARWorldMap(bool value) {
+    NSLog(@"[world_map] set isUsingARWorldMap %d", value);
+    [[ARSessionManager sharedARSessionManager] setIsUsingARWorldMap:value];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_ShareARWorldMap() {
+    [[ARSessionManager sharedARSessionManager] shareARWorldMap];
 }
 
 } // extern "C"

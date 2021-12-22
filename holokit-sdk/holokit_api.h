@@ -13,7 +13,7 @@
 #import <MetalKit/MetalKit.h>
 #import <simd/simd.h>
 #import "UnityXRTypes.h"
-#import "ar_session.h"
+#import "ar_session_manager.h"
 #import "math_helpers.h"
 #import "holokit_profile.h"
 #import "nfc_session.h"
@@ -107,7 +107,7 @@ private:
     /// @brief The vector from camera pointing to the center of the eyes.
     simd_float3 camera_to_center_eye_offset_;
     
-    HoloKitARSession* ar_session_handler_ = nullptr;
+    ARSessionManager* ar_session_handler_ = nullptr;
     
     static std::unique_ptr<HoloKitApi> holokit_api_;
     

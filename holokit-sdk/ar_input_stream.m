@@ -6,7 +6,7 @@
 //
 
 #import "ar_input_stream.h"
-#import "ar_session.h"
+#import "ar_session_manager.h"
 
 @interface ARInputStream() 
 
