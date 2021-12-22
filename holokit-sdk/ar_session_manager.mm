@@ -34,9 +34,6 @@ DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
 typedef void (*ThermalStateDidChange)(int state);
 ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
 
-typedef void (*SendARCollaborationData)(unsigned char *data, unsigned long length);
-SendARCollaborationData SendARCollaborationDataDelegate = NULL;
-
 typedef void (*CameraDidChangeTrackingState)(int trackingState);
 CameraDidChangeTrackingState CameraDidChangeTrackingStateDelegate = NULL;
 
@@ -266,13 +263,6 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
                 }
             }
         }
-    } else {
-        // Using Photon-Realtime to send ARCollaborationData
-        NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
-        unsigned char *unityData = (unsigned char *)[encodedData bytes];
-        if (SendARCollaborationDataDelegate != NULL) {
-            SendARCollaborationDataDelegate(unityData, encodedData.length);
-        }
     }
 }
 
@@ -435,11 +425,6 @@ UnityHoloKit_SetIsSynchronizationComplete(BOOL val) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_RemoveAllLocalAnchors() {
     [[ARSessionManager sharedARSessionManager] removeAllLocalAnchors];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetSendARCollaborationDataDelegate(SendARCollaborationData callback) {
-    SendARCollaborationDataDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

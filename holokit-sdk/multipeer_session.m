@@ -376,73 +376,7 @@ typedef enum {
 }
 
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
-    // First try to decode the received data as ARCollaboration data.
-    ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
-    if (collaborationData != nil) {
-        [[ARSessionManager sharedARSessionManager] updateWithCollaborationData:collaborationData];
-        
-        if (self.logNetworkData) {
-            // For measurement purpose.
-            if (self.firstARCollaborationDataTimestamp == -1) {
-                self.firstARCollaborationDataTimestamp = [[NSProcessInfo processInfo] systemUptime];
-            }
-            self.receivedARCollaborationDataTotalLength += data.length;
-            self.receivedARCollaborationDataTotalCount++;
-            if (data.length > self.largestARCollaborationData) {
-                self.largestARCollaborationData = data.length;
-                //NSLog(@"[network] largest ARCollaborationData %lu", self.largestARCollaborationData);
-            }
-            if (collaborationData.priority == ARCollaborationDataPriorityCritical) {
-                //NSLog(@"[network] did receive Critical ARCollaborationData with length %f kb", data.length / (float)1024);
-                self.receivedCriticalARCollaborationDataTotalLength += data.length;
-                self.receivedCriticalARCollaborationDataTotalCount++;
-                if (data.length > self.largestCriticalARCollaborationData) {
-                    self.largestCriticalARCollaborationData = data.length;
-                    //NSLog(@"[network] largest Critical ARCollborationData %lu", self.largestCriticalARCollaborationData);
-                }
-            } else {
-                self.receivedOptionalARCollaborationDataTotalLength += data.length;
-                self.receivedOptionalARCollaborationDataTotalCount++;
-                if (data.length > self.largestOptionalARCollaborationData) {
-                    self.largestOptionalARCollaborationData = data.length;
-                    //NSLog(@"[network] largest Optional ARCollaborationData %lu", self.largestOptionalARCollaborationData);
-                }
-            }
-        }
-        return;
-    }
-
-    if ([[ARSessionManager sharedARSessionManager] isUsingARWorldMap]) {
-        ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:data error:nil];
-        if (worldMap != nil) {
-            NSLog(@"[world_map] before rerun ARSession");
-            ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
-            ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)arSession.configuration;
-            configuration.initialWorldMap = worldMap;
-            [arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
-            NSLog(@"[world_map] after rerun ARSession");
-            if (DidReceiveARWorldMapDelegate != NULL) {
-                DidReceiveARWorldMapDelegate();
-            }
-            return;
-        }
-    }
-    
-    if (self.logNetworkData) {
-        // For measurement purpose.
-        self.receivedNetcodeDataTotalLength += data.length;
-        self.receivedNetcodeDataTotalCount++;
-        if (data.length > self.largestNetcodeData) {
-            self.largestNetcodeData = data.length;
-            //NSLog(@"[network] largest NetcodeData %lu", self.largestNetcodeData);
-        }
-    }
-    
     unsigned char *decodedData = (unsigned char *) [data bytes];
-    if (decodedData == nil) {
-        NSLog(@"[ar_session]: Failed to decode the received data.");
-        return;
-    }
     switch ((int)decodedData[0]) {
         case 0: {
             int dataArrayLength;
@@ -454,6 +388,17 @@ typedef enum {
             }
             unsigned long transportId = [self.peerID2TransportIdMap[peerID] unsignedLongValue];
             DidReceivePeerDataDelegate(transportId, netcodeData, dataArrayLength);
+            
+            if (self.logNetworkData) {
+                // For measurement purpose.
+                self.receivedNetcodeDataTotalLength += data.length;
+                self.receivedNetcodeDataTotalCount++;
+                if (data.length > self.largestNetcodeData) {
+                    self.largestNetcodeData = data.length;
+                    //NSLog(@"[network] largest NetcodeData %lu", self.largestNetcodeData);
+                }
+            }
+            
             break;
         }
         case 1: {
@@ -479,7 +424,7 @@ typedef enum {
             break;
         }
         case 4: {
-            NSLog(@"[mc_session] Did receive a disconnection message.");
+            NSLog(@"[mc_session] Did receive a disconnection message");
             [self.mcSession disconnect];
             if (DidDisconnectFromServerDelegate != NULL) {
                 DidDisconnectFromServerDelegate();
@@ -508,7 +453,55 @@ typedef enum {
             break;
         }
         default: {
-            NSLog(@"[mc_session] Failed to decode the received data.");
+            if ([[ARSessionManager sharedARSessionManager] isUsingARWorldMap]) {
+                ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:data error:nil];
+                if (worldMap != nil) {
+                    NSLog(@"[world_map] did receive ARWorldMap with size %f kb", data.length / 1024.0);
+                    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
+                    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)arSession.configuration;
+                    configuration.initialWorldMap = worldMap;
+                    [arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
+                    if (DidReceiveARWorldMapDelegate != NULL) {
+                        DidReceiveARWorldMapDelegate();
+                    }
+                    return;
+                }
+            } else {
+                ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
+                if (collaborationData != nil) {
+                    [[ARSessionManager sharedARSessionManager] updateWithCollaborationData:collaborationData];
+                    
+                    if (self.logNetworkData) {
+                        // For measurement purpose.
+                        if (self.firstARCollaborationDataTimestamp == -1) {
+                            self.firstARCollaborationDataTimestamp = [[NSProcessInfo processInfo] systemUptime];
+                        }
+                        self.receivedARCollaborationDataTotalLength += data.length;
+                        self.receivedARCollaborationDataTotalCount++;
+                        if (data.length > self.largestARCollaborationData) {
+                            self.largestARCollaborationData = data.length;
+                            //NSLog(@"[network] largest ARCollaborationData %lu", self.largestARCollaborationData);
+                        }
+                        if (collaborationData.priority == ARCollaborationDataPriorityCritical) {
+                            //NSLog(@"[network] did receive Critical ARCollaborationData with length %f kb", data.length / (float)1024);
+                            self.receivedCriticalARCollaborationDataTotalLength += data.length;
+                            self.receivedCriticalARCollaborationDataTotalCount++;
+                            if (data.length > self.largestCriticalARCollaborationData) {
+                                self.largestCriticalARCollaborationData = data.length;
+                                //NSLog(@"[network] largest Critical ARCollborationData %lu", self.largestCriticalARCollaborationData);
+                            }
+                        } else {
+                            self.receivedOptionalARCollaborationDataTotalLength += data.length;
+                            self.receivedOptionalARCollaborationDataTotalCount++;
+                            if (data.length > self.largestOptionalARCollaborationData) {
+                                self.largestOptionalARCollaborationData = data.length;
+                                //NSLog(@"[network] largest Optional ARCollaborationData %lu", self.largestOptionalARCollaborationData);
+                            }
+                        }
+                    }
+                    return;
+                }
+            }
             break;
         }
     }
