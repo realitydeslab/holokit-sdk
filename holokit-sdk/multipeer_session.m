@@ -8,7 +8,6 @@
 #import "multipeer_session.h"
 #import "IUnityInterface.h"
 #import "ar_session_manager.h"
-#import "ar_input_stream.h"
 
 typedef void (*BrowserDidFindPeer)(unsigned long transportId, const char *deviceName);
 BrowserDidFindPeer BrowserDidFindPeerDelegate = NULL;
@@ -40,12 +39,23 @@ PeerDidReconnect PeerDidReconnectDelegate = NULL;
 typedef void (*DidReceiveARWorldMap)(void);
 DidReceiveARWorldMap DidReceiveARWorldMapDelegate = NULL;
 
+typedef void (*DidReceiveHostLocalIpAddress)(const char *ip);
+DidReceiveHostLocalIpAddress DidReceiveHostLocalIpAddressDelegate = NULL;
+
+typedef void (*DidReceivePhotonRoomName)(const char *roomName);
+DidReceivePhotonRoomName DidReceivePhotonRoomNameDelegate = NULL;
+
 typedef enum {
-    MLAPIData,
-    Ping,
-    Pong,
-    Disconnection
-} MultipeerDataType;
+    NetcodeTransportUNet = 0,
+    NetcodeTransportMPC = 1,
+    NetcodeTransportPhoton = 2
+} NetcodeTransport;
+
+typedef enum {
+    ARSyncModeNone = 0,
+    ARSyncModeCollaboration = 1,
+    ARSyncModeWorldMap = 2
+} ARSyncMode;
 
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
 
@@ -59,27 +69,12 @@ typedef enum {
 @property (nonatomic, strong) NSMutableDictionary<MCPeerID *, NSString *> *peerID2DeviceNameMap;
 @property (nonatomic, strong) NSMutableDictionary<MCPeerID *, NSString *> *peerID2ARSessionIdMap;
 @property (nonatomic, strong) NSMutableArray<MCPeerID *> *browsedPeers;
-@property (assign) double lastPingTime;
-@property (assign) int pingCount;
-@property (assign) int pongCount;
 @property (assign) bool isInAR;
 @property (assign) bool isReconnecting;
-@property (nonatomic, strong) NSMutableDictionary<MCPeerID *, NSOutputStream *> *peerID2OutputStreamMap;
-@property (nonatomic, strong) NSMutableDictionary<MCPeerID *, ARInputStream *> *peerID2InputStreamMap;
-@property (assign) unsigned long receivedARCollaborationDataTotalLength;
-@property (assign) unsigned long receivedARCollaborationDataTotalCount;
-@property (assign) unsigned long largestARCollaborationData;
-@property (assign) double firstARCollaborationDataTimestamp;
-@property (assign) unsigned long receivedCriticalARCollaborationDataTotalLength;
-@property (assign) unsigned long receivedCriticalARCollaborationDataTotalCount;
-@property (assign) unsigned long receivedOptionalARCollaborationDataTotalLength;
-@property (assign) unsigned long receivedOptionalARCollaborationDataTotalCount;
-@property (assign) unsigned long receivedNetcodeDataTotalLength;
-@property (assign) unsigned long receivedNetcodeDataTotalCount;
-@property (assign) unsigned long largestNetcodeData;
-@property (assign) unsigned long largestCriticalARCollaborationData;
-@property (assign) unsigned long largestOptionalARCollaborationData;
-@property (assign) BOOL logNetworkData;
+@property (assign) NetcodeTransport netcodeTransport;
+@property (nonatomic, strong) NSString *hostLocalIpAddress;
+@property (nonatomic, strong) NSString *photonRoomName;
+@property (assign) ARSyncMode arSyncMode;
 
 @end
 
@@ -108,28 +103,8 @@ typedef enum {
         self.peerID2DeviceNameMap = [[NSMutableDictionary alloc] init];
         self.peerID2ARSessionIdMap = [[NSMutableDictionary alloc] init];
         
-        self.pingCount = 0;
-        self.pongCount = 0;
         self.isInAR = NO;
         self.isReconnecting = NO;
-        
-        self.peerID2OutputStreamMap = [[NSMutableDictionary alloc] init];
-        self.peerID2InputStreamMap = [[NSMutableDictionary alloc] init];
-        
-        self.receivedARCollaborationDataTotalLength = 0;
-        self.receivedARCollaborationDataTotalCount = 0;
-        self.largestARCollaborationData = 0;
-        self.firstARCollaborationDataTimestamp = -1;
-        self.receivedCriticalARCollaborationDataTotalLength = 0;
-        self.receivedCriticalARCollaborationDataTotalCount = 0;
-        self.receivedOptionalARCollaborationDataTotalLength = 0;
-        self.receivedOptionalARCollaborationDataTotalCount = 0;
-        self.receivedNetcodeDataTotalLength = 0;
-        self.receivedNetcodeDataTotalCount = 0;
-        self.largestNetcodeData = 0;
-        self.largestCriticalARCollaborationData = 0;
-        self.largestOptionalARCollaborationData = 0;
-        self.logNetworkData = NO;
     }
     return self;
 }
@@ -149,34 +124,18 @@ typedef enum {
     }
 }
 
-- (void)sendToAllPeersThroughStream:(NSData *)data {
-    NSLog(@"[mc_session] sendToAllPeersThroughStream with length %lu", data.length);
-    for (MCPeerID *peerID in self.mcSession.connectedPeers) {
-        if (self.peerID2OutputStreamMap[peerID] == nil) {
-            NSString *streamName = [self.peerID2TransportIdMap[peerID] stringValue];
-            NSOutputStream *outputStream = [self.mcSession startStreamWithName:streamName toPeer:peerID error:nil];
-            if (outputStream != nil) {
-                [outputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-                [outputStream open];
-                [self.peerID2OutputStreamMap setObject:outputStream forKey:peerID];
-            }
-        }
-        //NSLog(@"[mc_session] write bytes to stream with legnth %lu", data.length);
-        NSLog(@"[mc_session] actual data length %lu", [self.peerID2OutputStreamMap[peerID] write:data.bytes maxLength:data.length]);
-    }
-}
-
 - (void)startBrowsing {
     self.browsedPeers = [[NSMutableArray alloc] init];
     self.browser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.localPeerID serviceType:self.serviceType];
     self.browser.delegate = self;
     [self.browser startBrowsingForPeers];
+    NSLog(@"[mc_session] did start browsing");
 }
 
 - (void)stopBrowsing {
-    self.browsedPeers = [[NSMutableArray alloc] init];
     [self.browser stopBrowsingForPeers];
-    NSLog(@"[mc_session] stop browsing");
+    self.browsedPeers = [[NSMutableArray alloc] init];
+    NSLog(@"[mc_session] did stop browsing");
 }
 
 - (void)startAdvertising {
@@ -184,11 +143,12 @@ typedef enum {
     self.advertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.localPeerID discoveryInfo:discoveryInfo serviceType:self.serviceType];
     self.advertiser.delegate = self;
     [self.advertiser startAdvertisingPeer];
+    NSLog(@"[mc_session] did start Advertising");
 }
 
 - (void)stopAdvertising {
     [self.advertiser stopAdvertisingPeer];
-    NSLog(@"[mc_session] stop advertising");
+    NSLog(@"[mc_session] did stop advertising");
 }
 
 - (bool)isHost {
@@ -228,8 +188,6 @@ typedef enum {
 }
 
 - (void)invitePeer:(MCPeerID *)peerID {
-    NSLog(@"[mc_session] invitePeer %@", [peerID displayName]);
-    self.hostPeerID = peerID;
     NSDictionary<NSString *, NSString *> *dict = @{ @"DeviceName":[[UIDevice currentDevice] name], @"Password":@"" };
     NSData *context = [NSKeyedArchiver archivedDataWithRootObject:dict requiringSecureCoding:NO error:nil];
     [self.browser invitePeer:peerID toSession:self.mcSession withContext:context timeout:30];
@@ -237,15 +195,33 @@ typedef enum {
 
 - (void)sendARSessionId2AllPeers {
     NSString* arSessionId = [[ARSessionManager sharedARSessionManager] arSession].identifier.UUIDString;
-    //NSLog(@"[mc_session] send my ARSessionId %@", arSessionId);
     const char *str = [arSessionId cStringUsingEncoding:NSUTF8StringEncoding];
-    
     unsigned char *data = malloc(2 + strlen(str));
-    data[0] = (unsigned char)5;
-    data[1] = (unsigned char)strlen(str);
+    data[0] = 5;
+    data[1] = strlen(str);
     memcpy(data + 2, str, strlen(str));
     NSData *dataReadyToBeSent = [NSData dataWithBytes:data length:(2 + strlen(str))];
     [self sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
+}
+
+- (void)sendHostLocalIpAddress2Peer:(MCPeerID *)peerID {
+    const char *str = [self.hostLocalIpAddress cStringUsingEncoding:NSUTF8StringEncoding];
+    unsigned char *data = malloc(2 + strlen(str));
+    data[0] = 7;
+    data[1] = strlen(str);
+    memcpy(data + 2, str, strlen(str));
+    NSData *dataReadyToBeSent = [NSData dataWithBytes:data length:(2 + strlen(str))];
+    [self sendToPeer:dataReadyToBeSent peer:peerID sendDataMode:MCSessionSendDataReliable];
+}
+
+- (void)sendPhotonRoomName2Peer:(MCPeerID *)peerID {
+    const char *str = [self.photonRoomName cStringUsingEncoding:NSUTF8StringEncoding];
+    unsigned char *data = malloc(2 + strlen(str));
+    data[0] = 8;
+    data[1] = strlen(str);
+    memcpy(data + 2, str, strlen(str));
+    NSData *dataReadyToBeSent = [NSData dataWithBytes:data length:(2 + strlen(str))];
+    [self sendToPeer:dataReadyToBeSent peer:peerID sendDataMode:MCSessionSendDataReliable];
 }
 
 - (void)removeAllAnchorsOriginatingFromARSessionWithID:(NSString *)ARSessionId {
@@ -305,72 +281,74 @@ typedef enum {
             break;
         case MCSessionStateConnected:
             NSLog(@"[mc_session] connected with peer %@.", peerID.displayName);
-            if (self.browser != nil) {
+            if ([self isHost]) {
+                switch(self.netcodeTransport) {
+                    case NetcodeTransportUNet:
+                        [self sendHostLocalIpAddress2Peer:peerID];
+                        break;
+                    case NetcodeTransportMPC:
+                        
+                        break;
+                    case NetcodeTransportPhoton:
+                        [self sendPhotonRoomName2Peer:peerID];
+                        break;
+                }
+            } else {
                 [self stopBrowsing];
             }
             
-            if (self.isInAR) {
-                if ([self isHost]) {
-                    if (PeerDidReconnectDelegate != NULL) {
-                        PeerDidReconnectDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue]);
-                    }
-                } else {
-                    if (PeerDidReconnectDelegate != NULL) {
-                        PeerDidReconnectDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue]);
-                    }
-                }
-            } else {
-                if ([self isHost]) {
-                    
-                } else {
-                    if ([peerID isEqual:self.hostPeerID]) {
-                        PeerDidConnectDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue], [self.peerID2DeviceNameMap[peerID] UTF8String]);
-                    }
-                }
-            }
-            
-            // Open stream channel
-//            if (self.peerID2OutputStreamMap[peerID] == nil) {
-//                NSString *streamName = [self.peerID2TransportIdMap[peerID] stringValue];
-//                NSOutputStream *outputStream = [self.mcSession startStreamWithName:streamName toPeer:peerID error:nil];
-//                if (outputStream != nil) {
-//                    [outputStream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-//                    [outputStream open];
-//                    [self.peerID2OutputStreamMap setObject:outputStream forKey:peerID];
+            // For reconnection
+//            if (self.isInAR) {
+//                if ([self isHost]) {
+//                    if (PeerDidReconnectDelegate != NULL) {
+//                        PeerDidReconnectDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue]);
+//                    }
+//                } else {
+//                    if (PeerDidReconnectDelegate != NULL) {
+//                        PeerDidReconnectDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue]);
+//                    }
+//                }
+//            } else {
+//                if ([self isHost]) {
+//
+//                } else {
+//                    if ([peerID isEqual:self.hostPeerID]) {
+//                        PeerDidConnectDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue], [self.peerID2DeviceNameMap[peerID] UTF8String]);
+//                    }
 //                }
 //            }
             
             break;
         case MCSessionStateNotConnected:
             NSLog(@"[mc_session] disconnected with peer %@.", peerID.displayName);
-            if (self.isInAR) {
-                if ([self isHost]) {
-                    // Peer temporarily disconnected.
-                    if (PeerDidDisconnectTemporarilyDelegate != NULL) {
-                        PeerDidDisconnectTemporarilyDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue]);
-                    }
-                } else {
-                    if ([peerID isEqual:self.hostPeerID]) {
-                        NSLog(@"[mc_session] disconnected from the host");
-                        if (PeerDidDisconnectTemporarilyDelegate != NULL) {
-                            PeerDidDisconnectTemporarilyDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue]);
-                        }
-                        // Try to reconnect.
-                        self.isReconnecting = YES;
-                        [self startBrowsing];
-                    }
-                }
-            } else {
-                if ([self isHost]) {
-                    unsigned long transportId = [self.peerID2TransportIdMap[peerID] unsignedLongValue];
-                    if (PeerDidDisconnectDelegate != NULL) {
-                        PeerDidDisconnectDelegate(transportId);
-                    }
-                    //[self removeAllAnchorsOriginatingFromARSessionWithID:self.peerID2ARSessionIdMap[peerID]];
-                } else {
-                    
-                }
-            }
+//            if (self.isInAR) {
+//                if ([self isHost]) {
+//                    // Peer temporarily disconnected.
+//                    if (PeerDidDisconnectTemporarilyDelegate != NULL) {
+//                        PeerDidDisconnectTemporarilyDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue]);
+//                    }
+//                } else {
+//                    if ([peerID isEqual:self.hostPeerID]) {
+//                        NSLog(@"[mc_session] disconnected from the host");
+//                        if (PeerDidDisconnectTemporarilyDelegate != NULL) {
+//                            PeerDidDisconnectTemporarilyDelegate([self.peerID2TransportIdMap[peerID] unsignedLongValue]);
+//                        }
+//                        // Try to reconnect.
+//                        self.isReconnecting = YES;
+//                        [self startBrowsing];
+//                    }
+//                }
+//            } else {
+//                if ([self isHost]) {
+//                    unsigned long transportId = [self.peerID2TransportIdMap[peerID] unsignedLongValue];
+//                    if (PeerDidDisconnectDelegate != NULL) {
+//                        PeerDidDisconnectDelegate(transportId);
+//                    }
+//                    //[self removeAllAnchorsOriginatingFromARSessionWithID:self.peerID2ARSessionIdMap[peerID]];
+//                } else {
+//
+//                }
+//            }
             break;
     }
 }
@@ -388,72 +366,86 @@ typedef enum {
             }
             unsigned long transportId = [self.peerID2TransportIdMap[peerID] unsignedLongValue];
             DidReceivePeerDataDelegate(transportId, netcodeData, dataArrayLength);
-            
-            if (self.logNetworkData) {
-                // For measurement purpose.
-                self.receivedNetcodeDataTotalLength += data.length;
-                self.receivedNetcodeDataTotalCount++;
-                if (data.length > self.largestNetcodeData) {
-                    self.largestNetcodeData = data.length;
-                    //NSLog(@"[network] largest NetcodeData %lu", self.largestNetcodeData);
-                }
-            }
-            
             break;
         }
-        case 1: {
-            // Did receive a Ping data
-            unsigned char pongMessageData[1];
-            pongMessageData[0] = (unsigned char)2;
-            NSData *dataReadyToBeSent = [NSData dataWithBytes:pongMessageData length:sizeof(pongMessageData)];
-            [self sendToPeer:dataReadyToBeSent peer:peerID sendDataMode:MCSessionSendDataUnreliable];
-            break;
-        }
-        case 2: {
-            // Did receive a Pong message
-            //NSLog(@"[mc_session]: pong time %d %f", ++self.pongTime, [[NSProcessInfo processInfo] systemUptime]);
-            double rtt = ([[NSProcessInfo processInfo] systemUptime] - self.lastPingTime) * 1000;
-            unsigned long transportId = [self.peerID2TransportIdMap[peerID] unsignedLongValue];
-            DidReceivePongMessageDelegate(transportId, rtt);
-            break;
-        }
-        case 3: {
-            NSLog(@"[mc_session] did receive a connection message");
-//            [self.connectedPeersForUnity addObject:peerID];
-//            PeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue], [self.peerName2DeviceNameMap[peerID.displayName] UTF8String]);
-            break;
-        }
-        case 4: {
-            NSLog(@"[mc_session] Did receive a disconnection message");
-            [self.mcSession disconnect];
-            if (DidDisconnectFromServerDelegate != NULL) {
-                DidDisconnectFromServerDelegate();
-            }
-            break;
-        }
-        case 5: {
+//        case 1: {
+//            // Did receive a Ping data
+//            unsigned char pongMessageData[1];
+//            pongMessageData[0] = (unsigned char)2;
+//            NSData *dataReadyToBeSent = [NSData dataWithBytes:pongMessageData length:sizeof(pongMessageData)];
+//            [self sendToPeer:dataReadyToBeSent peer:peerID sendDataMode:MCSessionSendDataUnreliable];
+//            break;
+//        }
+//        case 2: {
+//            // Did receive a Pong message
+//            //NSLog(@"[mc_session]: pong time %d %f", ++self.pongTime, [[NSProcessInfo processInfo] systemUptime]);
+//            double rtt = ([[NSProcessInfo processInfo] systemUptime] - self.lastPingTime) * 1000;
+//            unsigned long transportId = [self.peerID2TransportIdMap[peerID] unsignedLongValue];
+//            DidReceivePongMessageDelegate(transportId, rtt);
+//            break;
+//        }
+//        case 3: {
+//            NSLog(@"[mc_session] did receive a connection message");
+////            [self.connectedPeersForUnity addObject:peerID];
+////            PeerDidConnectDelegate([self.peerName2ClientIdMap[peerID.displayName] unsignedLongValue], [self.peerName2DeviceNameMap[peerID.displayName] UTF8String]);
+//            break;
+//        }
+//        case 4: {
+//            NSLog(@"[mc_session] Did receive a disconnection message");
+//            [self.mcSession disconnect];
+//            if (DidDisconnectFromServerDelegate != NULL) {
+//                DidDisconnectFromServerDelegate();
+//            }
+//            break;
+//        }
+//        case 5: {
+//            // ARSessionId
+//            int strlen = (int)decodedData[1];
+//            char *str = malloc(strlen);
+//            memcpy(str, decodedData + 2, strlen);
+//            NSString *arSessionId = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
+//            //NSLog(@"[mc_session] Did receive an ARSessionId %@", arSessionId);
+//            [self.peerID2ARSessionIdMap setObject:arSessionId forKey:peerID];
+//            break;
+//        }
+//        case 6: {
+//            // Did reset ARSession message
+//            NSLog(@"[mc_session] did receive DidResetARSession message");
+//            NSString *arSessionId = self.peerID2ARSessionIdMap[peerID];
+//            ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
+//            for (ARAnchor *anchor in [[arSession currentFrame] anchors]) {
+//                if ([anchor.identifier.UUIDString isEqualToString:arSessionId]) {
+//                    [arSession removeAnchor:anchor];
+//                }
+//            }
+//            break;
+//        }
+        case 7: {
+            // Host local ip address
             int strlen = (int)decodedData[1];
             char *str = malloc(strlen);
             memcpy(str, decodedData + 2, strlen);
-            NSString *arSessionId = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
-            //NSLog(@"[mc_session] Did receive an ARSessionId %@", arSessionId);
-            [self.peerID2ARSessionIdMap setObject:arSessionId forKey:peerID];
+            NSString *hostLocalIpAddress = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
+            DidReceiveHostLocalIpAddressDelegate([hostLocalIpAddress UTF8String]);
             break;
         }
-        case 6: {
-            // Did reset ARSession message
-            NSLog(@"[mc_session] did receive DidResetARSession message");
-            NSString *arSessionId = self.peerID2ARSessionIdMap[peerID];
-            ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
-            for (ARAnchor *anchor in [[arSession currentFrame] anchors]) {
-                if ([anchor.identifier.UUIDString isEqualToString:arSessionId]) {
-                    [arSession removeAnchor:anchor];
-                }
-            }
+        case 8: {
+            // Photon room name
+            int strlen = (int)decodedData[1];
+            char *str = malloc(strlen);
+            memcpy(str, decodedData + 2, strlen);
+            NSString *photonRoomName = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
+            DidReceivePhotonRoomNameDelegate([photonRoomName UTF8String]);
             break;
         }
         default: {
-            if ([[ARSessionManager sharedARSessionManager] isUsingARWorldMap]) {
+            if (self.arSyncMode == ARSyncModeCollaboration) {
+                ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
+                if (collaborationData != nil) {
+                    [[ARSessionManager sharedARSessionManager] updateWithCollaborationData:collaborationData];
+                    return;
+                }
+            } else if (self.arSyncMode == ARSyncModeWorldMap) {
                 ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:data error:nil];
                 if (worldMap != nil) {
                     NSLog(@"[world_map] did receive ARWorldMap with size %f kb", data.length / 1024.0);
@@ -466,41 +458,6 @@ typedef enum {
                     }
                     return;
                 }
-            } else {
-                ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
-                if (collaborationData != nil) {
-                    [[ARSessionManager sharedARSessionManager] updateWithCollaborationData:collaborationData];
-                    
-                    if (self.logNetworkData) {
-                        // For measurement purpose.
-                        if (self.firstARCollaborationDataTimestamp == -1) {
-                            self.firstARCollaborationDataTimestamp = [[NSProcessInfo processInfo] systemUptime];
-                        }
-                        self.receivedARCollaborationDataTotalLength += data.length;
-                        self.receivedARCollaborationDataTotalCount++;
-                        if (data.length > self.largestARCollaborationData) {
-                            self.largestARCollaborationData = data.length;
-                            //NSLog(@"[network] largest ARCollaborationData %lu", self.largestARCollaborationData);
-                        }
-                        if (collaborationData.priority == ARCollaborationDataPriorityCritical) {
-                            //NSLog(@"[network] did receive Critical ARCollaborationData with length %f kb", data.length / (float)1024);
-                            self.receivedCriticalARCollaborationDataTotalLength += data.length;
-                            self.receivedCriticalARCollaborationDataTotalCount++;
-                            if (data.length > self.largestCriticalARCollaborationData) {
-                                self.largestCriticalARCollaborationData = data.length;
-                                //NSLog(@"[network] largest Critical ARCollborationData %lu", self.largestCriticalARCollaborationData);
-                            }
-                        } else {
-                            self.receivedOptionalARCollaborationDataTotalLength += data.length;
-                            self.receivedOptionalARCollaborationDataTotalCount++;
-                            if (data.length > self.largestOptionalARCollaborationData) {
-                                self.largestOptionalARCollaborationData = data.length;
-                                //NSLog(@"[network] largest Optional ARCollaborationData %lu", self.largestOptionalARCollaborationData);
-                            }
-                        }
-                    }
-                    return;
-                }
             }
             break;
         }
@@ -508,13 +465,7 @@ typedef enum {
 }
 
 - (void)session:(MCSession *)session didReceiveStream:(NSInputStream *)stream withName:(NSString *)streamName fromPeer:(MCPeerID *)peerID {
-    NSLog(@"[mc_session] did receive stream with stream name %@", streamName);
-    ARInputStream *arInputStream = [[ARInputStream alloc] initWithInputStream:stream];
-    stream.delegate = arInputStream;
-    [stream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-    [stream open];
     
-    [self.peerID2InputStreamMap setObject:arInputStream forKey:peerID];
 }
 
 - (void)session:(MCSession *)session didStartReceivingResourceWithName:(NSString *)resourceName fromPeer:(MCPeerID *)peerID withProgress:(NSProgress *)progress {
@@ -534,9 +485,7 @@ typedef enum {
 #pragma mark - extern "C"
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCInitialize(const char* serviceType) {
-    //HoloKitARSession* ar_session_instance = [HoloKitARSession sharedARSession];
-    //ar_session_instance.multipeerSession = [[MultipeerSession alloc] initWithServiceType:[NSString stringWithUTF8String:serviceType]];
+UnityHoloKit_MCInit(const char* serviceType) {
     [[ARSessionManager sharedARSessionManager] setMultipeerSession:[[MultipeerSession alloc] initWithServiceType:[NSString stringWithUTF8String:serviceType]]];
 }
 
@@ -601,7 +550,6 @@ UnityHoloKit_MCSendPingMessage(unsigned long transportId) {
             unsigned char pingMessageData[1];
             pingMessageData[0] = (unsigned char)1;
             NSData *dataReadyToBeSent = [NSData dataWithBytes:pingMessageData length:sizeof(pingMessageData)];
-            multipeerSession.lastPingTime = [[NSProcessInfo processInfo] systemUptime];
             [multipeerSession sendToPeer:dataReadyToBeSent peer:peerID sendDataMode:MCSessionSendDataUnreliable];
             //NSLog(@"[mc_session]: ping time %d %f", ++multipeerSession.pingTime, [[NSProcessInfo processInfo] systemUptime]);
             return;
@@ -654,14 +602,9 @@ UnityHoloKit_MCDisconnectAllClients(void) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCShutdown(void) {
     MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
-    if ([multipeerSession isHost]) {
-        [multipeerSession stopAdvertising];
-    } else {
-        [multipeerSession stopBrowsing];
-    }
     [multipeerSession.mcSession disconnect];
     [multipeerSession setMcSession:nil];
-    multipeerSession = nil;
+    [[ARSessionManager sharedARSessionManager] setMultipeerSession:nil];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -752,26 +695,37 @@ UnityHoloKit_SendDidResetARSessionMessage(void) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_LogNetworkData(void) {
-    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
-    double timeElapsed = [[NSProcessInfo processInfo] systemUptime] - multipeerSession.firstARCollaborationDataTimestamp;
-    NSLog(@"");
-    NSLog(@"[network] time elapsed %f", timeElapsed);
-    NSLog(@"[network] received ARCollaborationData bytes %f kb per second", multipeerSession.receivedARCollaborationDataTotalLength / timeElapsed / 1024);
-    NSLog(@"[network] received ARCollaborationData count %f per second", multipeerSession.receivedARCollaborationDataTotalCount / timeElapsed);
-    NSLog(@"[network] largest ARCollaborationData bytes %f kb", multipeerSession.largestARCollaborationData / (float)1024);
-    NSLog(@"[network] received Critical ARCollaborationData bytes %f kb per second", multipeerSession.receivedCriticalARCollaborationDataTotalLength / timeElapsed / 1024);
-    NSLog(@"[network] received Critical ARCollaborationData count %f per second", multipeerSession.receivedCriticalARCollaborationDataTotalCount / timeElapsed);
-    NSLog(@"[network] largest Critical ARCollaborationData bytes %f kb", multipeerSession.largestCriticalARCollaborationData / (float)1024);
-    NSLog(@"[network] received Optional ARCollaborationData bytes %f kb per second", multipeerSession.receivedOptionalARCollaborationDataTotalLength / timeElapsed / 1024);
-    NSLog(@"[network] received Optional ARCollaboartionData count %f per second", multipeerSession.receivedOptionalARCollaborationDataTotalCount / timeElapsed);
-    NSLog(@"[network] largest Optional ARCollaborationData bytes %f kb", multipeerSession.largestOptionalARCollaborationData / (float)1024);
-    NSLog(@"[network] received NetcodeData bytes %f kb per second", multipeerSession.receivedNetcodeDataTotalLength / timeElapsed / 1024);
-    NSLog(@"[network] received NetcodeData count %f per second", multipeerSession.receivedNetcodeDataTotalCount / timeElapsed);
-    NSLog(@"[network] largest Netcode Data bytes %f kb", multipeerSession.largestNetcodeData / (float)1024);
+UnityHoloKit_SetDidReceiveARWorldMapDelegate(DidReceiveARWorldMap callback) {
+    DidReceiveARWorldMapDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidReceiveARWorldMapDelegate(DidReceiveARWorldMap callback) {
-    DidReceiveARWorldMapDelegate = callback;
+UnityHoloKit_SetHostLocalIpAddress(const char *ip) {
+    NSLog(@"[mc_session] UnityHoloKit_SetHostLocalIpAddress %@", [NSString stringWithUTF8String:ip]);
+    [[[ARSessionManager sharedARSessionManager] multipeerSession] setHostLocalIpAddress:[NSString stringWithUTF8String:ip]];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetPhotonRoomName(const char *roomName) {
+    [[[ARSessionManager sharedARSessionManager] multipeerSession] setPhotonRoomName:[NSString stringWithUTF8String:roomName]];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidReceiveHostLocalIpAddressDelegate(DidReceiveHostLocalIpAddress callback) {
+    DidReceiveHostLocalIpAddressDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidReceivePhotonRoomNameDelegate(DidReceivePhotonRoomName callback) {
+    DidReceivePhotonRoomNameDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetNetcodeTransport(int transport) {
+    [[[ARSessionManager sharedARSessionManager] multipeerSession] setNetcodeTransport:(NetcodeTransport)transport];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetARSyncMode(int syncMode) {
+    [[[ARSessionManager sharedARSessionManager] multipeerSession] setArSyncMode:(ARSyncMode)syncMode];
 }

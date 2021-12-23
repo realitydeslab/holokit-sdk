@@ -61,7 +61,7 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
         self.isSynchronizationComplete = NO;
-        self.isUsingARWorldMap = NO;
+        self.isScanningARWorldMap = NO;
         self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
@@ -168,7 +168,7 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
         holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
     }
     
-    if (self.isUsingARWorldMap && [self.multipeerSession isHost]) {
+    if (self.isScanningARWorldMap) {
         //NSLog(@"[world_map] world mapping status %d", frame.worldMappingStatus);
         if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
             switch(frame.worldMappingStatus) {
@@ -438,9 +438,8 @@ UnityHoloKit_SetARWorldMappingStatusDidChangeDelegate(ARWorldMappingStatusDidCha
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetIsUsingARWorldMap(bool value) {
-    NSLog(@"[world_map] set isUsingARWorldMap %d", value);
-    [[ARSessionManager sharedARSessionManager] setIsUsingARWorldMap:value];
+UnityHoloKit_SetIsScanningARWorldMap(bool value) {
+    [[ARSessionManager sharedARSessionManager] setIsScanningARWorldMap:value];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

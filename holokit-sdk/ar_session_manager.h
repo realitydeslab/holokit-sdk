@@ -23,7 +23,7 @@
 @property (nonatomic, strong, nullable) CADisplayLink *aDisplayLink;
 @property (nonatomic, assign) double lastVsyncTimestamp;
 @property (nonatomic, assign) double nextVsyncTimestamp;
-@property (assign) BOOL isUsingARWorldMap;
+@property (assign) BOOL isScanningARWorldMap;
 
 + (id _Nonnull )sharedARSessionManager;
 - (void)updateWithCollaborationData:(ARCollaborationData *_Nonnull) collaborationData;

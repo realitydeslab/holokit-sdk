@@ -18,7 +18,6 @@
 		4B16B10D26DB9F420016FFA0 /* low_latency_tracking_api_naive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B16B10C26DB9EFC0016FFA0 /* low_latency_tracking_api_naive.mm */; };
 		4B188AD026F432B4001FD67D /* hand_tracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B188ACF26F432B4001FD67D /* hand_tracking.mm */; };
 		4B1C73E726C4F6BD0063AC2A /* speech_recognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */; };
-		4B1D8C8B276893B700BC95F8 /* ar_input_stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B1D8C8A276893B700BC95F8 /* ar_input_stream.m */; };
 		4B260C9926368C280004B771 /* multipeer_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B260C9826368C280004B771 /* multipeer_session.m */; };
 		4B2B2FE725E23588002AC24F /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; };
 		4B2B2FE825E23588002AC24F /* HandTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 963CA066253C76D800345591 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -328,8 +327,6 @@
 		4B188ACF26F432B4001FD67D /* hand_tracking.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hand_tracking.mm; sourceTree = "<group>"; };
 		4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = speech_recognizer.m; sourceTree = "<group>"; };
 		4B1C73E826C4F6D00063AC2A /* speech_recognizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = speech_recognizer.h; sourceTree = "<group>"; };
-		4B1D8C8A276893B700BC95F8 /* ar_input_stream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ar_input_stream.m; sourceTree = "<group>"; };
-		4B1D8C8C276893C300BC95F8 /* ar_input_stream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_input_stream.h; sourceTree = "<group>"; };
 		4B260C9826368C280004B771 /* multipeer_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = multipeer_session.m; sourceTree = "<group>"; };
 		4B260CA926368C3A0004B771 /* multipeer_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = multipeer_session.h; sourceTree = "<group>"; };
 		4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-monocular-handtracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -885,8 +882,6 @@
 				4B188ACF26F432B4001FD67D /* hand_tracking.mm */,
 				4B610F0926F5C6BA00CB2AEA /* core_haptics.h */,
 				4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */,
-				4B1D8C8C276893C300BC95F8 /* ar_input_stream.h */,
-				4B1D8C8A276893B700BC95F8 /* ar_input_stream.m */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -2066,7 +2061,6 @@
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4B188AD026F432B4001FD67D /* hand_tracking.mm in Sources */,
 				4B921B0926DCF07800EC359F /* core_motion.mm in Sources */,
-				4B1D8C8B276893B700BC95F8 /* ar_input_stream.m in Sources */,
 				4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
