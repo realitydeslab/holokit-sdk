@@ -24,6 +24,7 @@
 @property (nonatomic, assign) double lastVsyncTimestamp;
 @property (nonatomic, assign) double nextVsyncTimestamp;
 @property (assign) BOOL isScanningARWorldMap;
+@property (nonatomic, strong, nullable) ARWorldMap *worldMap;
 
 + (id _Nonnull )sharedARSessionManager;
 - (void)updateWithCollaborationData:(ARCollaborationData *_Nonnull) collaborationData;

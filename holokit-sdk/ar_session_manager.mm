@@ -25,8 +25,8 @@
 typedef void (*DidAddARParticipantAnchor)();
 DidAddARParticipantAnchor DidAddARParticipantAnchorDelegate = NULL;
 
-typedef void (*ARSessionDidStart)();
-ARSessionDidStart ARSessionDidStartDelegate = NULL;
+typedef void (*ARSessionDidUpdate)();
+ARSessionDidUpdate ARSessionDidUpdateDelegate = NULL;
 
 typedef void (*DidReceiveMagicAnchor)(int clientId, int magicIndex, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float rotW);
 DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
@@ -39,6 +39,9 @@ CameraDidChangeTrackingState CameraDidChangeTrackingStateDelegate = NULL;
 
 typedef void (*ARWorldMappingStatusDidChange)(int status);
 ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
+
+typedef void (*DidFindARWorldMap)(const char *mapName);
+DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 
 @interface ARSessionManager() <ARSessionDelegate>
 
@@ -122,7 +125,7 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
     }
 }
 
-- (void)shareARWorldMap {
+- (void)saveARWorldMap:(NSString *)mapName {
     if (self.currentARWorldMappingStatus != ARWorldMappingStatusMapped) {
         NSLog(@"[world_map] ARWorldMap is currently not available");
         return;
@@ -130,13 +133,64 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
     
     [self.arSession getCurrentWorldMapWithCompletionHandler:^(ARWorldMap * _Nullable worldMap, NSError * _Nullable error) {
         if (error != nil) {
-            NSLog(@"[world_map] Failed to get ARWorldMap");
+            NSLog(@"[world_map] failed to get ARWorldMap");
             return;
         }
         
-        NSData *encodedData = [NSKeyedArchiver archivedDataWithRootObject:worldMap requiringSecureCoding:NO error:nil];
-        [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+        NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:worldMap requiringSecureCoding:NO error:nil];
+        NSURL *url = [[[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil]
+                      URLByAppendingPathComponent:[NSString stringWithFormat:@"%@%@", mapName, @".arexperience"]];
+        
+        [mapData writeToURL:url atomically:true];
+        NSLog(@"[world_map] did save world map of size %f mb to path %@", mapData.length / (1024.0 * 1024.0), url);
     }];
+}
+
+- (void)searchARWorldMaps {
+    NSURL *url = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
+    NSUInteger length = [url.absoluteString length];
+    
+    NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:url includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsSubdirectoryDescendants error:nil];
+    [dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSURL *fileUrl = (NSURL *)obj;
+        NSString *fileStr = fileUrl.absoluteString;
+        NSString *extension = [[fileStr pathExtension] lowercaseString];
+        if ([extension isEqualToString:@"arexperience"]) {
+            NSString *mapName = [fileStr substringFromIndex:length + 8]; // private/
+            mapName = [mapName substringToIndex:mapName.length - 13]; // .arexperience
+            mapName = [mapName stringByReplacingOccurrencesOfString:@"%20" withString:@" "]; // %20
+            if (DidFindARWorldMapDelegate != NULL) {
+                DidFindARWorldMapDelegate([mapName UTF8String]);
+            }
+        }
+    }];
+}
+
+- (void)retrieveARWorldMap:(NSString *)mapName {
+    NSLog(@"[loadARWorldMap] mapName %@", mapName);
+    NSURL *url = [[[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil]
+                  URLByAppendingPathComponent:[NSString stringWithFormat:@"%@%@", mapName, @".arexperience"]];
+    NSData *mapData = [[NSData alloc] initWithContentsOfURL:url];
+    ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:mapData error:nil];
+    if (worldMap == nil) {
+        NSLog(@"[world_map] failed to decode saved ARWorldMap, URL: %@", url);
+        return;
+    }
+    NSLog(@"[world_map] did retrieve ARWorldMap of size %f mb from path %@", mapData.length / (1024.0 * 1024.0), url);
+    self.worldMap = worldMap;
+}
+
+- (void)loadARWorldMap {
+    if (self.worldMap == nil) {
+        NSLog(@"[world_map] there is no local ARWorldMap to load");
+        return;
+    }
+    
+    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
+    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)arSession.configuration;
+    configuration.initialWorldMap = self.worldMap;
+    [arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
+    self.worldMap = nil;
 }
 
 #pragma mark - ARSessionDelegate
@@ -151,11 +205,11 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
     //    os_signpost_interval_begin(log, spid, "Update ARKit");
     
     if(![self.currentARSessionId isEqual:session.identifier]) {
-        //NSLog(@"[ar_session] ARSession did update");
         self.arSession = session;
         self.currentARSessionId = session.identifier;
-        if (ARSessionDidStartDelegate != NULL) {
-            ARSessionDidStartDelegate();
+        //NSLog(@"[ar_session] new ARSessionId %@", self.currentARSessionId);
+        if (ARSessionDidUpdateDelegate != NULL) {
+            ARSessionDidUpdateDelegate();
             [self.multipeerSession sendARSessionId2AllPeers];
         }
     }
@@ -196,8 +250,6 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
             self.currentARWorldMappingStatus = frame.worldMappingStatus;
         }
     }
-    
-    //NSLog(@"[ar_session]: current number of anchors %lu", (unsigned long)frame.anchors.count);
     
     //os_signpost_interval_end(log, spid, "Update ARKit");
 }
@@ -320,11 +372,11 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
 }
 
 - (void)sessionWasInterrupted:(ARSession *)session {
-    NSLog(@"[ar_session] session was interrupted.");
+    NSLog(@"[ar_session] session was interrupted");
 }
 
 - (void)sessionInterruptionEnded:(ARSession *)session {
-    NSLog(@"[ar_session] session interruption ended.");
+    NSLog(@"[ar_session] session interruption ended");
 }
 
 - (BOOL)sessionShouldAttemptRelocalization:(ARSession *)session {
@@ -384,8 +436,8 @@ UnityHoloKit_SetDidAddARParticipantAnchorDelegate(DidAddARParticipantAnchor call
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetARSessionDidStartDelegate(ARSessionDidStart callback) {
-    ARSessionDidStartDelegate = callback;
+UnityHoloKit_SetARSessionDidUpdateDelegate(ARSessionDidUpdate callback) {
+    ARSessionDidUpdateDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -443,8 +495,33 @@ UnityHoloKit_SetIsScanningARWorldMap(bool value) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_ShareARWorldMap() {
-    [[ARSessionManager sharedARSessionManager] shareARWorldMap];
+UnityHoloKit_DeleteARSessionReference() {
+    [[ARSessionManager sharedARSessionManager] setArSession:nil];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SaveARWorldMap(const char *mapName) {
+    [[ARSessionManager sharedARSessionManager] saveARWorldMap:[NSString stringWithUTF8String:mapName]];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_RetrieveARWorldMap(const char *mapName) {
+    [[ARSessionManager sharedARSessionManager] retrieveARWorldMap:[NSString stringWithUTF8String:mapName]];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SearchARWorldMaps() {
+    [[ARSessionManager sharedARSessionManager] searchARWorldMaps];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidFindARWorldMapDelegate(DidFindARWorldMap callback) {
+    DidFindARWorldMapDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_LoadARWorldMap() {
+    [[ARSessionManager sharedARSessionManager] loadARWorldMap];
 }
 
 } // extern "C"
