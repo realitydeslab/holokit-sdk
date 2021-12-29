@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.Events;
@@ -8,12 +6,8 @@ using System;
 
 namespace UnityEngine.XR.HoloKit
 {
-    /// <summary>
-    /// This is a master class to help Unity communiate with HoloKit SDK. 
-    /// </summary>
     public class HoloKitManager : MonoBehaviour
     {
-        // This class is a singleton.
         private static HoloKitManager _instance;
 
         public static HoloKitManager Instance { get { return _instance; } }
@@ -39,18 +33,24 @@ namespace UnityEngine.XR.HoloKit
             get => UnityHoloKit_IsStereoscopicRendering();
         }
 
-        [SerializeField] private Transform m_CenterEyePoint;
+        public Transform CenterEyePoint;
 
-        public bool LowLatencyTrackingActive
-        {
-            get => UnityHoloKit_GetLowLatencyTrackingApiActive();
-        }
+        //public bool LowLatencyTrackingActive
+        //{
+        //    get => UnityHoloKit_GetLowLatencyTrackingApiActive();
+        //}
 
-        public event UnityAction<int> ThermalStateDidChangeEvent;
+        //private ARKitCameraTrackingState m_CurrentCameraTrackingState;
 
-        public static event UnityAction DidChange2StAREvent;
+        //private ARKitCameraTrackingState m_NewCameraTrackingState;
 
-        public static event UnityAction DidChange2AREvent;
+        public event UnityAction DidChange2StAREvent;
+
+        public event UnityAction DidChange2AREvent;
+
+        public event UnityAction<iOSThermalState> ThermalStateDidChangeEvent;
+
+        public event UnityAction<ARKitCameraTrackingState> CameraDidChangeTrackingStateEvent; 
 
         [DllImport("__Internal")]
         private static extern bool UnityHoloKit_IsStereoscopicRendering();
@@ -76,11 +76,11 @@ namespace UnityEngine.XR.HoloKit
         [DllImport("__Internal")]
         private static extern bool UnityHoloKit_StartNfcSession();
 
-        [DllImport("__Internal")]
-        private static extern bool UnityHoloKit_GetLowLatencyTrackingApiActive();
+        //[DllImport("__Internal")]
+        //private static extern bool UnityHoloKit_GetLowLatencyTrackingApiActive();
 
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetLowLatencyTrackingApiActive(bool value);
+        //[DllImport("__Internal")]
+        //private static extern void UnityHoloKit_SetLowLatencyTrackingApiActive(bool value);
 
         [DllImport("__Internal")]
         private static extern int UnityHoloKit_GetThermalState();
@@ -89,11 +89,20 @@ namespace UnityEngine.XR.HoloKit
         [AOT.MonoPInvokeCallback(typeof(ThermalStateDidChange))]
         private static void OnThermalStateDidChange(int state)
         {
-            Debug.Log($"[HoloKitManager] thermal state changed to {(iOSThermalState)state}");
-            Instance.ThermalStateDidChangeEvent?.Invoke(state);
+            Instance.ThermalStateDidChangeEvent?.Invoke((iOSThermalState)state);
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetThermalStateDidChangeDelegate(ThermalStateDidChange callback);
+
+        delegate void CameraDidChangeTrackingState(int trackingState);
+        [AOT.MonoPInvokeCallback(typeof(CameraDidChangeTrackingState))]
+        private static void OnCameraDidChangeTrackingState(int trackingState)
+        {
+            //Instance.m_NewCameraTrackingState = (ARKitCameraTrackingState)trackingState;
+            Instance.CameraDidChangeTrackingStateEvent?.Invoke((ARKitCameraTrackingState)trackingState);
+        }
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(CameraDidChangeTrackingState callback);
 
         private void Awake()
         {
@@ -109,8 +118,7 @@ namespace UnityEngine.XR.HoloKit
 
         private void OnEnable()
         {
-            // Retrieve center eye offset from the SDK.
-            // From https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
+            // Get camera to center eye offset from sdk.
             IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
             float[] offset = new float[3];
             Marshal.Copy(offsetPtr, offset, 0, 3);
@@ -127,8 +135,11 @@ namespace UnityEngine.XR.HoloKit
 
             m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
 
+            //m_CurrentCameraTrackingState = ARKitCameraTrackingState.NotAvailable;
+
             UnityHoloKit_SetSetARCameraBackgroundDelegate(OnSetARCameraBackground);
             UnityHoloKit_SetThermalStateDidChangeDelegate(OnThermalStateDidChange);
+            UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(OnCameraDidChangeTrackingState);
         }
 
         private void OnDisable()
@@ -138,19 +149,19 @@ namespace UnityEngine.XR.HoloKit
 
         private void Start()
         {
-            // Let it be bright.
             Screen.brightness = 1.0f;
-
-            // Do not sleep.
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
-
             iOS.Device.hideHomeButton = true;
         }
 
-        private void Update()
-        {
-
-        }
+        //private void Update()
+        //{
+        //    if (m_CurrentCameraTrackingState != m_NewCameraTrackingState)
+        //    {
+        //        CameraDidChangeTrackingStateEvent?.Invoke(m_NewCameraTrackingState);
+        //        m_CurrentCameraTrackingState = m_NewCameraTrackingState;
+        //    }
+        //}
 
         public bool EnableStereoscopicRendering(bool value)
         {
@@ -160,7 +171,7 @@ namespace UnityEngine.XR.HoloKit
                 {
                     UnityHoloKit_EnableStereoscopicRendering(true);
                     m_DisplaySubsystem.Start();
-                    m_CenterEyePoint.localPosition = m_CameraToCenterEyeOffset;
+                    CenterEyePoint.localPosition = m_CameraToCenterEyeOffset;
                     DidChange2StAREvent?.Invoke();
                     return true;
                 }
@@ -173,16 +184,16 @@ namespace UnityEngine.XR.HoloKit
             {
                 m_DisplaySubsystem.Stop();
                 UnityHoloKit_EnableStereoscopicRendering(false);
-                m_CenterEyePoint.localPosition = Vector3.zero;
+                CenterEyePoint.localPosition = Vector3.zero;
                 DidChange2AREvent?.Invoke();
                 return true;
             }
         }
 
-        public void SetLowLatencyTrackingActive(bool value)
-        {
-            UnityHoloKit_SetLowLatencyTrackingApiActive(value);
-        }
+        //public void SetLowLatencyTrackingActive(bool value)
+        //{
+        //    UnityHoloKit_SetLowLatencyTrackingApiActive(value);
+        //}
 
         public iOSThermalState GetThermalState()
         {

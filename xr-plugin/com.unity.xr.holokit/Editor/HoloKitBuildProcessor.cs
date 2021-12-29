@@ -1,8 +1,6 @@
 #if UNITY_IOS
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEditor.Build;
@@ -10,9 +8,6 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.iOS.Xcode;
 using UnityEditor.iOS.Xcode.Extensions;
 using UnityEditor.iOS;
-using UnityEditor.Callbacks;
-using UnityEngine;
-using UnityEngine.XR.ARKit;
 using OSVersion = UnityEngine.XR.ARKit.OSVersion;
 
 namespace UnityEditor.XR.HoloKit
@@ -88,13 +83,12 @@ namespace UnityEditor.XR.HoloKit
                     return;
                 }
 
-                ChangeXcodePlist(report.summary.outputPath);
+                AddXcodePlist(report.summary.outputPath);
                 AddXcodeCapabilities(report.summary.outputPath);
                 AddDynamicFramework(report.summary.outputPath);
-                //AppleWatchSetup(report.summary.outputPath);
             }
 
-            static void ChangeXcodePlist(string path) 
+            static void AddXcodePlist(string path) 
             {
                 string plistPath = path + "/Info.plist";
                 PlistDocument plist = new PlistDocument();
@@ -102,18 +96,16 @@ namespace UnityEditor.XR.HoloKit
 
                 PlistElementDict rootDict = plist.root;
 
-                Debug.Log("[HoloKitBuildProcessor]: ChangeXcodePlist()");
-
-                // For NFC
+                // NFC
                 rootDict.SetString("NFCReaderUsageDescription", "For HoloKit to authenticate the NFC chip.");
 
-                // For AR collaboration
+                // AR collaboration
                 rootDict.SetString("NSLocalNetworkUsageDescription", "For HoloKit to enable nearby AR collaboration.");
                 PlistElementArray array = rootDict.CreateArray("NSBonjourServices");
-                array.AddString("_holokit-collab._tcp");
-                array.AddString("_holokit-collab._udp");
+                array.AddString("_magics-ar612._tcp");
+                array.AddString("_magics-ar612._udp");
 
-                // For CoreLocation
+                // CoreLocation
                 rootDict.SetString("NSLocationWhenInUseUsageDescription", "For thatReality to locate your current location.");
 
                 // For save replay to iPhone's photo library
@@ -187,92 +179,7 @@ namespace UnityEditor.XR.HoloKit
 
                 return entitlementDoc;
             }
-
-            // https://github.com/Manurocker95/IronRuby-Test/blob/57f8b66e88d7df2e9bd7936e83777a79427f8e13/Assets/VirtualPhenix/Scripts/Editor/AppleWatch/VP_SetupWatchExtension.cs
-            private static void AppleWatchSetup(string buildPath)
-            {
-                PBXProject project = new PBXProject();
-                string projectPath = PBXProject.GetPBXProjectPath(buildPath);
-                project.ReadFromFile(projectPath);
-                string targetGuid = project.GetUnityFrameworkTargetGuid();
-
-                string packageName = UnityEngine.Application.identifier;
-
-                string watchExtensionTargetGuid = PBXProjectExtensions.AddWatchExtension(project, targetGuid,
-                    "Watch Extension",
-                    $"{packageName}.watchkitapp.watchkitextension",
-                    "Watch Extension/Info.plist");
-
-                string watchAppTargetGuid = PBXProjectExtensions.AddWatchApp(project, targetGuid, watchExtensionTargetGuid,
-                    "Watch",
-                    $"{packageName}.watchkitapp",
-                    "Watch/Info.plist");
-
-                FileUtil.CopyFileOrDirectory("Assets/Plugins/AppleWatchAsController/Watch", Path.Combine(buildPath, "Watch"));
-                FileUtil.CopyFileOrDirectory("Assets/Plugins/AppleWatchAsController/Watch Extension", Path.Combine(buildPath, "Watch Extension"));
-
-                var filesToBuild = new List<string>
-                {
-                    "Watch/Interface.storyboard",
-                    "Watch/Assets.xcassets"
-                };
-
-                foreach(var path in filesToBuild)
-                {
-                    var fileGuid = project.AddFile(path, path);
-                    project.AddFileToBuild(watchAppTargetGuid, fileGuid);
-                }
-
-                filesToBuild = new List<string>
-                {
-                    "Watch Extension/Assets.xcassets",
-                    "Watch Extension/ExtensionDelegate.swift",
-                    "Watch Extension/InterfaceController.swift",
-                    "Watch Extension/NotificationController.swift",
-                    "Watch Extension/ComplicationController.swift",
-                };
-
-                foreach (var path in filesToBuild)
-                {
-                    var fileGuid = project.AddFile(path, path);
-                    project.AddFileToBuild(watchExtensionTargetGuid, fileGuid);
-                }
-
-                var filesToAdd = new List<string>
-                {
-                    "Watch/Info.plist",
-                    "Watch Extension/Info.plist",
-                    "Watch Extension/PushNotificationPayload.apns"
-                };
-
-                foreach (var path in filesToAdd)
-                {
-                    project.AddFile(path, path);
-                }
-
-                project.SetBuildProperty(watchAppTargetGuid, "SWIFT_VERSION", "5.0");
-                project.SetBuildProperty(watchExtensionTargetGuid, "SWIFT_VERSION", "5.0");
-
-                foreach (var configName in project.BuildConfigNames())
-                {
-                    var configGuid = project.BuildConfigByName(watchAppTargetGuid, configName);
-
-                    project.SetBuildPropertyForConfig(configGuid, "WATCHOS_DEPLOYMENT_TARGET", "8.0");
-                }
-
-
-                foreach (var configName in project.BuildConfigNames())
-                {
-                    var configGuid = project.BuildConfigByName(watchExtensionTargetGuid, configName);
-
-                    project.SetBuildPropertyForConfig(configGuid, "WATCHOS_DEPLOYMENT_TARGET", "8.0");
-                }
-
-                project.WriteToFile(projectPath);
-            }
         }
-
-
     }
 }
 

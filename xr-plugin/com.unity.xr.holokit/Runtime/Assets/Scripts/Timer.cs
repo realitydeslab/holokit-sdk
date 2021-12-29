@@ -1,13 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace UnityEngine.XR.HoloKit
 {
     public class Timer : MonoBehaviour
     {
-
         [SerializeField]
         Text txt;
 
@@ -21,7 +17,6 @@ namespace UnityEngine.XR.HoloKit
         void Update()
         {
             float currentTime = Time.time - m_StartTime;
-
             string minutes = Mathf.Floor(currentTime / 60f).ToString("00");
             string seconds = (currentTime % 60f).ToString("00");
             txt.text = $"{minutes}:{seconds}";
