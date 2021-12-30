@@ -12,18 +12,22 @@ namespace UnityEngine.XR.HoloKit
 
         public static HoloKitManager Instance { get { return _instance; } }
 
-        private XRDisplaySubsystem m_DisplaySubsystem;
+        private XRDisplaySubsystem m_HoloKitDisplaySubsystem;
 
-        public XRDisplaySubsystem DisplaySubsystem
-        {
-            get => m_DisplaySubsystem;
-        }
+        //public XRDisplaySubsystem DisplaySubsystem
+        //{
+        //    get => m_DisplaySubsystem;
+        //}
 
-        private static Vector3 m_CameraToCenterEyeOffset;
+        private XRInputSubsystem m_HoloKitInputSubsystem;
+
+        private XRInputSubsystem m_ARKitInputSubsystem;
+
+        private static Vector3 k_CameraToCenterEyeOffset = new Vector3(0.0495f, -0.090635f, -0.07965f);
 
         public static Vector3 CameraToCenterEyeOffset
         {
-            get => m_CameraToCenterEyeOffset;
+            get => k_CameraToCenterEyeOffset;
         }
 
         private ARCameraBackground m_ARCameraBackground;
@@ -66,12 +70,6 @@ namespace UnityEngine.XR.HoloKit
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetSetARCameraBackgroundDelegate(SetARCameraBackground callback);
-
-        [DllImport("__Internal")]
-        private static extern IntPtr UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
-
-        [DllImport("__Internal")]
-        private static extern void UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(IntPtr ptr);
 
         [DllImport("__Internal")]
         private static extern bool UnityHoloKit_StartNfcSession();
@@ -118,24 +116,32 @@ namespace UnityEngine.XR.HoloKit
 
         private void OnEnable()
         {
-            // Get camera to center eye offset from sdk.
-            IntPtr offsetPtr = UnityHoloKit_GetCameraToCenterEyeOffsetPtr();
-            float[] offset = new float[3];
-            Marshal.Copy(offsetPtr, offset, 0, 3);
-            m_CameraToCenterEyeOffset = new Vector3(offset[0], offset[1], -offset[2]);
-            UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(offsetPtr);
-
             // Get a reference of the display subsystem.
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
             if (displaySubsystems.Count > 0)
             {
-                m_DisplaySubsystem = displaySubsystems[0];
+                m_HoloKitDisplaySubsystem = displaySubsystems[0];
             }
 
-            m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
+            List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
+            SubsystemManager.GetSubsystems(inputSubsystems);
+            foreach (var inputSubsystem in inputSubsystems)
+            {
+                if (inputSubsystem.subsystemDescriptor.id.Equals("HoloKit Input"))
+                {
+                    m_HoloKitInputSubsystem = inputSubsystem;
+                }
+                else if (inputSubsystem.subsystemDescriptor.id.Equals("ARKit-Input"))
+                {
+                    m_ARKitInputSubsystem = inputSubsystem;
+                }
+                Debug.Log($"[InputSubsystems] id {inputSubsystem.subsystemDescriptor.id} and running {inputSubsystem.running}");
+            }
+            //m_HoloKitInputSubsystem.Stop();
+            //m_ARKitInputSubsystem.Start();
 
-            //m_CurrentCameraTrackingState = ARKitCameraTrackingState.NotAvailable;
+            m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
 
             UnityHoloKit_SetSetARCameraBackgroundDelegate(OnSetARCameraBackground);
             UnityHoloKit_SetThermalStateDidChangeDelegate(OnThermalStateDidChange);
@@ -170,8 +176,8 @@ namespace UnityEngine.XR.HoloKit
                 if (UnityHoloKit_StartNfcSession())
                 {
                     UnityHoloKit_EnableStereoscopicRendering(true);
-                    m_DisplaySubsystem.Start();
-                    CenterEyePoint.localPosition = m_CameraToCenterEyeOffset;
+                    m_HoloKitDisplaySubsystem.Start();
+                    CenterEyePoint.localPosition = k_CameraToCenterEyeOffset;
                     DidChange2StAREvent?.Invoke();
                     return true;
                 }
@@ -182,7 +188,7 @@ namespace UnityEngine.XR.HoloKit
             }
             else
             {
-                m_DisplaySubsystem.Stop();
+                m_HoloKitDisplaySubsystem.Stop();
                 UnityHoloKit_EnableStereoscopicRendering(false);
                 CenterEyePoint.localPosition = Vector3.zero;
                 DidChange2AREvent?.Invoke();

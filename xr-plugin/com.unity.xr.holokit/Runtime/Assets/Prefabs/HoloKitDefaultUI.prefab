@@ -537,7 +537,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 118810028400873974}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8979291048829963825}
+        m_TargetAssemblyTypeName: UnityEngine.XR.HoloKit.HoloKitDefaultUI, Unity.XR.HoloKit
+        m_MethodName: ToggleStAR
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2049224426796196632
 GameObject:
   m_ObjectHideFlags: 0
@@ -573,8 +585,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1323, y: -60}
-  m_SizeDelta: {x: 451.6836, y: 130}
+  m_AnchoredPosition: {x: 1402.9285, y: -60}
+  m_SizeDelta: {x: 611.5405, y: 130}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1403235159944453938
 CanvasRenderer:
@@ -743,7 +755,6 @@ MonoBehaviour:
   m_Timer: {fileID: 5068260794037388848}
   m_ThermalState: {fileID: 2935235668756524230}
   m_CameraTrackingState: {fileID: 7616762592587398663}
-  m_InvisibleButton: {fileID: 1047186062348670759}
 --- !u!1 &8291633032330438279
 GameObject:
   m_ObjectHideFlags: 0
@@ -864,4 +875,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4864810590612941103}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8979291048829963825}
+        m_TargetAssemblyTypeName: UnityEngine.XR.HoloKit.HoloKitDefaultUI, Unity.XR.HoloKit
+        m_MethodName: ToggleUI
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

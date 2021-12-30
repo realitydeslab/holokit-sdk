@@ -71,6 +71,12 @@ public:
 
     NSString* GetModelName() { return model_name_; }
     
+    simd_float4x4 GetPortraitMatrix() { return portrait_matrix; }
+    
+    simd_float4x4 GetLandscapeLeftMatrix() { return landscape_left_matrix; }
+    
+    simd_float4x4 GetPortraitUpsidedownMatrix() { return portrait_upsidedown_matrix; }
+    
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
 private:
@@ -107,7 +113,7 @@ private:
     /// @brief The vector from camera pointing to the center of the eyes.
     simd_float3 camera_to_center_eye_offset_;
     
-    ARSessionManager* ar_session_handler_ = nullptr;
+    ARSessionManager* ar_session_manager = nullptr;
     
     static std::unique_ptr<HoloKitApi> holokit_api_;
     
@@ -123,6 +129,12 @@ private:
     double last_populate_next_frame_time_ = 0.0;
     
     bool is_skipping_frame_ = false;
+    
+    simd_float4x4 portrait_matrix;
+    
+    simd_float4x4 landscape_left_matrix;
+    
+    simd_float4x4 portrait_upsidedown_matrix;
 
 }; // class HoloKitApi
 

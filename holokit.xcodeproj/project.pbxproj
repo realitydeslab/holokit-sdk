@@ -412,16 +412,6 @@
 		966021E725393723004019A5 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphics.h; sourceTree = "<group>"; };
 		966021E825393723004019A5 /* IUnityRenderingExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityRenderingExtensions.h; sourceTree = "<group>"; };
 		966021E925393723004019A5 /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
-		9666E9702571E2A300A7F127 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		9666E9722571E2A400A7F127 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
-		9666E9742571E2A400A7F127 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
-		9666E9752571E2A400A7F127 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
-		9666E9772571E2A400A7F127 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		9666E97A2571E2A400A7F127 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		9666E97C2571E2A900A7F127 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		9666E97F2571E2A900A7F127 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9666E9812571E2A900A7F127 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9666E9822571E2A900A7F127 /* test_metalarkit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "test_metalarkit-Bridging-Header.h"; sourceTree = "<group>"; };
 		9666E9902572395C00A7F127 /* HandTracker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HandTracker.framework; path = sdk/third_party/HandTracker.framework; sourceTree = "<group>"; };
 		9666E9E2257260D800A7F127 /* test-headtracking2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-headtracking2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9666E9E4257260D800A7F127 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -754,7 +744,6 @@
 				9651053B2575FC9800F076B5 /* official-app */,
 				4BE7B60C261104ED001F39F2 /* holokit-sdk */,
 				9660219C25393723004019A5 /* sdk */,
-				9666E96F2571E2A300A7F127 /* test-metalarkit */,
 				9666E9E3257260D800A7F127 /* test-headtracking2 */,
 				9699F67A2575E2160011D823 /* test-holokit-app-extension */,
 				965106A92576659000F076B5 /* test-holokit-app-clip */,
@@ -967,23 +956,6 @@
 				961B8AD8253B40110025BA7D /* UnityXRNativePtrs.h */,
 			);
 			path = XR;
-			sourceTree = "<group>";
-		};
-		9666E96F2571E2A300A7F127 /* test-metalarkit */ = {
-			isa = PBXGroup;
-			children = (
-				9666E9702571E2A300A7F127 /* AppDelegate.swift */,
-				9666E9722571E2A400A7F127 /* Shaders.metal */,
-				9666E9742571E2A400A7F127 /* ShaderTypes.h */,
-				9666E9752571E2A400A7F127 /* Renderer.swift */,
-				9666E9772571E2A400A7F127 /* ViewController.swift */,
-				9666E9792571E2A400A7F127 /* Main.storyboard */,
-				9666E97C2571E2A900A7F127 /* Assets.xcassets */,
-				9666E97E2571E2A900A7F127 /* LaunchScreen.storyboard */,
-				9666E9812571E2A900A7F127 /* Info.plist */,
-				9666E9822571E2A900A7F127 /* test_metalarkit-Bridging-Header.h */,
-			);
-			path = "test-metalarkit";
 			sourceTree = "<group>";
 		};
 		9666E9E3257260D800A7F127 /* test-headtracking2 */ = {
@@ -1704,22 +1676,6 @@
 				965106E725766AB200F076B5 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		9666E9792571E2A400A7F127 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9666E97A2571E2A400A7F127 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		9666E97E2571E2A900A7F127 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9666E97F2571E2A900A7F127 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 		9666E9ED257260D900A7F127 /* Main.storyboard */ = {

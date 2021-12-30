@@ -86,7 +86,6 @@ public:
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandLeft);
         //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandRight);
-        //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitAppleWatch);
         
         //ar_session_handler = [HoloKitARSession getSingletonInstance];
         
@@ -99,7 +98,6 @@ public:
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
         //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandLeft);
         //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandRight);
-        //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitAppleWatch);
     }
     
     UnitySubsystemErrorCode Tick() {
@@ -220,7 +218,7 @@ public:
     
     UnitySubsystemErrorCode UpdateDeviceState(
         UnityXRInternalInputDeviceId device_id, UnityXRInputUpdateType update_type, UnityXRInputDeviceState* state) {
-        
+
         UnityXRInputFeatureIndex feature_index = 0;
         if (update_type == kUnityXRInputUpdateTypeDynamic) {
             //NSLog(@"[input]: input dynamic time: %f", [[NSProcessInfo processInfo] systemUptime]);
@@ -335,13 +333,8 @@ public:
             if (device_id == kDeviceIdHoloKitHmd) {
 //                os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
 //                os_signpost_id_t spid = os_signpost_id_generate(log);
-//                os_signpost_interval_begin(log, spid, "UpdateCenterEyePositionAndRotation", "update_type: %d, frame_count: %d, last_frame_time: %f, system_uptime: %f", update_type, frame_count_, last_frame_time_, [[NSProcessInfo processInfo] systemUptime]);
-                
-                //NSLog(@"[input]: input before render time: %f", [[NSProcessInfo processInfo] systemUptime]);
-                os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-                os_signpost_id_t spid = os_signpost_id_generate(log);
-                os_signpost_interval_begin(log, spid, "Update HMD");
-                os_signpost_interval_end(log, spid, "Update HMD");
+//                os_signpost_interval_begin(log, spid, "Update HMD");
+//                os_signpost_interval_end(log, spid, "Update HMD");
                 
                 // TODO: low latency tracking - get predicted camera transform
                 //double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp];
@@ -358,14 +351,27 @@ public:
                     rotation = EigenQuaterniondToUnityXRVector4(eigen_rotation);
                 } else {
                     simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
+                    switch([[[[[UIApplication sharedApplication] windows] firstObject] windowScene] interfaceOrientation]) {
+                        case UIInterfaceOrientationLandscapeRight:
+                            break;
+                        case UIInterfaceOrientationPortrait: {
+                            camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetPortraitMatrix());
+                            break;
+                        }
+                        case UIInterfaceOrientationLandscapeLeft:
+                            camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetLandscapeLeftMatrix());
+                            break;
+                        case UIInterfaceOrientationPortraitUpsideDown:
+                            camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetPortraitUpsidedownMatrix());
+                            break;
+                        default:
+                            break;
+                    }
                     simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
                     position = UnityXRVector3 { camera_position.x, camera_position.y, -camera_position.z };
-                    // DELETE ME
-                    //position= UnityXRVector3 { 0, 0, 0 };
                     simd_quatf quaternion = simd_quaternion(camera_transform);
                     rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
                 }
-                
                 //Is Tracked
                 input_->DeviceState_SetBinaryValue(state, feature_index++, true);
                 //Track State

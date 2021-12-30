@@ -11,6 +11,8 @@
 #import "display.mm"
 #import "hand_tracking.h"
 
+#define DEGREES_TO_RADIANS(degrees) ((degrees) * (M_PI / 180.0))
+
 const float kUserInterpupillaryDistance = 0.064;
 
 namespace holokit {
@@ -27,15 +29,25 @@ void HoloKitApi::Initialize() {
     
     InitOpticalParameters();
     
-    ar_session_handler_ = [ARSessionManager sharedARSessionManager];
+    ar_session_manager = [ARSessionManager sharedARSessionManager];
     
-//    if ([model_name_ isEqualToString:@"iPhone13,3"] == NO &&
-//        [model_name_ isEqualToString:@"iPhone13,4"] == NO) {
-//        NSLog(@"[HoloKitApi]: the phone type does not support hand tracking.");
-//        [[HoloKitHandTracker sharedHandTracker] setIsHandTrackingEnabled:NO];
-//    } else {
-//        NSLog(@"[HoloKitApi]: the phone type does support hand tracking.");
-//    }
+    portrait_matrix = matrix_identity_float4x4;
+    portrait_matrix.columns[0].x = cos(DEGREES_TO_RADIANS(90));
+    portrait_matrix.columns[0].y = sin(DEGREES_TO_RADIANS(90));
+    portrait_matrix.columns[1].x = -sin(DEGREES_TO_RADIANS(90));
+    portrait_matrix.columns[1].y = cos(DEGREES_TO_RADIANS(90));
+    
+    landscape_left_matrix = matrix_identity_float4x4;
+    landscape_left_matrix.columns[0].x = cos(DEGREES_TO_RADIANS(180));
+    landscape_left_matrix.columns[0].y = sin(DEGREES_TO_RADIANS(180));
+    landscape_left_matrix.columns[1].x = -sin(DEGREES_TO_RADIANS(180));
+    landscape_left_matrix.columns[1].y = cos(DEGREES_TO_RADIANS(180));
+    
+    portrait_upsidedown_matrix = matrix_identity_float4x4;
+    portrait_upsidedown_matrix.columns[0].x = cos(DEGREES_TO_RADIANS(-90));
+    portrait_upsidedown_matrix.columns[0].y = sin(DEGREES_TO_RADIANS(-90));
+    portrait_upsidedown_matrix.columns[1].x = -sin(DEGREES_TO_RADIANS(-90));
+    portrait_upsidedown_matrix.columns[1].y = cos(DEGREES_TO_RADIANS(-90));
     
     is_initialized_ = true;
 }
@@ -167,8 +179,8 @@ bool HoloKitApi::StartNfcSession() {
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
-    if (ar_session_handler_ != nullptr && ar_session_handler_.arSession != NULL) {
-        return ar_session_handler_.arSession.currentFrame.camera.transform;
+    if (ar_session_manager.arSession != NULL) {
+        return ar_session_manager.arSession.currentFrame.camera.transform;
     } else {
         return matrix_identity_float4x4;
     }
