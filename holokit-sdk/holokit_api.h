@@ -55,14 +55,6 @@ public:
     
     bool StartNfcSession();
     
-    double GetLastSubmitCurrentFrameTime() { return last_submit_current_frame_time_; }
-    
-    void SetLastSubmitCurrentFrameTime(double time) { last_submit_current_frame_time_ = time; }
-    
-    double GetLastPopulateNextFrameTime() { return last_populate_next_frame_time_; }
-    
-    void SetLastPopulateNextFrameTime(double time) { last_populate_next_frame_time_ = time; }
-    
     bool GetIsSkippingFrame() { return is_skipping_frame_; }
     
     void SetIsSkippingFrame(bool val) { is_skipping_frame_ = val; }
@@ -123,10 +115,6 @@ private:
     bool is_stereoscopic_rendering_ = false;
     
     bool is_single_pass_rendering_ = false;
-    
-    double last_submit_current_frame_time_ = 0.0;
-    
-    double last_populate_next_frame_time_ = 0.0;
     
     bool is_skipping_frame_ = false;
     

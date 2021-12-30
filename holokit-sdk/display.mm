@@ -122,9 +122,6 @@ NSString* content_shader = @
 typedef void (*SetARCameraBackground)(bool value);
 SetARCameraBackground SetARCameraBackgroundDelegate = NULL;
 
-typedef void (*RenderCallback)(void);
-RenderCallback RenderCallbackDelegate = NULL;
-
 namespace holokit {
 class HoloKitDisplayProvider {
 public:
@@ -186,8 +183,6 @@ public:
     }
     
     UnitySubsystemErrorCode Start() {
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f Start()", GetCurrentTime());
-        
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -197,7 +192,7 @@ public:
     
     UnitySubsystemErrorCode GfxThread_Start(
             UnityXRRenderingCapabilities* rendering_caps) {
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Start()", GetCurrentTime());
+
         // Does the system use multi-pass rendering?
         rendering_caps->noSinglePassRenderingSupport = true;
         rendering_caps->invalidateRenderStateAfterEachCallback = false;
@@ -215,30 +210,9 @@ public:
     
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_SubmitCurrentFrame()", GetCurrentTime());
-        //NSLog(@"[time_interval]: %f", GetCurrentTime() - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
-        if (GetCurrentTime() - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime() > 0.014) {
-            holokit::HoloKitApi::GetInstance()->SetIsSkippingFrame(true);
-        } else {
-            holokit::HoloKitApi::GetInstance()->SetIsSkippingFrame(false);
-        }
-        
-        os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-        os_signpost_id_t spid = os_signpost_id_generate(log);
-        os_signpost_interval_begin(log, spid, "SubmitCurrentFrame");
-        
-        double currentTime = [[NSProcessInfo processInfo] systemUptime];
-        //NSLog(@"[submitCurrentFrame]: current time: %f, time from last populate next frame: %f", currentTime, currentTime - holokit::HoloKitApi::GetInstance()->GetLastPopulateNextFrameTime());
-        holokit::HoloKitApi::GetInstance()->SetLastSubmitCurrentFrameTime(currentTime);
-        
         RenderContent();
         RenderAlignmentMarker();
         
-        if (RenderCallbackDelegate != NULL) {
-            RenderCallbackDelegate();
-        }
-        
-        os_signpost_interval_end(log, spid, "SubmitCurrentFrame");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
@@ -330,20 +304,8 @@ public:
 
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
-        //NSLog(@" ");
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_PopulateNextFrameDesc()", GetCurrentTime());
-        
-        os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-        os_signpost_id_t spid = os_signpost_id_generate(log);
-        os_signpost_interval_begin(log, spid, "PopulateNextFrame");
-        
-        double currentTime = [[NSProcessInfo processInfo] systemUptime];
-        holokit::HoloKitApi::GetInstance()->SetLastPopulateNextFrameTime(currentTime);
-        //NSLog(@"[populateNextFrame]: current time: %f", [[NSProcessInfo processInfo] systemUptime]);
-        
         // We interrupt the graphics thread if it is not manually opened by SDK.
         if (!holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering()) {
-            //NSLog(@"[display]: Manually shut down the display subsystem.");
             return kUnitySubsystemErrorCodeFailure;
         }
         
@@ -357,64 +319,37 @@ public:
         
         if (!holokit::HoloKitApi::GetInstance()->IsSinglePassRendering())
         {
-            next_frame->renderPassesCount = NUM_RENDER_PASSES;
-            
+            next_frame->renderPassesCount = 2;
             // Iterate through each render pass.
             for (int pass = 0; pass < next_frame->renderPassesCount; ++pass)
             {
                 auto& render_pass = next_frame->renderPasses[pass];
                 
-                if (pass < 2) {
-                    // The first two passes for stereo rendering.
-                    render_pass.textureId = unity_textures_[0];
-
-                    render_pass.renderParamsCount = 1;
-                    // Both passes share the same set of culling parameters.
-                    render_pass.cullingPassIndex = pass;
-
-                    auto& render_params = render_pass.renderParams[0];
-                    // Render a black image in the first frame to avoid left viewport glitch.
-                    if (is_first_frame_) {
-                        UnityXRVector3 sky_position = UnityXRVector3 { 0, 999, 0 };
-                        UnityXRVector4 sky_rotation = UnityXRVector4 { 0, 0, 0, 1 };
-                        UnityXRPose sky_pose = { sky_position, sky_rotation };
-                        render_params.deviceAnchorToEyePose = sky_pose;
-                        is_first_frame_ = false;
-                    } else {
-                        render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
-                    }
-                    render_params.projection.type = kUnityXRProjectionTypeMatrix;
-                    render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
-                    render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
-                    
-                    // Do culling for each eye seperately.
-                    auto& culling_pass = next_frame->cullingPasses[pass];
-                    culling_pass.separation = 0.064f;
-                    culling_pass.deviceAnchorToCullingPose = next_frame->renderPasses[pass].renderParams[0].deviceAnchorToEyePose;
-                    culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-                    culling_pass.projection.data.matrix = next_frame->renderPasses[pass].renderParams[0].projection.data.matrix;
+                render_pass.textureId = unity_textures_[0];
+                render_pass.renderParamsCount = 1;
+                render_pass.cullingPassIndex = pass;
+                
+                auto& render_params = render_pass.renderParams[0];
+                // Render a black image in the first frame to avoid left viewport glitch.
+                if (is_first_frame_) {
+                    UnityXRVector3 sky_position = UnityXRVector3 { 0, 999, 0 };
+                    UnityXRVector4 sky_rotation = UnityXRVector4 { 0, 0, 0, 1 };
+                    UnityXRPose sky_pose = { sky_position, sky_rotation };
+                    render_params.deviceAnchorToEyePose = sky_pose;
+                    is_first_frame_ = false;
                 } else {
-                    // The extra pass for the invisible AR camera.
-                    render_pass.textureId = unity_textures_[1];
-                    //NSLog(@"texture id: %u", unity_textures_[1]);
-                    render_pass.renderParamsCount = 1;
-                    render_pass.cullingPassIndex = 0;
-                    
-                    auto& render_params = render_pass.renderParams[0];
-                    UnityXRVector3 position = UnityXRVector3 { 0, 0, 0 };
-                    UnityXRVector4 rotation = UnityXRVector4 { 0, 0, 0, 1 };
-                    UnityXRPose pose = { position, rotation };
-                    render_params.deviceAnchorToEyePose = pose;
-                    render_params.projection.type = kUnityXRProjectionTypeMatrix;
-                    simd_float4x4 projection_matrix = [[ARSessionManager sharedARSessionManager] arSession].currentFrame.camera.projectionMatrix;
-                    render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(projection_matrix);
-                    render_params.viewportRect = {
-                        0.0f,                    // x
-                        0.0f,                    // y
-                        1.0f,                    // width
-                        1.0f                     // height
-                    };
+                    render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
                 }
+                render_params.projection.type = kUnityXRProjectionTypeMatrix;
+                render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
+                render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
+                
+                // Do culling for each eye seperately.
+                auto& culling_pass = next_frame->cullingPasses[pass];
+                culling_pass.separation = 0.064f;
+                culling_pass.deviceAnchorToCullingPose = next_frame->renderPasses[pass].renderParams[0].deviceAnchorToEyePose;
+                culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
+                culling_pass.projection.data.matrix = next_frame->renderPasses[pass].renderParams[0].projection.data.matrix;
             }
         }
         else
@@ -438,14 +373,10 @@ public:
             culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             culling_pass.projection.data.matrix = next_frame->renderPasses[0].renderParams[0].projection.data.matrix;
         }
-        os_signpost_interval_end(log, spid, "PopulateNextFrame");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
     UnitySubsystemErrorCode GfxThread_Stop() {
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f GfxThread_Stop()", GetCurrentTime());
-
-        //holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(false);
         if (holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(true);
         }
@@ -458,8 +389,6 @@ public:
     }
     
     UnitySubsystemErrorCode QueryMirrorViewBlitDesc(const UnityXRMirrorViewBlitInfo mirrorBlitInfo, UnityXRMirrorViewBlitDesc * blitDescriptor) {
-        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "%f QueryMirrorViewBlitDesc()", GetCurrentTime());
-        //return kUnitySubsystemErrorCodeSuccess;
         return kUnitySubsystemErrorCodeFailure;
     }
     
@@ -511,8 +440,6 @@ private:
             native_color_textures_[i] = reinterpret_cast<void*>(color_buffer);
             uint64_t depth_buffer = 0;
             native_depth_textures_[i] = reinterpret_cast<void*>(depth_buffer);
-            
-            //io_surfaces_[i] = color_surface;
             
             texture_descriptor.color.nativePtr = native_color_textures_[i];
             texture_descriptor.depth.nativePtr = native_depth_textures_[i];
@@ -645,11 +572,6 @@ extern "C" {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetSetARCameraBackgroundDelegate(SetARCameraBackground callback) {
     SetARCameraBackgroundDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetRenderCallbackDelegate(RenderCallback callback) {
-    RenderCallbackDelegate = callback;
 }
 
 } // extern "C"
