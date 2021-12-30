@@ -31,7 +31,6 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 @implementation HandTracker
 
 - (instancetype)init {
-    NSLog(@"[hand_tracker] init");
     if (self = [super init]) {
         self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
         // This value can be changed to 1 to save performance.

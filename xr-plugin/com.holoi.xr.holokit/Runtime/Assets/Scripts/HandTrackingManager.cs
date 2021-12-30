@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using UnityEngine.XR.ARFoundation;
 
 namespace UnityEngine.XR.HoloKit
 {
@@ -17,7 +15,7 @@ namespace UnityEngine.XR.HoloKit
 
         private List<GameObject> m_HoloKitHands = new List<GameObject>();
 
-        [SerializeField] private bool m_HandTrackingEnabled = true;
+        [SerializeField] private bool m_EnableHandTrackingOnStart = true;
 
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_TurnOnHandTracking();
@@ -68,9 +66,15 @@ namespace UnityEngine.XR.HoloKit
                 //Debug.Log("HoloKit right hand connected.");
             }
 
-            // Get hand landmarks using the tag
-            GameObject[] leftLandmarks = GameObject.FindGameObjectsWithTag("LandmarkLeft");
-            GameObject[] rightLandmarks = GameObject.FindGameObjectsWithTag("LandmarkRight");
+            // Get hand landmarks
+            GameObject[] leftLandmarks = new GameObject[21];
+            GameObject[] rightLandmarks = new GameObject[21];
+            for (int i = 0; i < transform.GetChild(0).GetChild(0).childCount; i++)
+            {
+                leftLandmarks[i] = transform.GetChild(0).GetChild(0).GetChild(i).gameObject;
+                rightLandmarks[i] = transform.GetChild(0).GetChild(1).GetChild(i).gameObject;
+            }
+            
             System.Array.Reverse(leftLandmarks);
             System.Array.Reverse(rightLandmarks);
             m_MultiHandLandmakrs.Add(leftLandmarks);
@@ -104,7 +108,7 @@ namespace UnityEngine.XR.HoloKit
                 }
             }
 
-            if (m_HandTrackingEnabled)
+            if (m_EnableHandTrackingOnStart)
             {
                 TurnOnHandTracking();
             }
@@ -112,7 +116,7 @@ namespace UnityEngine.XR.HoloKit
 
         private void Update()
         {
-            if(m_HandTrackingEnabled)
+            if(UnityHoloKit_IsHandTrackingOn())
             {
                 UpdateHandLandmarks();
             }

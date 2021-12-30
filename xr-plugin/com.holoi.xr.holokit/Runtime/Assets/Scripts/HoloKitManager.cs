@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.Events;
-using UnityEngine.XR.Management;
 
 namespace UnityEngine.XR.HoloKit
 {
@@ -110,10 +109,7 @@ namespace UnityEngine.XR.HoloKit
             {
                 _instance = this;
             }
-        }
 
-        private void OnEnable()
-        {
             // Get the reference of the display subsystem.
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
@@ -125,14 +121,14 @@ namespace UnityEngine.XR.HoloKit
             // Get the reference of the input subsystem.
             List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
             SubsystemManager.GetSubsystems(inputSubsystems);
-            foreach(var inputSubsystem in inputSubsystems)
+            foreach (var inputSubsystem in inputSubsystems)
             {
-                Debug.Log($"[HoloKitManager] input subsytem id {inputSubsystem.subsystemDescriptor.id}");
                 if (inputSubsystem.subsystemDescriptor.id.Equals("HoloKit Input"))
                 {
                     m_HoloKitInputSubsystem = inputSubsystem;
                 }
             }
+            //m_HoloKitInputSubsystem.Stop();
 
             m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
 
@@ -141,28 +137,22 @@ namespace UnityEngine.XR.HoloKit
             UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(OnCameraDidChangeTrackingState);
         }
 
-        private void OnDisable()
-        {
-
-        }
-
         private void Start()
         {
             Screen.brightness = 1.0f;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             iOS.Device.hideHomeButton = true;
 
-            
+            if (FindObjectOfType<HandTrackingManager>() == null)
+            {
+                m_HoloKitInputSubsystem.Stop();
+            }
         }
 
-        //private void Update()
-        //{
-        //    if (m_CurrentCameraTrackingState != m_NewCameraTrackingState)
-        //    {
-        //        CameraDidChangeTrackingStateEvent?.Invoke(m_NewCameraTrackingState);
-        //        m_CurrentCameraTrackingState = m_NewCameraTrackingState;
-        //    }
-        //}
+        private void OnDestroy()
+        {
+            
+        }
 
         public bool EnableStereoscopicRendering(bool value)
         {
