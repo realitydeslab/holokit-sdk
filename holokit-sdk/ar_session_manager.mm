@@ -11,16 +11,14 @@
 #import "UnityXRTypes.h"
 #import "IUnityInterface.h"
 #import "XR/UnitySubsystemTypes.h"
-
 #import <os/log.h>
 #import <os/signpost.h>
 #import <vector>
-
-//#if TARGET_OS_IPHONE
 #import "low-latency-tracking/low_latency_tracking_api.h"
 #import "holokit_api.h"
 #import "core_motion.h"
 #import "math_helpers.h"
+#import "hand_tracker.h"
 
 typedef void (*DidAddARParticipantAnchor)();
 DidAddARParticipantAnchor DidAddARParticipantAnchorDelegate = NULL;
@@ -56,7 +54,6 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 
 #pragma mark - init
 - (instancetype)init {
-    NSLog(@"[ar_session] init");
     if (self = [super init]) {
         // https://developer.apple.com/videos/play/wwdc2021/10147/
         CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self
@@ -77,11 +74,6 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 - (void)displayLinkCallback:(CADisplayLink *)link {
     self.lastVsyncTimestamp = link.timestamp;
     self.nextVsyncTimestamp = link.targetTimestamp;
-
-//    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-//    os_signpost_id_t spid = os_signpost_id_generate(log);
-//    os_signpost_interval_begin(log, spid, "CADisplayLink");
-//    os_signpost_interval_end(log, spid, "CADisplayLink");
 }
 
 - (void)thermalStateDidChange {
@@ -197,15 +189,11 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
-    NSLog(@"[ar_session] didUpdateFrame");
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
     
-    //    os_log_t log = os_log_create("com.HoloInteractive.TheMagic", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-    //    os_signpost_id_t spid = os_signpost_id_generate(log);
-    //    os_signpost_interval_begin(log, spid, "Update ARKit");
-    
+    // Check for ARSession update
     if(![self.currentARSessionId isEqual:session.identifier]) {
         self.arSession = session;
         self.currentARSessionId = session.identifier;
@@ -216,14 +204,15 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
         }
     }
     
-    if (holokit::LowLatencyTrackingApi::GetInstance()->IsActive()) {
-        holokit::ARKitData data = { frame.timestamp,
-            TransformToEigenVector3d(frame.camera.transform),
-            TransformToEigenQuaterniond(frame.camera.transform),
-            MatrixToEigenMatrix3d(frame.camera.intrinsics) };
-        holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
-    }
+//    if (holokit::LowLatencyTrackingApi::GetInstance()->IsActive()) {
+//        holokit::ARKitData data = { frame.timestamp,
+//            TransformToEigenVector3d(frame.camera.transform),
+//            TransformToEigenQuaterniond(frame.camera.transform),
+//            MatrixToEigenMatrix3d(frame.camera.intrinsics) };
+//        holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
+//    }
     
+    // Check ARWorldMap status
     if (self.isScanningARWorldMap) {
         //NSLog(@"[world_map] world mapping status %d", frame.worldMappingStatus);
         if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
@@ -253,7 +242,10 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
         }
     }
     
-    //os_signpost_interval_end(log, spid, "Update ARKit");
+    // Hand tracking
+    if ([[HandTracker sharedHandTracker] isHandTrackingOn]) {
+        [[HandTracker sharedHandTracker] performHumanHandPoseRequest:frame];
+    }
 }
 
 - (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
@@ -393,7 +385,6 @@ extern "C" {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
-    NSLog(@"[ar_session] UnityHoloKit_SetARSession");
     if (ar_native_session == nullptr) {
         NSLog(@"[ar_session]: native ARSession is NULL.");
         return;

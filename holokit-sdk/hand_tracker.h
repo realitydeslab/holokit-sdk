@@ -9,8 +9,9 @@
 #define hand_tracking_h
 
 #import <Foundation/Foundation.h>
+#import <ARKit/ARKit.h>
 
-@interface LandmarkPosition : NSObject
+@interface HandLandmark : NSObject
 
 @property (assign) float x;
 @property (assign) float y;
@@ -22,14 +23,15 @@
 
 @interface HandTracker : NSObject
 
-@property (nonatomic, strong, nullable) NSMutableArray<LandmarkPosition *> *leftHandLandmarkPositions;
-@property (nonatomic, strong, nullable) NSMutableArray<LandmarkPosition *> *rightHandLandmarkPositions;
-@property (assign) bool isHandTrackingEnabled;
+@property (nonatomic, strong, nullable) NSMutableArray<HandLandmark *> *leftHandLandmarks;
+@property (nonatomic, strong, nullable) NSMutableArray<HandLandmark *> *rightHandLandmarks;
+@property (assign) bool isHandTrackingOn;
 @property (assign) bool isLeftHandTracked;
 @property (assign) bool isRightHandTracked;
-@property (assign) int handPosePredictionInterval;
+@property (assign) int handTrackingExecutionFrameInterval;
 
 + (id)sharedHandTracker;
+- (void)performHumanHandPoseRequest:(ARFrame *)frame;
 
 @end
 

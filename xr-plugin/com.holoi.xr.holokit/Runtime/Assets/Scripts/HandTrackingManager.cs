@@ -15,20 +15,18 @@ namespace UnityEngine.XR.HoloKit
 
         private List<GameObject[]> m_MultiHandLandmakrs = new List<GameObject[]>();
 
-        private int m_CurrentGestureInterval = 0;
-
-        private AROcclusionManager m_OcclusionManager;
-
         private List<GameObject> m_HoloKitHands = new List<GameObject>();
 
         [SerializeField] private bool m_HandTrackingEnabled = true;
 
-        [SerializeField] private bool m_LandmarksVisibilityEnabled = true;
-
-        [SerializeField] private bool m_ColliderEnabled = true;
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_TurnOnHandTracking();
 
         [DllImport("__Internal")]
-        public static extern void UnityHoloKit_EnableHandTracking(bool val);
+        private static extern void UnityHoloKit_TurnOffHandTracking();
+
+        [DllImport("__Internal")]
+        private static extern bool UnityHoloKit_IsHandTrackingOn();
 
         private void Awake()
         {
@@ -44,7 +42,6 @@ namespace UnityEngine.XR.HoloKit
 
         private void Start()
         {
-            m_OcclusionManager = GameObject.Find("HoloKitCamera").GetComponent<AROcclusionManager>();
             m_HoloKitHands.Add(transform.GetChild(0).GetChild(0).gameObject);
             m_HoloKitHands.Add(transform.GetChild(0).GetChild(1).gameObject);
 
@@ -84,11 +81,6 @@ namespace UnityEngine.XR.HoloKit
             {
                 for (int j = 0; j < 21; j++)
                 {
-                    m_MultiHandLandmakrs[i][j].GetComponent<Renderer>().enabled = m_LandmarksVisibilityEnabled;
-                    if (!m_LandmarksVisibilityEnabled)
-                    {
-                        continue;
-                    }
                     if (j == 0)
                     {
                         m_MultiHandLandmakrs[i][j].GetComponent<Renderer>().material.color = Color.gray;
@@ -112,18 +104,9 @@ namespace UnityEngine.XR.HoloKit
                 }
             }
 
-            if (!m_ColliderEnabled)
-            {
-                DisableCollider();
-            }
-
             if (m_HandTrackingEnabled)
             {
-                EnableHandTracking();
-            }
-            else
-            {
-                DisableHandTracking();
+                TurnOnHandTracking();
             }
         }
 
@@ -200,20 +183,6 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        public void DisableCollider()
-        {
-            Debug.Log("[HandTracking]: DisableCollider()");
-            for (int i = 0; i < 2; i++)
-            {
-                GameObject[] handLandmarks = m_MultiHandLandmakrs[i];
-                for (int j = 0; j < 21; j++)
-                {
-                    GameObject handLandmark = handLandmarks[j];
-                    handLandmark.GetComponent<BoxCollider>().enabled = false;
-                }
-            }
-        }
-
         public void ResetPosition()
         {
             Debug.Log("[HandTracking]: ResetPosition()");
@@ -228,32 +197,21 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        public void EnableHandTracking()
+        public void TurnOnHandTracking()
         {
-            UnityHoloKit_EnableHandTracking(true);
-            //m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Best;
-            transform.GetChild(0).transform.gameObject.SetActive(true);
-            m_HandTrackingEnabled = true;
-            Debug.Log("[HandTrackingManager]: hand tracking enabled.");
+            HoloKitManager.Instance.StartHoloKitInputSubsystem();
+            UnityHoloKit_TurnOnHandTracking();
         }
 
-        public void DisableHandTracking()
+        public void TurnOffHandTracking()
         {
-            UnityHoloKit_EnableHandTracking(false);
-            //m_OcclusionManager.requestedEnvironmentDepthMode = ARSubsystems.EnvironmentDepthMode.Disabled;
-            // Enable human segmentation hand tracking
-            //m_OcclusionManager.requestedHumanDepthMode = ARSubsystems.HumanSegmentationDepthMode.Fastest;
-            //m_OcclusionManager.requestedHumanStencilMode = ARSubsystems.HumanSegmentationStencilMode.Fastest;
-            //m_OcclusionManager.requestedOcclusionPreferenceMode = ARSubsystems.OcclusionPreferenceMode.PreferHumanOcclusion;
-            ResetPosition();
-            transform.GetChild(0).transform.gameObject.SetActive(false);
-            m_HandTrackingEnabled = false;
-            Debug.Log("[HandTrackingManager]: hand tracking disabled.");
+            UnityHoloKit_TurnOffHandTracking();
+            HoloKitManager.Instance.StopHoloKitInputSubsystem();
         }
 
-        public bool GetHandTrackingEnabled()
+        public bool IsHandTrackingOn()
         {
-            return m_HandTrackingEnabled;
+            return UnityHoloKit_IsHandTrackingOn();
         }
     }
 }

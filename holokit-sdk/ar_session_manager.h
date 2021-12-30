@@ -4,7 +4,6 @@
 //
 //  Created by Yuchen on 2021/4/8.
 //
-#pragma once
 #import <ARKit/ARKit.h>
 #import <CoreVideo/CoreVideo.h>
 #import "multipeer_session.h"

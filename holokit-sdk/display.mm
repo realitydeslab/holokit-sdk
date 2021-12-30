@@ -38,7 +38,7 @@
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, message, ...)                \
-  XR_TRACE_LOG(trace, "[HoloKitDisplayProvider]: " message "\n", \
+  XR_TRACE_LOG(trace, "[HoloKitDisplayProvider] " message "\n", \
                ##__VA_ARGS__)
 
 NSString* alignment_marker_shader = @
@@ -183,10 +183,13 @@ public:
     }
     
     UnitySubsystemErrorCode Start() {
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Start");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
-    void Stop() const {}
+    void Stop() const {
+        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Stop");
+    }
     
     void Shutdown() const {}
     

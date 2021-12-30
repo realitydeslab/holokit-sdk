@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.Events;
-using System;
+using UnityEngine.XR.Management;
 
 namespace UnityEngine.XR.HoloKit
 {
@@ -18,6 +18,8 @@ namespace UnityEngine.XR.HoloKit
         //{
         //    get => m_DisplaySubsystem;
         //}
+
+        private XRInputSubsystem m_HoloKitInputSubsystem;
 
         private static Vector3 k_CameraToCenterEyeOffset = new Vector3(0.0495f, -0.090635f, -0.07965f);
 
@@ -112,12 +114,24 @@ namespace UnityEngine.XR.HoloKit
 
         private void OnEnable()
         {
-            // Get a reference of the display subsystem.
+            // Get the reference of the display subsystem.
             List<XRDisplaySubsystem> displaySubsystems = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displaySubsystems);
             if (displaySubsystems.Count > 0)
             {
                 m_HoloKitDisplaySubsystem = displaySubsystems[0];
+            }
+
+            // Get the reference of the input subsystem.
+            List<XRInputSubsystem> inputSubsystems = new List<XRInputSubsystem>();
+            SubsystemManager.GetSubsystems(inputSubsystems);
+            foreach(var inputSubsystem in inputSubsystems)
+            {
+                Debug.Log($"[HoloKitManager] input subsytem id {inputSubsystem.subsystemDescriptor.id}");
+                if (inputSubsystem.subsystemDescriptor.id.Equals("HoloKit Input"))
+                {
+                    m_HoloKitInputSubsystem = inputSubsystem;
+                }
             }
 
             m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
@@ -137,6 +151,8 @@ namespace UnityEngine.XR.HoloKit
             Screen.brightness = 1.0f;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             iOS.Device.hideHomeButton = true;
+
+            
         }
 
         //private void Update()
@@ -183,6 +199,16 @@ namespace UnityEngine.XR.HoloKit
         public iOSThermalState GetThermalState()
         {
             return (iOSThermalState)UnityHoloKit_GetThermalState();
+        }
+
+        public void StartHoloKitInputSubsystem()
+        {
+            m_HoloKitInputSubsystem.Start();
+        }
+
+        public void StopHoloKitInputSubsystem()
+        {
+            m_HoloKitInputSubsystem.Stop();
         }
     }
 }

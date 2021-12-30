@@ -1,120 +1,164 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using System.Linq;
 
 namespace UnityEngine.XR.HoloKit
 {
+
     public class LiteHandTrackingManager : MonoBehaviour
     {
 
-        [SerializeField] private AROcclusionManager m_OcclusionManager;
-
-        //public GameObject m_Quad;
+        private float k_MaxHandDepth = 1.0f;
 
         public ComputeShader m_ComputeShader;
 
-        private ComputeBuffer m_ComputeBuffer;
+        private Camera m_ARCamera;
+        private AROcclusionManager m_OcclusionManager;
+        private ARCameraManager m_ARCameraManager;
 
-        private Vector3[] m_ResultBuffer;
-
-        private RenderTexture m_QuadRenderTexture;
-
-        private int m_Width = 256;
-
-        private int m_Height = 192;
-
-        private int m_Kernel;
+        [SerializeField] private bool m_HandTrackingEnabled = true;
 
         private bool m_IsHandValid = false;
 
-        private const float k_MaxHandDepth = 0.6f;
+        [SerializeField] bool m_WriteToObjectPosition = false;
+        [SerializeField] GameObject m_HandObject;
+        private Vector3 m_CurrentHandPosition;
 
-        private const int k_MinHandPixelsThreshold = 500;
+        private int m_InitializeHorizonalHistogramKernel;
+        private int m_InitializeVerticalHistogramKernel;
+        private int m_CalculateHistogramKernel;
 
-        private Camera m_ArCamera;
+        private ComputeBuffer m_VerticalHistogramBuffer;
+        private ComputeBuffer m_HorizonalHistogramBuffer;
+        private uint[] m_VerticalHistogramData;
+        private uint[] m_HorizonalHistogramData;
 
-        [SerializeField] GameObject m_HandSphere;
+        private int m_Width = 0;
+        private int m_Height = 0;
 
-        // Start is called before the first frame update
-        void Start()
+        public Vector3 CurrentHandPosition
         {
-            //m_OcclusionManager = GetComponent<AROcclusionManager>();
-
-            m_ArCamera = Camera.main;
-
-            m_ComputeBuffer = new ComputeBuffer(m_Width * m_Height, sizeof(float) * 3);
-
-            m_Kernel = m_ComputeShader.FindKernel("CSMain");
-            m_QuadRenderTexture = new RenderTexture(m_Width, m_Height, 1);
-            m_QuadRenderTexture.enableRandomWrite = true;
-            m_QuadRenderTexture.Create();
-
-            //m_Quad.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", m_QuadRenderTexture);
-            //m_ComputeShader.SetTexture(m_Kernel, "Result", m_QuadRenderTexture);
-            m_ComputeShader.SetBuffer(m_Kernel, "ResultBuffer", m_ComputeBuffer);
-            m_ComputeShader.SetFloat("Width", m_Width);
-            m_ComputeShader.SetFloat("Height", m_Height);
-            m_ComputeShader.SetFloat("MaxDepth", k_MaxHandDepth);
-
-            m_ResultBuffer = new Vector3[m_Width * m_Height];
-            for (int i = 0; i < m_Width * m_Height; i++)
-            {
-                m_ResultBuffer[i] = new Vector3(0, 0, 0);
-            }
+            get { return m_CurrentHandPosition; }
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Start()
         {
-            if (m_OcclusionManager.humanDepthTexture != null)
-            {
-                m_ComputeShader.SetTexture(m_Kernel, "DepthTexture", m_OcclusionManager.humanDepthTexture);
-                m_ComputeShader.SetTexture(m_Kernel, "StencilTexture", m_OcclusionManager.humanStencilTexture);
-                m_ComputeShader.Dispatch(m_Kernel, Mathf.CeilToInt(m_Width / 8f), Mathf.CeilToInt(m_Height / 8f), 1);
-                m_ComputeBuffer.GetData(m_ResultBuffer);
+            m_ARCameraManager = GameObject.FindObjectOfType<ARCameraManager>();
+            m_ARCamera = m_ARCameraManager.GetComponent<Camera>();
+            m_OcclusionManager = GameObject.FindObjectOfType<AROcclusionManager>();
 
-                Vector3 screenSpacePoint = WeightedAverage(m_ResultBuffer);
+            Debug.Assert(m_ComputeShader != null);
+            Debug.Assert(m_OcclusionManager != null);
+            Debug.Assert(m_ARCamera != null);
+
+            m_HorizonalHistogramBuffer = null;
+            m_VerticalHistogramBuffer = null;
+            m_Width = 0;
+            m_Height = 0;
+
+            m_InitializeHorizonalHistogramKernel = m_ComputeShader.FindKernel("InitializeHorizonalHistogram");
+            m_InitializeVerticalHistogramKernel = m_ComputeShader.FindKernel("InitializeVerticalHistogram");
+            m_CalculateHistogramKernel = m_ComputeShader.FindKernel("CalculateHistogram");
+
+            m_ComputeShader.SetFloat("MaxDepth", k_MaxHandDepth);
+        }
+
+        struct HistStruct
+        {
+            public uint sum;
+        }
+
+        private void Update()
+        {
+            if (m_InitializeHorizonalHistogramKernel >= 0 &&
+                m_InitializeVerticalHistogramKernel >= 0 &&
+                m_CalculateHistogramKernel >= 0 &&
+                m_OcclusionManager.humanDepthTexture != null && m_OcclusionManager.humanStencilTexture != null)
+            {
+                if (m_Width == 0 || m_Height == 0)
+                {
+                    m_Width = m_OcclusionManager.humanDepthTexture.width;
+                    m_Height = m_OcclusionManager.humanDepthTexture.height;
+                    // Debug.Log($"Update Holokit Hand Tracking with humanDepthTexture.width={m_Width} humanDepthTexture.height={m_Height}");
+                    // Debug.Log($"Update Holokit Hand Tracking with m_OcclusionManager.humanStencilTexture={m_OcclusionManager.humanStencilTexture.width} m_OcclusionManager.humanStencilTexture={m_OcclusionManager.humanStencilTexture.height}");
+
+                    m_HorizonalHistogramBuffer = new ComputeBuffer(m_Width, sizeof(uint));
+                    m_VerticalHistogramBuffer = new ComputeBuffer(m_Height, sizeof(uint));
+                    m_HorizonalHistogramData = new uint[m_Width];
+                    m_VerticalHistogramData = new uint[m_Height];
+                    m_ComputeShader.SetBuffer(m_InitializeHorizonalHistogramKernel, "HorizonalHistogram", m_HorizonalHistogramBuffer);
+                    m_ComputeShader.SetBuffer(m_InitializeVerticalHistogramKernel, "VerticalHistogram", m_VerticalHistogramBuffer);
+                    m_ComputeShader.SetBuffer(m_CalculateHistogramKernel, "HorizonalHistogram", m_HorizonalHistogramBuffer);
+                    m_ComputeShader.SetBuffer(m_CalculateHistogramKernel, "VerticalHistogram", m_VerticalHistogramBuffer);
+                }
+
+                m_ComputeShader.Dispatch(m_InitializeHorizonalHistogramKernel, Mathf.CeilToInt(m_Width / 64f), 1, 1);
+                m_ComputeShader.Dispatch(m_InitializeVerticalHistogramKernel, Mathf.CeilToInt(m_Height / 64f), 1, 1);
+
+                m_ComputeShader.SetTexture(m_CalculateHistogramKernel, "DepthTexture", m_OcclusionManager.humanDepthTexture);
+                m_ComputeShader.SetTexture(m_CalculateHistogramKernel, "StencilTexture", m_OcclusionManager.humanStencilTexture);
+                m_ComputeShader.Dispatch(m_CalculateHistogramKernel, Mathf.CeilToInt(m_Width / 8f), Mathf.CeilToInt(m_Height / 8f), 1);
+
+                m_HorizonalHistogramBuffer.GetData(m_HorizonalHistogramData);
+                m_VerticalHistogramBuffer.GetData(m_VerticalHistogramData);
+
+                float xCoordinate = m_HorizonalHistogramData.Select((x, i) => new { weightedX = (float)x * (m_Width - i) / m_Width, i }).Aggregate((a, a1) => a.weightedX > a1.weightedX ? a : a1).i; //Friendly for Right Hand
+                float yCoordinate = m_Height - m_VerticalHistogramData.Select((x, i) => new { weightedX = (float)x * (m_Height - i) / m_Height, i }).Aggregate((a, a1) => a.weightedX > a1.weightedX ? a : a1).i;
+                float xCoordinateInCamera = xCoordinate / m_Width * m_ARCamera.pixelWidth;
+                float yCoordinateInCamera = yCoordinate / m_Height * m_ARCamera.pixelHeight;
+                float zCoordinateInCamera = 0.4f;
+
+                float moreThanThresholdX = m_HorizonalHistogramData.Where(x => x > 10).Count();
+                float moreThanThresholdY = m_VerticalHistogramData.Where(x => x > 10).Count();
+
+                m_IsHandValid = moreThanThresholdX / m_Width > 0.05f && moreThanThresholdY / m_Height > 0.05f;
+                //Debug.Log($"Update xCoordinate={xCoordinate} yCoordinate={yCoordinate} moreThanThresholdX={moreThanThresholdX} moreThanThresholdY={moreThanThresholdY}");
+
                 if (m_IsHandValid)
                 {
-                    m_HandSphere.SetActive(true);
-                    float xCoordinate = (screenSpacePoint.x / (m_Width - 1)) * (Screen.width - 1) + 1;
-                    float yCoordinate = (screenSpacePoint.y / (m_Height - 1)) * (Screen.height - 1) + 1;
-                    m_HandSphere.transform.position = m_ArCamera.ScreenToWorldPoint(new Vector3(xCoordinate, yCoordinate, screenSpacePoint.z));
+                    m_CurrentHandPosition = m_ARCamera.ScreenToWorldPoint(new Vector3(xCoordinateInCamera, yCoordinateInCamera, zCoordinateInCamera));
+                    if (m_WriteToObjectPosition)
+                    {
+                        m_HandObject.SetActive(true);
+                        m_HandObject.transform.position = m_CurrentHandPosition;
+                        //Debug.Log("Hand is valid with a value of:" + m_HandObject.transform.position);
+                    }
                 }
                 else
                 {
-                    m_HandSphere.SetActive(false);
+                    m_CurrentHandPosition = Camera.main.transform.position;
+                    if (m_WriteToObjectPosition)
+                    {
+                        m_HandObject.SetActive(true);
+                        m_HandObject.transform.position = m_CurrentHandPosition;
+                    }
+                }
+            }
+            else
+            {
+                //m_HandCenter.SetActive(false);
+                m_IsHandValid = false;
+                m_CurrentHandPosition = Camera.main.transform.position;
+                if (m_WriteToObjectPosition)
+                {
+                    m_HandObject.SetActive(true);
+                    m_HandObject.transform.position = m_CurrentHandPosition;
                 }
             }
         }
 
-        Vector3 WeightedAverage(Vector3[] input)
+        void OnDestroy()
         {
-            Vector3 accumulatedResult = new Vector3(0, 0, 0);
-            int pixelSum = 0;
-            float totalWeight = 0;
-            int length = input.Length;
-            for (int i = 0; i < length; i++)
+            if (null != m_HorizonalHistogramBuffer)
             {
-                if (input[i].x != 0 || input[i].y != 0)
-                {
-                    float weight = Mathf.FloorToInt(i / (float)m_Width) + 1;
-                    accumulatedResult += input[i] * weight * weight;
-                    totalWeight += weight * weight;
-                    pixelSum++;
-                }
+                m_HorizonalHistogramBuffer.Release();
+                m_HorizonalHistogramBuffer = null;
             }
-            if (pixelSum > k_MinHandPixelsThreshold)
+
+            if (null != m_VerticalHistogramBuffer)
             {
-                m_IsHandValid = true;
+                m_VerticalHistogramBuffer.Release();
+                m_VerticalHistogramBuffer = null;
             }
-            else
-            {
-                m_IsHandValid = false;
-                m_HandSphere.transform.position = new Vector3(0f, 3f, 0f);
-            }
-            return new Vector3(accumulatedResult.x / totalWeight, accumulatedResult.y / totalWeight, accumulatedResult.z / totalWeight);
         }
     }
 }

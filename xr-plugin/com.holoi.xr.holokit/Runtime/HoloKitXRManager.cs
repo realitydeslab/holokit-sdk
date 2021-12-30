@@ -52,25 +52,12 @@ namespace UnityEngine.XR.HoloKit
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void OnBeforeSceneLoad()
         {
-            var xrSettings = XRGeneralSettings.Instance;
-            if (xrSettings == null)
-            {
-                return;
-            }
-
-            var xrManager = xrSettings.Manager;
-            if (xrManager == null)
-            {
-                Debug.Log($"XRManagerSettings is null.");
-                return;
-            }
-            // Manually load loaders
-            foreach (var loader in xrManager.activeLoaders)
+            foreach (var loader in XRGeneralSettings.Instance.Manager.activeLoaders)
             {
                 if (loader.name.Equals("Holo Kit XR Loader"))
                 {
-                    isHoloKitInitialized = true;
                     loader.Initialize();
+                    loader.Start();
                 }
             }
 
@@ -86,7 +73,7 @@ namespace UnityEngine.XR.HoloKit
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void OnAfterSceneLoad()
         {
-   
+
         }
     }
 }

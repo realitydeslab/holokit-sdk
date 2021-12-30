@@ -12,13 +12,6 @@
 #import "ar_session_manager.h"
 #import "IUnityInterface.h"
 
-#define CLAMP(x, low, high) ({\
-__typeof__(x) __x = (x); \
-__typeof__(low) __low = (low);\
-__typeof__(high) __high = (high);\
-__x > __high ? __high : (__x < __low ? __low : __x);\
-})
-
 static const float kMaxLandmarkDepth = 0.6f;
 static const float kMaxLandmarkStartInterval = 0.12f;
 static const float kMaxLandmark1Interval = 0.05f;
@@ -38,6 +31,7 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 @implementation HandTracker
 
 - (instancetype)init {
+    NSLog(@"[hand_tracker] init");
     if (self = [super init]) {
         self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
         // This value can be changed to 1 to save performance.
@@ -45,21 +39,21 @@ static const float kMaxLandmarkEndInterval = 0.024f;
         self.handPoseRequest.revision = VNDetectHumanHandPoseRequestRevision1;
         
         self.frameCount = 0;
-        self.handPosePredictionInterval = 8;
+        self.handTrackingExecutionFrameInterval = 4;
         
-        self.leftHandLandmarkPositions = [[NSMutableArray alloc] init];
-        self.rightHandLandmarkPositions = [[NSMutableArray alloc] init];
+        self.leftHandLandmarks = [[NSMutableArray alloc] init];
+        self.rightHandLandmarks = [[NSMutableArray alloc] init];
         for(int i = 0; i < 21; i++){
-            LandmarkPosition *position = [[LandmarkPosition alloc] initWithX:0.0 y:0.0 z:0.0];
-            [self.leftHandLandmarkPositions addObject:position];
-            [self.rightHandLandmarkPositions addObject:position];
+            HandLandmark *position = [[HandLandmark alloc] initWithX:0.0 y:0.0 z:0.0];
+            [self.leftHandLandmarks addObject:position];
+            [self.rightHandLandmarks addObject:position];
         }
         
         self.isLeftHandTracked = false;
         self.isRightHandTracked = false;
         self.lastHandTrackingTimestamp = [[NSProcessInfo processInfo] systemUptime];
 
-        self.isHandTrackingEnabled = YES;
+        self.isHandTrackingOn = NO;
     }
     return self;
 }
@@ -73,33 +67,137 @@ static const float kMaxLandmarkEndInterval = 0.024f;
     return _sharedObject;
 }
 
-- (simd_float3)unprojectScreenPoint:(CGPoint)screenPoint depth:(float)z {
-    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
+- (void)performHumanHandPoseRequest:(ARFrame *)frame {
+    VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc]
+                                             initWithCVPixelBuffer: frame.capturedImage
+                                             orientation:kCGImagePropertyOrientationUp options:[NSMutableDictionary dictionary]];
+    self.frameCount++;
+    if (self.frameCount % self.handTrackingExecutionFrameInterval != 0) return;
+ 
+    @try {
+        NSArray<VNRequest *> * requests = [[NSArray alloc] initWithObjects:self.handPoseRequest, nil];
+        [requestHandler performRequests:requests error:nil];
+        unsigned long numOfHands = self.handPoseRequest.results.count;
+        if (numOfHands == 0) {
+            // There is no hand in this frame
+            self.isLeftHandTracked = self.isRightHandTracked = false;
+            return;
+        }
+        if (numOfHands == 1) {
+            self.isLeftHandTracked = true;
+            self.isRightHandTracked = false;
+        } else {
+            self.isLeftHandTracked = self.isRightHandTracked = true;
+        }
     
+        // Acquire scene depth.
+        ARDepthData* sceneDepth = frame.sceneDepth;
+        if (sceneDepth == nil) {
+            NSLog(@"[ar_session]: failed to acquire scene depth.");
+            return;
+        }
+        CVPixelBufferRef depthBuffer = sceneDepth.depthMap;
+        CVPixelBufferLockBaseAddress(depthBuffer, 0);
+        size_t depthBufferWidth = CVPixelBufferGetWidth(depthBuffer);
+        size_t depthBufferHeight = CVPixelBufferGetHeight(depthBuffer);
+        Float32 *depthBufferBaseAddress = (Float32*)CVPixelBufferGetBaseAddress(depthBuffer);
+        // Go through all detected hands
+        for (int handIndex = 0; handIndex < numOfHands; handIndex++) {
+            VNHumanHandPoseObservation *handPoseObservation = self.handPoseRequest.results[handIndex];
+            if (handPoseObservation == nil) {
+                // Failed to perform request
+                return;
+            }
+            // TODO: the accuracy of chirality might be improved in the future.
+//            NSLog(@"chirality %d", handPoseObservation.chirality);
+//            NSLog(@"confidence %f", handPoseObservation.confidence);
+            NSDictionary<VNRecognizedPointKey, VNRecognizedPoint*>* landmarks = [handPoseObservation recognizedPointsForGroupKey:VNRecognizedPointGroupKeyAll error:nil];
+            float landmarkDepths[21];
+            // Go through all hand landmakrs
+            for(int landmarkIndex = 0; landmarkIndex < 21; landmarkIndex++) {
+                VNRecognizedPointKey key = [HandTracker landmarkIndexToHumanHandPoseKey:landmarkIndex];
+                // Landmark's x and y coordinate are originated from bottom-left corner
+                // and is within 0 and 1.
+                // The y is reverted compared to Google Mediapipe landmark.
+                VNRecognizedPoint *landmark = [landmarks objectForKey:key];
+
+                // Calculte the screen space coordinate of this point.
+                int screenX = (CGFloat)landmark.x * frame.camera.imageResolution.width;
+                int screenY = (CGFloat)(1 - landmark.y) * frame.camera.imageResolution.height;
+                CGPoint screenPoint = CGPointMake(screenX, screenY);
+
+                // Calculate the coordinate of this point in depth buffer space.
+                int depthX = landmark.x * depthBufferWidth;
+                int depthY = (1 - landmark.y) * depthBufferHeight;
+                float landmarkDepth = depthBufferBaseAddress[depthY * depthBufferWidth + depthX];
+
+                // Depth validation to eliminate false positive results.
+                if (landmarkIndex == 0 && landmarkDepth > kMaxLandmarkDepth) {
+                    // The depth of the wrist is not reasonable, which means that
+                    // this result is false positive, abandon it.
+                    break;
+                }
+                if (landmarkIndex != 0) {
+                    int landmarkParentIndex = [HandTracker getParentLandmarkIndex:landmarkIndex];
+                    if (landmarkDepth > kMaxLandmarkDepth) {
+                        landmarkDepth = landmarkDepths[landmarkParentIndex];
+                    }
+                    if (landmarkIndex == 1 || landmarkIndex == 5 || landmarkIndex == 9 || landmarkIndex == 13 || landmarkIndex == 17) {
+                        if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmarkStartInterval) {
+                            landmarkDepth = landmarkDepths[landmarkParentIndex];
+                        }
+                    } else if (landmarkIndex == 2 || landmarkIndex == 6 || landmarkIndex == 10 || landmarkIndex == 14 || landmarkIndex == 18) {
+                        if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmark1Interval) {
+                            landmarkDepth = landmarkDepths[landmarkParentIndex];
+                        }
+                    } else if (landmarkIndex == 3 || landmarkIndex == 7 || landmarkIndex == 11 || landmarkIndex == 15 || landmarkIndex == 19) {
+                        if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmark2Interval) {
+                            landmarkDepth = landmarkDepths[landmarkParentIndex];
+                        }
+                    } else {
+                        if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmarkEndInterval) {
+                            landmarkDepth = landmarkDepths[landmarkParentIndex];
+                        }
+                    }
+                }
+                landmarkDepths[landmarkIndex] = landmarkDepth;
+
+                simd_float3 unprojectedPoint = [HandTracker unprojectScreenPoint:screenPoint depth:landmarkDepth frame:frame];
+                HandLandmark *position = [[HandLandmark alloc] initWithX:unprojectedPoint.x y:unprojectedPoint.y z:unprojectedPoint.z];
+                if (handIndex == 0) {
+                    [self.leftHandLandmarks replaceObjectAtIndex:landmarkIndex withObject:position];
+                } else if (handIndex == 1) {
+                    [self.rightHandLandmarks replaceObjectAtIndex:landmarkIndex withObject:position];
+                }
+            }
+        }
+    } @catch(NSException * e) {
+        NSLog(@"Vision hand tracking updating failed.");
+    }
+}
+
++ (simd_float3)unprojectScreenPoint:(CGPoint)screenPoint depth:(float)z frame:(ARFrame *)frame {
     simd_float4x4 translation = matrix_identity_float4x4;
     translation.columns[3].z = -z;
-    simd_float4x4 planeOrigin = simd_mul(arSession.currentFrame.camera.transform, translation);
+    simd_float4x4 planeOrigin = simd_mul(frame.camera.transform, translation);
     simd_float3 xAxis = simd_make_float3(1, 0, 0);
     simd_float4x4 rotation = simd_matrix4x4(simd_quaternion(0.5 * M_PI, xAxis));
     simd_float4x4 plane = simd_mul(planeOrigin, rotation);
-    simd_float3 unprojectedPoint = [arSession.currentFrame.camera unprojectPoint:screenPoint ontoPlaneWithTransform:plane orientation:UIInterfaceOrientationLandscapeRight viewportSize:arSession.currentFrame.camera.imageResolution];
-    
+    simd_float3 unprojectedPoint = [frame.camera unprojectPoint:screenPoint ontoPlaneWithTransform:plane orientation:UIInterfaceOrientationLandscapeRight viewportSize:frame.camera.imageResolution];
     return unprojectedPoint;
 }
 
-//- (bool)isBlooming:(NSArray<Landmark *> *)landmarks {
-//    if (landmarks[4].y < landmarks[3].y < landmarks[2].y < landmarks[1].y &&
-//        landmarks[8].y < landmarks[7].y < landmarks[6].y < landmarks[5].y &&
-//        landmarks[12].y < landmarks[11].y < landmarks[10].y < landmarks[9].y &&
-//        landmarks[16].y < landmarks[15].y < landmarks[14].y < landmarks[13].y &&
-//        landmarks[20].y < landmarks[19].y < landmarks[18].y < landmarks[17].y) {
-//        //NSLog(@"[ar_session]: blooming");
-//        return true;
-//    }
-//    return false;
-//}
++ (int)getParentLandmarkIndex:(int)landmarkIndex {
+    int parentIndex;
+    if (landmarkIndex == 0 || landmarkIndex == 5 || landmarkIndex == 9 || landmarkIndex == 13 || landmarkIndex == 17) {
+        parentIndex = 0;
+    } else{
+        parentIndex = landmarkIndex - 1;
+    }
+    return parentIndex;
+}
 
-- (int)humanHandPoseKeyToIndex:(NSString *)key {
++ (int)humanHandPoseKeyToIndex:(NSString *)key {
     int index = 0;
     if ([key isEqual:VNHumanHandPoseObservationJointNameWrist]) {
         index = 0;
@@ -147,7 +245,7 @@ static const float kMaxLandmarkEndInterval = 0.024f;
     return index;
 }
 
-- (VNRecognizedPointKey)landmarkIndexToHumanHandPoseKey:(int)landmarkIndex {
++ (VNRecognizedPointKey)landmarkIndexToHumanHandPoseKey:(int)landmarkIndex {
     VNRecognizedPointKey result = VNHumanHandPoseObservationJointNameWrist;
     switch(landmarkIndex) {
         case 1:
@@ -216,131 +314,9 @@ static const float kMaxLandmarkEndInterval = 0.024f;
     return result;
 }
 
-+ (int)getParentLandmarkIndex:(int)landmarkIndex {
-    int parentIndex;
-    if (landmarkIndex == 0 || landmarkIndex == 5 || landmarkIndex == 9 || landmarkIndex == 13 || landmarkIndex == 17) {
-        parentIndex = 0;
-    } else{
-        parentIndex = landmarkIndex - 1;
-    }
-    return parentIndex;
-}
-
-- (void)performHumanHandPoseRequest:(ARFrame *)frame {
-    VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc]
-                                             initWithCVPixelBuffer: frame.capturedImage
-                                             orientation:kCGImagePropertyOrientationUp options:[NSMutableDictionary dictionary]];
-    @try {
-        NSArray<VNRequest *> * requests = [[NSArray alloc] initWithObjects:self.handPoseRequest, nil];
-        [requestHandler performRequests:requests error:nil];
-        unsigned long numOfHands = self.handPoseRequest.results.count;
-        if (numOfHands == 0) {
-            // There is no hand in this frame
-            self.isLeftHandTracked = self.isRightHandTracked = false;
-            return;
-        }
-        if (numOfHands == 1) {
-            self.isLeftHandTracked = true;
-            self.isRightHandTracked = false;
-        } else {
-            self.isLeftHandTracked = self.isRightHandTracked = true;
-        }
-    
-        // Acquire scene depth.
-        ARDepthData* sceneDepth = frame.sceneDepth;
-        if (sceneDepth == nil) {
-            NSLog(@"[ar_session]: failed to acquire scene depth.");
-            return;
-        }
-        CVPixelBufferRef depthBuffer = sceneDepth.depthMap;
-        CVPixelBufferLockBaseAddress(depthBuffer, 0);
-        size_t depthBufferWidth = CVPixelBufferGetWidth(depthBuffer);
-        size_t depthBufferHeight = CVPixelBufferGetHeight(depthBuffer);
-        Float32 *depthBufferBaseAddress = (Float32*)CVPixelBufferGetBaseAddress(depthBuffer);
-        // Go through all detected hands
-        for (int handIndex = 0; handIndex < numOfHands; handIndex++) {
-            VNHumanHandPoseObservation *handPoseObservation = self.handPoseRequest.results[handIndex];
-            if (handPoseObservation == nil) {
-                // Failed to perform request.
-                return;
-            }
-            // TODO: the accuracy of chirality might be improved in the future.
-            //NSLog(@"chirality %d", handPoseObservation.chirality);
-            //NSLog(@"confidence %f", handPoseObservation.confidence);
-            NSDictionary<VNRecognizedPointKey, VNRecognizedPoint*>* landmarks = [handPoseObservation recognizedPointsForGroupKey:VNRecognizedPointGroupKeyAll error:nil];
-            float landmarkDepths[21];
-            // Go through all hand landmakrs
-            for(int landmarkIndex = 0; landmarkIndex < 21; landmarkIndex++) {
-                VNRecognizedPointKey key = [self landmarkIndexToHumanHandPoseKey:landmarkIndex];
-                // Landmark's x and y coordinate are originated from bottom-left corner
-                // and is within 0 and 1.
-                // The y is reverted compared to Google Mediapipe landmark.
-                VNRecognizedPoint *landmark = [landmarks objectForKey:key];
-                //NSLog(@"landmark: %f, %f", landmark.x, landmark.y);
-                
-                // Calculte the screen space coordinate of this point.
-                int screenX = (CGFloat)landmark.x * frame.camera.imageResolution.width;
-                int screenY = (CGFloat)(1 - landmark.y) * frame.camera.imageResolution.height;
-                CGPoint screenPoint = CGPointMake(screenX, screenY);
-                
-                // Calculate the coordinate of this point in depth buffer space.
-                int depthX = landmark.x * depthBufferWidth;
-                int depthY = (1 - landmark.y) * depthBufferHeight;
-                float landmarkDepth = depthBufferBaseAddress[depthY * depthBufferWidth + depthX];
-                //landmarkDepth -= 0.05f;
-                
-                // Depth validation to eliminate false positive results.
-                if (landmarkIndex == 0 && landmarkDepth > kMaxLandmarkDepth) {
-                    // The depth of the wrist is not reasonable, which means that
-                    // this result is false positive, abandon it.
-                    break;
-                }
-                if (landmarkIndex != 0) {
-                    int landmarkParentIndex = [HandTracker getParentLandmarkIndex:landmarkIndex];
-                    if (landmarkDepth > kMaxLandmarkDepth) {
-                        landmarkDepth = landmarkDepths[landmarkParentIndex];
-                    }
-                    if (landmarkIndex == 1 || landmarkIndex == 5 || landmarkIndex == 9 || landmarkIndex == 13 || landmarkIndex == 17) {
-                        if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmarkStartInterval) {
-                            landmarkDepth = landmarkDepths[landmarkParentIndex];
-                        }
-                    } else if (landmarkIndex == 2 || landmarkIndex == 6 || landmarkIndex == 10 || landmarkIndex == 14 || landmarkIndex == 18) {
-                        if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmark1Interval) {
-                            landmarkDepth = landmarkDepths[landmarkParentIndex];
-                        }
-                    } else if (landmarkIndex == 3 || landmarkIndex == 7 || landmarkIndex == 11 || landmarkIndex == 15 || landmarkIndex == 19) {
-                        if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmark2Interval) {
-                            landmarkDepth = landmarkDepths[landmarkParentIndex];
-                        }
-                    } else {
-                        if (abs(landmarkDepth - landmarkDepths[landmarkParentIndex]) > kMaxLandmarkEndInterval) {
-                            landmarkDepth = landmarkDepths[landmarkParentIndex];
-                        }
-                    }
-                }
-                landmarkDepths[landmarkIndex] = landmarkDepth;
-                
-                simd_float3 unprojectedPoint = [self unprojectScreenPoint:screenPoint depth:landmarkDepth];
-                LandmarkPosition *position = [[LandmarkPosition alloc] initWithX:unprojectedPoint.x y:unprojectedPoint.y z:unprojectedPoint.z];
-                if (handIndex == 0) {
-                    [self.leftHandLandmarkPositions replaceObjectAtIndex:landmarkIndex withObject:position];
-                } else if (handIndex == 1) {
-                    [self.rightHandLandmarkPositions replaceObjectAtIndex:landmarkIndex withObject:position];
-                }
-            }
-        }
-    } @catch(NSException * e) {
-        NSLog(@"Vision hand tracking updating failed.");
-    }
-}
-
-- (float)euclideanDistance:(simd_float2)point1 point2:(simd_float2)point2 {
-    return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
-}
-
 @end
 
-@implementation LandmarkPosition
+@implementation HandLandmark
 
 - (instancetype)initWithX:(float)x y:(float)y z:(float)z {
     self = [super init];
@@ -356,16 +332,20 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 extern "C" {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_EnableHandTracking(bool enabled) {
-    HandTracker* hand_tracker = [HandTracker sharedHandTracker];
-    hand_tracker.isHandTrackingEnabled = enabled;
-    NSLog(@"[ar_session]: EnableHandTracking(%d)", enabled);
+UnityHoloKit_TurnOnHandTracking() {
+    [[HandTracker sharedHandTracker] setIsHandTrackingOn:YES];
+    NSLog(@"[hand_tracker] did turn on hand tracking");
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetHandTrackingInterval(int val) {
-    HandTracker* hand_tracker = [HandTracker sharedHandTracker];
-    [hand_tracker setHandPosePredictionInterval:val];
+UnityHoloKit_TurnOffHandTracking() {
+    [[HandTracker sharedHandTracker] setIsHandTrackingOn:NO];
+    NSLog(@"[hand_tracker] did turn off hand tracking");
+}
+
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_IsHandTrackingOn(){
+    return [[HandTracker sharedHandTracker] isHandTrackingOn];
 }
 
 }
