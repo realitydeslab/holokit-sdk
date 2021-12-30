@@ -56,6 +56,7 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 
 #pragma mark - init
 - (instancetype)init {
+    NSLog(@"[ar_session] init");
     if (self = [super init]) {
         // https://developer.apple.com/videos/play/wwdc2021/10147/
         CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self
@@ -196,6 +197,7 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
+    NSLog(@"[ar_session] didUpdateFrame");
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
@@ -391,6 +393,7 @@ extern "C" {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
+    NSLog(@"[ar_session] UnityHoloKit_SetARSession");
     if (ar_native_session == nullptr) {
         NSLog(@"[ar_session]: native ARSession is NULL.");
         return;

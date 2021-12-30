@@ -1,5 +1,18 @@
 {
   "dependencies": {
+    "com.holoi.xr.holokit": {
+      "version": "file:../../../xr-plugin/com.holoi.xr.holokit",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.xr.management": "4.0.7",
+        "com.unity.xr.arfoundation": "4.2.1",
+        "com.unity.xr.arkit": "4.2.1",
+        "com.unity.render-pipelines.universal": "12.1.1",
+        "com.unity.visualeffectgraph": "12.1.1",
+        "com.unity.netcode.gameobjects": "1.0.0-pre.3"
+      }
+    },
     "com.unity.burst": {
       "version": "1.6.0",
       "depth": 2,
@@ -237,19 +250,6 @@
         "com.unity.xr.management": "4.0.1"
       },
       "url": "https://packages.unity.com"
-    },
-    "com.unity.xr.holokit": {
-      "version": "file:../../../xr-plugin/com.unity.xr.holokit",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.unity.xr.management": "4.0.7",
-        "com.unity.xr.arfoundation": "4.2.1",
-        "com.unity.xr.arkit": "4.2.1",
-        "com.unity.render-pipelines.universal": "12.1.1",
-        "com.unity.visualeffectgraph": "12.1.1",
-        "com.unity.netcode.gameobjects": "1.0.0-pre.3"
-      }
     },
     "com.unity.xr.legacyinputhelpers": {
       "version": "2.1.8",

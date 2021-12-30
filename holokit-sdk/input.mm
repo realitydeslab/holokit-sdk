@@ -18,7 +18,7 @@
 #import "math_helpers.h"
 #import "holokit_api.h"
 #import "low-latency-tracking/low_latency_tracking_api.h"
-#import "hand_tracking.h"
+//#import "hand_tracker.h"
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_INPUT_XR_TRACE_LOG(trace, message, ...)                \

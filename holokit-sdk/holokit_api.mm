@@ -9,7 +9,7 @@
 #import "IUnityInterface.h"
 #import <sys/utsname.h>
 #import "display.mm"
-#import "hand_tracking.h"
+#import "hand_tracker.h"
 
 #define DEGREES_TO_RADIANS(degrees) ((degrees) * (M_PI / 180.0))
 

@@ -1,0 +1,16 @@
+{
+	"name": "HoloKit XR Plugin",
+	"version": "1.0.0",
+	"libraryName": "UnityHoloKit",
+
+	"displays": [
+		{
+			"id": "HoloKit Display"
+		}
+	],
+	"inputs": [
+		{
+			"id": "HoloKit Input"
+		}
+	]
+}
