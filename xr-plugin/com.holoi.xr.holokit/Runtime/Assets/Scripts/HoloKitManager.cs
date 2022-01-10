@@ -176,11 +176,6 @@ namespace UnityEngine.XR.HoloKit
             DidChange2AREvent?.Invoke();
         }
 
-        //public void SetLowLatencyTrackingActive(bool value)
-        //{
-        //    UnityHoloKit_SetLowLatencyTrackingApiActive(value);
-        //}
-
         public iOSThermalState GetThermalState()
         {
             return (iOSThermalState)UnityHoloKit_GetThermalState();

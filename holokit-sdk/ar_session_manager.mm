@@ -13,7 +13,6 @@
 #import "XR/UnitySubsystemTypes.h"
 #import <os/log.h>
 #import <os/signpost.h>
-#import <vector>
 #import "low-latency-tracking/low_latency_tracking_api.h"
 #import "holokit_api.h"
 #import "core_motion.h"
@@ -25,9 +24,6 @@ DidAddARParticipantAnchor DidAddARParticipantAnchorDelegate = NULL;
 
 typedef void (*ARSessionDidUpdate)();
 ARSessionDidUpdate ARSessionDidUpdateDelegate = NULL;
-
-typedef void (*DidReceiveMagicAnchor)(int clientId, int magicIndex, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float rotW);
-DidReceiveMagicAnchor DidReceiveMagicAnchorDelegate = NULL;
 
 typedef void (*ThermalStateDidChange)(int state);
 ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
@@ -440,11 +436,6 @@ UnityHoloKit_SetDidAddARParticipantAnchorDelegate(DidAddARParticipantAnchor call
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetARSessionDidUpdateDelegate(ARSessionDidUpdate callback) {
     ARSessionDidUpdateDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidReceiveMagicAnchorDelegate(DidReceiveMagicAnchor callback) {
-    DidReceiveMagicAnchorDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
