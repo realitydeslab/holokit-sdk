@@ -37,6 +37,9 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
 typedef void (*DidFindARWorldMap)(const char *mapName);
 DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 
+typedef void (*DidFinishSavingARWorldMap)();
+DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
+
 @interface ARSessionManager() <ARSessionDelegate>
 
 @property (assign) BOOL isSynchronizationComplete;
@@ -132,6 +135,9 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
         
         [mapData writeToURL:url atomically:true];
         NSLog(@"[world_map] did save world map of size %f mb to path %@", mapData.length / (1024.0 * 1024.0), url);
+        if (DidFinishSavingARWorldMapDelegate != NULL) {
+            DidFinishSavingARWorldMapDelegate();
+        }
     }];
 }
 
@@ -517,6 +523,11 @@ UnityHoloKit_SetDidFindARWorldMapDelegate(DidFindARWorldMap callback) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_LoadARWorldMap() {
     [[ARSessionManager sharedARSessionManager] loadARWorldMap];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidFinishSavingARWorldMapDelegate(DidFinishSavingARWorldMap callback) {
+    DidFinishSavingARWorldMapDelegate = callback;
 }
 
 } // extern "C"
