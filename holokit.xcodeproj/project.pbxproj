@@ -60,6 +60,7 @@
 		4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */; };
 		4BD62BC926D9ECAD00CC0197 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC826D9ECAD00CC0197 /* state.cpp */; };
 		4BD62BCC26D9ECC500CC0197 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BCB26D9ECC500CC0197 /* utility.cpp */; };
+		4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* Crypto.swift */; };
 		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
 		4BE7B63E2611051A001F39F2 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
 		4BE7B64F26110544001F39F2 /* load.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* load.mm */; };
@@ -292,6 +293,7 @@
 		4BD62BCA26D9ECB800CC0197 /* state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state.h; sourceTree = "<group>"; };
 		4BD62BCB26D9ECC500CC0197 /* utility.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
 		4BD62BCD26D9ECD100CC0197 /* utility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
+		4BD9A6A0278AA53C000BD266 /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE7B62126110504001F39F2 /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 		4BE7B63D2611051A001F39F2 /* input.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = input.mm; sourceTree = "<group>"; };
@@ -678,6 +680,7 @@
 				4B188ACF26F432B4001FD67D /* hand_tracker.mm */,
 				4B610F0926F5C6BA00CB2AEA /* core_haptics.h */,
 				4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */,
+				4BD9A6A0278AA53C000BD266 /* Crypto.swift */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -1264,6 +1267,7 @@
 					};
 					4BE7B60A261104ED001F39F2 = {
 						CreatedOnToolsVersion = 12.4;
+						LastSwiftMigration = 1320;
 					};
 					965106A72576659000F076B5 = {
 						CreatedOnToolsVersion = 12.2;
@@ -1482,6 +1486,7 @@
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
 				4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */,
 				4B1C73E726C4F6BD0063AC2A /* speech_recognizer.m in Sources */,
+				4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1878,6 +1883,7 @@
 		4BE7B611261104ED001F39F2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
@@ -1889,6 +1895,11 @@
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/sdk/third_party",
@@ -1896,6 +1907,9 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1903,6 +1917,7 @@
 		4BE7B612261104ED001F39F2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
@@ -1914,6 +1929,11 @@
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/sdk/third_party",
@@ -1921,6 +1941,8 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

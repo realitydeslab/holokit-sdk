@@ -45,13 +45,20 @@ public:
     
     int GetScreenHeight() { return screen_height_; }
     
-    bool IsStereoscopicRendering() { return is_stereoscopic_rendering_; }
+    bool GetIsStereoscopicRendering() { return is_stereoscopic_rendering_; }
     
-    void EnableStereoscopicRendering(bool value) { is_stereoscopic_rendering_ = value; }
+    void SetIsStereoscopicRendering(bool val) {
+        if (!val) {
+            is_stereoscopic_rendering_ = val;
+        } else {
+            StartNfcSession();
+            is_stereoscopic_rendering_ = val;
+        }
+    }
     
-    bool IsSinglePassRendering() { return is_single_pass_rendering_; }
+    bool GetIsSinglePassRendering() { return is_single_pass_rendering_; }
     
-    void EnableSinglePassRendering(bool value) { is_single_pass_rendering_ = value; }
+    void SetIsSinglePassRendering(bool val) { is_single_pass_rendering_ = val; }
     
     bool StartNfcSession();
     
@@ -104,8 +111,6 @@ private:
     
     /// @brief The vector from camera pointing to the center of the eyes.
     simd_float3 camera_to_center_eye_offset_;
-    
-    ARSessionManager* ar_session_manager = nullptr;
     
     static std::unique_ptr<HoloKitApi> holokit_api_;
     

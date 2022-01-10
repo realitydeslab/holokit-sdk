@@ -31,7 +31,7 @@ namespace UnityEngine.XR.HoloKit
 
         public bool IsStereoscopicRendering
         {
-            get => UnityHoloKit_IsStereoscopicRendering();
+            get => UnityHoloKit_GetIsStereoscopicRendering();
         }
 
         public Transform CenterEyePoint;
@@ -54,10 +54,10 @@ namespace UnityEngine.XR.HoloKit
         public event UnityAction<ARKitCameraTrackingState> CameraDidChangeTrackingStateEvent; 
 
         [DllImport("__Internal")]
-        private static extern bool UnityHoloKit_IsStereoscopicRendering();
+        private static extern bool UnityHoloKit_GetIsStereoscopicRendering();
 
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_EnableStereoscopicRendering(bool value);
+        private static extern void UnityHoloKit_SetIsStereoscopicRendering(bool value);
 
         delegate void SetARCameraBackground(bool value);
         [AOT.MonoPInvokeCallback(typeof(SetARCameraBackground))]
@@ -67,9 +67,6 @@ namespace UnityEngine.XR.HoloKit
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetSetARCameraBackgroundDelegate(SetARCameraBackground callback);
-
-        [DllImport("__Internal")]
-        private static extern bool UnityHoloKit_StartNfcSession();
 
         //[DllImport("__Internal")]
         //private static extern bool UnityHoloKit_GetLowLatencyTrackingApiActive();
@@ -158,23 +155,16 @@ namespace UnityEngine.XR.HoloKit
         {
             if (value)
             {
-                if (UnityHoloKit_StartNfcSession())
-                {
-                    UnityHoloKit_EnableStereoscopicRendering(true);
-                    m_HoloKitDisplaySubsystem.Start();
-                    CenterEyePoint.localPosition = k_CameraToCenterEyeOffset;
-                    DidChange2StAREvent?.Invoke();
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                UnityHoloKit_SetIsStereoscopicRendering(true);
+                m_HoloKitDisplaySubsystem.Start();
+                CenterEyePoint.localPosition = k_CameraToCenterEyeOffset;
+                DidChange2StAREvent?.Invoke();
+                return true;
             }
             else
             {
                 m_HoloKitDisplaySubsystem.Stop();
-                UnityHoloKit_EnableStereoscopicRendering(false);
+                UnityHoloKit_SetIsStereoscopicRendering(false);
                 CenterEyePoint.localPosition = Vector3.zero;
                 DidChange2AREvent?.Invoke();
                 return true;

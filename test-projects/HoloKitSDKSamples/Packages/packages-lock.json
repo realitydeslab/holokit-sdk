@@ -9,7 +9,6 @@
         "com.unity.xr.arfoundation": "4.2.1",
         "com.unity.xr.arkit": "4.2.1",
         "com.unity.render-pipelines.universal": "12.1.1",
-        "com.unity.visualeffectgraph": "12.1.1",
         "com.unity.netcode.gameobjects": "1.0.0-pre.3"
       }
     },
@@ -208,15 +207,6 @@
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
-      }
-    },
-    "com.unity.visualeffectgraph": {
-      "version": "12.1.1",
-      "depth": 1,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.shadergraph": "12.1.1",
-        "com.unity.render-pipelines.core": "12.1.1"
       }
     },
     "com.unity.xr.arfoundation": {
@@ -482,14 +472,6 @@
         "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.assetbundle": "1.0.0",
         "com.unity.modules.imageconversion": "1.0.0"
-      }
-    },
-    "com.unity.modules.vehicles": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.physics": "1.0.0"
       }
     },
     "com.unity.modules.video": {

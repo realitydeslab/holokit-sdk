@@ -139,10 +139,11 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
     }];
 }
 
-- (void)searchARWorldMaps {
+- (int)searchARWorldMaps {
     NSURL *url = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
     NSUInteger length = [url.absoluteString length];
     
+    __block int numOfMaps = 0;
     NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:url includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsSubdirectoryDescendants error:nil];
     [dirs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         NSURL *fileUrl = (NSURL *)obj;
@@ -152,11 +153,14 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
             NSString *mapName = [fileStr substringFromIndex:length + 8]; // private/
             mapName = [mapName substringToIndex:mapName.length - 13]; // .arexperience
             mapName = [mapName stringByReplacingOccurrencesOfString:@"%20" withString:@" "]; // %20
+            NSLog(@"[world_map] found map %@", mapName);
             if (DidFindARWorldMapDelegate != NULL) {
                 DidFindARWorldMapDelegate([mapName UTF8String]);
             }
+            numOfMaps++;
         }
     }];
+    return numOfMaps;
 }
 
 - (void)retrieveARWorldMap:(NSString *)mapName {
@@ -503,9 +507,11 @@ UnityHoloKit_RetrieveARWorldMap(const char *mapName) {
     [[ARSessionManager sharedARSessionManager] retrieveARWorldMap:[NSString stringWithUTF8String:mapName]];
 }
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SearchARWorldMaps() {
-    [[ARSessionManager sharedARSessionManager] searchARWorldMaps];
+    int numOfMaps = [[ARSessionManager sharedARSessionManager] searchARWorldMaps];
+    NSLog(@"[world_map] found %d maps in total", numOfMaps);
+    return numOfMaps;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

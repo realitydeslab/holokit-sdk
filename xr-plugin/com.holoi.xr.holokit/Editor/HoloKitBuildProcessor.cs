@@ -98,6 +98,8 @@ namespace UnityEditor.XR.HoloKit
 
                 // NFC
                 rootDict.SetString("NFCReaderUsageDescription", "For HoloKit to authenticate the NFC chip.");
+                PlistElementArray nfcArray = rootDict.CreateArray("com.apple.developer.nfc.readersession.iso7816.select-identifiers");
+                nfcArray.AddString("D2760000850101");
 
                 // AR collaboration
                 rootDict.SetString("NSLocalNetworkUsageDescription", "For HoloKit to enable nearby AR collaboration.");

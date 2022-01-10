@@ -204,7 +204,7 @@ public:
         
         allocate_new_textures_ = true;
         is_first_frame_ = true;
-        if (holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
+        if (holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(false);
         }
         
@@ -308,7 +308,7 @@ public:
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
         // We interrupt the graphics thread if it is not manually opened by SDK.
-        if (!holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering()) {
+        if (!holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering()) {
             return kUnitySubsystemErrorCodeFailure;
         }
         
@@ -320,7 +320,7 @@ public:
             allocate_new_textures_ = false;
         }
         
-        if (!holokit::HoloKitApi::GetInstance()->IsSinglePassRendering())
+        if (!holokit::HoloKitApi::GetInstance()->GetIsSinglePassRendering())
         {
             next_frame->renderPassesCount = 2;
             // Iterate through each render pass.
@@ -380,7 +380,7 @@ public:
     }
     
     UnitySubsystemErrorCode GfxThread_Stop() {
-        if (holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
+        if (holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(true);
         }
         

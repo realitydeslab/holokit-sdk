@@ -3,7 +3,7 @@
   "displayName": "HoloKit XR Plugin",
   "version": "1.0.0",
   "unity": "2021.2",
-  "description": "HoloKit SDK.",
+  "description": "Provides stereoscopic rendering and several Apple native integrations for development of Unity projects on HoloKit.\n\nIncludes the following features:\n-Stereoscopic Rendering\n-Apple Vision Hand Tracking\n-Lite Hand Tracking using Human Segmentation\n-Multiplayer AR with Netcode for GameObjects and MultipeerConnectivity Transrport Layer\n-AR World Map Synchronization using MultipeerConnectivity\n-Realtime AR Collaboration using MultipeerConnectivty\n-NFC Authentication\n-Apple Core Location\n-Apple Core Motion\n-Apple Watch as Controller\n\nHoloKit SDK is compatible with ARFoundation.",
   "keywords": [
     "holokit",
     "ar",
@@ -16,7 +16,7 @@
   ],
   "author": {
     "name": "Holo Interactive",
-    "email": "dev@holoi.com",
+    "email": "yuchen@holoi.com",
     "url": "https://holoi.com"
   },
   "dependencies": {
@@ -24,8 +24,28 @@
     "com.unity.xr.arfoundation": "4.2.1",
     "com.unity.xr.arkit": "4.2.1",
     "com.unity.render-pipelines.universal": "12.1.1",
-    "com.unity.visualeffectgraph": "12.1.1",
     "com.unity.netcode.gameobjects": "1.0.0-pre.3"
   },
-  "hideInEditor": false
+  "hideInEditor": false,
+  "samples": [
+    {
+      "displayName": "Stereoscopic Rendering",
+      "description": "Contains sample code on how to setup stereoscopic rendering",
+      "path": "Samples~/SamplesStAR"
+    },
+    {
+      "displayName": "Hand Tracking",
+      "description": "Contains sample code on how to setup Apple Vision hand tracking (this algorithm is extremyly energy consuming and not recommended for long time usage)",
+      "path": "Samples~/SamplesHandTracking"
+    },
+    {
+      "displayName": "Lite Hand Tracking",
+      "description": "Contains sample code on how to setup an alternative low energy comsuming but less precise hand tracking algorithm",
+      "path": "Samples~/SamplesLiteHandTracking"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/holoi/com.holoi.xr.holokit.git"
+  }
 }

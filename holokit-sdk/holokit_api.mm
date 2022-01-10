@@ -29,8 +29,6 @@ void HoloKitApi::Initialize() {
     
     InitOpticalParameters();
     
-    ar_session_manager = [ARSessionManager sharedARSessionManager];
-    
     portrait_matrix = matrix_identity_float4x4;
     portrait_matrix.columns[0].x = cos(DEGREES_TO_RADIANS(90));
     portrait_matrix.columns[0].y = sin(DEGREES_TO_RADIANS(90));
@@ -179,8 +177,8 @@ bool HoloKitApi::StartNfcSession() {
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
-    if (ar_session_manager.arSession != NULL) {
-        return ar_session_manager.arSession.currentFrame.camera.transform;
+    if ([[ARSessionManager sharedARSessionManager] arSession] != NULL) {
+        return [[ARSessionManager sharedARSessionManager] arSession].currentFrame.camera.transform;
     } else {
         return matrix_identity_float4x4;
     }
@@ -191,37 +189,13 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
 extern "C" {
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_IsStereoscopicRendering() {
-    return holokit::HoloKitApi::GetInstance()->IsStereoscopicRendering();
+UnityHoloKit_GetIsStereoscopicRendering() {
+    return holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering();
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_EnableStereoscopicRendering(bool value) {
-    return holokit::HoloKitApi::GetInstance()->EnableStereoscopicRendering(value);
-}
-
-float* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetCameraToCenterEyeOffsetPtr() {
-    simd_float3 offset = holokit::HoloKitApi::GetInstance()->GetCameraToCenterEyeOffset();
-    float* result = new float[3];
-    result[0] = offset.x;
-    result[1] = offset.y;
-    result[2] = offset.z;
-    return result;
-}
-
-int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_ReleaseCameraToCenterEyeOffsetPtr(float* ptr) {
-    // https://stackoverflow.com/questions/17634480/return-c-array-to-c-sharp/18041888
-    delete[] ptr;
-    return 0;
-}
-
-bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StartNfcSession() {
-    // TEMPORARY
-    return true;
-    return holokit::HoloKitApi::GetInstance()->StartNfcSession();
+UnityHoloKit_SetIsStereoscopicRendering(bool value) {
+    return holokit::HoloKitApi::GetInstance()->SetIsStereoscopicRendering(value);
 }
 
 char* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
