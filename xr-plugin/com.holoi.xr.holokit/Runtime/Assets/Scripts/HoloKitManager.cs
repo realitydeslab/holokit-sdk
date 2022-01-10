@@ -33,6 +33,8 @@ namespace UnityEngine.XR.HoloKit
 
         public Transform CenterEyePoint;
 
+        [SerializeField] private bool m_StereoscopicRenderingOnStart = true;
+
         public event UnityAction DidChange2StAREvent;
 
         public event UnityAction DidChange2AREvent;
@@ -75,7 +77,6 @@ namespace UnityEngine.XR.HoloKit
         [AOT.MonoPInvokeCallback(typeof(CameraDidChangeTrackingState))]
         private static void OnCameraDidChangeTrackingState(int trackingState)
         {
-            //Instance.m_NewCameraTrackingState = (ARKitCameraTrackingState)trackingState;
             Instance.CameraDidChangeTrackingStateEvent?.Invoke((ARKitCameraTrackingState)trackingState);
         }
         [DllImport("__Internal")]
@@ -133,6 +134,7 @@ namespace UnityEngine.XR.HoloKit
 
         private void Start()
         {
+            Debug.Log("[HoloKitManager] Start");
             Screen.brightness = 1.0f;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             iOS.Device.hideHomeButton = true;
@@ -140,6 +142,12 @@ namespace UnityEngine.XR.HoloKit
             if (FindObjectOfType<HandTrackingManager>() == null)
             {
                 m_HoloKitInputSubsystem.Stop();
+            }
+
+            Debug.Log($"[HoloKitManager] m_StereoscopicRenderingOnStart {m_StereoscopicRenderingOnStart}");
+            if (true)
+            {
+                TurnOnStereoscopicRendering();
             }
         }
 

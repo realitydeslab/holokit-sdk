@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: CenterEyePoint
       value: 
       objectReference: {fileID: 1083260529}
+    - target: {fileID: 6854715683357352112, guid: 5c1d06383a2824dd0808b5476b98c72b, type: 3}
+      propertyPath: m_StereoscopicRenderingOnStart
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6854715683357352113, guid: 5c1d06383a2824dd0808b5476b98c72b, type: 3}
       propertyPath: m_Name
       value: HoloKitManager

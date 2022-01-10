@@ -339,4 +339,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bedbf8424b6c0493cb00ae280e87513f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_CenterEyePoint: {fileID: 6833096829744493572}
+  CenterEyePoint: {fileID: 6833096829744493572}
+  m_StereoscopicRenderingOnStart: 1
