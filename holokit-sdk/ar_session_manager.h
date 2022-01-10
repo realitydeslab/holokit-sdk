@@ -27,5 +27,6 @@
 
 + (id _Nonnull )sharedARSessionManager;
 - (void)updateWithCollaborationData:(ARCollaborationData *_Nonnull) collaborationData;
+- (void)setIsStereoscopicRendering:(BOOL)val;
 
 @end

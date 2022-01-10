@@ -7,6 +7,11 @@
 
 #import "nfc_session.h"
 #import "holokit_sdk-Swift.h"
+#import "IUnityInterface.h"
+#import "ar_session_manager.h"
+
+typedef void (*NFCAuthenticationDidSucceed)(void);
+NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
 
 @interface NFCSession () <NFCTagReaderSessionDelegate>
 
@@ -19,8 +24,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.isFinished = NO;
-        self.isValid = NO;
+
     }
     return self;
 }
@@ -35,10 +39,10 @@
 }
 
 - (void)startReaderSession {
+    NSLog(@"[nfc_session] NFC authentication started...zzz");
     self.readerSession = [[NFCTagReaderSession alloc] initWithPollingOption:NFCPollingISO14443 delegate:self queue:nil];
     self.readerSession.alertMessage = @"Please put your iPhone onto HoloKit.";
     [self.readerSession beginSession];
-    NSLog(@"[nfc_session] NFC authentication started...zzz");
 }
 
 - (void)stopReaderSession {
@@ -72,12 +76,11 @@
 #pragma mark - Delegates
 
 - (void)tagReaderSessionDidBecomeActive:(NFCTagReaderSession *)session {
-    self.isFinished = NO;
-    self.isValid = NO;
+
 }
 
 - (void)tagReaderSession:(NFCTagReaderSession *)session didInvalidateWithError:(NSError *)error {
-    self.isFinished = YES;
+
 }
 
 - (void)tagReaderSession:(NFCTagReaderSession *)session didDetectTags:(NSArray<__kindof id<NFCTag>> *)tags {
@@ -125,7 +128,13 @@
                         NSLog(@"[nfc_session] content %@", content);
                         if ([content isEqualToString:uid]) {
                             if ([Crypto validateSignatureWithSignature:signature content:content]) {
+                                [session setAlertMessage:@"NFC authentication succeeded"];
+                                [session invalidateSession];
                                 
+                                [[ARSessionManager sharedARSessionManager] setIsStereoscopicRendering:YES];
+                                if (NFCAuthenticationDidSucceedDelegate != NULL) {
+                                    NFCAuthenticationDidSucceedDelegate();
+                                }
                             } else {
                                 [session setAlertMessage:@"NFC authentication failed"];
                                 [session invalidateSession];
@@ -147,3 +156,10 @@
 }
 
 @end
+
+#pragma mark - extern "C"
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetNFCAuthenticationDidSucceedDelegate(NFCAuthenticationDidSucceed callback) {
+    NFCAuthenticationDidSucceedDelegate = callback;
+}

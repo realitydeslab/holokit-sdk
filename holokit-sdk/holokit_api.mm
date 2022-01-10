@@ -151,29 +151,12 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     return simd_make_float3(0);
 }
 
-bool HoloKitApi::StartNfcSession() {
-    NFCSession* nfcSession = [NFCSession sharedNFCSession];
-    [nfcSession startReaderSession];
-    
-    double nfc_start_time = [[NSProcessInfo processInfo] systemUptime];
-    double nfc_timeout = 15;
-    while([[NSProcessInfo processInfo] systemUptime] - nfc_start_time < nfc_timeout && !nfcSession.isFinished) {
-         //Waiting the user to validate NFC
-    }
-    
-    // BETA: Wait for a short period of time
-    double start_time = [[NSProcessInfo processInfo] systemUptime];
-    double interval;
-    if (nfcSession.isValid) {
-        interval = 4;
-    } else {
-        interval = 1.5;
-    }
-    while([[NSProcessInfo processInfo] systemUptime] - start_time < interval) {
-        // Wait
-    }
-    
-    return nfcSession.isValid;
+void HoloKitApi::StartNfcAuthentication() {
+    [[NFCSession sharedNFCSession] startReaderSession];
+}
+
+void HoloKitApi::SetIsStereoscopicRendering(bool val) {
+    is_stereoscopic_rendering_ = val;
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
@@ -194,8 +177,13 @@ UnityHoloKit_GetIsStereoscopicRendering() {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetIsStereoscopicRendering(bool value) {
-    return holokit::HoloKitApi::GetInstance()->SetIsStereoscopicRendering(value);
+UnityHoloKit_StartNFCAuthentication() {
+    holokit::HoloKitApi::GetInstance()->StartNfcAuthentication();
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_DisableIsStereoscopicRendering() {
+    return holokit::HoloKitApi::GetInstance()->SetIsStereoscopicRendering(false);
 }
 
 char* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

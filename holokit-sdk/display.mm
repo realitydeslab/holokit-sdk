@@ -309,6 +309,7 @@ public:
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
         // We interrupt the graphics thread if it is not manually opened by SDK.
         if (!holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering()) {
+            NSLog(@"[display] unauthorized StAR");
             return kUnitySubsystemErrorCodeFailure;
         }
         

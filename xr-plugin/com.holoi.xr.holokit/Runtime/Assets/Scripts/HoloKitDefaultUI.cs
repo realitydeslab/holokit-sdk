@@ -22,29 +22,37 @@ namespace UnityEngine.XR.HoloKit
             OnThermalStateDidChange(HoloKitManager.Instance.GetThermalState());
             HoloKitManager.Instance.ThermalStateDidChangeEvent += OnThermalStateDidChange;
             HoloKitManager.Instance.CameraDidChangeTrackingStateEvent += OnCameraDidChangeTrackingState;
+            HoloKitManager.Instance.DidChange2StAREvent += OnDidChange2StAR;
+            HoloKitManager.Instance.DidChange2AREvent += OnDidChange2AR;
         }
 
         private void OnDisable()
         {
             HoloKitManager.Instance.ThermalStateDidChangeEvent -= OnThermalStateDidChange;
             HoloKitManager.Instance.CameraDidChangeTrackingStateEvent -= OnCameraDidChangeTrackingState;
+            HoloKitManager.Instance.DidChange2StAREvent -= OnDidChange2StAR;
+            HoloKitManager.Instance.DidChange2AREvent -= OnDidChange2AR;
+        }
+
+        private void OnDidChange2StAR()
+        {
+            m_StARButton.transform.Find("Text").GetComponent<Text>().text = "AR";
+        }
+
+        private void OnDidChange2AR()
+        {
+            m_StARButton.transform.Find("Text").GetComponent<Text>().text = "StAR";
         }
 
         public void ToggleStAR()
         {
             if (!HoloKitManager.Instance.IsStereoscopicRendering)
             {
-                if (HoloKitManager.Instance.EnableStereoscopicRendering(true))
-                {
-                    m_StARButton.transform.Find("Text").GetComponent<Text>().text = "AR";
-                }
+                HoloKitManager.Instance.TurnOnStereoscopicRendering();
             }
             else
             {
-                if (HoloKitManager.Instance.EnableStereoscopicRendering(false))
-                {
-                    m_StARButton.transform.Find("Text").GetComponent<Text>().text = "StAR";
-                }
+                HoloKitManager.Instance.TurnOffStereoscopicRendering();
             }
         }
 

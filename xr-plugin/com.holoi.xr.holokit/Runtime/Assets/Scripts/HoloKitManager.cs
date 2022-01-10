@@ -13,11 +13,6 @@ namespace UnityEngine.XR.HoloKit
 
         private XRDisplaySubsystem m_HoloKitDisplaySubsystem;
 
-        //public XRDisplaySubsystem DisplaySubsystem
-        //{
-        //    get => m_DisplaySubsystem;
-        //}
-
         private XRInputSubsystem m_HoloKitInputSubsystem;
 
         private static Vector3 k_CameraToCenterEyeOffset = new Vector3(0.0495f, -0.090635f, -0.07965f);
@@ -34,16 +29,9 @@ namespace UnityEngine.XR.HoloKit
             get => UnityHoloKit_GetIsStereoscopicRendering();
         }
 
+        private bool m_NFCAuthenticationDidSucceed;
+
         public Transform CenterEyePoint;
-
-        //public bool LowLatencyTrackingActive
-        //{
-        //    get => UnityHoloKit_GetLowLatencyTrackingApiActive();
-        //}
-
-        //private ARKitCameraTrackingState m_CurrentCameraTrackingState;
-
-        //private ARKitCameraTrackingState m_NewCameraTrackingState;
 
         public event UnityAction DidChange2StAREvent;
 
@@ -57,7 +45,10 @@ namespace UnityEngine.XR.HoloKit
         private static extern bool UnityHoloKit_GetIsStereoscopicRendering();
 
         [DllImport("__Internal")]
-        private static extern void UnityHoloKit_SetIsStereoscopicRendering(bool value);
+        private static extern void UnityHoloKit_StartNFCAuthentication();
+
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_DisableIsStereoscopicRendering();
 
         delegate void SetARCameraBackground(bool value);
         [AOT.MonoPInvokeCallback(typeof(SetARCameraBackground))]
@@ -67,12 +58,6 @@ namespace UnityEngine.XR.HoloKit
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetSetARCameraBackgroundDelegate(SetARCameraBackground callback);
-
-        //[DllImport("__Internal")]
-        //private static extern bool UnityHoloKit_GetLowLatencyTrackingApiActive();
-
-        //[DllImport("__Internal")]
-        //private static extern void UnityHoloKit_SetLowLatencyTrackingApiActive(bool value);
 
         [DllImport("__Internal")]
         private static extern int UnityHoloKit_GetThermalState();
@@ -95,6 +80,16 @@ namespace UnityEngine.XR.HoloKit
         }
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(CameraDidChangeTrackingState callback);
+
+        delegate void NFCAuthenticationDidSucceed();
+        [AOT.MonoPInvokeCallback(typeof(NFCAuthenticationDidSucceed))]
+        private static void OnNFCAuthenticationDidSucceed()
+        {
+            Debug.Log("[HoloKitManager] OnNFCAuthenticationDidSucceed");
+            Instance.m_NFCAuthenticationDidSucceed = true;
+        }
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetNFCAuthenticationDidSucceedDelegate(NFCAuthenticationDidSucceed callback);
 
         private void Awake()
         {
@@ -128,7 +123,9 @@ namespace UnityEngine.XR.HoloKit
             //m_HoloKitInputSubsystem.Stop();
 
             m_ARCameraBackground = Camera.main.GetComponent<ARCameraBackground>();
+            m_NFCAuthenticationDidSucceed = false;
 
+            UnityHoloKit_SetNFCAuthenticationDidSucceedDelegate(OnNFCAuthenticationDidSucceed);
             UnityHoloKit_SetSetARCameraBackgroundDelegate(OnSetARCameraBackground);
             UnityHoloKit_SetThermalStateDidChangeDelegate(OnThermalStateDidChange);
             UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(OnCameraDidChangeTrackingState);
@@ -146,29 +143,37 @@ namespace UnityEngine.XR.HoloKit
             }
         }
 
-        private void OnDestroy()
+        private void Update()
         {
-            
-        }
-
-        public bool EnableStereoscopicRendering(bool value)
-        {
-            if (value)
+            if (m_NFCAuthenticationDidSucceed)
             {
-                UnityHoloKit_SetIsStereoscopicRendering(true);
                 m_HoloKitDisplaySubsystem.Start();
                 CenterEyePoint.localPosition = k_CameraToCenterEyeOffset;
                 DidChange2StAREvent?.Invoke();
-                return true;
+
+                m_NFCAuthenticationDidSucceed = false;
             }
-            else
-            {
-                m_HoloKitDisplaySubsystem.Stop();
-                UnityHoloKit_SetIsStereoscopicRendering(false);
-                CenterEyePoint.localPosition = Vector3.zero;
-                DidChange2AREvent?.Invoke();
-                return true;
-            }
+        }
+
+        private void OnDestroy()
+        {
+            UnityHoloKit_SetNFCAuthenticationDidSucceedDelegate(null);
+            UnityHoloKit_SetSetARCameraBackgroundDelegate(null);
+            UnityHoloKit_SetThermalStateDidChangeDelegate(null);
+            UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(null);
+        }
+
+        public void TurnOnStereoscopicRendering()
+        {
+            UnityHoloKit_StartNFCAuthentication();
+        }
+
+        public void TurnOffStereoscopicRendering()
+        {
+            m_HoloKitDisplaySubsystem.Stop();
+            UnityHoloKit_DisableIsStereoscopicRendering();
+            CenterEyePoint.localPosition = Vector3.zero;
+            DidChange2AREvent?.Invoke();
         }
 
         //public void SetLowLatencyTrackingActive(bool value)

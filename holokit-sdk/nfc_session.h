@@ -9,9 +9,6 @@
 
 @interface NFCSession : NSObject
 
-@property (nonatomic, assign) bool isFinished;
-@property (nonatomic, assign) bool isValid;
-
 - (void)startReaderSession;
 
 - (void)stopReaderSession;

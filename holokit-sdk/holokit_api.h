@@ -47,20 +47,13 @@ public:
     
     bool GetIsStereoscopicRendering() { return is_stereoscopic_rendering_; }
     
-    void SetIsStereoscopicRendering(bool val) {
-        if (!val) {
-            is_stereoscopic_rendering_ = val;
-        } else {
-            StartNfcSession();
-            is_stereoscopic_rendering_ = val;
-        }
-    }
+    void SetIsStereoscopicRendering(bool val);
     
     bool GetIsSinglePassRendering() { return is_single_pass_rendering_; }
     
     void SetIsSinglePassRendering(bool val) { is_single_pass_rendering_ = val; }
     
-    bool StartNfcSession();
+    void StartNfcAuthentication();
     
     bool GetIsSkippingFrame() { return is_skipping_frame_; }
     

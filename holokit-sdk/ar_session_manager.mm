@@ -190,6 +190,10 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
     self.worldMap = nil;
 }
 
+- (void)setIsStereoscopicRendering:(BOOL)val {
+    holokit::HoloKitApi::GetInstance()->SetIsStereoscopicRendering(val);
+}
+
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
