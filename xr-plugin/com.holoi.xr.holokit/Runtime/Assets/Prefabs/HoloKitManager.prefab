@@ -340,4 +340,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CenterEyePoint: {fileID: 6833096829744493572}
-  m_StereoscopicRenderingOnStart: 1
+  m_StereoscopicRenderingOnStart: 0

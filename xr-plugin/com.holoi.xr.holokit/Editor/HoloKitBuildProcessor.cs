@@ -85,6 +85,7 @@ namespace UnityEditor.XR.HoloKit
 
                 AddXcodePlist(report.summary.outputPath);
                 AddXcodeCapabilities(report.summary.outputPath);
+                AddXcodeBuildSettings(report.summary.outputPath);
                 //AddDynamicFramework(report.summary.outputPath);
             }
 
@@ -118,6 +119,20 @@ namespace UnityEditor.XR.HoloKit
                 rootDict.SetString("NSSpeechRecognitionUsageDescription", "HoloKit uses speech recognition to cast spell.");
 
                 File.WriteAllText(plistPath, plist.WriteToString());
+            }
+
+            private static void AddXcodeBuildSettings(string pathToBuiltProject)
+            {
+                string projPath = PBXProject.GetPBXProjectPath(pathToBuiltProject);
+                PBXProject proj = new PBXProject();
+                proj.ReadFromString(File.ReadAllText(projPath));
+
+                string mainTargetGuid = proj.GetUnityMainTargetGuid();
+                string unityFrameworkTargetGuid = proj.GetUnityFrameworkTargetGuid();
+
+                proj.AddBuildProperty(unityFrameworkTargetGuid, "LIBRARY_SEARCH_PATHS", "$(SDKROOT)/usr/lib/swift");
+
+                proj.WriteToFile(projPath);
             }
 
             static void AddDynamicFramework(string pathToBuiltProject)
