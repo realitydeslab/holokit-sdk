@@ -11,7 +11,8 @@ namespace UnityEngine.XR.HoloKit
 
         public static WatchConnectivityManager Instance { get { return _instance; } }
 
-        //[DllImport("")]
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_InitWatchConnectivity();
 
         private void Awake()
         {
@@ -23,6 +24,16 @@ namespace UnityEngine.XR.HoloKit
             {
                 _instance = this;
             }
+        }
+
+        public void SendMessageWithTypeInt(string key, int value)
+        {
+            
+        }
+
+        public void SendMessageWithTypeFloat(string key, float value)
+        {
+
         }
     }
 }

@@ -10,7 +10,7 @@
 
 #import <WatchConnectivity/WatchConnectivity.h>
 
-@interface HoloKitWatchConnectivity: NSObject
+@interface WatchConnectivity: NSObject
 
 + (id)sharedWatchConnectivity;
 

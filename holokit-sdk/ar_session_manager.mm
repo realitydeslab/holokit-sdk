@@ -190,6 +190,7 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
     configuration.initialWorldMap = self.worldMap;
     [arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
     self.worldMap = nil;
+    NSLog(@"[world_map] did load ARWorldMap");
 }
 
 - (void)setIsStereoscopicRendering:(BOOL)val {

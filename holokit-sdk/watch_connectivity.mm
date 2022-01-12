@@ -22,13 +22,13 @@ DidReceiveCalorieMessage DidReceiveCalorieMessageDelegate = NULL;
 typedef void (*DidChangeReachability)(bool reachable);
 DidChangeReachability DidChangeReachabilityDelegate = NULL;
 
-@interface HoloKitWatchConnectivity() <WCSessionDelegate>
+@interface WatchConnectivity() <WCSessionDelegate>
 
 @property (nonatomic, strong) WCSession *wcSession;
 
 @end
 
-@implementation HoloKitWatchConnectivity
+@implementation WatchConnectivity
 
 - (instancetype)init {
     if (self = [super init]) {
@@ -119,13 +119,13 @@ extern "C" {
 
 // You need to manually init WCSession in Unity.
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_InitWatchConnectivitySession() {
-    [HoloKitWatchConnectivity sharedWatchConnectivity];
+UnityHoloKit_InitWatchConnectivity() {
+    [WatchConnectivity sharedWatchConnectivity];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendMessage2Watch(const char *messageType, int index) {
-    HoloKitWatchConnectivity *wc_session = [HoloKitWatchConnectivity sharedWatchConnectivity];
+    WatchConnectivity *wc_session = [WatchConnectivity sharedWatchConnectivity];
     [wc_session sendMessage2WatchWithMessageType:[NSString stringWithUTF8String:messageType] messageIndex:index];
 }
 
@@ -146,7 +146,7 @@ UnityHoloKit_SetDidReceiveCalorieMessageDelegate(DidReceiveCalorieMessage callba
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetIsReachable() {
-    return [[HoloKitWatchConnectivity sharedWatchConnectivity] wcSession].isReachable;
+    return [[WatchConnectivity sharedWatchConnectivity] wcSession].isReachable;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
