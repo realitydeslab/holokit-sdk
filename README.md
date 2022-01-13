@@ -4,14 +4,14 @@
 
 Please note that this SDK only works on iOS platform. Some functionalities cannot run properly in Unity Editor on your Mac.
 
-Please use Unity version 2021.1.
+Please use Unity version 2021.2.
 
 ### Step 0: Cloning HoloKit SDK project to your computer
 
 Open the terminal, go to an appropriate file path (the place you want to put the project) and enter the following instruction
 
 ```
-git clone -b yuchen https://github.com/holoi/HoloKitSDK.git
+git clone -b yuchen https://github.com/holoi/holokit-sdk.git
 ```
 (Notice that we are cloning branch "yuchen")
 
@@ -60,7 +60,7 @@ You still need to figure out some settings.
 
 <a href="https://ibb.co/vhB9nHw"><img src="https://i.ibb.co/C6tLGz1/Screen-Shot-2021-06-15-at-12-08-11-PM.png" alt="Screen-Shot-2021-06-15-at-12-08-11-PM" border="0"></a>
 
-* In Project Settings -> Player -> Other Settings, fill in some words in "Camera Usage Description" and set "Target minimum iOS Version" to 14.0.
+* In Project Settings -> Player -> Other Settings, fill in some words in "Camera Usage Description" and set "Target minimum iOS Version" to 15.0.
 
 <a href="https://ibb.co/BZrX5qs"><img src="https://i.ibb.co/tsx7T8C/Screen-Shot-2021-06-15-at-12-10-56-PM.png" alt="Screen-Shot-2021-06-15-at-12-10-56-PM" border="0"></a>
 
