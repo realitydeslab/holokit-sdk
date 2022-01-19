@@ -226,6 +226,7 @@ typedef enum {
 }
 
 - (void)shareARWorldMap:(MCPeerID *)peerID {
+    NSLog(@"[world map] share ARWorldMap to %@", peerID.displayName);
     NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:[[ARSessionManager sharedARSessionManager] worldMap] requiringSecureCoding:NO error:nil];
     [self sendToPeer:mapData peer:peerID sendDataMode:MCSessionSendDataReliable];
 }
@@ -433,13 +434,9 @@ typedef enum {
             if (worldMap != nil) {
                 NSLog(@"[world_map] did receive ARWorldMap of size %f mb", data.length / 1024.0 / 1024.0);
                 [[ARSessionManager sharedARSessionManager] setWorldMap:worldMap];
-                //                    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
-                //                    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)arSession.configuration;
-                //                    configuration.initialWorldMap = worldMap;
-                //                    [arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
-                //                    if (DidReceiveARWorldMapDelegate != NULL) {
-                //                        DidReceiveARWorldMapDelegate();
-                //                    }
+                if (DidReceiveARWorldMapDelegate != NULL) {
+                    DidReceiveARWorldMapDelegate();
+                }
                 return;
             }
             break;

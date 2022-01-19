@@ -2,7 +2,7 @@ using UnityEngine.UI;
 
 namespace UnityEngine.XR.HoloKit
 {
-    public class Timer : MonoBehaviour
+    internal class Timer : MonoBehaviour
     {
         [SerializeField]
         Text txt;

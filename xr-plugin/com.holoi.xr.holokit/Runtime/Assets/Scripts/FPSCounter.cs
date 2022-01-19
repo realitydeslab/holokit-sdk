@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace UnityEngine.XR.HoloKit
 {
-    public class FPSCounter : MonoBehaviour
+    internal class FPSCounter : MonoBehaviour
     {
         public float m_refreshTime = 0.5f;
         int m_frameCounter = 0;
