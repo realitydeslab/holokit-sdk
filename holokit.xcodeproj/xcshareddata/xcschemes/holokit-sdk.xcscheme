@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4BE7B60A261104ED001F39F2"
-               BuildableName = "libholokit-sdk-2.a"
+               BuildableName = "libholokit-sdk.a"
                BlueprintName = "holokit-sdk"
                ReferencedContainer = "container:holokit.xcodeproj">
             </BuildableReference>
@@ -51,7 +51,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4BE7B60A261104ED001F39F2"
-            BuildableName = "libholokit-sdk-2.a"
+            BuildableName = "libholokit-sdk.a"
             BlueprintName = "holokit-sdk"
             ReferencedContainer = "container:holokit.xcodeproj">
          </BuildableReference>
