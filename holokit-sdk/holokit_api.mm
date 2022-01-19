@@ -26,6 +26,7 @@ void HoloKitApi::Initialize() {
     
     // Get the device name.
     device_name_ = [UIDevice currentDevice].name;
+    camera_offset_ = simd_make_float3(0, 0, 0);
     
     InitOpticalParameters();
     
@@ -199,6 +200,11 @@ UnityHoloKit_GetDeviceScreenWidth() {
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetDeviceScreenHeight() {
     return holokit::HoloKitApi::GetInstance()->GetScreenHeight();
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetCameraOffset(float x, float y, float z) {
+    holokit::HoloKitApi::GetInstance()->SetCameraOffset(simd_make_float3(x, y, z));
 }
 
 } // extern "C"

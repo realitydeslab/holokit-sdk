@@ -57,6 +57,10 @@ public:
     
     bool GetIsSkippingFrame() { return is_skipping_frame_; }
     
+    void SetCameraOffset(simd_float3 offset) { camera_offset_ = offset; }
+    
+    simd_float3 GetCameraOffset() { return camera_offset_; };
+    
     void SetIsSkippingFrame(bool val) { is_skipping_frame_ = val; }
     
     NSString* GetDeviceName() { return device_name_; }
@@ -121,6 +125,8 @@ private:
     simd_float4x4 landscape_left_matrix;
     
     simd_float4x4 portrait_upsidedown_matrix;
+    
+    simd_float3 camera_offset_;
 
 }; // class HoloKitApi
 

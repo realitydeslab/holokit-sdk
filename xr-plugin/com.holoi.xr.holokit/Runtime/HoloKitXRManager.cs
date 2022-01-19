@@ -45,6 +45,19 @@ namespace UnityEngine.XR.HoloKit
                 if (loader.name.Equals("Holo Kit XR Loader"))
                 {
                     loader.Initialize();
+                    //loader.Start();
+                }
+            }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        private static void OnBeforeSplashScreen()
+        {
+            foreach (var loader in XRGeneralSettings.Instance.Manager.activeLoaders)
+            {
+                if (loader.name.Equals("Holo Kit XR Loader"))
+                {
+                    //loader.Initialize();
                     loader.Start();
                 }
             }
@@ -56,12 +69,6 @@ namespace UnityEngine.XR.HoloKit
                 UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
 #endif
             }
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-        private static void OnBeforeSplashScreen()
-        {
-            
         }
  
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

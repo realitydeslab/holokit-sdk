@@ -272,8 +272,9 @@ public:
                             break;
                     }
                     simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
-//                    position = UnityXRVector3 { camera_position.x, camera_position.y, -camera_position.z };
-                    position = UnityXRVector3 { 0, 0, 0 };
+                    simd_float3 camera_offset = holokit::HoloKitApi::GetInstance()->GetCameraOffset();
+                    position = UnityXRVector3 { camera_position.x + camera_offset.x, camera_position.y + camera_offset.y, -camera_position.z + camera_offset.z };
+                    //position = UnityXRVector3 { 0, 0, 0 };
                     simd_quatf quaternion = simd_quaternion(camera_transform);
                     rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
                 }
@@ -358,7 +359,6 @@ std::unique_ptr<HoloKitInputProvider>& HoloKitInputProvider::GetInstance() {
 }
     
 } //namespace
-
 
 UnitySubsystemErrorCode LoadInput(IUnityInterfaces* xr_interfaces) {
     auto* input = xr_interfaces->Get<IUnityXRInputInterface>();
