@@ -120,6 +120,7 @@
 		96BC68C125396851008B557A /* polynomial_radial_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BC25396851008B557A /* polynomial_radial_distortion.cc */; };
 		96BC68C225396851008B557A /* distortion_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BD25396851008B557A /* distortion_mesh.cc */; };
 		96BC68CF25396B40008B557A /* screen_params.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68CE25396B40008B557A /* screen_params.mm */; };
+		96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C102C0279152B30052AF2B /* CryptoKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -162,13 +163,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
-		4BE7B609261104ED001F39F2 /* CopyFiles */ = {
+		4BE7B609261104ED001F39F2 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		9660213B253930CC004019A5 /* CopyFiles */ = {
@@ -460,6 +462,7 @@
 		96BC68CD25396B40008B557A /* screen_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = screen_params.h; sourceTree = "<group>"; };
 		96BC68CE25396B40008B557A /* screen_params.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = screen_params.mm; sourceTree = "<group>"; };
 		96BC68D625396BF5008B557A /* holokit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = holokit.h; sourceTree = "<group>"; };
+		96C102C0279152B30052AF2B /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/CryptoKit.framework; sourceTree = DEVELOPER_DIR; };
 		96F95491253AA8BE007CE50B /* input.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = input.cc; sourceTree = "<group>"; };
 		96F95492253AA8C0007CE50B /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -498,6 +501,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */,
 				4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */,
 				4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */,
 			);
@@ -770,6 +774,7 @@
 		96602188253935D7004019A5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				96C102C0279152B30052AF2B /* CryptoKit.framework */,
 				4BC45B25262815CB00BA98E4 /* CoreNFC.framework */,
 				4B04D8A9260CCCA20055020F /* MetalKit.framework */,
 				4B6615A325F39FED00CC4E81 /* Metal.framework */,
@@ -1128,7 +1133,7 @@
 			buildPhases = (
 				4BE7B607261104ED001F39F2 /* Sources */,
 				4BE7B608261104ED001F39F2 /* Frameworks */,
-				4BE7B609261104ED001F39F2 /* CopyFiles */,
+				4BE7B609261104ED001F39F2 /* Copy Files */,
 				4BE7B6F22611CE4B001F39F2 /* ShellScript */,
 			);
 			buildRules = (
@@ -1404,7 +1409,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "PRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios/arm64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.holoi.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/HoloKitSDKSamples/Build/Libraries/com.holoi.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/UnityHoloKit.a\"\n";
+			shellScript = "PRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios/arm64\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.holoi.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/HoloKitSDKSamples/Build/Libraries/com.holoi.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1890,9 +1895,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
 					"$(SRCROOT)/sdk/third_party/eigen",
-					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
-					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
-					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1924,9 +1926,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
 					"$(SRCROOT)/sdk/third_party/eigen",
-					"$(SRCROOT)/sdk/third_party/ceres-solver/config",
-					"$(SRCROOT)/sdk/third_party/ceres-solver/internal/ceres/miniglog",
-					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
