@@ -83,8 +83,6 @@ namespace HoloKit
 
         void CheckConnectedDevice(InputDevice device, bool displayWarning = true)
         {
-            Debug.Log("fuck");
-
             if (!device.characteristics.HasFlag(InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice)) {
                 return;
             }

@@ -40,18 +40,6 @@ namespace UnityEngine.XR.HoloKit
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void OnAfterAssembliesLoaded()
         {
-
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-        private static void OnBeforeSplashScreen()
-        {
-
-        }
- 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void OnBeforeSceneLoad()
-        {
             foreach (var loader in XRGeneralSettings.Instance.Manager.activeLoaders)
             {
                 if (loader.name.Equals("Holo Kit XR Loader"))
@@ -68,6 +56,33 @@ namespace UnityEngine.XR.HoloKit
                 UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
 #endif
             }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        private static void OnBeforeSplashScreen()
+        {
+            
+        }
+ 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void OnBeforeSceneLoad()
+        {
+//            foreach (var loader in XRGeneralSettings.Instance.Manager.activeLoaders)
+//            {
+//                if (loader.name.Equals("Holo Kit XR Loader"))
+//                {
+//                    loader.Initialize();
+//                    loader.Start();
+//                }
+//            }
+
+//            var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
+//            if (xrSessionSubsystem != null)
+//            {
+//#if UNITY_IOS
+//                UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
+//#endif
+//            }
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]

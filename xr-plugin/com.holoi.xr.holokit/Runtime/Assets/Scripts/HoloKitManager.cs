@@ -136,10 +136,10 @@ namespace UnityEngine.XR.HoloKit
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             iOS.Device.hideHomeButton = true;
 
-            if (FindObjectOfType<HandTrackingManager>() == null)
-            {
-                m_HoloKitInputSubsystem.Stop();
-            }
+            //if (FindObjectOfType<HandTrackingManager>() == null)
+            //{
+            //    m_HoloKitInputSubsystem.Stop();
+            //}
         }
 
         private void Update()

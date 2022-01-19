@@ -83,7 +83,7 @@ public:
     UnitySubsystemErrorCode Start(UnitySubsystemHandle handle) {
         HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "Start");
         
-        //input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
+        input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHmd);
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandLeft);
         input_->InputSubsystem_DeviceConnected(handle, kDeviceIdHoloKitHandRight);
         
@@ -95,7 +95,7 @@ public:
     void Stop(UnitySubsystemHandle handle) {
         HOLOKIT_INPUT_XR_TRACE_LOG(trace_, "Stop");
         
-        //input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
+        input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHmd);
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandLeft);
         input_->InputSubsystem_DeviceDisconnected(handle, kDeviceIdHoloKitHandRight);
     }
