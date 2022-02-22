@@ -46,6 +46,7 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
 @property (nonatomic, strong) ARAnchor *originAnchor;
 @property (nonatomic, strong) NSUUID *currentARSessionId;
 @property (assign) ARWorldMappingStatus currentARWorldMappingStatus;
+@property (assign) BOOL sessionShouldAttemptRelocalization;
 
 @end
 
@@ -63,6 +64,8 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
         self.isSynchronizationComplete = NO;
         self.isScanningARWorldMap = NO;
         self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
+        
+        self.sessionShouldAttemptRelocalization = true;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -385,7 +388,9 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
 }
 
 - (BOOL)sessionShouldAttemptRelocalization:(ARSession *)session {
-    return true;
+    //return true;
+    NSLog(@"[ar_session] sessionShouldAttemptRelocalization %d", self.sessionShouldAttemptRelocalization);
+    return self.sessionShouldAttemptRelocalization;
 }
 
 @end
@@ -529,6 +534,11 @@ UnityHoloKit_LoadARWorldMap() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetDidFinishSavingARWorldMapDelegate(DidFinishSavingARWorldMap callback) {
     DidFinishSavingARWorldMapDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetSessionShouldAttemptRelocalization(bool value) {
+    [[ARSessionManager sharedARSessionManager] setSessionShouldAttemptRelocalization:value];
 }
 
 } // extern "C"

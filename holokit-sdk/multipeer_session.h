@@ -8,9 +8,8 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 
 typedef enum {
-    ARSyncModeNone = 0,
-    ARSyncModeCollaboration = 1,
-    ARSyncModeWorldMap = 2
+    ARSyncModeWorldMap = 0,
+    ARSyncModeCollaboration = 1
 } ARSyncMode;
 
 NS_ASSUME_NONNULL_BEGIN

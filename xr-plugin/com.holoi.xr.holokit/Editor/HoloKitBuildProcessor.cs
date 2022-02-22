@@ -109,14 +109,14 @@ namespace UnityEditor.XR.HoloKit
                 array.AddString("_magics-ar612._udp");
 
                 // CoreLocation
-                rootDict.SetString("NSLocationWhenInUseUsageDescription", "For thatReality to locate your current location.");
+                //rootDict.SetString("NSLocationWhenInUseUsageDescription", "For thatReality to locate your current location.");
 
                 // For save replay to iPhone's photo library
-                rootDict.SetString("NSPhotoLibraryAddUsageDescription", "Export AR replay.");
-                rootDict.SetString("NSPhotoLibraryUsageDescription", "Export AR replay.");
+                //rootDict.SetString("NSPhotoLibraryAddUsageDescription", "Export AR replay.");
+                //rootDict.SetString("NSPhotoLibraryUsageDescription", "Export AR replay.");
 
                 // For speech recognition
-                rootDict.SetString("NSSpeechRecognitionUsageDescription", "HoloKit uses speech recognition to cast spell.");
+                //rootDict.SetString("NSSpeechRecognitionUsageDescription", "HoloKit uses speech recognition to cast spell.");
 
                 File.WriteAllText(plistPath, plist.WriteToString());
             }
@@ -131,6 +131,7 @@ namespace UnityEditor.XR.HoloKit
                 string unityFrameworkTargetGuid = proj.GetUnityFrameworkTargetGuid();
 
                 proj.AddBuildProperty(unityFrameworkTargetGuid, "LIBRARY_SEARCH_PATHS", "$(SDKROOT)/usr/lib/swift");
+                proj.SetBuildProperty(mainTargetGuid, "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD", "NO"); // This is fucking comfortable
 
                 proj.WriteToFile(projPath);
             }

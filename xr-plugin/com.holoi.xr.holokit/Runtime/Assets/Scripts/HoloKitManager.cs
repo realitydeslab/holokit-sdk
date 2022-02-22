@@ -50,7 +50,10 @@ namespace UnityEngine.XR.HoloKit
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_DisableIsStereoscopicRendering();
 
-        delegate void SetARCameraBackground(bool value);
+        [DllImport("__Internal")]
+        private static extern void UnityHoloKit_SetSessionShouldAttemptRelocalization(bool value);
+
+        private delegate void SetARCameraBackground(bool value);
         [AOT.MonoPInvokeCallback(typeof(SetARCameraBackground))]
         private static void OnSetARCameraBackground(bool value)
         {
@@ -62,7 +65,7 @@ namespace UnityEngine.XR.HoloKit
         [DllImport("__Internal")]
         private static extern int UnityHoloKit_GetThermalState();
 
-        delegate void ThermalStateDidChange(int state);
+        private delegate void ThermalStateDidChange(int state);
         [AOT.MonoPInvokeCallback(typeof(ThermalStateDidChange))]
         private static void OnThermalStateDidChange(int state)
         {
@@ -71,7 +74,7 @@ namespace UnityEngine.XR.HoloKit
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetThermalStateDidChangeDelegate(ThermalStateDidChange callback);
 
-        delegate void CameraDidChangeTrackingState(int trackingState);
+        private delegate void CameraDidChangeTrackingState(int trackingState);
         [AOT.MonoPInvokeCallback(typeof(CameraDidChangeTrackingState))]
         private static void OnCameraDidChangeTrackingState(int trackingState)
         {
@@ -80,7 +83,7 @@ namespace UnityEngine.XR.HoloKit
         [DllImport("__Internal")]
         private static extern void UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(CameraDidChangeTrackingState callback);
 
-        delegate void NFCAuthenticationDidSucceed();
+        private delegate void NFCAuthenticationDidSucceed();
         [AOT.MonoPInvokeCallback(typeof(NFCAuthenticationDidSucceed))]
         private static void OnNFCAuthenticationDidSucceed()
         {
@@ -188,6 +191,11 @@ namespace UnityEngine.XR.HoloKit
         public void StopHoloKitInputSubsystem()
         {
             m_HoloKitInputSubsystem.Stop();
+        }
+
+        public void SetSetSessionShouldAttemptRelocalization(bool value)
+        {
+            UnityHoloKit_SetSessionShouldAttemptRelocalization(value);
         }
     }
 }

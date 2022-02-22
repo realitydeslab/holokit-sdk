@@ -37,10 +37,9 @@ typedef void (*DidDisconnectFromHost)(void);
 DidDisconnectFromHost DidDisconnectFromHostDelegate = NULL;
 
 typedef enum {
-    NetcodeTransportNone = 0,
-    NetcodeTransportUNet = 1,
+    NetcodeTransportUNet = 0,
+    NetcodeTransportPhoton = 1,
     NetcodeTransportMPC = 2,
-    NetcodeTransportPhoton = 3
 } NetcodeTransport;
 
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
@@ -280,8 +279,6 @@ typedef enum {
             [self.transportId2PeerIDMap setObject:peerID forKey:transportId];
             if ([self isHost]) {
                 switch(self.netcodeTransport) {
-                    case NetcodeTransportNone:
-                        break;
                     case NetcodeTransportUNet:
                         [self sendHostLocalIpAddress2Peer:peerID];
                         break;
@@ -308,7 +305,6 @@ typedef enum {
             NSLog(@"[mc_session] disconnected with peer %@", peerID.displayName);
             if ([self isHost]) {
                 switch(self.netcodeTransport) {
-                    case NetcodeTransportNone:
                     case NetcodeTransportUNet:
                     case NetcodeTransportPhoton:
                         break;
@@ -320,8 +316,6 @@ typedef enum {
                 }
             } else {
                 switch(self.netcodeTransport) {
-                    case NetcodeTransportNone:
-                        break;
                     case NetcodeTransportUNet:
                     case NetcodeTransportPhoton:
                         if ([[ARSessionManager sharedARSessionManager] arSession] != nil) {

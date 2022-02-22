@@ -14,11 +14,6 @@
 @property (nonatomic, strong, nullable) ARSession* arSession;
 @property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
 @property (nonatomic, strong, nullable) MultipeerSession *multipeerSession;
-// For Apple Watch input device
-@property (assign) bool appleWatchIsTracked;
-@property (nonatomic, assign) simd_quatd appleWatchRotation;
-@property (nonatomic, assign) simd_double3 appleWatchAcceleration;
-@property (nonatomic, assign) simd_double3 appleWatchAngularVelocity;
 @property (nonatomic, strong, nullable) CADisplayLink *aDisplayLink;
 @property (nonatomic, assign) double lastVsyncTimestamp;
 @property (nonatomic, assign) double nextVsyncTimestamp;
