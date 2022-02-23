@@ -7,7 +7,6 @@
 #import <ARKit/ARKit.h>
 #import <CoreVideo/CoreVideo.h>
 #import "multipeer_session.h"
-#import "ar_recorder.h"
 
 @interface ARSessionManager : NSObject
 

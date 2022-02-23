@@ -26,7 +26,6 @@
 		4B2B300B25E23E95002AC24F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B2B300925E23E95002AC24F /* LaunchScreen.storyboard */; };
 		4B2B300E25E23E95002AC24F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B300D25E23E95002AC24F /* main.m */; };
 		4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */; };
-		4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B4431F926B7A1A000869815 /* ar_recorder.mm */; };
 		4B610F0B26F5C6CA00CB2AEA /* core_haptics.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */; };
 		4B63298D26FED3D400101B4E /* low_latency_tracking_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */; };
 		4B69FF4126C611D200843FCF /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B69FF4026C611D200843FCF /* main.mm */; };
@@ -231,8 +230,6 @@
 		4B2B300C25E23E95002AC24F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B2B300D25E23E95002AC24F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = "MyHandPoseClassifier01 1.mlpackage"; sourceTree = "<group>"; };
-		4B4431F826B7A19000869815 /* ar_recorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_recorder.h; sourceTree = "<group>"; };
-		4B4431F926B7A1A000869815 /* ar_recorder.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_recorder.mm; sourceTree = "<group>"; };
 		4B46940926B3C56C00DC960E /* low_latency_tracking_api.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = low_latency_tracking_api.h; sourceTree = "<group>"; };
 		4B610F0926F5C6BA00CB2AEA /* core_haptics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_haptics.h; sourceTree = "<group>"; };
 		4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = core_haptics.m; sourceTree = "<group>"; };
@@ -670,8 +667,6 @@
 				4BB5587226205B7D00DC0213 /* nfc_session.m */,
 				4B260CA926368C3A0004B771 /* multipeer_session.h */,
 				4B260C9826368C280004B771 /* multipeer_session.m */,
-				4B4431F826B7A19000869815 /* ar_recorder.h */,
-				4B4431F926B7A1A000869815 /* ar_recorder.mm */,
 				4B1C73E826C4F6D00063AC2A /* speech_recognizer.h */,
 				4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */,
 				4B921B0326DCE6C600EC359F /* watch_connectivity.h */,
@@ -1489,7 +1484,6 @@
 				4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
-				4B4431FA26B7A1A000869815 /* ar_recorder.mm in Sources */,
 				4B1C73E726C4F6BD0063AC2A /* speech_recognizer.m in Sources */,
 				4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */,
 			);

@@ -5,26 +5,25 @@
 //  Created by Yuchen on 2021/3/29.
 //
 
-#include <memory>
-#include <vector>
+#import <memory>
+#import <vector>
 
 #import <os/log.h>
 #import <os/signpost.h>
 
-#include "IUnityXRTrace.h"
-#include "IUnityXRDisplay.h"
-#include "UnitySubsystemTypes.h"
-#include "load.h"
-#include "math_helpers.h"
-#include "holokit_api.h"
-#include "ar_recorder.h"
+#import "IUnityXRTrace.h"
+#import "IUnityXRDisplay.h"
+#import "UnitySubsystemTypes.h"
+#import "load.h"
+#import "math_helpers.h"
+#import "holokit_api.h"
 
 #if __APPLE__
 #define XR_METAL 1
 #define XR_ANDROID 0
-#include "IUnityGraphicsMetal.h"
-#include <Metal/Metal.h>
-#include <MetalKit/MetalKit.h>
+#import "IUnityGraphicsMetal.h"
+#import <Metal/Metal.h>
+#import <MetalKit/MetalKit.h>
 #import <simd/simd.h>
 #else
 #define XR_METAL 0

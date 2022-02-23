@@ -5,7 +5,7 @@
 //  Created by Yuchen on 2021/4/8.
 //
 
-#include <simd/simd.h>
+#import <simd/simd.h>
 
 namespace holokit {
 

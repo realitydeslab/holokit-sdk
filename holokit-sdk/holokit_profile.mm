@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#include "holokit_profile.h"
+#import "holokit_profile.h"
 
 #define CASE(str)                       if ([__s__ isEqualToString:(str)])
 #define SWITCH(s)                       for (NSString *__s__ = (s); ; )
