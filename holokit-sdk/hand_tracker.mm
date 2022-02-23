@@ -9,7 +9,7 @@
 #import <CoreVideo/CoreVideo.h>
 #import "math_helpers.h"
 #import "holokit_api.h"
-#import "ar_session_manager.h"
+//#import "ar_session_manager.h"
 #import "IUnityInterface.h"
 
 static const float kMaxLandmarkDepth = 0.6f;

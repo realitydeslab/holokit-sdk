@@ -17,7 +17,13 @@ const float kUserInterpupillaryDistance = 0.064;
 
 namespace holokit {
 
-#pragma mark - Initialize()
+std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;
+
+std::unique_ptr<HoloKitApi>& HoloKitApi::GetInstance() {
+    return holokit_api_;
+}
+
+#pragma mark - Initialize
 void HoloKitApi::Initialize() {
     // Get the model of the machine.
     struct utsname system_info;

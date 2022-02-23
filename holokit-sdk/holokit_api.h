@@ -124,11 +124,5 @@ private:
 
 }; // class HoloKitApi
 
-std::unique_ptr<HoloKitApi> HoloKitApi::holokit_api_;
-
-std::unique_ptr<HoloKitApi>& HoloKitApi::GetInstance() {
-    return holokit_api_;
-}
-
 } // namespace holokit
 
