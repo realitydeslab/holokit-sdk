@@ -13,7 +13,7 @@
 #import <MetalKit/MetalKit.h>
 #import <simd/simd.h>
 #import "UnityXRTypes.h"
-#import "ar_session_manager.h"
+#import "ar_session.h"
 #import "math_helpers.h"
 #import "holokit_profile.h"
 #import "nfc_session.h"
@@ -54,12 +54,6 @@ public:
     void SetIsSinglePassRendering(bool val) { is_single_pass_rendering_ = val; }
     
     void StartNfcAuthentication();
-    
-    bool GetIsSkippingFrame() { return is_skipping_frame_; }
-    
-    void SetIsSkippingFrame(bool val) { is_skipping_frame_ = val; }
-    
-    NSString* GetDeviceName() { return device_name_; }
 
     NSString* GetModelName() { return model_name_; }
     
@@ -80,9 +74,6 @@ private:
     
     /// @brief The model name of the machine.
     NSString* model_name_;
-    
-    /// @brief The device name of the machine.
-    NSString* device_name_;
     
     /// @brief Stores left and right eye projection matrices.
     std::vector<simd_float4x4> projection_matrices_;
@@ -113,8 +104,6 @@ private:
     bool is_stereoscopic_rendering_ = false;
     
     bool is_single_pass_rendering_ = false;
-    
-    bool is_skipping_frame_ = false;
     
     simd_float4x4 portrait_matrix;
     

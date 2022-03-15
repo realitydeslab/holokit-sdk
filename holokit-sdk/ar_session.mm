@@ -5,19 +5,18 @@
 //  Created by Yuchen on 2021/3/6.
 //
 
-#import "ar_session_manager.h"
+#import "ar_session.h"
 #import "UnityXRNativePtrs.h"
 #import <TargetConditionals.h>
 #import "UnityXRTypes.h"
 #import "IUnityInterface.h"
 #import "XR/UnitySubsystemTypes.h"
+#import "holokit_api.h"
+#import "math_helpers.h"
+
+// For testing purpose
 #import <os/log.h>
 #import <os/signpost.h>
-#import "low-latency-tracking/low_latency_tracking_api.h"
-#import "holokit_api.h"
-#import "core_motion.h"
-#import "math_helpers.h"
-#import "hand_tracker.h"
 
 typedef void (*DidAddARParticipantAnchor)();
 DidAddARParticipantAnchor DidAddARParticipantAnchorDelegate = NULL;
@@ -40,7 +39,7 @@ DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 typedef void (*DidFinishSavingARWorldMap)();
 DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
 
-@interface ARSessionManager() <ARSessionDelegate>
+@interface ARSessionDelegateController() <ARSessionDelegate>
 
 @property (assign) BOOL isSynchronizationComplete;
 @property (nonatomic, strong) ARAnchor *originAnchor;
@@ -50,17 +49,11 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
 
 @end
 
-@implementation ARSessionManager
+@implementation ARSessionDelegateController
 
 #pragma mark - init
 - (instancetype)init {
     if (self = [super init]) {
-        // https://developer.apple.com/videos/play/wwdc2021/10147/
-        CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self
-                                                          selector:@selector(displayLinkCallback:)];
-        //[link setPreferredFramesPerSecond:60];
-        [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-        
         self.isSynchronizationComplete = NO;
         self.isScanningARWorldMap = NO;
         self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
@@ -72,10 +65,13 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
     return self;
 }
 
-// https://developer.apple.com/videos/play/wwdc2021/10147/
-- (void)displayLinkCallback:(CADisplayLink *)link {
-    self.lastVsyncTimestamp = link.timestamp;
-    self.nextVsyncTimestamp = link.targetTimestamp;
++ (id)sharedARSessionDelegateController {
+    static dispatch_once_t onceToken = 0;
+    static id _sharedObject = nil;
+    dispatch_once(&onceToken, ^{
+        _sharedObject = [[self alloc] init];
+    });
+    return _sharedObject;
 }
 
 - (void)thermalStateDidChange {
@@ -97,15 +93,6 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
             ThermalStateDidChangeDelegate(3);
             break;
     }
-}
-
-+ (id)sharedARSessionManager {
-    static dispatch_once_t onceToken = 0;
-    static id _sharedObject = nil;
-    dispatch_once(&onceToken, ^{
-        _sharedObject = [[self alloc] init];
-    });
-    return _sharedObject;
 }
 
 - (void)updateWithCollaborationData:(ARCollaborationData *)collaborationData {
@@ -188,7 +175,7 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
         return;
     }
     
-    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
+    ARSession *arSession = [[ARSessionDelegateController sharedARSessionDelegateController] arSession];
     ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)arSession.configuration;
     configuration.initialWorldMap = self.worldMap;
     [arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
@@ -257,9 +244,9 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
     }
     
     // Hand tracking
-    if ([[HandTracker sharedHandTracker] isHandTrackingOn]) {
-        [[HandTracker sharedHandTracker] performHumanHandPoseRequest:frame];
-    }
+//    if ([[HandTracker sharedHandTracker] isHandTrackingOn]) {
+//        [[HandTracker sharedHandTracker] performHumanHandPoseRequest:frame];
+//    }
 }
 
 - (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
@@ -407,7 +394,7 @@ UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
     }
     
     ARSession* sessionPtr = (__bridge ARSession*)ar_native_session->sessionPtr;
-    ARSessionManager* ar_session_manager = [ARSessionManager sharedARSessionManager];
+    ARSessionDelegateController* ar_session_manager = [ARSessionDelegateController sharedARSessionDelegateController];
     ar_session_manager.unityARSessionDelegate = sessionPtr.delegate;
     
     [sessionPtr setDelegate:ar_session_manager];
@@ -417,13 +404,13 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
     
-    ARSessionManager* ar_session = [ARSessionManager sharedARSessionManager];
+    ARSessionDelegateController* ar_session = [ARSessionDelegateController sharedARSessionDelegateController];
     [ar_session.arSession setWorldOrigin:(transform_matrix)];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float rotation[4]) {
-    ARSessionManager *session = [ARSessionManager sharedARSessionManager];
+    ARSessionDelegateController *session = [ARSessionDelegateController sharedARSessionDelegateController];
     simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
     std::vector<float> rot = SimdFloat4x42UnityRotation(transform_matrix);
     NSString *name = [NSString stringWithUTF8String:anchorName];
@@ -476,12 +463,12 @@ UnityHoloKit_GetThermalState() {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetIsSynchronizationComplete(BOOL val) {
-    [[ARSessionManager sharedARSessionManager] setIsSynchronizationComplete:val];
+    [[ARSessionDelegateController sharedARSessionDelegateController] setIsSynchronizationComplete:val];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_RemoveAllLocalAnchors() {
-    [[ARSessionManager sharedARSessionManager] removeAllLocalAnchors];
+    [[ARSessionDelegateController sharedARSessionDelegateController] removeAllLocalAnchors];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -496,27 +483,27 @@ UnityHoloKit_SetARWorldMappingStatusDidChangeDelegate(ARWorldMappingStatusDidCha
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetIsScanningARWorldMap(bool value) {
-    [[ARSessionManager sharedARSessionManager] setIsScanningARWorldMap:value];
+    [[ARSessionDelegateController sharedARSessionDelegateController] setIsScanningARWorldMap:value];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_DeleteARSessionReference() {
-    [[ARSessionManager sharedARSessionManager] setArSession:nil];
+    [[ARSessionDelegateController sharedARSessionDelegateController] setArSession:nil];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SaveARWorldMap(const char *mapName) {
-    [[ARSessionManager sharedARSessionManager] saveARWorldMap:[NSString stringWithUTF8String:mapName]];
+    [[ARSessionDelegateController sharedARSessionDelegateController] saveARWorldMap:[NSString stringWithUTF8String:mapName]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_RetrieveARWorldMap(const char *mapName) {
-    [[ARSessionManager sharedARSessionManager] retrieveARWorldMap:[NSString stringWithUTF8String:mapName]];
+    [[ARSessionDelegateController sharedARSessionDelegateController] retrieveARWorldMap:[NSString stringWithUTF8String:mapName]];
 }
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SearchARWorldMaps() {
-    int numOfMaps = [[ARSessionManager sharedARSessionManager] searchARWorldMaps];
+    int numOfMaps = [[ARSessionDelegateController sharedARSessionDelegateController] searchARWorldMaps];
     NSLog(@"[world_map] found %d maps in total", numOfMaps);
     return numOfMaps;
 }
@@ -528,7 +515,7 @@ UnityHoloKit_SetDidFindARWorldMapDelegate(DidFindARWorldMap callback) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_LoadARWorldMap() {
-    [[ARSessionManager sharedARSessionManager] loadARWorldMap];
+    [[ARSessionDelegateController sharedARSessionDelegateController] loadARWorldMap];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -538,7 +525,7 @@ UnityHoloKit_SetDidFinishSavingARWorldMapDelegate(DidFinishSavingARWorldMap call
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetSessionShouldAttemptRelocalization(bool value) {
-    [[ARSessionManager sharedARSessionManager] setSessionShouldAttemptRelocalization:value];
+    [[ARSessionDelegateController sharedARSessionDelegateController] setSessionShouldAttemptRelocalization:value];
 }
 
 } // extern "C"

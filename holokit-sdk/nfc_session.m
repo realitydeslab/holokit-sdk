@@ -8,7 +8,7 @@
 #import "nfc_session.h"
 #import "holokit_sdk-Swift.h"
 #import "IUnityInterface.h"
-#import "ar_session_manager.h"
+#import "ar_session.h"
 
 typedef void (*NFCAuthenticationDidSucceed)(void);
 NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
@@ -127,7 +127,7 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
                             if ([Crypto validateSignatureWithSignature:signature content:content]) {
                                 [session setAlertMessage:@"NFC authentication succeeded"];
                                 [session invalidateSession];
-                                [[ARSessionManager sharedARSessionManager] setIsStereoscopicRendering:YES];
+                                [[ARSessionDelegateController sharedARSessionDelegateController] setIsStereoscopicRendering:YES];
                                 if (NFCAuthenticationDidSucceedDelegate != NULL) {
                                     NFCAuthenticationDidSucceedDelegate();
                                 }

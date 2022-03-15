@@ -6,7 +6,6 @@
 //
 
 #import "watch_connectivity.h"
-#import "core_motion.h"
 #import "math_helpers.h"
 #import "IUnityInterface.h"
 

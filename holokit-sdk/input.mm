@@ -17,7 +17,6 @@
 #import "IUnityXRInput.h"
 #import "math_helpers.h"
 #import "holokit_api.h"
-#import "low-latency-tracking/low_latency_tracking_api.h"
 #import "hand_tracker.h"
 
 // @def Logs to Unity XR Trace interface @p message.
@@ -240,43 +239,29 @@ public:
             // This kind of update happens right before Unity starts rendering.
             // We update center eye position and rotation here.
             if (device_id == kDeviceIdHoloKitHmd) {
-                // TODO: low latency tracking - get predicted camera transform
-                //double vsync_time_stamp = [arSessionDelegateController.aDisplayLink targetTimestamp];
-                double vsync_time_stamp = [[NSProcessInfo processInfo] systemUptime];
-                UnityXRVector3 position;
-                UnityXRVector4 rotation;
-                
-                Eigen::Vector3d eigen_position;
-                Eigen::Quaterniond eigen_rotation;
-                if(holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering()
-                   && holokit::LowLatencyTrackingApi::GetInstance()->IsActive()
-                   && holokit::LowLatencyTrackingApi::GetInstance()->GetPose(vsync_time_stamp, eigen_position, eigen_rotation)) {
-                    position = EigenVector3dToUnityXRVector3(eigen_position);
-                    rotation = EigenQuaterniondToUnityXRVector4(eigen_rotation);
-                } else {
-                    simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
-                    switch([[[[[UIApplication sharedApplication] windows] firstObject] windowScene] interfaceOrientation]) {
-                        case UIInterfaceOrientationLandscapeRight:
-                            break;
-                        case UIInterfaceOrientationPortrait: {
-                            camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetPortraitMatrix());
-                            break;
-                        }
-                        case UIInterfaceOrientationLandscapeLeft:
-                            camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetLandscapeLeftMatrix());
-                            break;
-                        case UIInterfaceOrientationPortraitUpsideDown:
-                            camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetPortraitUpsidedownMatrix());
-                            break;
-                        default:
-                            break;
+
+                simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
+                switch([[[[[UIApplication sharedApplication] windows] firstObject] windowScene] interfaceOrientation]) {
+                    case UIInterfaceOrientationLandscapeRight:
+                        break;
+                    case UIInterfaceOrientationPortrait: {
+                        camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetPortraitMatrix());
+                        break;
                     }
-                    simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
-//                    position = UnityXRVector3 { camera_position.x, camera_position.y, -camera_position.z };
-                    position = UnityXRVector3 { 0, 0, 0 };
-                    simd_quatf quaternion = simd_quaternion(camera_transform);
-                    rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
+                    case UIInterfaceOrientationLandscapeLeft:
+                        camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetLandscapeLeftMatrix());
+                        break;
+                    case UIInterfaceOrientationPortraitUpsideDown:
+                        camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetPortraitUpsidedownMatrix());
+                        break;
+                    default:
+                        break;
                 }
+                simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
+                UnityXRVector3 position = UnityXRVector3 { camera_position.x, camera_position.y, -camera_position.z };
+                simd_quatf quaternion = simd_quaternion(camera_transform);
+                UnityXRVector4 rotation = UnityXRVector4 { -quaternion.vector.x, -quaternion.vector.y, quaternion.vector.z, quaternion.vector.w };
+                
                 //Is Tracked
                 input_->DeviceState_SetBinaryValue(state, feature_index++, true);
                 //Track State
@@ -343,7 +328,7 @@ private:
     
     static std::unique_ptr<HoloKitInputProvider> input_provider_;
     
-    ARSessionManager* ar_session_handler;
+    ARSessionDelegateController* ar_session_handler;
     
     IUnityInterfaces* xr_interfaces_;
     

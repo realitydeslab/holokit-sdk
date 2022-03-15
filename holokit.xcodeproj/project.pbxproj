@@ -8,14 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
-		4B14CB3F2712C6A800C1DBC1 /* pose_predictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B14CB3D2712C6A800C1DBC1 /* pose_predictor.cpp */; };
-		4B16B10826DB99E40016FFA0 /* imu_process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A528626CCDF96005D55C5 /* imu_process.cpp */; };
-		4B16B10926DB99E70016FFA0 /* pose_ekf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */; };
-		4B16B10A26DB99EC0016FFA0 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC826D9ECAD00CC0197 /* state.cpp */; };
-		4B16B10B26DB99EE0016FFA0 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BCB26D9ECC500CC0197 /* utility.cpp */; };
-		4B16B10D26DB9F420016FFA0 /* low_latency_tracking_api_naive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B16B10C26DB9EFC0016FFA0 /* low_latency_tracking_api_naive.mm */; };
 		4B188AD026F432B4001FD67D /* hand_tracker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B188ACF26F432B4001FD67D /* hand_tracker.mm */; };
-		4B1C73E726C4F6BD0063AC2A /* speech_recognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */; };
 		4B260C9926368C280004B771 /* multipeer_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B260C9826368C280004B771 /* multipeer_session.m */; };
 		4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FF925E23E94002AC24F /* AppDelegate.m */; };
 		4B2B2FFC25E23E94002AC24F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FFB25E23E94002AC24F /* Shaders.metal */; };
@@ -26,12 +19,10 @@
 		4B2B300B25E23E95002AC24F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B2B300925E23E95002AC24F /* LaunchScreen.storyboard */; };
 		4B2B300E25E23E95002AC24F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B300D25E23E95002AC24F /* main.m */; };
 		4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */; };
-		4B610F0B26F5C6CA00CB2AEA /* core_haptics.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */; };
-		4B63298D26FED3D400101B4E /* low_latency_tracking_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */; };
 		4B69FF4126C611D200843FCF /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B69FF4026C611D200843FCF /* main.mm */; };
 		4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6AD99125E343EB008F9911 /* MathHelper.m */; };
 		4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C84E825E3F19B00B04F03 /* MathHelper.m */; };
-		4B6C9420261493E300CBDFB4 /* ar_session_manager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ar_session_manager.mm */; };
+		4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ar_session.mm */; };
 		4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		4B6CC26A25D42C2C0068CB66 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26925D42C2C0068CB66 /* AppDelegate.m */; };
@@ -42,9 +33,7 @@
 		4B6CC27825D42C2D0068CB66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27725D42C2D0068CB66 /* Assets.xcassets */; };
 		4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27925D42C2D0068CB66 /* LaunchScreen.storyboard */; };
 		4B6CC27E25D42C2D0068CB66 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC27D25D42C2D0068CB66 /* main.m */; };
-		4B8A528826CCDF96005D55C5 /* imu_process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A528626CCDF96005D55C5 /* imu_process.cpp */; };
 		4B921B0526DCE6D600EC359F /* watch_connectivity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0426DCE6D600EC359F /* watch_connectivity.mm */; };
-		4B921B0926DCF07800EC359F /* core_motion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0826DCF07800EC359F /* core_motion.mm */; };
 		4B921B0C26DDE4B400EC359F /* core_location.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0B26DDE4B400EC359F /* core_location.m */; };
 		4B9304D32625A4AA005D9975 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
 		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
@@ -56,9 +45,6 @@
 		4BC45AEC262813BD00BA98E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEA262813BD00BA98E4 /* Main.storyboard */; };
 		4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AED262813BE00BA98E4 /* Assets.xcassets */; };
 		4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */; };
-		4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */; };
-		4BD62BC926D9ECAD00CC0197 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BC826D9ECAD00CC0197 /* state.cpp */; };
-		4BD62BCC26D9ECC500CC0197 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD62BCB26D9ECC500CC0197 /* utility.cpp */; };
 		4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* Crypto.swift */; };
 		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
 		4BE7B63E2611051A001F39F2 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
@@ -206,13 +192,8 @@
 /* Begin PBXFileReference section */
 		4B04D8A9260CCCA20055020F /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B06977225ECADA3009D51BD /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = System/Library/Frameworks/Vision.framework; sourceTree = SDKROOT; };
-		4B14CB3D2712C6A800C1DBC1 /* pose_predictor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pose_predictor.cpp; sourceTree = "<group>"; };
-		4B14CB3E2712C6A800C1DBC1 /* pose_predictor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pose_predictor.h; sourceTree = "<group>"; };
-		4B16B10C26DB9EFC0016FFA0 /* low_latency_tracking_api_naive.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = low_latency_tracking_api_naive.mm; sourceTree = "<group>"; };
 		4B188ACE26F432A4001FD67D /* hand_tracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hand_tracker.h; sourceTree = "<group>"; };
 		4B188ACF26F432B4001FD67D /* hand_tracker.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hand_tracker.mm; sourceTree = "<group>"; };
-		4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = speech_recognizer.m; sourceTree = "<group>"; };
-		4B1C73E826C4F6D00063AC2A /* speech_recognizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = speech_recognizer.h; sourceTree = "<group>"; };
 		4B260C9826368C280004B771 /* multipeer_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = multipeer_session.m; sourceTree = "<group>"; };
 		4B260CA926368C3A0004B771 /* multipeer_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = multipeer_session.h; sourceTree = "<group>"; };
 		4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-monocular-handtracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -230,9 +211,6 @@
 		4B2B300C25E23E95002AC24F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B2B300D25E23E95002AC24F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = "MyHandPoseClassifier01 1.mlpackage"; sourceTree = "<group>"; };
-		4B46940926B3C56C00DC960E /* low_latency_tracking_api.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = low_latency_tracking_api.h; sourceTree = "<group>"; };
-		4B610F0926F5C6BA00CB2AEA /* core_haptics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_haptics.h; sourceTree = "<group>"; };
-		4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = core_haptics.m; sourceTree = "<group>"; };
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		4B69FF3E26C611D200843FCF /* low-latency-tracking-api-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "low-latency-tracking-api-test"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -241,7 +219,7 @@
 		4B6AD99B25E34404008F9911 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
 		4B6C84E825E3F19B00B04F03 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
 		4B6C84F225E3F1A700B04F03 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
-		4B6C941F261493E300CBDFB4 /* ar_session_manager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session_manager.mm; sourceTree = "<group>"; };
+		4B6C941F261493E300CBDFB4 /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
 		4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-stereoscopic-rendering.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B6CC26825D42C2C0068CB66 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B6CC26925D42C2C0068CB66 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -256,18 +234,13 @@
 		4B6CC27A25D42C2D0068CB66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4B6CC27C25D42C2D0068CB66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B6CC27D25D42C2D0068CB66 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		4B8A528626CCDF96005D55C5 /* imu_process.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = imu_process.cpp; sourceTree = "<group>"; };
-		4B8A528726CCDF96005D55C5 /* imu_process.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = imu_process.h; sourceTree = "<group>"; };
 		4B921B0326DCE6C600EC359F /* watch_connectivity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = watch_connectivity.h; sourceTree = "<group>"; };
 		4B921B0426DCE6D600EC359F /* watch_connectivity.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = watch_connectivity.mm; sourceTree = "<group>"; };
-		4B921B0726DCF06C00EC359F /* core_motion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_motion.h; sourceTree = "<group>"; };
-		4B921B0826DCF07800EC359F /* core_motion.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = core_motion.mm; sourceTree = "<group>"; };
 		4B921B0A26DDE4A600EC359F /* core_location.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_location.h; sourceTree = "<group>"; };
 		4B921B0B26DDE4B400EC359F /* core_location.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = core_location.m; sourceTree = "<group>"; };
 		4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = holokit_profile.mm; sourceTree = "<group>"; };
 		4B9C52AF261EF13A0020E4C8 /* holokit_profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = holokit_profile.h; sourceTree = "<group>"; };
-		4B9C52BE261F0B330020E4C8 /* ar_session_manager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_session_manager.h; sourceTree = "<group>"; };
-		4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = low_latency_tracking_api.mm; sourceTree = "<group>"; };
+		4B9C52BE261F0B330020E4C8 /* ar_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_session.h; sourceTree = "<group>"; };
 		4BB5587226205B7D00DC0213 /* nfc_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = nfc_session.m; sourceTree = "<group>"; };
 		4BB5588226205B8E00DC0213 /* nfc_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nfc_session.h; sourceTree = "<group>"; };
 		4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "factory-app-nfc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -283,15 +256,6 @@
 		4BC45AF3262813BE00BA98E4 /* factory_app_nfc-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "factory_app_nfc-Bridging-Header.h"; sourceTree = "<group>"; };
 		4BC45B06262813CA00BA98E4 /* factory-app-nfc.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "factory-app-nfc.entitlements"; sourceTree = "<group>"; };
 		4BC45B25262815CB00BA98E4 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
-		4BD62BC026D9EC2100CC0197 /* calcQ.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = calcQ.h; sourceTree = "<group>"; };
-		4BD62BC126D9EC3D00CC0197 /* eigen_utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = eigen_utils.h; sourceTree = "<group>"; };
-		4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pose_ekf.cpp; sourceTree = "<group>"; };
-		4BD62BC626D9EC8B00CC0197 /* pose_ekf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pose_ekf.h; sourceTree = "<group>"; };
-		4BD62BC726D9EC9B00CC0197 /* sensor_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sensor_config.h; sourceTree = "<group>"; };
-		4BD62BC826D9ECAD00CC0197 /* state.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = state.cpp; sourceTree = "<group>"; };
-		4BD62BCA26D9ECB800CC0197 /* state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state.h; sourceTree = "<group>"; };
-		4BD62BCB26D9ECC500CC0197 /* utility.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
-		4BD62BCD26D9ECD100CC0197 /* utility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
 		4BD9A6A0278AA53C000BD266 /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE7B62126110504001F39F2 /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
@@ -576,29 +540,6 @@
 			path = "test-monocular-handtracking";
 			sourceTree = "<group>";
 		};
-		4B46940826B3C52300DC960E /* low-latency-tracking */ = {
-			isa = PBXGroup;
-			children = (
-				4B46940926B3C56C00DC960E /* low_latency_tracking_api.h */,
-				4BA0DBF526B401360097C1F5 /* low_latency_tracking_api.mm */,
-				4B16B10C26DB9EFC0016FFA0 /* low_latency_tracking_api_naive.mm */,
-				4BD62BC026D9EC2100CC0197 /* calcQ.h */,
-				4BD62BC126D9EC3D00CC0197 /* eigen_utils.h */,
-				4B8A528626CCDF96005D55C5 /* imu_process.cpp */,
-				4B8A528726CCDF96005D55C5 /* imu_process.h */,
-				4BD62BC426D9EC7200CC0197 /* pose_ekf.cpp */,
-				4BD62BC626D9EC8B00CC0197 /* pose_ekf.h */,
-				4BD62BC726D9EC9B00CC0197 /* sensor_config.h */,
-				4BD62BC826D9ECAD00CC0197 /* state.cpp */,
-				4BD62BCA26D9ECB800CC0197 /* state.h */,
-				4BD62BCB26D9ECC500CC0197 /* utility.cpp */,
-				4BD62BCD26D9ECD100CC0197 /* utility.h */,
-				4B14CB3D2712C6A800C1DBC1 /* pose_predictor.cpp */,
-				4B14CB3E2712C6A800C1DBC1 /* pose_predictor.h */,
-			);
-			path = "low-latency-tracking";
-			sourceTree = "<group>";
-		};
 		4B69FF3F26C611D200843FCF /* low-latency-tracking-api-test */ = {
 			isa = PBXGroup;
 			children = (
@@ -650,7 +591,6 @@
 		4BE7B60C261104ED001F39F2 /* holokit-sdk */ = {
 			isa = PBXGroup;
 			children = (
-				4B46940826B3C52300DC960E /* low-latency-tracking */,
 				4BE7B62126110504001F39F2 /* display.mm */,
 				4BE7B63D2611051A001F39F2 /* input.mm */,
 				4BE7B64C26110537001F39F2 /* load.h */,
@@ -659,26 +599,20 @@
 				4BE7B66A2611055A001F39F2 /* math_helpers.mm */,
 				4BE7B6C926117AE1001F39F2 /* holokit_api.h */,
 				4BE7B6C826117AE1001F39F2 /* holokit_api.mm */,
-				4B9C52BE261F0B330020E4C8 /* ar_session_manager.h */,
-				4B6C941F261493E300CBDFB4 /* ar_session_manager.mm */,
+				4B9C52BE261F0B330020E4C8 /* ar_session.h */,
+				4B6C941F261493E300CBDFB4 /* ar_session.mm */,
 				4B9C52AF261EF13A0020E4C8 /* holokit_profile.h */,
 				4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */,
 				4BB5588226205B8E00DC0213 /* nfc_session.h */,
 				4BB5587226205B7D00DC0213 /* nfc_session.m */,
 				4B260CA926368C3A0004B771 /* multipeer_session.h */,
 				4B260C9826368C280004B771 /* multipeer_session.m */,
-				4B1C73E826C4F6D00063AC2A /* speech_recognizer.h */,
-				4B1C73E626C4F6BD0063AC2A /* speech_recognizer.m */,
 				4B921B0326DCE6C600EC359F /* watch_connectivity.h */,
 				4B921B0426DCE6D600EC359F /* watch_connectivity.mm */,
-				4B921B0726DCF06C00EC359F /* core_motion.h */,
-				4B921B0826DCF07800EC359F /* core_motion.mm */,
 				4B921B0A26DDE4A600EC359F /* core_location.h */,
 				4B921B0B26DDE4B400EC359F /* core_location.m */,
 				4B188ACE26F432A4001FD67D /* hand_tracker.h */,
 				4B188ACF26F432B4001FD67D /* hand_tracker.mm */,
-				4B610F0926F5C6BA00CB2AEA /* core_haptics.h */,
-				4B610F0A26F5C6CA00CB2AEA /* core_haptics.m */,
 				4BD9A6A0278AA53C000BD266 /* Crypto.swift */,
 			);
 			path = "holokit-sdk";
@@ -1427,12 +1361,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B16B10A26DB99EC0016FFA0 /* state.cpp in Sources */,
 				4B69FF4126C611D200843FCF /* main.mm in Sources */,
-				4B16B10826DB99E40016FFA0 /* imu_process.cpp in Sources */,
-				4B16B10D26DB9F420016FFA0 /* low_latency_tracking_api_naive.mm in Sources */,
-				4B16B10926DB99E70016FFA0 /* pose_ekf.cpp in Sources */,
-				4B16B10B26DB99EE0016FFA0 /* utility.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1464,27 +1393,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BD62BCC26D9ECC500CC0197 /* utility.cpp in Sources */,
 				4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */,
-				4BD62BC926D9ECAD00CC0197 /* state.cpp in Sources */,
-				4B14CB3F2712C6A800C1DBC1 /* pose_predictor.cpp in Sources */,
 				4B921B0C26DDE4B400EC359F /* core_location.m in Sources */,
 				4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */,
 				4BE7B63E2611051A001F39F2 /* input.mm in Sources */,
 				4B921B0526DCE6D600EC359F /* watch_connectivity.mm in Sources */,
 				4B260C9926368C280004B771 /* multipeer_session.m in Sources */,
-				4B8A528826CCDF96005D55C5 /* imu_process.cpp in Sources */,
 				4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */,
-				4B6C9420261493E300CBDFB4 /* ar_session_manager.mm in Sources */,
-				4B63298D26FED3D400101B4E /* low_latency_tracking_api.mm in Sources */,
-				4B610F0B26F5C6CA00CB2AEA /* core_haptics.m in Sources */,
+				4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */,
 				4BE7B62226110504001F39F2 /* display.mm in Sources */,
 				4B188AD026F432B4001FD67D /* hand_tracker.mm in Sources */,
-				4B921B0926DCF07800EC359F /* core_motion.mm in Sources */,
-				4BD62BC526D9EC7200CC0197 /* pose_ekf.cpp in Sources */,
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
-				4B1C73E726C4F6BD0063AC2A /* speech_recognizer.m in Sources */,
 				4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

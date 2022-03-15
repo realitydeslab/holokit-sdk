@@ -18,54 +18,42 @@
 #import "math_helpers.h"
 #import "holokit_api.h"
 
-#if __APPLE__
-#define XR_METAL 1
-#define XR_ANDROID 0
 #import "IUnityGraphicsMetal.h"
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #import <simd/simd.h>
-#else
-#define XR_METAL 0
-#define XR_ANDROID 1
-#endif
-
-/// If this is 1, both render passes will render to a single texture.
-/// Otherwise, they will render to two separate textures.
-#define SIDE_BY_SIDE 1
-#define NUM_RENDER_PASSES 2
 
 // @def Logs to Unity XR Trace interface @p message.
 #define HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, message, ...)                \
   XR_TRACE_LOG(trace, "[HoloKitDisplayProvider] " message "\n", \
                ##__VA_ARGS__)
 
-NSString* alignment_marker_shader = @
-    "#include <metal_stdlib>\n"
-    "using namespace metal;\n"
-    "struct VertexInOut\n"
-    "{\n"
-    "    float4  position [[position]];\n"
-    "    float4  color;\n"
-    "};\n"
-    "vertex VertexInOut passThroughVertex(uint vid [[ vertex_id ]],\n"
-    "                                     constant packed_float4* position  [[ buffer(0) ]])\n"
-    "{\n"
-    "    VertexInOut outVertex;\n"
-    "    outVertex.position = position[vid];\n"
-    "    return outVertex;\n"
-    "};\n"
-    "fragment half4 passThroughFragment(VertexInOut inFrag [[stage_in]])\n"
-    "{\n"
-    "//  return half4(1, 0, 0, 1);\n"
-    "    return half4(1, 1, 1, 1);\n"
-    "};\n";
+//NSString* alignment_marker_shader = @
+//    "#include <metal_stdlib>\n"
+//    "using namespace metal;\n"
+//    "struct VertexInOut\n"
+//    "{\n"
+//    "    float4  position [[position]];\n"
+//    "    float4  color;\n"
+//    "};\n"
+//    "vertex VertexInOut passThroughVertex(uint vid [[ vertex_id ]],\n"
+//    "                                     constant packed_float4* position  [[ buffer(0) ]])\n"
+//    "{\n"
+//    "    VertexInOut outVertex;\n"
+//    "    outVertex.position = position[vid];\n"
+//    "    return outVertex;\n"
+//    "};\n"
+//    "fragment half4 passThroughFragment(VertexInOut inFrag [[stage_in]])\n"
+//    "{\n"
+//    "//  return half4(1, 0, 0, 1);\n"
+//    "    return half4(1, 1, 1, 1);\n"
+//    "};\n";
 
-// widgets data
-float vertex_data[] = {
-    0.829760, 1, 0.0, 1.0,
-    0.829760, 0.7, 0.0, 1.0
-};
+//// widgets data
+//float vertex_data[] = {
+//    0.829760, 1, 0.0, 1.0,
+//    0.829760, 0.7, 0.0, 1.0
+//};
 
 // new content rendering data
 constexpr static float main_vertices[] = { -1, -1, 1, -1, -1, 1, 1, 1 };
@@ -82,7 +70,7 @@ typedef enum FragmentInputIndex {
   FragmentInputIndexTexture = 0,
 } FragmentInputIndex;
 
-NSString* content_shader = @
+NSString* quad_shader = @
     R"msl(#include <metal_stdlib>
     #include <simd/simd.h>
     
@@ -182,12 +170,12 @@ public:
     }
     
     UnitySubsystemErrorCode Start() {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Start");
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Start");
         return kUnitySubsystemErrorCodeSuccess;
     }
     
     void Stop() const {
-        HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Stop");
+        //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Stop");
     }
     
     void Shutdown() const {}
@@ -201,8 +189,10 @@ public:
         // Unity will swap buffers for us after GfxThread_SubmitCurrentFrame() is executed.
         rendering_caps->skipPresentToMainScreen = false;
         
+        // Allocate new textures when gfx thread starts.
         allocate_new_textures_ = true;
         is_first_frame_ = true;
+        // Disable AR background image
         if (holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(false);
         }
@@ -213,17 +203,14 @@ public:
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
         RenderContent();
-        RenderAlignmentMarker();
-        
         return kUnitySubsystemErrorCodeSuccess;
     }
     
-    // Mimic how Google Cardboard does the rendering
     void RenderContent() {
-        if (!main_metal_setup_) {
+        if (!metal_setup_) {
             id<MTLDevice> mtl_device = metal_interface_->MetalDevice();
             // Compile Metal library
-            id<MTLLibrary> mtl_library = [mtl_device newLibraryWithSource:content_shader
+            id<MTLLibrary> mtl_library = [mtl_device newLibraryWithSource:quad_shader
                                                                   options:nil
                                                                     error:nil];
             if (mtl_library == nil) {
@@ -257,7 +244,7 @@ public:
                 HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Failed to create Metal content render pipeline.");
                 return;
             }
-            main_metal_setup_ = true;
+            metal_setup_ = true;
         }
         
         id<MTLRenderCommandEncoder> mtl_render_command_encoder =
@@ -270,60 +257,48 @@ public:
                                        vertexStart:0
                                        vertexCount:4];
     }
-    
-    void RenderAlignmentMarker() {
-        if (!second_metal_setup_) {
-            id<MTLDevice> mtl_device = metal_interface_->MetalDevice();
-            vertex_data[0] = vertex_data[4] = holokit::HoloKitApi::GetInstance()->GetHorizontalAlignmentMarkerOffset();
-            
-            second_vertex_buffer_ = [mtl_device newBufferWithBytes:vertex_data length:sizeof(vertex_data) options:MTLResourceOptionCPUCacheModeDefault];
-            second_vertex_buffer_.label = @"vertices";
-            //id<MTLBuffer> vertex_color_buffer = [mtl_device_ newBufferWithBytes:vertex_color_data length:sizeof(vertex_color_data) options:MTLResourceOptionCPUCacheModeDefault];
-            //vertex_color_buffer.label = @"colors";
-            
-            id<MTLLibrary> lib = [mtl_device newLibraryWithSource:alignment_marker_shader options:nil error:nil];
-            id<MTLFunction> vertex_function = [lib newFunctionWithName:@"passThroughVertex"];
-            id<MTLFunction> fragment_function = [lib newFunctionWithName:@"passThroughFragment"];
-            
-            MTLRenderPipelineDescriptor* pipeline_descriptor = [[MTLRenderPipelineDescriptor alloc] init];
-            pipeline_descriptor.vertexFunction = vertex_function;
-            pipeline_descriptor.fragmentFunction = fragment_function;
-            pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-            pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-            pipeline_descriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-            pipeline_descriptor.sampleCount = 1;
-            
-            second_render_pipeline_state_ = [mtl_device newRenderPipelineStateWithDescriptor:pipeline_descriptor error:nil];
-            second_metal_setup_ = true;
-        }
-        
-        id<MTLRenderCommandEncoder> command_encoder = (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [command_encoder setRenderPipelineState:second_render_pipeline_state_];
-        [command_encoder setVertexBuffer:second_vertex_buffer_ offset:0 atIndex:0];
-        //[command_encoder setVertexBuffer:vertex_color_buffer offset:0 atIndex:1];
-        [command_encoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:(sizeof(vertex_data) / sizeof(float))];
-    }
 
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
-        // We interrupt the graphics thread if it is not manually opened by SDK.
+        // We interrupt the graphics thread if it is not manually opened by the SDK.
         if (!holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering()) {
-            NSLog(@"[display] unauthorized StAR");
+            HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Shut down Gfx Thread.");
             return kUnitySubsystemErrorCodeFailure;
         }
         
         // If this is the first frame for stereoscopic rendering mode.
         if (allocate_new_textures_) {
             DestroyTextures();
-            int num_textures = 1;
-            CreateTextures(num_textures);
+            CreateTextures(1);
             allocate_new_textures_ = false;
         }
         
-        if (!holokit::HoloKitApi::GetInstance()->GetIsSinglePassRendering())
+        if (holokit::HoloKitApi::GetInstance()->GetIsSinglePassRendering())
         {
+            // Single-pass rendering
+            next_frame->renderPassesCount = 1;
+            auto& render_pass = next_frame->renderPasses[0];
+            render_pass.textureId = unity_textures_[0];
+            render_pass.renderParamsCount = 2;
+            render_pass.cullingPassIndex = 0;
+            for (int i = 0; i < 2; i++) {
+                auto& render_params = render_pass.renderParams[i];
+                render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(i));
+                render_params.projection.type = kUnityXRProjectionTypeMatrix;
+                render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(i));
+                render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(i));
+            }
+            auto& culling_pass = next_frame->cullingPasses[0];
+            culling_pass.separation = 0.064f;
+            culling_pass.deviceAnchorToCullingPose = next_frame->renderPasses[0].renderParams[0].deviceAnchorToEyePose;
+            culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
+            culling_pass.projection.data.matrix = next_frame->renderPasses[0].renderParams[0].projection.data.matrix;
+        }
+        else
+        {
+            // 2-pass rendering
             next_frame->renderPassesCount = 2;
-            // Iterate through each render pass.
+            // Iterate through 2 render passes.
             for (int pass = 0; pass < next_frame->renderPassesCount; ++pass)
             {
                 auto& render_pass = next_frame->renderPasses[pass];
@@ -355,31 +330,11 @@ public:
                 culling_pass.projection.data.matrix = next_frame->renderPasses[pass].renderParams[0].projection.data.matrix;
             }
         }
-        else
-        {
-            // Single-pass rendering
-            next_frame->renderPassesCount = 1;
-            auto& render_pass = next_frame->renderPasses[0];
-            render_pass.textureId = unity_textures_[0];
-            render_pass.renderParamsCount = 2;
-            render_pass.cullingPassIndex = 0;
-            for (int i = 0; i < 2; i++) {
-                auto& render_params = render_pass.renderParams[i];
-                render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(i));
-                render_params.projection.type = kUnityXRProjectionTypeMatrix;
-                render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(i));
-                render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(i));
-            }
-            auto& culling_pass = next_frame->cullingPasses[0];
-            culling_pass.separation = 0.064f;
-            culling_pass.deviceAnchorToCullingPose = next_frame->renderPasses[0].renderParams[0].deviceAnchorToEyePose;
-            culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
-            culling_pass.projection.data.matrix = next_frame->renderPasses[0].renderParams[0].projection.data.matrix;
-        }
         return kUnitySubsystemErrorCodeSuccess;
     }
     
     UnitySubsystemErrorCode GfxThread_Stop() {
+        // Enable AR background image
         if (holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering() && SetARCameraBackgroundDelegate) {
             SetARCameraBackgroundDelegate(true);
         }
@@ -498,22 +453,10 @@ private:
     std::vector<IOSurfaceRef> io_surfaces_;
     
     /// @brief This value is set to true when Metal is initialized for the first time.
-    bool main_metal_setup_ = false;
+    bool metal_setup_ = false;
     
     /// @brief The render pipeline state for content rendering.
     id <MTLRenderPipelineState> main_render_pipeline_state_;
-    
-    /// @brief This value is used for rendering widgets.
-    bool second_metal_setup_ = false;
-    
-    id <MTLBuffer> main_vertex_buffer_;
-    
-    id <MTLBuffer> main_index_buffer_;
-    
-    id <MTLBuffer> second_vertex_buffer_;
-    
-    /// @brief The render pipeline state for rendering alignment marker.
-    id <MTLRenderPipelineState> second_render_pipeline_state_;
     
     bool is_first_frame_ = true;
     

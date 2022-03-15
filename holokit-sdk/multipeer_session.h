@@ -7,18 +7,13 @@
 
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 
-typedef enum {
-    ARSyncModeWorldMap = 0,
-    ARSyncModeCollaboration = 1
-} ARSyncMode;
-
 NS_ASSUME_NONNULL_BEGIN
 @interface MultipeerSession: NSObject
 
 @property (nonatomic, strong, nullable) MCSession *mcSession;
-@property (assign) ARSyncMode arSyncMode;
 
-- (instancetype)initWithServiceType:(NSString *)serviceType;
++ (id _Nonnull)sharedMultipeerSession;
+- (void)initializeWithServiceType:(NSString *)serviceType;
 - (void)sendToAllPeers:(NSData *)data sendDataMode:(MCSessionSendDataMode)sendDataMode;
 - (void)sendToPeer:(NSData *)data peer:(MCPeerID *)peerId sendDataMode:(MCSessionSendDataMode)sendDataMode;
 - (bool)isHost;

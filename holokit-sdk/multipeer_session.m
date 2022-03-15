@@ -7,7 +7,7 @@
 
 #import "multipeer_session.h"
 #import "IUnityInterface.h"
-#import "ar_session_manager.h"
+#import "ar_session.h"
 
 typedef void (*BrowserDidFindPeer)(unsigned long transportId, const char *deviceName);
 BrowserDidFindPeer BrowserDidFindPeerDelegate = NULL;
@@ -62,30 +62,43 @@ typedef enum {
 
 @implementation MultipeerSession
 
-- (instancetype)initWithServiceType:(NSString *)serviceType {
-    self = [super init];
-    if (self) {
-        self.serviceType = serviceType;
-        NSString *deviceName = [UIDevice currentDevice].name;
-        NSString *systemUptime = [[NSNumber numberWithDouble:[[NSProcessInfo processInfo] systemUptime]] stringValue];
-        NSString *displayNameBeforeHash = [NSString stringWithFormat:@"%@%@", deviceName, systemUptime];
-        unsigned long hashedNumber = [displayNameBeforeHash hash];
-        NSString *displayName = [NSString stringWithFormat:@"%lu", hashedNumber];
-        // To prevent the overflow problem when marshalling although it is unlikely to happen.
-        displayName = [displayName substringToIndex:11];
-        NSLog(@"[mc_session] did init MultipeerSession with peerID %@", displayName);
-        self.localPeerID = [[MCPeerID alloc] initWithDisplayName:displayName];
+- (instancetype)init {
+    if (self = [super init]) {
         
-        // If encryptionPreference is MCEncryptionRequired, the connection state is not connected...
-        self.mcSession = [[MCSession alloc] initWithPeer:self.localPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
-        self.mcSession.delegate = self;
-        
-        self.peerID2TransportIdMap = [[NSMutableDictionary alloc] init];
-        self.transportId2PeerIDMap = [[NSMutableDictionary alloc] init];
-        self.browsedPeers = [[NSMutableArray alloc] init];
-        self.peerID2ARSessionIdMap = [[NSMutableDictionary alloc] init];
     }
     return self;
+}
+
++ (id _Nonnull)sharedMultipeerSession {
+    static dispatch_once_t onceToken = 0;
+    static id _sharedObject = nil;
+    dispatch_once(&onceToken, ^{
+        _sharedObject = [[self alloc] init];
+    });
+    return _sharedObject;
+}
+
+- (void)initializeWithServiceType:(NSString *)serviceType {
+    self.serviceType = serviceType;
+    // Hash device name and current system uptime to get a random transportId
+    NSString *deviceName = [UIDevice currentDevice].name;
+    NSString *systemUptime = [[NSNumber numberWithDouble:[[NSProcessInfo processInfo] systemUptime]] stringValue];
+    NSString *str = [NSString stringWithFormat:@"%@%@", deviceName, systemUptime];
+    unsigned long hashedNumber = [str hash];
+    NSString *displayName = [NSString stringWithFormat:@"%lu", hashedNumber];
+    // Optional: To prevent the overflow problem when marshalling although it is unlikely to happen.
+    displayName = [displayName substringToIndex:11];
+    NSLog(@"[mc_session] initialized MultipeerSession with peerID: %@", displayName);
+    self.localPeerID = [[MCPeerID alloc] initWithDisplayName:displayName];
+    
+    // Initialize the mcSession
+    self.mcSession = [[MCSession alloc] initWithPeer:self.localPeerID securityIdentity:nil encryptionPreference:MCEncryptionNone];
+    self.mcSession.delegate = self;
+    
+    self.peerID2TransportIdMap = [[NSMutableDictionary alloc] init];
+    self.transportId2PeerIDMap = [[NSMutableDictionary alloc] init];
+    self.browsedPeers = [[NSMutableArray alloc] init];
+    self.peerID2ARSessionIdMap = [[NSMutableDictionary alloc] init];
 }
 
 - (void)sendToAllPeers: (NSData *)data sendDataMode:(MCSessionSendDataMode)sendDataMode {
@@ -95,39 +108,31 @@ typedef enum {
     }
 }
 
-- (void)sendToPeer: (NSData *)data peer:(MCPeerID *)peerID sendDataMode:(MCSessionSendDataMode)sendDataMode {
-    NSArray *peerArray = @[peerID];
-    bool success = [self.mcSession sendData:data toPeers:peerArray withMode:sendDataMode error:nil];
-    if (!success) {
-        NSLog(@"[multipeer_session] Failed to send data to peer %@", peerID.displayName);
-    }
-}
-
 - (void)startBrowsing {
     self.browsedPeers = [[NSMutableArray alloc] init];
     self.browser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.localPeerID serviceType:self.serviceType];
     self.browser.delegate = self;
     [self.browser startBrowsingForPeers];
-    NSLog(@"[mc_session] did start browsing");
+    NSLog(@"[mc_session] started browsing");
 }
 
 - (void)stopBrowsing {
     [self.browser stopBrowsingForPeers];
-    self.browsedPeers = [[NSMutableArray alloc] init];
-    NSLog(@"[mc_session] did stop browsing");
+    NSLog(@"[mc_session] stopped browsing");
 }
 
 - (void)startAdvertising {
-    NSDictionary<NSString *, NSString *> *discoveryInfo = @{ @"DeviceName":[[UIDevice currentDevice] name], @"RequirePassword": @"No" };
+    // Note: If we want password, add it here.
+    NSDictionary<NSString *, NSString *> *discoveryInfo = @{ @"DeviceName":[[UIDevice currentDevice] name] };
     self.advertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.localPeerID discoveryInfo:discoveryInfo serviceType:self.serviceType];
     self.advertiser.delegate = self;
     [self.advertiser startAdvertisingPeer];
-    NSLog(@"[mc_session] did start Advertising");
+    NSLog(@"[mc_session] started Advertising");
 }
 
 - (void)stopAdvertising {
     [self.advertiser stopAdvertisingPeer];
-    NSLog(@"[mc_session] did stop advertising");
+    NSLog(@"[mc_session] stopped advertising");
 }
 
 - (bool)isHost {
@@ -135,6 +140,14 @@ typedef enum {
         return YES;
     } else {
         return NO;
+    }
+}
+
+- (void)sendToPeer: (NSData *)data peer:(MCPeerID *)peerID sendDataMode:(MCSessionSendDataMode)sendDataMode {
+    NSArray *peerArray = @[peerID];
+    bool success = [self.mcSession sendData:data toPeers:peerArray withMode:sendDataMode error:nil];
+    if (!success) {
+        NSLog(@"[mc_session] failed to send data to peer %@", peerID.displayName);
     }
 }
 
@@ -174,7 +187,7 @@ typedef enum {
 }
 
 - (void)sendARSessionId2AllPeers {
-    NSString* arSessionId = [[ARSessionManager sharedARSessionManager] arSession].identifier.UUIDString;
+    NSString* arSessionId = [[ARSessionDelegateController sharedARSessionDelegateController] arSession].identifier.UUIDString;
     const char *str = [arSessionId cStringUsingEncoding:NSUTF8StringEncoding];
     unsigned char *data = malloc(2 + strlen(str));
     data[0] = 5;
@@ -215,7 +228,7 @@ typedef enum {
 }
 
 - (void)removeAllAnchorsOriginatingFromARSessionWithID:(NSString *)ARSessionId {
-    ARSession *arSession = [[ARSessionManager sharedARSessionManager] arSession];
+    ARSession *arSession = [[ARSessionDelegateController sharedARSessionDelegateController] arSession];
     for (ARAnchor *anchor in arSession.currentFrame.anchors) {
         NSString *anchorSessionId = anchor.sessionIdentifier.UUIDString;
         if ([anchorSessionId isEqualToString:ARSessionId]) {
@@ -224,9 +237,9 @@ typedef enum {
     }
 }
 
-- (void)shareARWorldMap:(MCPeerID *)peerID {
+- (void)sendARWorldMap:(MCPeerID *)peerID {
     NSLog(@"[world map] share ARWorldMap to %@", peerID.displayName);
-    NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:[[ARSessionManager sharedARSessionManager] worldMap] requiringSecureCoding:NO error:nil];
+    NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:[[ARSessionDelegateController sharedARSessionDelegateController] worldMap] requiringSecureCoding:NO error:nil];
     [self sendToPeer:mapData peer:peerID sendDataMode:MCSessionSendDataReliable];
 }
 
@@ -234,19 +247,13 @@ typedef enum {
 
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL, MCSession * _Nullable))invitationHandler {
     NSLog(@"[mc_session] did receive invitation from peer %@", [peerID displayName]);
-    //NSDictionary<NSString *, NSString *> *dict = [NSKeyedUnarchiver unarchivedDictionaryWithKeysOfClass:[NSString class] objectsOfClass:[NSString class] fromData:context error:nil];
-    //NSString *deviceName = dict[@"DeviceName"];
     invitationHandler(true, self.mcSession);
 }
 
 #pragma mark - MCNearbyServiceBrowserDelegate
 
 - (void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary<NSString *,NSString *> *)info {
-    NSLog(@"[mc_session] broswer found peer %@", peerID.displayName);
-    
-    if ([[ARSessionManager sharedARSessionManager] arSession] != nil && [peerID isEqual:self.hostPeerID]) {
-        [self invitePeer:peerID];
-    }
+    NSLog(@"[mc_session] found peer %@", peerID.displayName);
     
     NSString *deviceName = info[@"DeviceName"];
     NSNumber *transportId = [MultipeerSession convertNSString2NSNumber:peerID.displayName];
@@ -257,7 +264,7 @@ typedef enum {
 }
 
 - (void)browser:(nonnull MCNearbyServiceBrowser *)browser lostPeer:(nonnull MCPeerID *)peerID {
-    //NSLog(@"[mc_session]: browser lost a peer %@.", peerID.displayName);
+    NSLog(@"[mc_session] lost peer %@", peerID.displayName);
     [self.browsedPeers removeObject:peerID];
     if (BrowserDidLosePeerDelegate != NULL) {
         BrowserDidLosePeerDelegate([[MultipeerSession convertNSString2NSNumber:peerID.displayName] unsignedLongValue]);
@@ -289,9 +296,9 @@ typedef enum {
                         [self sendPhotonRoomName2Peer:peerID];
                         break;
                 }
-                if (self.arSyncMode == ARSyncModeWorldMap) {
-                    [self shareARWorldMap:peerID];
-                }
+//                if (self.arSyncMode == ARSyncModeWorldMap) {
+//                    [self shareARWorldMap:peerID];
+//                }
             } else {
                 [self stopBrowsing];
                 // Record the host peerID for possiblte reconnection in the future.
@@ -318,7 +325,7 @@ typedef enum {
                 switch(self.netcodeTransport) {
                     case NetcodeTransportUNet:
                     case NetcodeTransportPhoton:
-                        if ([[ARSessionManager sharedARSessionManager] arSession] != nil) {
+                        if ([[ARSessionDelegateController sharedARSessionDelegateController] arSession] != nil) {
                             [self startBrowsing];
                         }
                         break;
@@ -416,18 +423,18 @@ typedef enum {
             break;
         }
         default: {
-            if (self.arSyncMode == ARSyncModeCollaboration) {
-                ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
-                if (collaborationData != nil) {
-                    [[ARSessionManager sharedARSessionManager] updateWithCollaborationData:collaborationData];
-                    return;
-                }
-            }
+//            if (self.arSyncMode == ARSyncModeCollaboration) {
+//                ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
+//                if (collaborationData != nil) {
+//                    [[ARSessionDelegateController sharedARSessionDelegateController] updateWithCollaborationData:collaborationData];
+//                    return;
+//                }
+//            }
             
             ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:data error:nil];
             if (worldMap != nil) {
                 NSLog(@"[world_map] did receive ARWorldMap of size %f mb", data.length / 1024.0 / 1024.0);
-                [[ARSessionManager sharedARSessionManager] setWorldMap:worldMap];
+                [[ARSessionDelegateController sharedARSessionDelegateController] setWorldMap:worldMap];
                 if (DidReceiveARWorldMapDelegate != NULL) {
                     DidReceiveARWorldMapDelegate();
                 }
@@ -460,37 +467,34 @@ typedef enum {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCInit(const char* serviceType) {
-    [[ARSessionManager sharedARSessionManager] setMultipeerSession:[[MultipeerSession alloc] initWithServiceType:[NSString stringWithUTF8String:serviceType]]];
+    MultipeerSession* mc_session = [MultipeerSession sharedMultipeerSession];
+    [mc_session initializeWithServiceType:[NSString stringWithUTF8String:serviceType]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCStartBrowsing(void) {
-    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
-    [ar_session_instance.multipeerSession startBrowsing];
+    [[MultipeerSession sharedMultipeerSession] startBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCStartAdvertising(void) {
-    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
-    [ar_session_instance.multipeerSession startAdvertising];
+    [[MultipeerSession sharedMultipeerSession] startAdvertising];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCStopBrowsing(void) {
-    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
-    [ar_session_instance.multipeerSession stopBrowsing];
+    [[MultipeerSession sharedMultipeerSession] stopBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCStopAdvertising(void) {
-    ARSessionManager* ar_session_instance = [ARSessionManager sharedARSessionManager];
-    [ar_session_instance.multipeerSession stopAdvertising];
+    [[MultipeerSession sharedMultipeerSession] stopAdvertising];
 }
 
 // https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCSendData(unsigned long transportId, unsigned char *data, int dataArrayLength, int networkDelivery) {
-    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
+    MultipeerSession *multipeerSession = [[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession];
     MCPeerID *peerID = multipeerSession.transportId2PeerIDMap[[[NSNumber alloc] initWithUnsignedLong:transportId]];
     unsigned char structuredData[dataArrayLength + 1 + sizeof(int)];
     // Append the data type at the beginning of the array
@@ -511,13 +515,13 @@ UnityHoloKit_MCSendData(unsigned long transportId, unsigned char *data, int data
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCDisconnectLocalClient(void) {
-    [[[[ARSessionManager sharedARSessionManager] multipeerSession] mcSession] disconnect];
+    [[[MultipeerSession sharedMultipeerSession] mcSession] disconnect];
 }
 
 // https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCDisconnectRemoteClient(unsigned long transportId) {
-    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
+    MultipeerSession *multipeerSession = [[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession];
     MCPeerID *peerID  = multipeerSession.transportId2PeerIDMap[[[NSNumber alloc] initWithUnsignedLong:transportId]];
     
     // Prepare the disconnection message
@@ -529,10 +533,9 @@ UnityHoloKit_MCDisconnectRemoteClient(unsigned long transportId) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCShutdown(void) {
-    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
+    MultipeerSession *multipeerSession = [MultipeerSession sharedMultipeerSession];
     [multipeerSession.mcSession disconnect];
     [multipeerSession setMcSession:nil];
-    [[ARSessionManager sharedARSessionManager] setMultipeerSession:nil];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -552,7 +555,7 @@ UnityHoloKit_SetDidReceivePeerDataDelegate(DidReceivePeerData callback) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MCInvitePeer(unsigned long transportId) {
-    MultipeerSession *multipeerSession = [[ARSessionManager sharedARSessionManager] multipeerSession];
+    MultipeerSession *multipeerSession = [MultipeerSession sharedMultipeerSession];
     for (MCPeerID *peerID in multipeerSession.browsedPeers) {
         if (transportId == [[MultipeerSession convertNSString2NSNumber:peerID.displayName] unsignedLongValue]) {
             [multipeerSession invitePeer:peerID];
@@ -565,7 +568,7 @@ UnityHoloKit_SendDidResetARSessionMessage(void) {
     unsigned char message[1];
     message[0] = (unsigned char)6;
     NSData *dataReadyToBeSent = [NSData dataWithBytes:message length:sizeof(message)];
-    [[[ARSessionManager sharedARSessionManager] multipeerSession] sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
+    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -575,12 +578,12 @@ UnityHoloKit_SetDidReceiveARWorldMapDelegate(DidReceiveARWorldMap callback) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetHostLocalIpAddress(const char *ip) {
-    [[[ARSessionManager sharedARSessionManager] multipeerSession] setHostLocalIpAddress:[NSString stringWithUTF8String:ip]];
+    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setHostLocalIpAddress:[NSString stringWithUTF8String:ip]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetPhotonRoomName(const char *roomName) {
-    [[[ARSessionManager sharedARSessionManager] multipeerSession] setPhotonRoomName:[NSString stringWithUTF8String:roomName]];
+    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setPhotonRoomName:[NSString stringWithUTF8String:roomName]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -595,12 +598,7 @@ UnityHoloKit_SetDidReceivePhotonRoomNameDelegate(DidReceivePhotonRoomName callba
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetNetcodeTransport(int transport) {
-    [[[ARSessionManager sharedARSessionManager] multipeerSession] setNetcodeTransport:(NetcodeTransport)transport];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetARSyncMode(int syncMode) {
-    [[[ARSessionManager sharedARSessionManager] multipeerSession] setArSyncMode:(ARSyncMode)syncMode];
+    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setNetcodeTransport:(NetcodeTransport)transport];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

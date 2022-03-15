@@ -9,7 +9,6 @@
 #import "IUnityInterface.h"
 #import <sys/utsname.h>
 #import "display.mm"
-#import "hand_tracker.h"
 
 #define DEGREES_TO_RADIANS(degrees) ((degrees) * (M_PI / 180.0))
 
@@ -29,9 +28,6 @@ void HoloKitApi::Initialize() {
     struct utsname system_info;
     uname(&system_info);
     model_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
-    
-    // Get the device name.
-    device_name_ = [UIDevice currentDevice].name;
     
     InitOpticalParameters();
     
@@ -133,7 +129,7 @@ simd_float4x4 HoloKitApi::GetProjectionMatrix(int eye_index) {
     } else if (eye_index == 1) {
         return projection_matrices_[1];
     }
-    NSLog(@"[HoloKitApi]: projection matrices are not initialized.");
+    NSLog(@"[holokit_api] projection matrices are not initialized.");
     return matrix_identity_float4x4;
 }
 
@@ -143,7 +139,7 @@ simd_float4 HoloKitApi::GetViewportRect(int eye_index) {
     } else if (eye_index == 1) {
         return viewport_rects_[1];
     }
-    NSLog(@"[HoloKitApi]: viewport rects are not initialized.");
+    NSLog(@"[holokit_api] viewport rects are not initialized.");
     return simd_make_float4(0);
 }
 
@@ -153,7 +149,7 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     } else if (eye_index == 1) {
         return eye_positions_[1];
     }
-    NSLog(@"[HoloKitApi]: eye positions are not initialized.");
+    NSLog(@"[holokit_api] eye positions are not initialized.");
     return simd_make_float3(0);
 }
 
@@ -166,8 +162,8 @@ void HoloKitApi::SetIsStereoscopicRendering(bool val) {
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
-    if ([[ARSessionManager sharedARSessionManager] arSession] != NULL) {
-        return [[ARSessionManager sharedARSessionManager] arSession].currentFrame.camera.transform;
+    if ([[ARSessionDelegateController sharedARSessionDelegateController] arSession] != NULL) {
+        return [[ARSessionDelegateController sharedARSessionDelegateController] arSession].currentFrame.camera.transform;
     } else {
         return matrix_identity_float4x4;
     }
@@ -190,11 +186,6 @@ UnityHoloKit_StartNFCAuthentication() {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_DisableIsStereoscopicRendering() {
     return holokit::HoloKitApi::GetInstance()->SetIsStereoscopicRendering(false);
-}
-
-char* UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetDeviceName() {
-    return convertNSStringToCString([UIDevice currentDevice].name);
 }
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
