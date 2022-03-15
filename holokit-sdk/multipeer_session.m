@@ -15,9 +15,6 @@ BrowserDidFindPeer BrowserDidFindPeerDelegate = NULL;
 typedef void (*BrowserDidLosePeer)(unsigned long transportId);
 BrowserDidLosePeer BrowserDidLosePeerDelegate = NULL;
 
-typedef void (*DidReceivePeerData)(unsigned long transportId, unsigned char *data, int dataArrayLength);
-DidReceivePeerData DidReceivePeerDataDelegate = NULL;
-
 typedef void (*DidReceiveARWorldMap)(void);
 DidReceiveARWorldMap DidReceiveARWorldMapDelegate = NULL;
 
@@ -127,7 +124,7 @@ typedef enum {
     self.advertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.localPeerID discoveryInfo:discoveryInfo serviceType:self.serviceType];
     self.advertiser.delegate = self;
     [self.advertiser startAdvertisingPeer];
-    NSLog(@"[mc_session] started Advertising");
+    NSLog(@"[mc_session] started advertising");
 }
 
 - (void)stopAdvertising {
@@ -355,7 +352,7 @@ typedef enum {
             }
             //memcpy(netcodeData, decodedData + 1 + sizeof(int), dataArrayLength);
             unsigned long transportId = [self.peerID2TransportIdMap[peerID] unsignedLongValue];
-            DidReceivePeerDataDelegate(transportId, netcodeData, dataArrayLength);
+            //DidReceivePeerDataDelegate(transportId, netcodeData, dataArrayLength);
             break;
         }
         case 4: {
@@ -466,95 +463,51 @@ typedef enum {
 #pragma mark - extern "C"
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCInit(const char* serviceType) {
+UnityHoloKit_MPCInitialize(const char* serviceType) {
     MultipeerSession* mc_session = [MultipeerSession sharedMultipeerSession];
     [mc_session initializeWithServiceType:[NSString stringWithUTF8String:serviceType]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCStartBrowsing(void) {
+UnityHoloKit_MPCStartBrowsing(void) {
     [[MultipeerSession sharedMultipeerSession] startBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCStartAdvertising(void) {
+UnityHoloKit_MPCStartAdvertising(void) {
     [[MultipeerSession sharedMultipeerSession] startAdvertising];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCStopBrowsing(void) {
+UnityHoloKit_MPCStopBrowsing(void) {
     [[MultipeerSession sharedMultipeerSession] stopBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCStopAdvertising(void) {
+UnityHoloKit_MPCStopAdvertising(void) {
     [[MultipeerSession sharedMultipeerSession] stopAdvertising];
 }
 
-// https://stackoverflow.com/questions/3426491/how-can-you-marshal-a-byte-array-in-c
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCSendData(unsigned long transportId, unsigned char *data, int dataArrayLength, int networkDelivery) {
-    MultipeerSession *multipeerSession = [[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession];
-    MCPeerID *peerID = multipeerSession.transportId2PeerIDMap[[[NSNumber alloc] initWithUnsignedLong:transportId]];
-    unsigned char structuredData[dataArrayLength + 1 + sizeof(int)];
-    // Append the data type at the beginning of the array
-    structuredData[0] = (unsigned char)0;
-    // Append the length of the data array at the second place
-    memcpy(structuredData + 1, &dataArrayLength, sizeof(int));
-    
-    for (int i = 0; i < dataArrayLength; i++) {
-        structuredData[i + 1 + sizeof(int)] = data[i];
-    }
-    //memcpy(structuredData + 1 + sizeof(int), data, dataArrayLength);
-    
-    // Convert the data to NSData format
-    // https://stackoverflow.com/questions/8354881/convert-unsigned-char-array-to-nsdata-and-back
-    NSData *dataReadyToBeSent = [NSData dataWithBytes:structuredData length:sizeof(structuredData)];
-    [multipeerSession sendToPeer:dataReadyToBeSent peer:peerID sendDataMode:[MultipeerSession convertNetworkDelivery2SendDataMode:networkDelivery]];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCDisconnectLocalClient(void) {
-    [[[MultipeerSession sharedMultipeerSession] mcSession] disconnect];
-}
-
-// https://stackoverflow.com/questions/20316848/multipeer-connectivity-programmatically-disconnect-a-peer
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCDisconnectRemoteClient(unsigned long transportId) {
-    MultipeerSession *multipeerSession = [[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession];
-    MCPeerID *peerID  = multipeerSession.transportId2PeerIDMap[[[NSNumber alloc] initWithUnsignedLong:transportId]];
-    
-    // Prepare the disconnection message
-    unsigned char disconnectionData[1];
-    disconnectionData[0] = 4;
-    NSData *dataReadyToBeSent = [NSData dataWithBytes:disconnectionData length:sizeof(unsigned char)];
-    [multipeerSession sendToPeer:dataReadyToBeSent peer:peerID sendDataMode:MCSessionSendDataReliable];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCShutdown(void) {
+UnityHoloKit_MPCDeinitialize(void) {
     MultipeerSession *multipeerSession = [MultipeerSession sharedMultipeerSession];
-    [multipeerSession.mcSession disconnect];
+    if ([[multipeerSession.mcSession connectedPeers] count] > 0)
+        [multipeerSession.mcSession disconnect];
     [multipeerSession setMcSession:nil];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetBrowserDidFindPeerDelegate(BrowserDidFindPeer callback) {
+UnityHoloKit_MPCSetBrowserDidFindPeerDelegate(BrowserDidFindPeer callback) {
     BrowserDidFindPeerDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetBrowserDidLosePeerDelegate(BrowserDidLosePeer callback) {
+UnityHoloKit_MPCSetBrowserDidLosePeerDelegate(BrowserDidLosePeer callback) {
     BrowserDidLosePeerDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidReceivePeerDataDelegate(DidReceivePeerData callback) {
-    DidReceivePeerDataDelegate = callback;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MCInvitePeer(unsigned long transportId) {
+UnityHoloKit_MPCInvitePeer(unsigned long transportId) {
     MultipeerSession *multipeerSession = [MultipeerSession sharedMultipeerSession];
     for (MCPeerID *peerID in multipeerSession.browsedPeers) {
         if (transportId == [[MultipeerSession convertNSString2NSNumber:peerID.displayName] unsignedLongValue]) {

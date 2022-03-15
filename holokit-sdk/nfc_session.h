@@ -9,6 +9,10 @@
 
 @interface NFCSession : NSObject
 
+// Set this to false to turn off nfc authentication.
+// This is for testing purpose.
+@property (assign) BOOL isUsingNfc;
+
 - (void)startReaderSession;
 
 - (void)stopReaderSession;

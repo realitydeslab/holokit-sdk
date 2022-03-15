@@ -24,7 +24,7 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
 - (instancetype)init {
     self = [super init];
     if (self) {
-
+        self.isUsingNfc = true;
     }
     return self;
 }
@@ -39,10 +39,16 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
 }
 
 - (void)startReaderSession {
-    NSLog(@"[nfc_session] NFC authentication started...");
-    self.readerSession = [[NFCTagReaderSession alloc] initWithPollingOption:NFCPollingISO14443 delegate:self queue:nil];
-    self.readerSession.alertMessage = @"Please put your iPhone onto HoloKit.";
-    [self.readerSession beginSession];
+    if (self.isUsingNfc) {
+        NSLog(@"[nfc_session] NFC authentication started...");
+        self.readerSession = [[NFCTagReaderSession alloc] initWithPollingOption:NFCPollingISO14443 delegate:self queue:nil];
+        self.readerSession.alertMessage = @"Please put your iPhone onto HoloKit.";
+        [self.readerSession beginSession];
+    }
+    else {
+        if (NFCAuthenticationDidSucceedDelegate)
+            NFCAuthenticationDidSucceedDelegate();
+    }
 }
 
 - (void)stopReaderSession {
@@ -158,4 +164,8 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetNFCAuthenticationDidSucceedDelegate(NFCAuthenticationDidSucceed callback) {
     NFCAuthenticationDidSucceedDelegate = callback;
+}
+
+void UnityHoloKit_SetIsUsingNfc(bool value) {
+    [[NFCSession sharedNFCSession] setIsUsingNfc:value];
 }

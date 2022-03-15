@@ -58,7 +58,7 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
         self.isScanningARWorldMap = NO;
         self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
         
-        self.sessionShouldAttemptRelocalization = true;
+        self.sessionShouldAttemptRelocalization = false;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -375,7 +375,6 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
 }
 
 - (BOOL)sessionShouldAttemptRelocalization:(ARSession *)session {
-    //return true;
     NSLog(@"[ar_session] sessionShouldAttemptRelocalization %d", self.sessionShouldAttemptRelocalization);
     return self.sessionShouldAttemptRelocalization;
 }
