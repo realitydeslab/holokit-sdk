@@ -36,14 +36,11 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
 typedef void (*DidFindARWorldMap)(const char *mapName);
 DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 
-typedef void (*DidFinishSavingARWorldMap)();
-DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
+typedef void (*DidSaveARWorldMap)(const char *mapName);
+DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
 
 @interface ARSessionDelegateController() <ARSessionDelegate>
 
-@property (assign) BOOL isSynchronizationComplete;
-@property (nonatomic, strong) ARAnchor *originAnchor;
-@property (nonatomic, strong) NSUUID *currentARSessionId;
 @property (assign) ARWorldMappingStatus currentARWorldMappingStatus;
 @property (assign) BOOL sessionShouldAttemptRelocalization;
 
@@ -54,8 +51,7 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
 #pragma mark - init
 - (instancetype)init {
     if (self = [super init]) {
-        self.isSynchronizationComplete = NO;
-        self.isScanningARWorldMap = NO;
+        self.scanEnvironment = NO;
         self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
         
         self.sessionShouldAttemptRelocalization = false;
@@ -95,19 +91,7 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
     }
 }
 
-- (void)updateWithCollaborationData:(ARCollaborationData *)collaborationData {
-    [self.arSession updateWithCollaborationData:collaborationData];
-}
-
-- (void)removeAllLocalAnchors {
-    for (ARAnchor *anchor in self.arSession.currentFrame.anchors) {
-        if ([anchor.identifier isEqual:self.arSession.identifier]) {
-            [self.arSession removeAnchor:anchor];
-        }
-    }
-}
-
-- (void)saveARWorldMap:(NSString *)mapName {
+- (void)saveARWorldMap {
     if (self.currentARWorldMappingStatus != ARWorldMappingStatusMapped) {
         NSLog(@"[world_map] ARWorldMap is currently not available");
         return;
@@ -119,14 +103,22 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
             return;
         }
         
+        NSLog(@"[world_map] started to save ARWorldMap");
+        double startTime = [[NSProcessInfo processInfo] systemUptime];
+        NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        // or @"yyyy-MM-dd hh:mm:ss a" if you prefer the time with AM/PM
+        NSString *mapName = [dateFormatter stringFromDate:[NSDate date]];
+        
         NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:worldMap requiringSecureCoding:NO error:nil];
         NSURL *url = [[[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil]
                       URLByAppendingPathComponent:[NSString stringWithFormat:@"%@%@", mapName, @".arexperience"]];
         
         [mapData writeToURL:url atomically:true];
-        NSLog(@"[world_map] did save world map of size %f mb to path %@", mapData.length / (1024.0 * 1024.0), url);
-        if (DidFinishSavingARWorldMapDelegate != NULL) {
-            DidFinishSavingARWorldMapDelegate();
+        NSLog(@"[world_map] saved ARWorldMap in %f", [[NSProcessInfo processInfo] systemUptime] - startTime);
+        NSLog(@"[world_map] map name: %@\nmap size: %f\nmap path %@", mapName, mapData.length / (1024.0 * 1024.0), url);
+        if (DidSaveARWorldMapDelegate != NULL) {
+            DidSaveARWorldMapDelegate([mapName UTF8String]);
         }
     }];
 }
@@ -194,52 +186,13 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
     
-    // Check for ARSession update
-    if(![self.currentARSessionId isEqual:session.identifier]) {
-        self.arSession = session;
-        self.currentARSessionId = session.identifier;
-        //NSLog(@"[ar_session] new ARSessionId %@", self.currentARSessionId);
-        if (ARSessionDidUpdateDelegate != NULL) {
-            ARSessionDidUpdateDelegate();
-            [self.multipeerSession sendARSessionId2AllPeers];
-        }
-    }
-    
-//    if (holokit::LowLatencyTrackingApi::GetInstance()->IsActive()) {
-//        holokit::ARKitData data = { frame.timestamp,
-//            TransformToEigenVector3d(frame.camera.transform),
-//            TransformToEigenQuaterniond(frame.camera.transform),
-//            MatrixToEigenMatrix3d(frame.camera.intrinsics) };
-//        holokit::LowLatencyTrackingApi::GetInstance()->OnARKitDataUpdated(data);
-//    }
-    
-    // Check ARWorldMap status
-    if (self.isScanningARWorldMap) {
-        //NSLog(@"[world_map] world mapping status %d", frame.worldMappingStatus);
+    // ARWorldMap status
+    if (self.scanEnvironment) {
         if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
-            switch(frame.worldMappingStatus) {
-                case ARWorldMappingStatusNotAvailable:
-                    if (ARWorldMappingStatusDidChangeDelegate != NULL) {
-                        ARWorldMappingStatusDidChangeDelegate(0);
-                    }
-                    break;
-                case ARWorldMappingStatusLimited:
-                    if (ARWorldMappingStatusDidChangeDelegate != NULL) {
-                        ARWorldMappingStatusDidChangeDelegate(1);
-                    }
-                    break;
-                case ARWorldMappingStatusExtending:
-                    if (ARWorldMappingStatusDidChangeDelegate != NULL) {
-                        ARWorldMappingStatusDidChangeDelegate(2);
-                    }
-                    break;
-                case ARWorldMappingStatusMapped:
-                    if (ARWorldMappingStatusDidChangeDelegate != NULL) {
-                        ARWorldMappingStatusDidChangeDelegate(3);
-                    }
-                    break;
-            }
             self.currentARWorldMappingStatus = frame.worldMappingStatus;
+            if (ARWorldMappingStatusDidChangeDelegate) {
+                ARWorldMappingStatusDidChangeDelegate((int)self.currentARWorldMappingStatus);
+            }
         }
     }
     
@@ -263,11 +216,11 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
             continue;
         }
         if (anchor.name != nil) {
-            if (![self.multipeerSession isHost] && [anchor.name isEqualToString:@"origin"]) {
-                NSLog(@"[ar_session] did receive an origin anchor");
-                [session setWorldOrigin:anchor.transform];
-                continue;
-            }
+//            if (![self.multipeerSession isHost] && [anchor.name isEqualToString:@"origin"]) {
+//                NSLog(@"[ar_session] did receive an origin anchor");
+//                [session setWorldOrigin:anchor.transform];
+//                continue;
+//            }
         }
     }
 }
@@ -297,20 +250,20 @@ DidFinishSavingARWorldMap DidFinishSavingARWorldMapDelegate = NULL;
         [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
     }
     
-    if (self.multipeerSession != nil) {
-        if (self.multipeerSession.mcSession.connectedPeers.count > 0) {
-            if (data.priority == ARCollaborationDataPriorityCritical) {
-                NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
-                [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
-            } else {
-                // Stop sending optional data after synchronization phase.
-                if (!self.isSynchronizationComplete) {
-                    NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
-                    [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
-                }
-            }
-        }
-    }
+//    if (self.multipeerSession != nil) {
+//        if (self.multipeerSession.mcSession.connectedPeers.count > 0) {
+//            if (data.priority == ARCollaborationDataPriorityCritical) {
+//                NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
+//                [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+//            } else {
+//                // Stop sending optional data after synchronization phase.
+//                if (!self.isSynchronizationComplete) {
+//                    NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
+//                    [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
+//                }
+//            }
+//        }
+//    }
 }
 
 #pragma mark - ARSessionObserver
@@ -409,70 +362,47 @@ UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float rotation[4]) {
-    ARSessionDelegateController *session = [ARSessionDelegateController sharedARSessionDelegateController];
-    simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
-    std::vector<float> rot = SimdFloat4x42UnityRotation(transform_matrix);
-    NSString *name = [NSString stringWithUTF8String:anchorName];
-    if ([name isEqualToString:@"origin"]){
-        // Do not accumulate anchors.
-        if (session.originAnchor != nil) {
-            [session.arSession removeAnchor:session.originAnchor];
-        }
-        session.originAnchor = [[ARAnchor alloc] initWithName:name transform:transform_matrix];
-        [session.arSession addAnchor:session.originAnchor];
-    } else {
-        ARAnchor* anchor = [[ARAnchor alloc] initWithName:name transform:transform_matrix];
-        [session.arSession addAnchor:anchor];
-    }
+//    ARSessionDelegateController *session = [ARSessionDelegateController sharedARSessionDelegateController];
+//    simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
+//    std::vector<float> rot = SimdFloat4x42UnityRotation(transform_matrix);
+//    NSString *name = [NSString stringWithUTF8String:anchorName];
+//    if ([name isEqualToString:@"origin"]){
+//        // Do not accumulate anchors.
+//        if (session.originAnchor != nil) {
+//            [session.arSession removeAnchor:session.originAnchor];
+//        }
+//        session.originAnchor = [[ARAnchor alloc] initWithName:name transform:transform_matrix];
+//        [session.arSession addAnchor:session.originAnchor];
+//    } else {
+//        ARAnchor* anchor = [[ARAnchor alloc] initWithName:name transform:transform_matrix];
+//        [session.arSession addAnchor:anchor];
+//    }
 }
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidAddARParticipantAnchorDelegate(DidAddARParticipantAnchor callback) {
-    DidAddARParticipantAnchorDelegate = callback;
-}
+#pragma mark - iOS Thermal API
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetARSessionDidUpdateDelegate(ARSessionDidUpdate callback) {
-    ARSessionDidUpdateDelegate = callback;
+int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_GetThermalState() {
+    NSProcessInfoThermalState thermalState = [[NSProcessInfo processInfo] thermalState];
+    return (int)thermalState;
 }
-
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetThermalStateDidChangeDelegate(ThermalStateDidChange callback) {
     ThermalStateDidChangeDelegate = callback;
 }
 
-int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetThermalState() {
-    NSProcessInfoThermalState thermalState = [[NSProcessInfo processInfo] thermalState];
-    switch(thermalState) {
-        case NSProcessInfoThermalStateNominal:
-            return 0;
-            break;
-        case NSProcessInfoThermalStateFair:
-            return 1;
-            break;
-        case NSProcessInfoThermalStateSerious:
-            return 2;
-            break;
-        case NSProcessInfoThermalStateCritical:
-            return 3;
-            break;
-    }
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetIsSynchronizationComplete(BOOL val) {
-    [[ARSessionDelegateController sharedARSessionDelegateController] setIsSynchronizationComplete:val];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_RemoveAllLocalAnchors() {
-    [[ARSessionDelegateController sharedARSessionDelegateController] removeAllLocalAnchors];
-}
+#pragma mark - CameraTrackingState API
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(CameraDidChangeTrackingState callback) {
     CameraDidChangeTrackingStateDelegate = callback;
+}
+
+#pragma mark - ARWorldMap API
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetScanEnvironment(bool value) {
+    [[ARSessionDelegateController sharedARSessionDelegateController] setScanEnvironment:value];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -481,18 +411,13 @@ UnityHoloKit_SetARWorldMappingStatusDidChangeDelegate(ARWorldMappingStatusDidCha
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetIsScanningARWorldMap(bool value) {
-    [[ARSessionDelegateController sharedARSessionDelegateController] setIsScanningARWorldMap:value];
+UnityHoloKit_SaveARWorldMap() {
+    [[ARSessionDelegateController sharedARSessionDelegateController] saveARWorldMap];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_DeleteARSessionReference() {
-    [[ARSessionDelegateController sharedARSessionDelegateController] setArSession:nil];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SaveARWorldMap(const char *mapName) {
-    [[ARSessionDelegateController sharedARSessionDelegateController] saveARWorldMap:[NSString stringWithUTF8String:mapName]];
+UnityHoloKit_SetDidSaveARWorldMapDelegate(DidSaveARWorldMap callback) {
+    DidSaveARWorldMapDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -515,11 +440,6 @@ UnityHoloKit_SetDidFindARWorldMapDelegate(DidFindARWorldMap callback) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_LoadARWorldMap() {
     [[ARSessionDelegateController sharedARSessionDelegateController] loadARWorldMap];
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidFinishSavingARWorldMapDelegate(DidFinishSavingARWorldMap callback) {
-    DidFinishSavingARWorldMapDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

@@ -518,10 +518,10 @@ UnityHoloKit_MPCInvitePeer(unsigned long transportId) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendDidResetARSessionMessage(void) {
-    unsigned char message[1];
-    message[0] = (unsigned char)6;
-    NSData *dataReadyToBeSent = [NSData dataWithBytes:message length:sizeof(message)];
-    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
+//    unsigned char message[1];
+//    message[0] = (unsigned char)6;
+//    NSData *dataReadyToBeSent = [NSData dataWithBytes:message length:sizeof(message)];
+//    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] sendToAllPeers:dataReadyToBeSent sendDataMode:MCSessionSendDataReliable];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -531,12 +531,12 @@ UnityHoloKit_SetDidReceiveARWorldMapDelegate(DidReceiveARWorldMap callback) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetHostLocalIpAddress(const char *ip) {
-    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setHostLocalIpAddress:[NSString stringWithUTF8String:ip]];
+    //[[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setHostLocalIpAddress:[NSString stringWithUTF8String:ip]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetPhotonRoomName(const char *roomName) {
-    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setPhotonRoomName:[NSString stringWithUTF8String:roomName]];
+    //[[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setPhotonRoomName:[NSString stringWithUTF8String:roomName]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -551,7 +551,7 @@ UnityHoloKit_SetDidReceivePhotonRoomNameDelegate(DidReceivePhotonRoomName callba
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetNetcodeTransport(int transport) {
-    [[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setNetcodeTransport:(NetcodeTransport)transport];
+    //[[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setNetcodeTransport:(NetcodeTransport)transport];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
