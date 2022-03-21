@@ -8,10 +8,9 @@
 #import "nfc_session.h"
 #import "holokit_sdk-Swift.h"
 #import "IUnityInterface.h"
-#import "ar_session.h"
 
-typedef void (*NFCAuthenticationDidSucceed)(void);
-NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
+typedef void (*NfcAuthenticationDidComplete)(bool);
+NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
 
 @interface NFCSession () <NFCTagReaderSessionDelegate>
 
@@ -24,7 +23,7 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.isUsingNfc = true;
+        self.usingNfc = true;
     }
     return self;
 }
@@ -39,15 +38,15 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
 }
 
 - (void)startReaderSession {
-    if (self.isUsingNfc) {
+    if (self.usingNfc) {
         NSLog(@"[nfc_session] NFC authentication started...");
         self.readerSession = [[NFCTagReaderSession alloc] initWithPollingOption:NFCPollingISO14443 delegate:self queue:nil];
         self.readerSession.alertMessage = @"Please put your iPhone onto HoloKit.";
         [self.readerSession beginSession];
     }
     else {
-        if (NFCAuthenticationDidSucceedDelegate)
-            NFCAuthenticationDidSucceedDelegate();
+        if (NfcAuthenticationDidCompleteDelegate)
+            NfcAuthenticationDidCompleteDelegate(YES);
     }
 }
 
@@ -92,11 +91,16 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
 - (void)tagReaderSession:(NFCTagReaderSession *)session didDetectTags:(NSArray<__kindof id<NFCTag>> *)tags {
     if ([tags count] > 1) {
         [session invalidateSessionWithErrorMessage:@"More than 1 NFC tag was detected"];
+        if (NfcAuthenticationDidCompleteDelegate)
+            NfcAuthenticationDidCompleteDelegate(NO);
+        return;
     }
     id<NFCTag> tag = tags[0];
     [session connectToTag:tag completionHandler:^(NSError * _Nullable error) {
         if (error != nil) {
             [session invalidateSessionWithErrorMessage:@"Failed to connect to tag"];
+            if (NfcAuthenticationDidCompleteDelegate)
+                NfcAuthenticationDidCompleteDelegate(NO);
             return;
         }
         id<NFCISO7816Tag> sTag = [tag asNFCISO7816Tag];
@@ -106,43 +110,56 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
         [sTag queryNDEFStatusWithCompletionHandler:^(NFCNDEFStatus status, NSUInteger capacity, NSError * _Nullable error) {
             if (error != nil) {
                 [session invalidateSessionWithErrorMessage:@"Failed to query NDEF status of the tag"];
+                if (NfcAuthenticationDidCompleteDelegate)
+                    NfcAuthenticationDidCompleteDelegate(NO);
                 return;
             }
             switch (status) {
                 case NFCNDEFStatusNotSupported: {
                     [session invalidateSessionWithErrorMessage:@"NDEF is not supported on this tag"];
+                    if (NfcAuthenticationDidCompleteDelegate)
+                        NfcAuthenticationDidCompleteDelegate(NO);
                     break;
                 }
                 case NFCNDEFStatusReadOnly: {
                     [session invalidateSessionWithErrorMessage:@"This tag is read only"];
+                    if (NfcAuthenticationDidCompleteDelegate)
+                        NfcAuthenticationDidCompleteDelegate(NO);
                     break;
                 }
                 case NFCNDEFStatusReadWrite: {
                     [sTag readNDEFWithCompletionHandler:^(NFCNDEFMessage * _Nullable message, NSError * _Nullable error) {
                         if ([message.records count] < 1 || message.records[0].payload == nil) {
                             [session invalidateSessionWithErrorMessage:@"There is no data in this tag"];
+                            if (NfcAuthenticationDidCompleteDelegate)
+                                NfcAuthenticationDidCompleteDelegate(NO);
                             return;
                         }
                         NSString *rawContent = [[NSString alloc] initWithData:message.records[0].payload encoding:NSUTF8StringEncoding];
-                        NSLog(@"[nfc_session] raw content %@", rawContent);
+                        //NSLog(@"[nfc_session] raw content %@", rawContent);
                         NSString *signature = [NFCSession findSignatureFromRawContent:rawContent];
-                        NSLog(@"[nfc_session] signature %@", signature);
+                        //NSLog(@"[nfc_session] signature %@", signature);
                         NSString *content = [NFCSession findContentFromRawContent:rawContent];
-                        NSLog(@"[nfc_session] content %@", content);
+                        //NSLog(@"[nfc_session] content %@", content);
                         if ([content isEqualToString:uid]) {
                             if ([Crypto validateSignatureWithSignature:signature content:content]) {
+                                NSLog(@"[nfc_session] nfc authentication succeeded");
                                 [session setAlertMessage:@"NFC authentication succeeded"];
                                 [session invalidateSession];
-                                [[ARSessionDelegateController sharedARSessionDelegateController] setIsStereoscopicRendering:YES];
-                                if (NFCAuthenticationDidSucceedDelegate != NULL) {
-                                    NFCAuthenticationDidSucceedDelegate();
+                                //[[ARSessionDelegateController sharedARSessionDelegateController] setIsStereoscopicRendering:YES];
+                                if (NfcAuthenticationDidCompleteDelegate) {
+                                    NfcAuthenticationDidCompleteDelegate(YES);
                                 }
                             } else {
                                 [session invalidateSessionWithErrorMessage:@"NFC authentication failed"];
+                                if (NfcAuthenticationDidCompleteDelegate)
+                                    NfcAuthenticationDidCompleteDelegate(NO);
                                 return;
                             }
                         } else {
                             [session invalidateSessionWithErrorMessage:@"NFC authentication failed"];
+                            if (NfcAuthenticationDidCompleteDelegate)
+                                NfcAuthenticationDidCompleteDelegate(NO);
                             return;
                         }
                     }];
@@ -162,10 +179,15 @@ NFCAuthenticationDidSucceed NFCAuthenticationDidSucceedDelegate = NULL;
 #pragma mark - extern "C"
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetNFCAuthenticationDidSucceedDelegate(NFCAuthenticationDidSucceed callback) {
-    NFCAuthenticationDidSucceedDelegate = callback;
+UnityHoloKit_StartNfcAuthentication(void) {
+    [[NFCSession sharedNFCSession] startReaderSession];
 }
 
-void UnityHoloKit_SetIsUsingNfc(bool value) {
-    [[NFCSession sharedNFCSession] setIsUsingNfc:value];
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetNfcAuthenticationDidCompleteDelegate(NfcAuthenticationDidComplete callback) {
+    NfcAuthenticationDidCompleteDelegate = callback;
+}
+
+void UnityHoloKit_SetUsingNfc(bool value) {
+    [[NFCSession sharedNFCSession] setUsingNfc:value];
 }

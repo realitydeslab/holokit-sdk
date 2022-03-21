@@ -45,15 +45,13 @@ public:
     
     int GetScreenHeight() { return screen_height_; }
     
-    bool GetIsStereoscopicRendering() { return is_stereoscopic_rendering_; }
+    bool GetStereoscopicRendering() { return stereoscopic_rendering_; }
     
-    void SetIsStereoscopicRendering(bool val);
+    void SetStereoscopicRendering(bool val);
     
-    bool GetIsSinglePassRendering() { return is_single_pass_rendering_; }
+    bool GetSinglePassRendering() { return single_pass_rendering_; }
     
-    void SetIsSinglePassRendering(bool val) { is_single_pass_rendering_ = val; }
-    
-    void StartNfcAuthentication();
+    void SetSinglePassRendering(bool val) { single_pass_rendering_ = val; }
 
     NSString* GetModelName() { return model_name_; }
     
@@ -101,9 +99,9 @@ private:
     bool is_initialized_ = false;
     
     /// @brief Whether stereoscopic rendering is open.
-    bool is_stereoscopic_rendering_ = false;
+    bool stereoscopic_rendering_ = false;
     
-    bool is_single_pass_rendering_ = false;
+    bool single_pass_rendering_ = false;
     
     simd_float4x4 portrait_matrix;
     

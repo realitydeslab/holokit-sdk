@@ -11,7 +11,7 @@
 
 // Set this to false to turn off nfc authentication.
 // This is for testing purpose.
-@property (assign) BOOL isUsingNfc;
+@property (assign) BOOL usingNfc;
 
 - (void)startReaderSession;
 

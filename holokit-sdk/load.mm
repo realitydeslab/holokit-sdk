@@ -28,7 +28,7 @@ UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
 
     HOLOKIT_MAIN_XR_TRACE_LOG(xr_trace, "UnityPluginLoad()\n");
 
-    // Set up HoloKitApi instance.
+    // Set up HoloKitApi first.
     holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
     holokit::HoloKitApi::GetInstance()->Initialize();
 

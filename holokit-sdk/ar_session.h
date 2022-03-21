@@ -5,7 +5,6 @@
 //  Created by Yuchen on 2021/4/8.
 //
 #import <ARKit/ARKit.h>
-#import "multipeer_session.h"
 
 @interface ARSessionDelegateController : NSObject
 

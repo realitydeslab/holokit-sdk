@@ -24,10 +24,10 @@ public class Crypto: NSObject {
         }
         let publicKey = try! Curve25519.Signing.PublicKey(rawRepresentation: dataWithHexString(hex: Crypto.publicKey))
         if publicKey.isValidSignature(signatureData, for: contentData) {
-            NSLog("[crypto] signature is true")
+            //NSLog("[crypto] signature is true")
             return true
         } else {
-            NSLog("[crypto] signature is false")
+            //NSLog("[crypto] signature is false")
             return false
         }
     }

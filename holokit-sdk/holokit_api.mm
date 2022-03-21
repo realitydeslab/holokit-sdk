@@ -153,12 +153,8 @@ simd_float3 HoloKitApi::GetEyePosition(int eye_index) {
     return simd_make_float3(0);
 }
 
-void HoloKitApi::StartNfcAuthentication() {
-    [[NFCSession sharedNFCSession] startReaderSession];
-}
-
-void HoloKitApi::SetIsStereoscopicRendering(bool val) {
-    is_stereoscopic_rendering_ = val;
+void HoloKitApi::SetStereoscopicRendering(bool val) {
+    stereoscopic_rendering_ = val;
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
@@ -174,18 +170,13 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
 extern "C" {
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetIsStereoscopicRendering() {
-    return holokit::HoloKitApi::GetInstance()->GetIsStereoscopicRendering();
+UnityHoloKit_GetStereoscopicRendering() {
+    return holokit::HoloKitApi::GetInstance()->GetStereoscopicRendering();
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StartNFCAuthentication() {
-    holokit::HoloKitApi::GetInstance()->StartNfcAuthentication();
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_DisableIsStereoscopicRendering() {
-    return holokit::HoloKitApi::GetInstance()->SetIsStereoscopicRendering(false);
+UnityHoloKit_SetStereoscopicRendering(bool value) {
+    holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(value);
 }
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
