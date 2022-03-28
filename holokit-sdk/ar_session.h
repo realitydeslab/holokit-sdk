@@ -14,7 +14,5 @@
 @property (nonatomic, strong, nullable) ARWorldMap *worldMap;
 
 + (id _Nonnull)sharedARSessionDelegateController;
-//- (void)updateWithCollaborationData:(ARCollaborationData *_Nonnull) collaborationData;
-- (void)setIsStereoscopicRendering:(BOOL)val;
 
 @end

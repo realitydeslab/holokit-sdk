@@ -169,6 +169,13 @@ simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
 
 extern "C" {
 
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_InitializeHoloKitApi() {
+    NSLog(@"[holokit_api] Initialize");
+    holokit::HoloKitApi::GetInstance().reset(new holokit::HoloKitApi);
+    holokit::HoloKitApi::GetInstance()->Initialize();
+}
+
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetStereoscopicRendering() {
     return holokit::HoloKitApi::GetInstance()->GetStereoscopicRendering();

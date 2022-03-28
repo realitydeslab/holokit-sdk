@@ -18,12 +18,6 @@
 #import <os/log.h>
 #import <os/signpost.h>
 
-typedef void (*DidAddARParticipantAnchor)();
-DidAddARParticipantAnchor DidAddARParticipantAnchorDelegate = NULL;
-
-typedef void (*ARSessionDidUpdate)();
-ARSessionDidUpdate ARSessionDidUpdateDelegate = NULL;
-
 typedef void (*ThermalStateDidChange)(int state);
 ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
 
@@ -32,9 +26,6 @@ CameraDidChangeTrackingState CameraDidChangeTrackingStateDelegate = NULL;
 
 typedef void (*ARWorldMappingStatusDidChange)(int status);
 ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
-
-typedef void (*DidFindARWorldMap)(const char *mapName);
-DidFindARWorldMap DidFindARWorldMapDelegate = NULL;
 
 typedef void (*DidSaveARWorldMap)(const char *mapName);
 DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
@@ -72,22 +63,8 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
 
 - (void)thermalStateDidChange {
     if (ThermalStateDidChangeDelegate) {
-        return;
-    }
-    NSProcessInfoThermalState thermalState = [[NSProcessInfo processInfo] thermalState];
-    switch(thermalState) {
-        case NSProcessInfoThermalStateNominal:
-            ThermalStateDidChangeDelegate(0);
-            break;
-        case NSProcessInfoThermalStateFair:
-            ThermalStateDidChangeDelegate(1);
-            break;
-        case NSProcessInfoThermalStateSerious:
-            ThermalStateDidChangeDelegate(2);
-            break;
-        case NSProcessInfoThermalStateCritical:
-            ThermalStateDidChangeDelegate(3);
-            break;
+        NSProcessInfoThermalState thermalState = [[NSProcessInfo processInfo] thermalState];
+        ThermalStateDidChangeDelegate((int)thermalState);
     }
 }
 
@@ -121,7 +98,9 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
         NSLog(@"[world_map] map name: %@\nmap size: %f mb\nmap path: %@", mapName, mapData.length / (1024.0 * 1024.0), filePath);
         
         if (DidSaveARWorldMapDelegate) {
-            DidSaveARWorldMapDelegate([mapName UTF8String]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                DidSaveARWorldMapDelegate([mapName UTF8String]);
+            });
         }
     }];
 }
@@ -146,20 +125,15 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
 
 - (void)loadARWorldMap {
     if (self.worldMap == nil) {
-        NSLog(@"[world_map] there is no local ARWorldMap to load");
+        NSLog(@"[world_map] there is no ARWorldMap to load");
         return;
     }
     
-    ARSession *arSession = [[ARSessionDelegateController sharedARSessionDelegateController] arSession];
-    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)arSession.configuration;
+    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.arSession.configuration;
     configuration.initialWorldMap = self.worldMap;
-    [arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
+    [self.arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
     self.worldMap = nil;
     NSLog(@"[world_map] did load ARWorldMap");
-}
-
-- (void)setIsStereoscopicRendering:(BOOL)val {
-    holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(val);
 }
 
 #pragma mark - ARSessionDelegate
@@ -189,23 +163,6 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
-
-    for (ARAnchor *anchor in anchors) {
-        if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            if (DidAddARParticipantAnchorDelegate) {
-                DidAddARParticipantAnchorDelegate();
-            }
-            NSLog(@"[ar_session] did add an ARParticipantAnchor");
-            continue;
-        }
-        if (anchor.name != nil) {
-//            if (![self.multipeerSession isHost] && [anchor.name isEqualToString:@"origin"]) {
-//                NSLog(@"[ar_session] did receive an origin anchor");
-//                [session setWorldOrigin:anchor.transform];
-//                continue;
-//            }
-        }
-    }
 }
 
 - (void)session:(ARSession *)session didUpdateAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
@@ -217,14 +174,6 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
 - (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate) {
         [self.unityARSessionDelegate session:session didRemoveAnchors:anchors];
-    }
-    for (ARAnchor *anchor in anchors) {
-        if ([anchor isKindOfClass:[ARParticipantAnchor class]]) {
-            NSLog(@"[ar_session] did remove an ARParticipantAnchor");
-        }
-        if ([anchor.name isEqualToString:@"origin"]) {
-            NSLog(@"[ar_session] did remove an origin anchor");
-        }
     }
 }
 
@@ -256,47 +205,61 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
         case ARTrackingStateNotAvailable:
             NSLog(@"[ar_session] AR tracking state changed to not available");
             if (CameraDidChangeTrackingStateDelegate) {
-                CameraDidChangeTrackingStateDelegate(0);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    CameraDidChangeTrackingStateDelegate(0);
+                });
             }
             break;
         case ARTrackingStateLimited:
             switch(camera.trackingStateReason) {
                 case ARTrackingStateReasonNone:
                     NSLog(@"[ar_session] AR tracking state changed to limited, with reason: None");
-                    if (CameraDidChangeTrackingStateDelegate != NULL) {
-                        CameraDidChangeTrackingStateDelegate(1);
+                    if (CameraDidChangeTrackingStateDelegate) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            CameraDidChangeTrackingStateDelegate(1);
+                        });
                     }
                     break;
                 case ARTrackingStateReasonInitializing:
                     NSLog(@"[ar_session] AR tracking state changed to limited, with reason: Initializing");
-                    if (CameraDidChangeTrackingStateDelegate != NULL) {
-                        CameraDidChangeTrackingStateDelegate(2);
+                    if (CameraDidChangeTrackingStateDelegate) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            CameraDidChangeTrackingStateDelegate(2);
+                        });
                     }
                     break;
                 case ARTrackingStateReasonExcessiveMotion:
                     NSLog(@"[ar_session] AR tracking state changed to limited, with reason: Excessive motion");
-                    if (CameraDidChangeTrackingStateDelegate != NULL) {
-                        CameraDidChangeTrackingStateDelegate(3);
+                    if (CameraDidChangeTrackingStateDelegate) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            CameraDidChangeTrackingStateDelegate(3);
+                        });
                     }
                     break;
                 case ARTrackingStateReasonInsufficientFeatures:
                     NSLog(@"[ar_session] AR tracking state changed to limited, with reason: Insufficient features");
-                    if (CameraDidChangeTrackingStateDelegate != NULL) {
-                        CameraDidChangeTrackingStateDelegate(4);
+                    if (CameraDidChangeTrackingStateDelegate) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            CameraDidChangeTrackingStateDelegate(4);
+                        });
                     }
                     break;
                 case ARTrackingStateReasonRelocalizing:
                     NSLog(@"[ar_session] AR tracking state changed to limited, with reason: Relocalizing");
-                    if (CameraDidChangeTrackingStateDelegate != NULL) {
-                        CameraDidChangeTrackingStateDelegate(5);
+                    if (CameraDidChangeTrackingStateDelegate) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            CameraDidChangeTrackingStateDelegate(5);
+                        });
                     }
                     break;
             }
             break;
         case ARTrackingStateNormal:
             NSLog(@"[ar_session] AR tracking state changed to normal");
-            if (CameraDidChangeTrackingStateDelegate != NULL) {
-                CameraDidChangeTrackingStateDelegate(6);
+            if (CameraDidChangeTrackingStateDelegate) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    CameraDidChangeTrackingStateDelegate(6);
+                });
             }
             break;
     }

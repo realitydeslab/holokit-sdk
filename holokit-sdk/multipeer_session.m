@@ -240,10 +240,12 @@ typedef enum {
             char *str = malloc(strlen);
             memcpy(str, decodedData + 2, strlen);
             NSString *photonRoomName = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
-            if (DidReceivePhotonRoomNameDelegate) {
-                DidReceivePhotonRoomNameDelegate([photonRoomName UTF8String]);
-            }
             free(str);
+            if (DidReceivePhotonRoomNameDelegate) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    DidReceivePhotonRoomNameDelegate([photonRoomName UTF8String]);
+                });
+            }
             break;
         }
         case 1: {
@@ -252,10 +254,12 @@ typedef enum {
             char *str = malloc(strlen);
             memcpy(str, decodedData + 2, strlen);
             NSString *hostLocalIpAddress = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
-            if (DidReceiveHostLocalIpAddressDelegate) {
-                DidReceiveHostLocalIpAddressDelegate([hostLocalIpAddress UTF8String]);
-            }
             free(str);
+            if (DidReceiveHostLocalIpAddressDelegate) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    DidReceiveHostLocalIpAddressDelegate([hostLocalIpAddress UTF8String]);
+                });
+            }
             break;
         }
         default: {
@@ -264,9 +268,10 @@ typedef enum {
                 NSLog(@"[world_map] did receive ARWorldMap of size %f mb", data.length / 1024.0 / 1024.0);
                 [[ARSessionDelegateController sharedARSessionDelegateController] setWorldMap:worldMap];
                 if (DidReceiveARWorldMapDelegate) {
-                    DidReceiveARWorldMapDelegate();
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        DidReceiveARWorldMapDelegate();
+                    });
                 }
-                return;
             }
             break;
         }
