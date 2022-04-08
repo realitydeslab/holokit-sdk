@@ -18,9 +18,6 @@ DidReceiveWatchInput DidReceiveWatchInputDelegate = NULL;
 typedef void (*DidReceiveCalorieMessage)(float calories);
 DidReceiveCalorieMessage DidReceiveCalorieMessageDelegate = NULL;
 
-typedef void (*DidChangeReachability)(bool reachable);
-DidChangeReachability DidChangeReachabilityDelegate = NULL;
-
 @interface WatchConnectivity() <WCSessionDelegate>
 
 @property (nonatomic, strong) WCSession *wcSession;
@@ -77,26 +74,29 @@ DidChangeReachability DidChangeReachabilityDelegate = NULL;
     } else {
         NSLog(@"[wc_session]: session reachability did change to not reachable.");
     }
-    if (DidChangeReachabilityDelegate != NULL) {
-        DidChangeReachabilityDelegate(session.isReachable);
-    }
 }
 
 - (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *,id> *)message {
     if (id playerInputValue = [message objectForKey:@"WatchInput"]) {
         NSInteger playerInput = [playerInputValue integerValue];
-        if (DidReceiveWatchInputDelegate != NULL) {
-            DidReceiveWatchInputDelegate((int)playerInput);
+        if (DidReceiveWatchInputDelegate) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                DidReceiveWatchInputDelegate((int)playerInput);
+            });
         }
     } else if (id watchSystemValue = [message objectForKey:@"WatchMessage"]) {
         NSInteger watchSystemIndex = [watchSystemValue integerValue];
-        if (DidReceiveWatchMessageDelegate != NULL) {
-            DidReceiveWatchMessageDelegate((int)watchSystemIndex);
+        if (DidReceiveWatchMessageDelegate) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                DidReceiveWatchMessageDelegate((int)watchSystemIndex);
+            });
         }
     } else if (id watchCalorieValue = [message objectForKey:@"Calorie"]) {
         float calories = [watchCalorieValue floatValue];
-        if (DidReceiveCalorieMessageDelegate != NULL) {
-            DidReceiveCalorieMessageDelegate(calories);
+        if (DidReceiveCalorieMessageDelegate) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                DidReceiveCalorieMessageDelegate(calories);
+            });
         }
      }
 }
@@ -141,16 +141,6 @@ UnityHoloKit_SetDidReceiveWatchInputDelegate(DidReceiveWatchInput callback) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetDidReceiveCalorieMessageDelegate(DidReceiveCalorieMessage callback) {
     DidReceiveCalorieMessageDelegate = callback;
-}
-
-bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_GetIsReachable() {
-    return [[WatchConnectivity sharedWatchConnectivity] wcSession].isReachable;
-}
-
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetDidChangeReachabilityDelegate(DidChangeReachability callback) {
-    DidChangeReachabilityDelegate = callback;
 }
 
 } // extern "C"
