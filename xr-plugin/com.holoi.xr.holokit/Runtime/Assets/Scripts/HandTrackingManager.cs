@@ -3,6 +3,31 @@ using System.Runtime.InteropServices;
 
 namespace UnityEngine.XR.HoloKit
 {
+    public enum HoloKitHandLandmark
+    {
+        Wrist = 0,
+        ThumbStart,
+        Thumb1,
+        Thumb2,
+        ThumbEnd,
+        IndexStart,
+        Index1,
+        Index2,
+        IndexEnd,
+        MiddleStart,
+        Middle1,
+        Middle2,
+        MiddleEnd,
+        RingStart,
+        Ring1,
+        Ring2,
+        RingEnd,
+        PinkyStart,
+        Pinky1,
+        Pinky2,
+        PinkyEnd
+    }
+
     public class HandTrackingManager : MonoBehaviour
     {
         private static HandTrackingManager _instance;
@@ -203,14 +228,14 @@ namespace UnityEngine.XR.HoloKit
 
         public void TurnOnHandTracking()
         {
-            HoloKitManager.Instance.StartHoloKitInputSubsystem();
+            //HoloKitManager.Instance.StartHoloKitInputSubsystem();
             UnityHoloKit_TurnOnHandTracking();
         }
 
         public void TurnOffHandTracking()
         {
             UnityHoloKit_TurnOffHandTracking();
-            HoloKitManager.Instance.StopHoloKitInputSubsystem();
+            //HoloKitManager.Instance.StopHoloKitInputSubsystem();
         }
 
         public bool IsHandTrackingOn()

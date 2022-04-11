@@ -5,21 +5,21 @@ namespace UnityEngine.XR.HoloKit
     internal class Timer : MonoBehaviour
     {
         [SerializeField]
-        Text txt;
+        private Text _text;
 
-        private float m_StartTime;
+        private float _startTime;
 
-        void Start()
+        private void Start()
         {
-            m_StartTime = Time.time;
+            _startTime = Time.time;
         }
 
-        void Update()
+        private void Update()
         {
-            float currentTime = Time.time - m_StartTime;
-            string minutes = Mathf.Floor(currentTime / 60f).ToString("00");
-            string seconds = (currentTime % 60f).ToString("00");
-            txt.text = $"{minutes}:{seconds}";
+            float timeToDisplay = Time.time - _startTime;
+            float minutes = Mathf.FloorToInt(timeToDisplay / 60);
+            float seconds = Mathf.FloorToInt(timeToDisplay % 60);
+            _text.text = string.Format("{0:00}:{1:00}", minutes, seconds);
         }
     }
 }

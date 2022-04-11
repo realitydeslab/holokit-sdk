@@ -52,22 +52,22 @@ namespace UnityEngine.XR.HoloKit
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void OnBeforeSceneLoad()
         {
-            foreach (var loader in XRGeneralSettings.Instance.Manager.activeLoaders)
-            {
-                if (loader.name.Equals("Holo Kit XR Loader"))
-                {
-                    loader.Initialize();
-                    loader.Start();
-                }
-            }
+//            foreach (var loader in XRGeneralSettings.Instance.Manager.activeLoaders)
+//            {
+//                if (loader.name.Equals("Holo Kit XR Loader"))
+//                {
+//                    loader.Initialize();
+//                    loader.Start();
+//                }
+//            }
 
-            var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
-            if (xrSessionSubsystem != null)
-            {
-#if UNITY_IOS
-                UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
-#endif
-            }
+//            var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
+//            if (xrSessionSubsystem != null)
+//            {
+//#if UNITY_IOS
+//                UnityHoloKit_SetARSession(xrSessionSubsystem.nativePtr);
+//#endif
+//            }
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
