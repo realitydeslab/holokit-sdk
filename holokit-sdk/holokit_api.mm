@@ -12,7 +12,7 @@
 
 #define DEGREES_TO_RADIANS(degrees) ((degrees) * (M_PI / 180.0))
 
-const float kUserInterpupillaryDistance = 0.064;
+//const float kUserInterpupillaryDistance = 0.064;
 
 namespace holokit {
 
@@ -30,24 +30,6 @@ void HoloKitApi::Initialize() {
     model_name_ = [NSString stringWithCString:system_info.machine encoding:NSUTF8StringEncoding];
     
     InitOpticalParameters();
-    
-    portrait_matrix = matrix_identity_float4x4;
-    portrait_matrix.columns[0].x = cos(DEGREES_TO_RADIANS(90));
-    portrait_matrix.columns[0].y = sin(DEGREES_TO_RADIANS(90));
-    portrait_matrix.columns[1].x = -sin(DEGREES_TO_RADIANS(90));
-    portrait_matrix.columns[1].y = cos(DEGREES_TO_RADIANS(90));
-    
-    landscape_left_matrix = matrix_identity_float4x4;
-    landscape_left_matrix.columns[0].x = cos(DEGREES_TO_RADIANS(180));
-    landscape_left_matrix.columns[0].y = sin(DEGREES_TO_RADIANS(180));
-    landscape_left_matrix.columns[1].x = -sin(DEGREES_TO_RADIANS(180));
-    landscape_left_matrix.columns[1].y = cos(DEGREES_TO_RADIANS(180));
-    
-    portrait_upsidedown_matrix = matrix_identity_float4x4;
-    portrait_upsidedown_matrix.columns[0].x = cos(DEGREES_TO_RADIANS(-90));
-    portrait_upsidedown_matrix.columns[0].y = sin(DEGREES_TO_RADIANS(-90));
-    portrait_upsidedown_matrix.columns[1].x = -sin(DEGREES_TO_RADIANS(-90));
-    portrait_upsidedown_matrix.columns[1].y = cos(DEGREES_TO_RADIANS(-90));
     
     is_initialized_ = true;
 }

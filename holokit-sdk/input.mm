@@ -241,22 +241,6 @@ public:
             if (device_id == kDeviceIdHoloKitHmd) {
 
                 simd_float4x4 camera_transform = holokit::HoloKitApi::GetInstance()->GetCurrentCameraTransform();
-                switch([[[[[UIApplication sharedApplication] windows] firstObject] windowScene] interfaceOrientation]) {
-                    case UIInterfaceOrientationLandscapeRight:
-                        break;
-                    case UIInterfaceOrientationPortrait: {
-                        camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetPortraitMatrix());
-                        break;
-                    }
-                    case UIInterfaceOrientationLandscapeLeft:
-                        camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetLandscapeLeftMatrix());
-                        break;
-                    case UIInterfaceOrientationPortraitUpsideDown:
-                        camera_transform = simd_mul(camera_transform, holokit::HoloKitApi::GetInstance()->GetPortraitUpsidedownMatrix());
-                        break;
-                    default:
-                        break;
-                }
                 simd_float3 camera_position = simd_make_float3(camera_transform.columns[3].x, camera_transform.columns[3].y, camera_transform.columns[3].z);
                 UnityXRVector3 position = UnityXRVector3 { camera_position.x, camera_position.y, -camera_position.z };
                 simd_quatf quaternion = simd_quaternion(camera_transform);

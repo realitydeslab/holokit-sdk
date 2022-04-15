@@ -288,7 +288,7 @@ public:
                 render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(i));
             }
             auto& culling_pass = next_frame->cullingPasses[0];
-            culling_pass.separation = 0.064f;
+            culling_pass.separation = holokit::HoloKitApi::GetInstance()->kUserInterpupillaryDistance;
             culling_pass.deviceAnchorToCullingPose = next_frame->renderPasses[0].renderParams[0].deviceAnchorToEyePose;
             culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
             culling_pass.projection.data.matrix = next_frame->renderPasses[0].renderParams[0].projection.data.matrix;
@@ -325,7 +325,7 @@ public:
                 
                 // Do culling for each eye seperately.
                 auto& culling_pass = next_frame->cullingPasses[pass];
-                culling_pass.separation = 0.064f;
+                culling_pass.separation = holokit::HoloKitApi::GetInstance()->kUserInterpupillaryDistance;
                 culling_pass.deviceAnchorToCullingPose = next_frame->renderPasses[pass].renderParams[0].deviceAnchorToEyePose;
                 culling_pass.projection.type = kUnityXRProjectionTypeMatrix;
                 culling_pass.projection.data.matrix = next_frame->renderPasses[pass].renderParams[0].projection.data.matrix;

@@ -55,11 +55,7 @@ public:
 
     NSString* GetModelName() { return model_name_; }
     
-    simd_float4x4 GetPortraitMatrix() { return portrait_matrix; }
-    
-    simd_float4x4 GetLandscapeLeftMatrix() { return landscape_left_matrix; }
-    
-    simd_float4x4 GetPortraitUpsidedownMatrix() { return portrait_upsidedown_matrix; }
+    const float kUserInterpupillaryDistance = 0.064;
     
     static std::unique_ptr<HoloKitApi>& GetInstance();
     
@@ -102,13 +98,6 @@ private:
     bool stereoscopic_rendering_ = false;
     
     bool single_pass_rendering_ = false;
-    
-    simd_float4x4 portrait_matrix;
-    
-    simd_float4x4 landscape_left_matrix;
-    
-    simd_float4x4 portrait_upsidedown_matrix;
-
 }; // class HoloKitApi
 
 } // namespace holokit
