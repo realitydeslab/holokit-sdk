@@ -180,8 +180,7 @@ public:
     
     void Shutdown() const {}
     
-    UnitySubsystemErrorCode GfxThread_Start(
-            UnityXRRenderingCapabilities* rendering_caps) {
+    UnitySubsystemErrorCode GfxThread_Start(UnityXRRenderingCapabilities* rendering_caps) {
 
         HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "GfxThread_Start");
         
@@ -193,7 +192,7 @@ public:
         
         // Allocate new textures when gfx thread starts.
         allocate_new_textures_ = true;
-        is_first_frame_ = true;
+        frame_count_ = 0;
         // Disable AR background image
 //        if (holokit::HoloKitApi::GetInstance()->GetStereoscopicRendering() && SetARCameraBackgroundDelegate) {
 //            SetARCameraBackgroundDelegate(false);
@@ -266,13 +265,7 @@ public:
 
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
-        // We interrupt the graphics thread if it is not manually opened by the SDK.
-//        if (!holokit::HoloKitApi::GetInstance()->GetStereoscopicRendering()) {
-//            HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Shut down Gfx Thread.");
-//            return kUnitySubsystemErrorCodeFailure;
-//        }
         
-        // If this is the first frame for stereoscopic rendering mode.
         if (allocate_new_textures_) {
             DestroyTextures();
             CreateTextures(1);
@@ -304,8 +297,8 @@ public:
         {
             // 2-pass rendering
             next_frame->renderPassesCount = 2;
-            // Iterate through 2 render passes.
-            for (int pass = 0; pass < next_frame->renderPassesCount; ++pass)
+            // 0 for the left eye and 1 for the right eye.
+            for (int pass = 0; pass < next_frame->renderPassesCount; pass++)
             {
                 auto& render_pass = next_frame->renderPasses[pass];
                 
@@ -314,16 +307,18 @@ public:
                 render_pass.cullingPassIndex = pass;
                 
                 auto& render_params = render_pass.renderParams[0];
-                // Render a black image in the first frame to avoid left viewport glitch.
-                if (is_first_frame_) {
+                // Render a black image for the 10 frames to avoid viewport glitch.
+                // This glitch only happened on the left viewport.
+                if (pass == 0 && frame_count_ < 10) {
+                    frame_count_++;
                     UnityXRVector3 sky_position = UnityXRVector3 { 0, 999, 0 };
                     UnityXRVector4 sky_rotation = UnityXRVector4 { 0, 0, 0, 1 };
                     UnityXRPose sky_pose = { sky_position, sky_rotation };
                     render_params.deviceAnchorToEyePose = sky_pose;
-                    is_first_frame_ = false;
                 } else {
                     render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
                 }
+                //render_params.deviceAnchorToEyePose = EyePositionToUnityXRPose(holokit::HoloKitApi::GetInstance()->GetEyePosition(pass));
                 render_params.projection.type = kUnityXRProjectionTypeMatrix;
                 render_params.projection.data.matrix = Float4x4ToUnityXRMatrix(holokit::HoloKitApi::GetInstance()->GetProjectionMatrix(pass));
                 render_params.viewportRect = Float4ToUnityXRRect(holokit::HoloKitApi::GetInstance()->GetViewportRect(pass));
@@ -470,7 +465,7 @@ private:
     /// @brief The render pipeline state for content rendering.
     id <MTLRenderPipelineState> main_render_pipeline_state_;
     
-    bool is_first_frame_ = true;
+    int frame_count_;
     
     bool allocate_new_textures_ = true;
     
