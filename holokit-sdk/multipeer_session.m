@@ -360,13 +360,15 @@ UnityHoloKit_MPCSetPhotonRoomName(const char *roomName) {
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MPCSetHostLocalIpAddress(const char *ip) {
-    //[[[ARSessionDelegateController sharedARSessionDelegateController] multipeerSession] setHostLocalIpAddress:[NSString stringWithUTF8String:ip]];
+UnityHoloKit_MPCSetDidReceivePhotonRoomNameDelegate(DidReceivePhotonRoomName callback) {
+    DidReceivePhotonRoomNameDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_MPCSetDidReceivePhotonRoomNameDelegate(DidReceivePhotonRoomName callback) {
-    DidReceivePhotonRoomNameDelegate = callback;
+UnityHoloKit_MPCSetHostLocalIpAddress(const char *ip) {
+    MultipeerSession *session = [MultipeerSession sharedMultipeerSession];
+    [session setHostLocalIpAddress:[NSString stringWithUTF8String:ip]];
+    [session setNetcodeTransport:NetcodeTransportWifi];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

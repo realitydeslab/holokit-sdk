@@ -28,33 +28,6 @@
   XR_TRACE_LOG(trace, "[HoloKitDisplayProvider] " message "\n", \
                ##__VA_ARGS__)
 
-//NSString* alignment_marker_shader = @
-//    "#include <metal_stdlib>\n"
-//    "using namespace metal;\n"
-//    "struct VertexInOut\n"
-//    "{\n"
-//    "    float4  position [[position]];\n"
-//    "    float4  color;\n"
-//    "};\n"
-//    "vertex VertexInOut passThroughVertex(uint vid [[ vertex_id ]],\n"
-//    "                                     constant packed_float4* position  [[ buffer(0) ]])\n"
-//    "{\n"
-//    "    VertexInOut outVertex;\n"
-//    "    outVertex.position = position[vid];\n"
-//    "    return outVertex;\n"
-//    "};\n"
-//    "fragment half4 passThroughFragment(VertexInOut inFrag [[stage_in]])\n"
-//    "{\n"
-//    "//  return half4(1, 0, 0, 1);\n"
-//    "    return half4(1, 1, 1, 1);\n"
-//    "};\n";
-
-//// widgets data
-//float vertex_data[] = {
-//    0.829760, 1, 0.0, 1.0,
-//    0.829760, 0.7, 0.0, 1.0
-//};
-
 // new content rendering data
 constexpr static float main_vertices[] = { -1, -1, 1, -1, -1, 1, 1, 1 };
 constexpr static float main_uvs[] = { 0, 0, 1, 0, 0, 1, 1, 1 };
@@ -207,6 +180,7 @@ public:
     
 #pragma mark - SubmitCurrentFrame()
     UnitySubsystemErrorCode GfxThread_SubmitCurrentFrame() {
+
         RenderContent();
         return kUnitySubsystemErrorCodeSuccess;
     }
@@ -232,8 +206,7 @@ public:
             mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
             //mtl_render_pipeline_descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
             mtl_render_pipeline_descriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-            mtl_render_pipeline_descriptor.stencilAttachmentPixelFormat =
-                MTLPixelFormatDepth32Float_Stencil8;
+            mtl_render_pipeline_descriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
             mtl_render_pipeline_descriptor.sampleCount = 1;
             // Blending options
             mtl_render_pipeline_descriptor.colorAttachments[0].blendingEnabled = YES;
@@ -244,9 +217,9 @@ public:
             mtl_render_pipeline_descriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
             mtl_render_pipeline_descriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOne;
             
-            main_render_pipeline_state_ = [mtl_device newRenderPipelineStateWithDescriptor:mtl_render_pipeline_descriptor error:nil];
+            metal_render_pipeline_state_ = [mtl_device newRenderPipelineStateWithDescriptor:mtl_render_pipeline_descriptor error:nil];
             if (mtl_render_pipeline_descriptor == nil) {
-                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Failed to create Metal content render pipeline.");
+                HOLOKIT_DISPLAY_XR_TRACE_LOG(trace_, "Failed to create Metal render pipeline.");
                 return;
             }
             metal_setup_ = true;
@@ -254,18 +227,16 @@ public:
         
         id<MTLRenderCommandEncoder> mtl_render_command_encoder =
             (id<MTLRenderCommandEncoder>)metal_interface_->CurrentCommandEncoder();
-        [mtl_render_command_encoder setRenderPipelineState:main_render_pipeline_state_];
+        [mtl_render_command_encoder setRenderPipelineState:metal_render_pipeline_state_];
         [mtl_render_command_encoder setVertexBytes:main_vertices length:sizeof(main_vertices) atIndex:VertexInputIndexPosition];
         [mtl_render_command_encoder setVertexBytes:main_uvs length:sizeof(main_uvs) atIndex:VertexInputIndexTexCoords];
         [mtl_render_command_encoder setFragmentTexture:metal_color_textures_[0] atIndex:FragmentInputIndexTexture];
-        [mtl_render_command_encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip
-                                       vertexStart:0
-                                       vertexCount:4];
+        [mtl_render_command_encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
     }
 
 #pragma mark - PopulateNextFrame()
     UnitySubsystemErrorCode GfxThread_PopulateNextFrameDesc(const UnityXRFrameSetupHints* frame_hints, UnityXRNextFrameDesc* next_frame) {
-        
+
         if (allocate_new_textures_) {
             DestroyTextures();
             CreateTextures(1);
@@ -463,7 +434,7 @@ private:
     bool metal_setup_ = false;
     
     /// @brief The render pipeline state for content rendering.
-    id <MTLRenderPipelineState> main_render_pipeline_state_;
+    id <MTLRenderPipelineState> metal_render_pipeline_state_;
     
     int frame_count_;
     

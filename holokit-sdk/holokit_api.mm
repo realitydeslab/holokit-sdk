@@ -163,10 +163,10 @@ UnityHoloKit_GetStereoscopicRendering() {
     return holokit::HoloKitApi::GetInstance()->GetStereoscopicRendering();
 }
 
-void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_SetStereoscopicRendering(bool value) {
-    holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(value);
-}
+//void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+//UnityHoloKit_SetStereoscopicRendering(bool value) {
+//    holokit::HoloKitApi::GetInstance()->SetStereoscopicRendering(value);
+//}
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_GetDeviceScreenWidth() {
