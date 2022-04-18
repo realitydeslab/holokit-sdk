@@ -15,6 +15,7 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
 @interface NFCSession () <NFCTagReaderSessionDelegate>
 
 @property (nonatomic, strong) NFCTagReaderSession* readerSession;
+@property (assign) BOOL success;
 
 @end
 
@@ -39,7 +40,8 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
 
 - (void)startReaderSession {
     if (self.usingNfc) {
-        NSLog(@"[nfc_session] NFC authentication started...");
+        NSLog(@"[nfc_session] NFC authentication started");
+        self.success = NO;
         self.readerSession = [[NFCTagReaderSession alloc] initWithPollingOption:NFCPollingISO14443 delegate:self queue:nil];
         self.readerSession.alertMessage = @"Please put your iPhone onto HoloKit.";
         [self.readerSession beginSession];
@@ -88,31 +90,29 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
 }
 
 - (void)tagReaderSession:(NFCTagReaderSession *)session didInvalidateWithError:(NSError *)error {
-    NSLog(@"[nfc_session] did invalidate with error %@", error.domain);
-    if (error) {
-        NSLog(@"[nfc_session] did invalidate with error");
-        if (NfcAuthenticationDidCompleteDelegate) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NfcAuthenticationDidCompleteDelegate(NO);
-            });
-        }
-    } else {
-        NSLog(@"[nfc_session] did invalidate with no error");
+    if (NfcAuthenticationDidCompleteDelegate) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NfcAuthenticationDidCompleteDelegate(self.success);
+        });
     }
 }
 
 - (void)tagReaderSession:(NFCTagReaderSession *)session didDetectTags:(NSArray<__kindof id<NFCTag>> *)tags {
     if ([tags count] > 1) {
-        [session invalidateSessionWithErrorMessage:@"More than 1 NFC tag was detected"];
+        [session invalidateSessionWithErrorMessage:@"More than one NFC tags were detected."];
         return;
     }
     id<NFCTag> tag = tags[0];
     [session connectToTag:tag completionHandler:^(NSError * _Nullable error) {
         if (error != nil) {
-            [session invalidateSessionWithErrorMessage:@"Failed to connect to tag"];
+            [session invalidateSessionWithErrorMessage:@"Failed to connect to the NFC tag."];
             return;
         }
         id<NFCISO7816Tag> sTag = [tag asNFCISO7816Tag];
+        if (sTag == nil) {
+            [session invalidateSessionWithErrorMessage:@"This tag is not compliant to ISO7816"];
+            return;
+        }
         NSString *uid = [NFCSession stringWithDeviceToken:[sTag identifier]];
         NSLog(@"[nfc_session] tag uid %@", uid);
         [sTag queryNDEFStatusWithCompletionHandler:^(NFCNDEFStatus status, NSUInteger capacity, NSError * _Nullable error) {
@@ -143,14 +143,9 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
                         //NSLog(@"[nfc_session] content %@", content);
                         if ([content isEqualToString:uid]) {
                             if ([Crypto validateSignatureWithSignature:signature content:content]) {
-                                NSLog(@"[nfc_session] nfc authentication succeeded");
+                                self.success = YES;
                                 [session setAlertMessage:@"NFC authentication succeeded"];
                                 [session invalidateSession];
-                                if (NfcAuthenticationDidCompleteDelegate) {
-                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                        NfcAuthenticationDidCompleteDelegate(YES);
-                                    });
-                                }
                                 return;
                             } else {
                                 [session invalidateSessionWithErrorMessage:@"NFC authentication failed"];
