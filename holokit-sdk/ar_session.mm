@@ -170,17 +170,16 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
     
-    for (int i = 0; i < anchors.count; i++) {
-        if (anchors[i].name) {
-            if (DidAddNativeAnchorDelegate) {
+    if (DidAddNativeAnchorDelegate) {
+        for (int i = 0; i < anchors.count; i++) {
+            if (anchors[i].name) {
                 std::vector<float> p = SimdFloat4x42UnityPosition(anchors[i].transform);
                 std::vector<float> r = SimdFloat4x42UnityRotation(anchors[i].transform);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     float position[] = { p[0], p[1], p[2] };
                     float rotation[] = { r[0], r[1], r[2], r[3] };
-                    NSLog(@"[ar_session] did add native anchor %@ with (%f, %f, %f) and (%f, %f, %f, %f)", anchors[i].name, position[0], position[1], position[2], rotation[0], rotation[1], rotation[2], rotation[3]);
+                    //NSLog(@"[ar_session] did add native anchor %@ with (%f, %f, %f) and (%f, %f, %f, %f)", anchors[i].name, position[0], position[1], position[2], rotation[0], rotation[1], rotation[2], rotation[3]);
                     DidAddNativeAnchorDelegate([anchors[i].name UTF8String], position, rotation);
-                    NSLog(@"[ar_session] native end");
                 });
             }
         }
