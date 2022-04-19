@@ -15,8 +15,8 @@
 #import "math_helpers.h"
 
 // For testing purpose
-#import <os/log.h>
-#import <os/signpost.h>
+//#import <os/log.h>
+//#import <os/signpost.h>
 
 typedef void (*ThermalStateDidChange)(int state);
 ThermalStateDidChange ThermalStateDidChangeDelegate = NULL;
@@ -30,7 +30,13 @@ ARWorldMappingStatusDidChange ARWorldMappingStatusDidChangeDelegate = NULL;
 typedef void (*DidSaveARWorldMap)(const char *mapName);
 DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
 
+typedef void (*DidAddNativeAnchor)(const char *anchorName, float *position, float *rotation);
+DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
+
 @interface ARSessionDelegateController() <ARSessionDelegate>
+
+@property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
+@property (assign) BOOL scanEnvironment;
 
 @property (assign) ARWorldMappingStatus currentARWorldMappingStatus;
 @property (assign) BOOL sessionShouldAttemptRelocalization;
@@ -132,7 +138,7 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
     ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.arSession.configuration;
     configuration.initialWorldMap = self.worldMap;
     [self.arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
-    self.worldMap = nil;
+    //self.worldMap = nil;
     NSLog(@"[world_map] did load ARWorldMap");
 }
 
@@ -163,6 +169,22 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didAddAnchors:anchors];
     }
+    
+    for (int i = 0; i < anchors.count; i++) {
+        if (anchors[i].name) {
+            if (DidAddNativeAnchorDelegate) {
+                std::vector<float> p = SimdFloat4x42UnityPosition(anchors[i].transform);
+                std::vector<float> r = SimdFloat4x42UnityRotation(anchors[i].transform);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    float position[] = { p[0], p[1], p[2] };
+                    float rotation[] = { r[0], r[1], r[2], r[3] };
+                    NSLog(@"[ar_session] did add native anchor %@ with (%f, %f, %f) and (%f, %f, %f, %f)", anchors[i].name, position[0], position[1], position[2], rotation[0], rotation[1], rotation[2], rotation[3]);
+                    DidAddNativeAnchorDelegate([anchors[i].name UTF8String], position, rotation);
+                    NSLog(@"[ar_session] native end");
+                });
+            }
+        }
+    }
 }
 
 - (void)session:(ARSession *)session didUpdateAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
@@ -181,21 +203,6 @@ DidSaveARWorldMap DidSaveARWorldMapDelegate = NULL;
     if (self.unityARSessionDelegate) {
         [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
     }
-    
-//    if (self.multipeerSession != nil) {
-//        if (self.multipeerSession.mcSession.connectedPeers.count > 0) {
-//            if (data.priority == ARCollaborationDataPriorityCritical) {
-//                NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
-//                [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
-//            } else {
-//                // Stop sending optional data after synchronization phase.
-//                if (!self.isSynchronizationComplete) {
-//                    NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
-//                    [self.multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataUnreliable];
-//                }
-//            }
-//        }
-//    }
 }
 
 #pragma mark - ARSessionObserver
@@ -317,6 +324,19 @@ UnityHoloKit_SetSessionShouldAttemptRelocalization(bool value) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetCameraDidChangeTrackingStateDelegate(CameraDidChangeTrackingState callback) {
     CameraDidChangeTrackingStateDelegate = callback;
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float rotation[4]) {
+    simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
+    NSString *name = [NSString stringWithUTF8String:anchorName];
+    ARAnchor* anchor = [[ARAnchor alloc] initWithName:name transform:transform_matrix];
+    [[[ARSessionDelegateController sharedARSessionDelegateController] arSession] addAnchor:anchor];
+}
+
+void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_SetDidAddNativeAnchorDelegate(DidAddNativeAnchor callback) {
+    DidAddNativeAnchorDelegate = callback;
 }
 
 #pragma mark - iOS Thermal API

@@ -9,8 +9,6 @@
 @interface ARSessionDelegateController : NSObject
 
 @property (nonatomic, strong, nullable) ARSession* arSession;
-@property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
-@property (assign) BOOL scanEnvironment;
 @property (nonatomic, strong, nullable) ARWorldMap *worldMap;
 
 + (id _Nonnull)sharedARSessionDelegateController;
