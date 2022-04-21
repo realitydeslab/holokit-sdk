@@ -108,7 +108,10 @@ typedef enum {
 
 - (void)requestLocalNetworkPermission {
     LocalNetworkPermission *permission = [[LocalNetworkPermission alloc] init];
+    double startTime = [[NSProcessInfo processInfo] systemUptime];
     [permission requestPermissionWithCompletion:^(BOOL granted) {
+        NSLog(@"[permissions] request local network permission completed with %d in %f", granted, [[NSProcessInfo processInfo] systemUptime] - startTime);
+        
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         if (![prefs boolForKey:@"LocalNetworkPermissionDetermined"]){
             [prefs setBool:YES forKey:@"LocalNetworkPermissionDetermined"];
