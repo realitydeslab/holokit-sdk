@@ -140,8 +140,8 @@ void HoloKitApi::SetStereoscopicRendering(bool val) {
 }
 
 simd_float4x4 HoloKitApi::GetCurrentCameraTransform() {
-    if ([[ARSessionDelegateController sharedARSessionDelegateController] arSession] != NULL) {
-        return [[ARSessionDelegateController sharedARSessionDelegateController] arSession].currentFrame.camera.transform;
+    if ([[ARSessionDelegateController sharedInstance] arSession] != NULL) {
+        return [[ARSessionDelegateController sharedInstance] arSession].currentFrame.camera.transform;
     } else {
         return matrix_identity_float4x4;
     }

@@ -17,6 +17,6 @@
 
 - (void)stopReaderSession;
 
-+ (id)sharedNFCSession;
++ (id)sharedInstance;
 
 @end

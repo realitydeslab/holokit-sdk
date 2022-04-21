@@ -29,7 +29,7 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
     return self;
 }
 
-+ (id)sharedNFCSession {
++ (id)sharedInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -173,7 +173,7 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_StartNfcAuthentication(void) {
-    [[NFCSession sharedNFCSession] startReaderSession];
+    [[NFCSession sharedInstance] startReaderSession];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -182,5 +182,5 @@ UnityHoloKit_SetNfcAuthenticationDidCompleteDelegate(NfcAuthenticationDidComplet
 }
 
 void UnityHoloKit_SetUsingNfc(bool value) {
-    [[NFCSession sharedNFCSession] setUsingNfc:value];
+    [[NFCSession sharedInstance] setUsingNfc:value];
 }

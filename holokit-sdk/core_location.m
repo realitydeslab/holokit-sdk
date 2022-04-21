@@ -35,7 +35,7 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
     return self;
 }
 
-+ (id)sharedCoreLocation {
++ (id)sharedInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -84,13 +84,13 @@ DidUpdateHeading DidUpdateHeadingDelegate = NULL;
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_StartUpdatingLocation(void) {
-    HoloKitCoreLocation *instance = [HoloKitCoreLocation sharedCoreLocation];
+    HoloKitCoreLocation *instance = [HoloKitCoreLocation sharedInstance];
     [instance.locationManager startUpdatingLocation];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_StartUpdatingHeading(void) {
-    HoloKitCoreLocation *instance = [HoloKitCoreLocation sharedCoreLocation];
+    HoloKitCoreLocation *instance = [HoloKitCoreLocation sharedInstance];
     [instance.locationManager startUpdatingHeading];
 }
 

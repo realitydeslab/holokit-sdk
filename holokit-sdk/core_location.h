@@ -20,7 +20,7 @@
 
 - (void)stopUpdatingHeading;
 
-+ (id)sharedCoreLocation;
++ (id)sharedInstance;
 
 @end
 

@@ -12,7 +12,7 @@
 
 @interface WatchConnectivity: NSObject
 
-+ (id)sharedWatchConnectivity;
++ (id)sharedInstance;
 
 @end
 

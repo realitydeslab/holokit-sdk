@@ -47,7 +47,7 @@ DidReceiveCalorieMessage DidReceiveCalorieMessageDelegate = NULL;
     }
 }
 
-+ (id)sharedWatchConnectivity {
++ (id)sharedInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -119,12 +119,12 @@ extern "C" {
 // You need to manually init WCSession in Unity.
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_InitWatchConnectivity() {
-    [WatchConnectivity sharedWatchConnectivity];
+    [WatchConnectivity sharedInstance];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SendMessage2Watch(const char *messageType, int index) {
-    WatchConnectivity *wc_session = [WatchConnectivity sharedWatchConnectivity];
+    WatchConnectivity *wc_session = [WatchConnectivity sharedInstance];
     [wc_session sendMessage2WatchWithMessageType:[NSString stringWithUTF8String:messageType] messageIndex:index];
 }
 

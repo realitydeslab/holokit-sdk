@@ -30,7 +30,7 @@
 @property (assign) bool isRightHandTracked;
 @property (assign) int handTrackingExecutionFrameInterval;
 
-+ (id)sharedHandTracker;
++ (id)sharedInstance;
 - (void)performHumanHandPoseRequest:(ARFrame *)frame;
 
 @end

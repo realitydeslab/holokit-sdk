@@ -199,7 +199,7 @@ public:
             }};
             
             if (device_id == kDeviceIdHoloKitHandLeft) {
-                HandTracker* hand_tracker = [HandTracker sharedHandTracker];
+                HandTracker* hand_tracker = [HandTracker sharedInstance];
 
 //                if ([hand_tracker.leftHandLandmarkPositions count] != 21){
 //                   //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;
@@ -217,7 +217,7 @@ public:
                 input_->DeviceState_SetBinaryValue(state, feature_index++, hand_tracker.isLeftHandTracked);
                 input_->DeviceState_SetDiscreteStateValue(state, feature_index++, kUnityXRInputTrackingStateAll);
             } else if (device_id == kDeviceIdHoloKitHandRight) {
-                HandTracker* hand_tracker = [HandTracker sharedHandTracker];
+                HandTracker* hand_tracker = [HandTracker sharedInstance];
 
 //                if ([hand_tracker.rightHandLandmarkPositions count] != 21){
 //                   //std::cout << "landmark zero... which means no landmark has been detected yet" << std::endl;

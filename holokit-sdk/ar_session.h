@@ -11,6 +11,6 @@
 @property (nonatomic, strong, nullable) ARSession* arSession;
 @property (nonatomic, strong, nullable) ARWorldMap *worldMap;
 
-+ (id _Nonnull)sharedARSessionDelegateController;
++ (id _Nonnull)sharedInstance;
 
 @end

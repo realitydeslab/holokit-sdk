@@ -57,7 +57,7 @@ static const float kMaxLandmarkEndInterval = 0.024f;
     return self;
 }
 
-+ (id)sharedHandTracker {
++ (id)sharedInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -332,19 +332,19 @@ extern "C" {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_TurnOnHandTracking() {
-    [[HandTracker sharedHandTracker] setIsHandTrackingOn:YES];
+    [[HandTracker sharedInstance] setIsHandTrackingOn:YES];
     NSLog(@"[hand_tracker] did turn on hand tracking");
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_TurnOffHandTracking() {
-    [[HandTracker sharedHandTracker] setIsHandTrackingOn:NO];
+    [[HandTracker sharedInstance] setIsHandTrackingOn:NO];
     NSLog(@"[hand_tracker] did turn off hand tracking");
 }
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_IsHandTrackingOn(){
-    return [[HandTracker sharedHandTracker] isHandTrackingOn];
+    return [[HandTracker sharedInstance] isHandTrackingOn];
 }
 
 }

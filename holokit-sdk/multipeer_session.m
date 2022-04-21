@@ -51,7 +51,7 @@ typedef enum {
     return self;
 }
 
-+ (id _Nonnull)sharedMultipeerSession {
++ (id _Nonnull)sharedInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -166,7 +166,7 @@ typedef enum {
 
 - (void)sendARWorldMap:(MCPeerID *)peerID {
     NSLog(@"[world map] send ARWorldMap to %@", peerID.displayName);
-    ARWorldMap *worldMap = [[ARSessionDelegateController sharedARSessionDelegateController] worldMap];
+    ARWorldMap *worldMap = [[ARSessionDelegateController sharedInstance] worldMap];
     NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:worldMap requiringSecureCoding:NO error:nil];
     [self sendToPeer:mapData peer:peerID sendDataMode:MCSessionSendDataReliable];
 }
@@ -266,7 +266,7 @@ typedef enum {
             ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:data error:nil];
             if (worldMap != nil) {
                 NSLog(@"[world_map] did receive ARWorldMap of size %f mb", data.length / 1024.0 / 1024.0);
-                [[ARSessionDelegateController sharedARSessionDelegateController] setWorldMap:worldMap];
+                [[ARSessionDelegateController sharedInstance] setWorldMap:worldMap];
                 if (DidReceiveARWorldMapDelegate) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         DidReceiveARWorldMapDelegate();
@@ -300,33 +300,33 @@ typedef enum {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCInitialize(const char* serviceType) {
-    MultipeerSession* mc_session = [MultipeerSession sharedMultipeerSession];
+    MultipeerSession* mc_session = [MultipeerSession sharedInstance];
     [mc_session initializeWithServiceType:[NSString stringWithUTF8String:serviceType]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCStartBrowsing(void) {
-    [[MultipeerSession sharedMultipeerSession] startBrowsing];
+    [[MultipeerSession sharedInstance] startBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCStartAdvertising(void) {
-    [[MultipeerSession sharedMultipeerSession] startAdvertising];
+    [[MultipeerSession sharedInstance] startAdvertising];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCStopBrowsing(void) {
-    [[MultipeerSession sharedMultipeerSession] stopBrowsing];
+    [[MultipeerSession sharedInstance] stopBrowsing];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCStopAdvertising(void) {
-    [[MultipeerSession sharedMultipeerSession] stopAdvertising];
+    [[MultipeerSession sharedInstance] stopAdvertising];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCDeinitialize(void) {
-    MultipeerSession *multipeerSession = [MultipeerSession sharedMultipeerSession];
+    MultipeerSession *multipeerSession = [MultipeerSession sharedInstance];
     if ([[multipeerSession.mcSession connectedPeers] count] > 0)
         [multipeerSession.mcSession disconnect];
     [multipeerSession setMcSession:nil];
@@ -344,7 +344,7 @@ UnityHoloKit_MPCSetBrowserDidLosePeerDelegate(BrowserDidLosePeer callback) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCInvitePeer(unsigned long transportId) {
-    MultipeerSession *multipeerSession = [MultipeerSession sharedMultipeerSession];
+    MultipeerSession *multipeerSession = [MultipeerSession sharedInstance];
     for (MCPeerID *peerID in multipeerSession.browsedPeers) {
         if (transportId == [[MultipeerSession convertNSString2NSNumber:peerID.displayName] unsignedLongValue]) {
             [multipeerSession invitePeer:peerID];
@@ -354,7 +354,7 @@ UnityHoloKit_MPCInvitePeer(unsigned long transportId) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCSetPhotonRoomName(const char *roomName) {
-    MultipeerSession *session = [MultipeerSession sharedMultipeerSession];
+    MultipeerSession *session = [MultipeerSession sharedInstance];
     [session setPhotonRoomName:[NSString stringWithUTF8String:roomName]];
     [session setNetcodeTransport:NetcodeTransportPhoton];
 }
@@ -366,7 +366,7 @@ UnityHoloKit_MPCSetDidReceivePhotonRoomNameDelegate(DidReceivePhotonRoomName cal
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCSetHostLocalIpAddress(const char *ip) {
-    MultipeerSession *session = [MultipeerSession sharedMultipeerSession];
+    MultipeerSession *session = [MultipeerSession sharedInstance];
     [session setHostLocalIpAddress:[NSString stringWithUTF8String:ip]];
     [session setNetcodeTransport:NetcodeTransportWifi];
 }
@@ -383,5 +383,5 @@ UnityHoloKit_MPCSetDidReceiveARWorldMapDelegate(DidReceiveARWorldMap callback) {
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCIsHost(void) {
-    return [[MultipeerSession sharedMultipeerSession] isHost];
+    return [[MultipeerSession sharedInstance] isHost];
 }

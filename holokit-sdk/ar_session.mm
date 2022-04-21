@@ -58,7 +58,7 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
     return self;
 }
 
-+ (id)sharedARSessionDelegateController {
++ (id)sharedInstance {
     static dispatch_once_t onceToken = 0;
     static id _sharedObject = nil;
     dispatch_once(&onceToken, ^{
@@ -300,7 +300,7 @@ UnityHoloKit_SetARSession(UnityXRNativeSession* ar_native_session) {
     }
     
     ARSession* sessionPtr = (__bridge ARSession*)ar_native_session->sessionPtr;
-    ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedARSessionDelegateController];
+    ARSessionDelegateController* arSessionDelegateController = [ARSessionDelegateController sharedInstance];
     arSessionDelegateController.unityARSessionDelegate = sessionPtr.delegate;
     [arSessionDelegateController setArSession:sessionPtr];
     
@@ -311,13 +311,13 @@ void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetWorldOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
     
-    ARSessionDelegateController* ar_session = [ARSessionDelegateController sharedARSessionDelegateController];
+    ARSessionDelegateController* ar_session = [ARSessionDelegateController sharedInstance];
     [ar_session.arSession setWorldOrigin:(transform_matrix)];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetSessionShouldAttemptRelocalization(bool value) {
-    [[ARSessionDelegateController sharedARSessionDelegateController] setSessionShouldAttemptRelocalization:value];
+    [[ARSessionDelegateController sharedInstance] setSessionShouldAttemptRelocalization:value];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -330,7 +330,7 @@ UnityHoloKit_AddNativeAnchor(const char * anchorName, float position[3], float r
     simd_float4x4 transform_matrix = UnityPositionAndRotation2SimdFloat4x4(position, rotation);
     NSString *name = [NSString stringWithUTF8String:anchorName];
     ARAnchor* anchor = [[ARAnchor alloc] initWithName:name transform:transform_matrix];
-    [[[ARSessionDelegateController sharedARSessionDelegateController] arSession] addAnchor:anchor];
+    [[[ARSessionDelegateController sharedInstance] arSession] addAnchor:anchor];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -354,7 +354,7 @@ UnityHoloKit_SetThermalStateDidChangeDelegate(ThermalStateDidChange callback) {
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SetScanEnvironment(bool value) {
-    [[ARSessionDelegateController sharedARSessionDelegateController] setScanEnvironment:value];
+    [[ARSessionDelegateController sharedInstance] setScanEnvironment:value];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -364,7 +364,7 @@ UnityHoloKit_SetARWorldMappingStatusDidChangeDelegate(ARWorldMappingStatusDidCha
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_SaveARWorldMap(const char *mapName) {
-    [[ARSessionDelegateController sharedARSessionDelegateController] saveARWorldMap:[NSString stringWithUTF8String:mapName]];
+    [[ARSessionDelegateController sharedInstance] saveARWorldMap:[NSString stringWithUTF8String:mapName]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -374,12 +374,12 @@ UnityHoloKit_SetDidSaveARWorldMapDelegate(DidSaveARWorldMap callback) {
 
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_RetrieveARWorldMap(const char *mapName) {
-    return [[ARSessionDelegateController sharedARSessionDelegateController] retrieveARWorldMap:[NSString stringWithUTF8String:mapName]];
+    return [[ARSessionDelegateController sharedInstance] retrieveARWorldMap:[NSString stringWithUTF8String:mapName]];
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_LoadARWorldMap() {
-    [[ARSessionDelegateController sharedARSessionDelegateController] loadARWorldMap];
+    [[ARSessionDelegateController sharedInstance] loadARWorldMap];
 }
 
 } // extern "C"

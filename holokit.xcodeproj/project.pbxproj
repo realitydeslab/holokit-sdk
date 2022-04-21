@@ -45,6 +45,8 @@
 		4BC45AEC262813BD00BA98E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEA262813BD00BA98E4 /* Main.storyboard */; };
 		4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AED262813BE00BA98E4 /* Assets.xcassets */; };
 		4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */; };
+		4BCFBF0E2810F8860000873A /* permissions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BCFBF0D2810F8860000873A /* permissions.m */; };
+		4BCFBF10281104930000873A /* local_network_permission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCFBF0F281104930000873A /* local_network_permission.swift */; };
 		4BD9A6A1278AA53C000BD266 /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* crypto.swift */; };
 		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
 		4BE7B63E2611051A001F39F2 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
@@ -256,6 +258,9 @@
 		4BC45AF3262813BE00BA98E4 /* factory_app_nfc-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "factory_app_nfc-Bridging-Header.h"; sourceTree = "<group>"; };
 		4BC45B06262813CA00BA98E4 /* factory-app-nfc.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "factory-app-nfc.entitlements"; sourceTree = "<group>"; };
 		4BC45B25262815CB00BA98E4 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
+		4BCFBF0C2810F8730000873A /* permissions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = permissions.h; sourceTree = "<group>"; };
+		4BCFBF0D2810F8860000873A /* permissions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = permissions.m; sourceTree = "<group>"; };
+		4BCFBF0F281104930000873A /* local_network_permission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = local_network_permission.swift; sourceTree = "<group>"; };
 		4BD9A6A0278AA53C000BD266 /* crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = crypto.swift; sourceTree = "<group>"; };
 		4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE7B62126110504001F39F2 /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
@@ -614,6 +619,9 @@
 				4B188ACE26F432A4001FD67D /* hand_tracker.h */,
 				4B188ACF26F432B4001FD67D /* hand_tracker.mm */,
 				4BD9A6A0278AA53C000BD266 /* crypto.swift */,
+				4BCFBF0C2810F8730000873A /* permissions.h */,
+				4BCFBF0D2810F8860000873A /* permissions.m */,
+				4BCFBF0F281104930000873A /* local_network_permission.swift */,
 			);
 			path = "holokit-sdk";
 			sourceTree = "<group>";
@@ -1393,6 +1401,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BCFBF10281104930000873A /* local_network_permission.swift in Sources */,
+				4BCFBF0E2810F8860000873A /* permissions.m in Sources */,
 				4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */,
 				4B921B0C26DDE4B400EC359F /* core_location.m in Sources */,
 				4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */,

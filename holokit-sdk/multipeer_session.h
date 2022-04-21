@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) MCSession *mcSession;
 
-+ (id _Nonnull)sharedMultipeerSession;
++ (id _Nonnull)sharedInstance;
 - (void)initializeWithServiceType:(NSString *)serviceType;
 - (void)sendToAllPeers:(NSData *)data sendDataMode:(MCSessionSendDataMode)sendDataMode;
 - (void)sendToPeer:(NSData *)data peer:(MCPeerID *)peerId sendDataMode:(MCSessionSendDataMode)sendDataMode;
