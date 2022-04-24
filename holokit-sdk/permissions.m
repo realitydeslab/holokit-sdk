@@ -36,9 +36,19 @@ typedef enum {
 
 @interface Permissions ()
 
+@property (assign) BOOL applicationDidEnterBackground;
+
 @end
 
 @implementation Permissions
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:[UIApplication sharedApplication]];
+    }
+    return self;
+}
 
 + (id)sharedInstance {
     static dispatch_once_t onceToken = 0;
@@ -111,12 +121,12 @@ typedef enum {
     double startTime = [[NSProcessInfo processInfo] systemUptime];
     [permission requestPermissionWithCompletion:^(BOOL granted) {
         NSLog(@"[permissions] request local network permission completed with %d in %f", granted, [[NSProcessInfo processInfo] systemUptime] - startTime);
-        
+
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         if (![prefs boolForKey:@"LocalNetworkPermissionDetermined"]){
             [prefs setBool:YES forKey:@"LocalNetworkPermissionDetermined"];
         }
-        
+
         if (RequestLocalNetworkPermissionCompletedDelegate) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 RequestLocalNetworkPermissionCompletedDelegate(granted);
@@ -134,6 +144,10 @@ typedef enum {
             });
         }
     }];
+}
+
+- (void)applicationWillEnterForeground {
+    self.applicationDidEnterBackground = true;
 }
 
 @end
@@ -194,4 +208,13 @@ void Permissions_SetJumpToAppSettingsCompletedDelegate(JumpToAppSettingsComplete
 
 void Permissions_JumpToAppSettings(void) {
     [[Permissions sharedInstance] jumpToAppSettings];
+}
+
+bool Permissions_ApplicationDidEnterBackground(void) {
+    Permissions *instance = [Permissions sharedInstance];
+    bool value =  [instance applicationDidEnterBackground];
+    if (value) {
+        [instance setApplicationDidEnterBackground:NO];
+    }
+    return value;
 }

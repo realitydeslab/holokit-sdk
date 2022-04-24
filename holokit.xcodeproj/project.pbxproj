@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
+		4B14AC652812E0DE00B7FEFB /* local_network_permission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCFBF0F281104930000873A /* local_network_permission.swift */; };
 		4B188AD026F432B4001FD67D /* hand_tracker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B188ACF26F432B4001FD67D /* hand_tracker.mm */; };
 		4B260C9926368C280004B771 /* multipeer_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B260C9826368C280004B771 /* multipeer_session.m */; };
 		4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FF925E23E94002AC24F /* AppDelegate.m */; };
@@ -46,7 +47,6 @@
 		4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AED262813BE00BA98E4 /* Assets.xcassets */; };
 		4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */; };
 		4BCFBF0E2810F8860000873A /* permissions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BCFBF0D2810F8860000873A /* permissions.m */; };
-		4BCFBF10281104930000873A /* local_network_permission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCFBF0F281104930000873A /* local_network_permission.swift */; };
 		4BD9A6A1278AA53C000BD266 /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* crypto.swift */; };
 		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
 		4BE7B63E2611051A001F39F2 /* input.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B63D2611051A001F39F2 /* input.mm */; };
@@ -1401,7 +1401,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BCFBF10281104930000873A /* local_network_permission.swift in Sources */,
+				4B14AC652812E0DE00B7FEFB /* local_network_permission.swift in Sources */,
 				4BCFBF0E2810F8860000873A /* permissions.m in Sources */,
 				4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */,
 				4B921B0C26DDE4B400EC359F /* core_location.m in Sources */,

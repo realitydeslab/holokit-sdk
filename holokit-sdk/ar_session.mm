@@ -382,4 +382,9 @@ UnityHoloKit_LoadARWorldMap() {
     [[ARSessionDelegateController sharedInstance] loadARWorldMap];
 }
 
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_IsARKitSupported() {
+    return [ARConfiguration isSupported];
+}
+
 } // extern "C"
