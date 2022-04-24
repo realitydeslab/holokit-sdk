@@ -264,7 +264,7 @@ typedef enum {
         }
         default: {
             ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:data error:nil];
-            if (worldMap != nil) {
+            if (worldMap) {
                 NSLog(@"[world_map] did receive ARWorldMap of size %f mb", data.length / 1024.0 / 1024.0);
                 [[ARSessionDelegateController sharedInstance] setWorldMap:worldMap];
                 if (DidReceiveARWorldMapDelegate) {
@@ -272,8 +272,14 @@ typedef enum {
                         DidReceiveARWorldMapDelegate();
                     });
                 }
+                return;
             }
-            break;
+            
+            ARCollaborationData* collaborationData = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARCollaborationData class] fromData:data error:nil];
+            if (collaborationData) {
+                [[ARSessionDelegateController sharedInstance] updateWithCollaborationData:collaborationData];
+                return;
+            }
         }
     }
 }

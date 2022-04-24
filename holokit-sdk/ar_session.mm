@@ -13,6 +13,7 @@
 #import "XR/UnitySubsystemTypes.h"
 #import "holokit_api.h"
 #import "math_helpers.h"
+#import "multipeer_session.h"
 
 // For testing purpose
 //#import <os/log.h>
@@ -142,6 +143,10 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
     NSLog(@"[world_map] did load ARWorldMap");
 }
 
+- (void)updateWithCollaborationData:(ARCollaborationData *_Nonnull) collaborationData {
+    [self.arSession updateWithCollaborationData:collaborationData];
+}
+
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
@@ -172,14 +177,13 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
     
     if (DidAddNativeAnchorDelegate) {
         for (int i = 0; i < anchors.count; i++) {
-            if (anchors[i].name) {
+            if (anchors[i].name || [anchors[i] isKindOfClass:[ARParticipantAnchor class]]) {
                 std::vector<float> p = SimdFloat4x42UnityPosition(anchors[i].transform);
                 std::vector<float> r = SimdFloat4x42UnityRotation(anchors[i].transform);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     float position[] = { p[0], p[1], p[2] };
                     float rotation[] = { r[0], r[1], r[2], r[3] };
-                    //NSLog(@"[ar_session] did add native anchor %@ with (%f, %f, %f) and (%f, %f, %f, %f)", anchors[i].name, position[0], position[1], position[2], rotation[0], rotation[1], rotation[2], rotation[3]);
-                    DidAddNativeAnchorDelegate([anchors[i].name UTF8String], position, rotation);
+                    DidAddNativeAnchorDelegate(anchors[i].name ? [anchors[i].name UTF8String] : [@"ARParticipantAnchor" UTF8String], position, rotation);
                 });
             }
         }
@@ -201,6 +205,15 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
 - (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data {
     if (self.unityARSessionDelegate) {
         [self.unityARSessionDelegate session:session didOutputCollaborationData:data];
+    }
+    
+    MultipeerSession *multipeerSession = [MultipeerSession sharedInstance];
+    if (multipeerSession.mcSession != nil) {
+        if (multipeerSession.mcSession.connectedPeers.count > 0) {
+            NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:data requiringSecureCoding:NO error:nil];
+            // TODO: Send some data unreliably or just stopping sending them
+            [multipeerSession sendToAllPeers:encodedData sendDataMode:MCSessionSendDataReliable];
+        }
     }
 }
 

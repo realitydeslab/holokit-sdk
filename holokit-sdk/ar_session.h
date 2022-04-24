@@ -12,5 +12,6 @@
 @property (nonatomic, strong, nullable) ARWorldMap *worldMap;
 
 + (id _Nonnull)sharedInstance;
+- (void)updateWithCollaborationData:(ARCollaborationData *_Nonnull) collaborationData;
 
 @end
