@@ -351,6 +351,11 @@ UnityHoloKit_SetDidAddNativeAnchorDelegate(DidAddNativeAnchor callback) {
     DidAddNativeAnchorDelegate = callback;
 }
 
+bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+UnityHoloKit_IsARKitSupported() {
+    return [ARConfiguration isSupported];
+}
+
 #pragma mark - iOS Thermal API
 
 int UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -393,11 +398,6 @@ UnityHoloKit_RetrieveARWorldMap(const char *mapName) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_LoadARWorldMap() {
     [[ARSessionDelegateController sharedInstance] loadARWorldMap];
-}
-
-bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_IsARKitSupported() {
-    return [ARConfiguration isSupported];
 }
 
 } // extern "C"
