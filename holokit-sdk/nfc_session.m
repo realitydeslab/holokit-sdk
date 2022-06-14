@@ -16,6 +16,7 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
 
 @property (nonatomic, strong) NFCTagReaderSession* readerSession;
 @property (assign) BOOL success;
+@property (assign) BOOL usingNfc;
 
 @end
 
@@ -38,12 +39,11 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
     return _sharedObject;
 }
 
-- (void)startReaderSession {
+- (void)startReaderSessionWith:(NSString *)alertMessage {
     if (self.usingNfc) {
-        NSLog(@"[nfc_session] NFC authentication started");
         self.success = NO;
         self.readerSession = [[NFCTagReaderSession alloc] initWithPollingOption:NFCPollingISO14443 delegate:self queue:nil];
-        self.readerSession.alertMessage = @"Please put your iPhone onto HoloKit.";
+        self.readerSession.alertMessage = alertMessage;
         [self.readerSession beginSession];
     }
     else {
@@ -114,6 +114,8 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
             return;
         }
         NSString *uid = [NFCSession stringWithDeviceToken:[sTag identifier]];
+        uid = [uid uppercaseString];
+        uid = [NSString stringWithFormat:@"%@%@", @"0x", uid];
         NSLog(@"[nfc_session] tag uid %@", uid);
         [sTag queryNDEFStatusWithCompletionHandler:^(NFCNDEFStatus status, NSUInteger capacity, NSError * _Nullable error) {
             if (error != nil) {
@@ -136,11 +138,11 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
                             return;
                         }
                         NSString *rawContent = [[NSString alloc] initWithData:message.records[0].payload encoding:NSUTF8StringEncoding];
-                        //NSLog(@"[nfc_session] raw content %@", rawContent);
+                        NSLog(@"[nfc_session] raw content %@", rawContent);
                         NSString *signature = [NFCSession findSignatureFromRawContent:rawContent];
-                        //NSLog(@"[nfc_session] signature %@", signature);
+                        NSLog(@"[nfc_session] signature %@", signature);
                         NSString *content = [NFCSession findContentFromRawContent:rawContent];
-                        //NSLog(@"[nfc_session] content %@", content);
+                        NSLog(@"[nfc_session] content %@", content);
                         if ([content isEqualToString:uid]) {
                             if ([Crypto validateSignatureWithSignature:signature content:content]) {
                                 self.success = YES;
@@ -172,8 +174,12 @@ NfcAuthenticationDidComplete NfcAuthenticationDidCompleteDelegate = NULL;
 #pragma mark - extern "C"
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-UnityHoloKit_StartNfcAuthentication(void) {
-    [[NFCSession sharedInstance] startReaderSession];
+UnityHoloKit_StartNfcAuthentication(const char *alertMessage) {
+    if (alertMessage == NULL) {
+        [[NFCSession sharedInstance] startReaderSessionWith:nil];
+    } else {
+        [[NFCSession sharedInstance] startReaderSessionWith:[NSString stringWithUTF8String:alertMessage]];
+    }
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API

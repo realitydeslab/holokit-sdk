@@ -13,8 +13,6 @@
 #define HOLOKIT_MAIN_XR_TRACE_LOG(trace, message) \
   XR_TRACE_LOG(trace, "[HoloKitXrMain]: " message "\n")
 
-//IUnityInterfaces* unity_interfaces_;
-
 extern "C" {
 
 // @brief Loads Unity XR Display and Input subsystems.
@@ -49,7 +47,7 @@ UnityPluginLoad(IUnityInterfaces* unity_interfaces) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityPluginUnload() {
     UnloadDisplay();
-    UnloadInput();
+    //UnloadInput();
 }
 
 } // extern "C"

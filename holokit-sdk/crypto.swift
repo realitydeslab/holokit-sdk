@@ -11,7 +11,7 @@ import CryptoKit
 public class Crypto: NSObject {
 
     // private key is in the factory app.
-    static let publicKey = "2c891662bb20135ed6d4916d0bad3e0c368586955fc4b2cbe46a541fea3bca1a"
+    static let publicKey = "aaf31dbb6eacc81799017ba9ec13f24d2c9b0727c6126ba4799157aff1c0ff04"
     
     @objc public static func validateSignature(signature: String, content: String) -> Bool {
         guard let signatureData = Data(base64Encoded: signature) else {

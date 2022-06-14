@@ -212,9 +212,9 @@ public:
             mtl_render_pipeline_descriptor.colorAttachments[0].blendingEnabled = YES;
             mtl_render_pipeline_descriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
             mtl_render_pipeline_descriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
-            mtl_render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+            mtl_render_pipeline_descriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorOne;
+            mtl_render_pipeline_descriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
             mtl_render_pipeline_descriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOne;
-            mtl_render_pipeline_descriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
             mtl_render_pipeline_descriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOne;
             
             metal_render_pipeline_state_ = [mtl_device newRenderPipelineStateWithDescriptor:mtl_render_pipeline_descriptor error:nil];
@@ -464,8 +464,6 @@ UnitySubsystemErrorCode LoadDisplay(IUnityInterfaces* xr_interfaces) {
         return kUnitySubsystemErrorCodeFailure;
     }
     holokit::HoloKitDisplayProvider::GetInstance().reset(new holokit::HoloKitDisplayProvider(trace, display));
-    //HOLOKIT_DISPLAY_XR_TRACE_LOG(trace, "%f LoadDisplay()", GetCurrentTime());
-    
     holokit::HoloKitDisplayProvider::GetInstance()->SetMtlInterface(xr_interfaces->Get<IUnityGraphicsMetal>());
     
     UnityLifecycleProvider display_lifecycle_handler;

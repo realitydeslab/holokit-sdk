@@ -36,8 +36,6 @@ typedef enum {
 
 @interface Permissions ()
 
-@property (assign) BOOL applicationDidEnterBackground;
-
 @end
 
 @implementation Permissions
@@ -45,7 +43,7 @@ typedef enum {
 - (instancetype)init {
     self = [super init];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:[UIApplication sharedApplication]];
+        
     }
     return self;
 }
@@ -146,8 +144,40 @@ typedef enum {
     }];
 }
 
-- (void)applicationWillEnterForeground {
-    self.applicationDidEnterBackground = true;
+- (void)showAlertWithTitle:(NSString *)alertTitle message:(NSString *)alertMessage actionTitle:(NSString *)alertActionTitle  {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:alertActionTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString: UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+    }];
+    
+    [alert addAction:defaultAction];
+    [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)openDeepLink:(NSString *)appUrl safariUrl:(NSString *)safariUrl {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:appUrl] options:@{} completionHandler:^(BOOL success) {
+        if (!success) {
+            NSLog(@"[deep_link] failed to open app url %@", appUrl);
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:safariUrl] options:@{} completionHandler:^(BOOL success) {
+            }];
+        }
+    }];
+}
+
+- (void)mailTo:(NSString *)address {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@", @"mailto:", address]] options:@{} completionHandler:^(BOOL success) {
+        if (!success) {
+            NSLog(@"[mailto] failed to send mail to %@", address);
+        }
+    }];
+}
+
+- (void)openSafariLink:(NSString *)url {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url] options:@{} completionHandler:^(BOOL success) {
+        if (!success) {
+            NSLog(@"[safari_link] failed to open url %@", url);
+        }
+    }];
 }
 
 @end
@@ -210,11 +240,28 @@ void Permissions_JumpToAppSettings(void) {
     [[Permissions sharedInstance] jumpToAppSettings];
 }
 
-bool Permissions_ApplicationDidEnterBackground(void) {
-    Permissions *instance = [Permissions sharedInstance];
-    bool value =  [instance applicationDidEnterBackground];
-    if (value) {
-        [instance setApplicationDidEnterBackground:NO];
+void Permissions_ShowAlert(const char *alertTitle, const char *alertMessage, const char *alertActionTitle) {
+    if (alertMessage == nil) {
+        [[Permissions sharedInstance] showAlertWithTitle:[NSString stringWithUTF8String:alertTitle] message:nil actionTitle:[NSString stringWithUTF8String:alertActionTitle]];
+    } else {
+        [[Permissions sharedInstance] showAlertWithTitle:[NSString stringWithUTF8String:alertTitle] message:[NSString stringWithUTF8String:alertMessage] actionTitle:[NSString stringWithUTF8String:alertActionTitle]];
     }
-    return value;
+}
+
+void Link_OpenDeepLink(const char *appUrl, const char *safariUrl) {
+    if (appUrl != NULL && safariUrl != NULL) {
+        [[Permissions sharedInstance] openDeepLink:[NSString stringWithUTF8String:appUrl] safariUrl:[NSString stringWithUTF8String:safariUrl]];
+    }
+}
+
+void Link_MailTo(const char *address) {
+    if (address != NULL) {
+        [[Permissions sharedInstance] mailTo:[NSString stringWithUTF8String:address]];
+    }
+}
+
+void Link_OpenSafariLink(const char *url) {
+    if (url != NULL) {
+        [[Permissions sharedInstance] openSafariLink:[NSString stringWithUTF8String:url]];
+    }
 }

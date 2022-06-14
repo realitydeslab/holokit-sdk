@@ -143,6 +143,12 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
     NSLog(@"[world_map] did load ARWorldMap");
 }
 
+- (void)setARCollaboration:(BOOL)value {
+    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.arSession.configuration;
+    configuration.collaborationEnabled = value;
+    [self.arSession runWithConfiguration:configuration];
+}
+
 - (void)updateWithCollaborationData:(ARCollaborationData *_Nonnull) collaborationData {
     [self.arSession updateWithCollaborationData:collaborationData];
 }
@@ -153,7 +159,7 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
-    
+
     // ARWorldMap status
     if (self.scanEnvironment) {
         if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
@@ -354,6 +360,10 @@ UnityHoloKit_SetDidAddNativeAnchorDelegate(DidAddNativeAnchor callback) {
 bool UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_IsARKitSupported() {
     return [ARConfiguration isSupported];
+}
+
+void UnityHoloKit_SetARCollaboration(bool value) {
+    [[ARSessionDelegateController sharedInstance] setARCollaboration:value];
 }
 
 #pragma mark - iOS Thermal API
