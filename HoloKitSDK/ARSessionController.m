@@ -4,7 +4,7 @@
 void (*OnThermalStateChanged)(int) = NULL;
 void (*OnCameraChangedTrackingState)(int) = NULL;
 void (*OnARWorldMapStatusChanged)(int) = NULL;
-void (*OnGotARWorldMap)(void) = NULL;
+void (*OnGotCurrentARWorldMap)(void) = NULL;
 
 @interface ARSessionController : NSObject
 
@@ -64,15 +64,15 @@ void (*OnGotARWorldMap)(void) = NULL;
             return;
         }
         self.worldMap = worldMap;
-        if (OnGotARWorldMap != NULL) {
+        if (OnGotCurrentARWorldMap != NULL) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                OnGotARWorldMap();
+                OnGotCurrentARWorldMap();
             });
         }
     }];
 }
 
-- (void)saveCurrentARWorldMapWithName:(NSString *)mapName {
+- (void)saveCurrentARWorldMapWithMapName:(NSString *)mapName {
     // Serialize map data
 //    NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:worldMap requiringSecureCoding:NO error:nil];
 //    // Create map folder if necessary
@@ -245,8 +245,6 @@ void (*OnGotARWorldMap)(void) = NULL;
 
 @end
 
-#pragma mark - AR Session
-
 void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSessionPtr) {
     if (nativeARSessionPtr == nil) {
         NSLog(@"[HoloKitSDK]: native ARSession is NULL");
@@ -257,6 +255,16 @@ void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSe
     arSessionDelegateController.unityARSessionDelegate = sessionPtr.delegate;
     [arSessionDelegateController setSession:sessionPtr];
     [sessionPtr setDelegate:arSessionDelegateController];
+}
+
+void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChanged)(int),
+                                                     void (*OnCameraChangedTrackingState)(int),
+                                                     void (*OnARWorldMapStatusChanged)(int),
+                                                     void (*OnGotCurrentARWorldMap)(void)) {
+    OnThermalStateChanged = OnThermalStateChanged;
+    OnCameraChangedTrackingState = OnCameraChangedTrackingState;
+    OnARWorldMapStatusChanged = OnARWorldMapStatusChanged;
+    OnGotCurrentARWorldMap = OnGotCurrentARWorldMap;
 }
 
 void HoloKitSDK_SetSessionShouldAttemptRelocalization(bool value) {
