@@ -116,3 +116,5 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+
+HoloKitSDK/Secrets.swift

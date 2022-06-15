@@ -9,8 +9,6 @@ import Foundation
 import CryptoKit
 
 public class Crypto: NSObject {
-
-    static let publicKey = "aaf31dbb6eacc81799017ba9ec13f24d2c9b0727c6126ba4799157aff1c0ff04"
     
     @objc public static func validateSignature(signature: String, content: String) -> Bool {
         guard let signatureData = Data(base64Encoded: signature) else {
@@ -21,7 +19,7 @@ public class Crypto: NSObject {
             NSLog("[crypto] failed to encode the content")
             return false
         }
-        let publicKey = try! Curve25519.Signing.PublicKey(rawRepresentation: dataWithHexString(hex: Crypto.publicKey))
+        let publicKey = try! Curve25519.Signing.PublicKey(rawRepresentation: dataWithHexString(hex: PUBLIC_KEY))
         if publicKey.isValidSignature(signatureData, for: contentData) {
             //NSLog("[crypto] signature is true")
             return true
