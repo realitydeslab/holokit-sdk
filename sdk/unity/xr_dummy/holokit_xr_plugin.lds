@@ -1,2 +1,0 @@
-UnityPluginLoad*
-UnityHoloKit_SetARSession*

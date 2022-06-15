@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.holoi.xr.holokit": "file:../../../xr-plugin/com.holoi.xr.holokit",
     "com.unity.collab-proxy": "1.15.12",
     "com.unity.ide.rider": "3.0.12",
     "com.unity.ide.visualstudio": "2.0.14",
@@ -9,7 +8,8 @@
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.6.3",
     "com.unity.ugui": "1.0.0",
-    "com.unity.xr.arkit": "4.2.2",
+    "com.unity.xr.arfoundation": "5.0.0-pre.12",
+    "com.unity.xr.arkit": "5.0.0-pre.12",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
