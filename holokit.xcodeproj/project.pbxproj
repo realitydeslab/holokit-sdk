@@ -235,7 +235,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "PRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"ios\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.holoi.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/HoloKitSDKSamples/Build/Libraries/com.holoi.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n";
+			shellScript = "PRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"iOS\"\nDESTDIR=\"${SRCROOT}/xr-plugin/com.holoi.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/test-projects/HoloKitSDKSamples/Build/Libraries/com.holoi.xr.holokit/Runtime/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

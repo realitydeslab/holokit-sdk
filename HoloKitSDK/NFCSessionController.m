@@ -173,6 +173,6 @@ void HoloKitSDK_StartNFCSession(const char *alertMessage) {
     }
 }
 
-void HoloKitSDK_RegisterNFCSessionControllerDelegates(void (*OnNFCSessionCompleted)(bool)) {
-    OnNFCSessionCompleted = OnNFCSessionCompleted;
+void HoloKitSDK_RegisterNFCSessionControllerDelegates(void (*OnNFCSessionCompletedDelegate)(bool)) {
+    OnNFCSessionCompleted = OnNFCSessionCompletedDelegate;
 }

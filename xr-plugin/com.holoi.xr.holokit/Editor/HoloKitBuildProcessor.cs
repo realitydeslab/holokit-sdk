@@ -10,14 +10,15 @@ using UnityEditor.iOS.Xcode.Extensions;
 using UnityEditor.iOS;
 using OSVersion = UnityEngine.XR.ARKit.OSVersion;
 
-namespace UnityEditor.XR.HoloKit
+// TODO: Refactor this
+namespace HoloInteractive.HoloKit.Editor
 {
 
     /// <summary>Processes the project files after the build is performed.</summary>
     class HoloKitBuildProcessor
     {
 
-        class BuildPreprocessor : IPreprocessBuildWithReport
+        class BuildPreprocessor
         {
             // The minimum target Xcode version for the plugin
             const int k_TargetMinimumMajorXcodeVersion = 12;
@@ -26,24 +27,24 @@ namespace UnityEditor.XR.HoloKit
 
             static readonly OSVersion k_MinimumiOSTargetVersion = new OSVersion(14, 0, 0);
 
-            public void OnPreprocessBuild(BuildReport report)
-            {
-                if (report.summary.platform != BuildTarget.iOS)
-                    return;
+            //public void OnPreprocessBuild(BuildReport report)
+            //{
+            //    //if (report.summary.platform != BuildTarget.iOS)
+            //    //    return;
 
-                EnsureMinimumXcodeVersion();
-                EnsureMinimumBuildTarget();
-            }
+            //    EnsureMinimumXcodeVersion();
+            //    EnsureMinimumBuildTarget();
+            //}
 
-            void EnsureMinimumBuildTarget()
-            {
-                var userSetTargetVersion = OSVersion.Parse(PlayerSettings.iOS.targetOSVersionString);
-                if (userSetTargetVersion < k_MinimumiOSTargetVersion)
-                {
-                    throw new BuildFailedException($"You have selected a minimum target iOS version of {userSetTargetVersion} and have the HoloKit package installed."
-                        + "HoloKit requires at least iOS version 14.0 (See Player Settings > Other Settings > Target minimum iOS Version).");
-                }
-            }
+            //void EnsureMinimumBuildTarget()
+            //{
+            //    var userSetTargetVersion = OSVersion.Parse(PlayerSettings.iOS.targetOSVersionString);
+            //    if (userSetTargetVersion < k_MinimumiOSTargetVersion)
+            //    {
+            //        throw new BuildFailedException($"You have selected a minimum target iOS version of {userSetTargetVersion} and have the HoloKit package installed."
+            //            + "HoloKit requires at least iOS version 14.0 (See Player Settings > Other Settings > Target minimum iOS Version).");
+            //    }
+            //}
 
             void EnsureMinimumXcodeVersion()
             {
@@ -78,10 +79,10 @@ namespace UnityEditor.XR.HoloKit
 
             void PostprocessBuild(BuildReport report)
             {
-                if (report.summary.platform != BuildTarget.iOS)
-                {
-                    return;
-                }
+                //if (report.summary.platform != BuildTarget.iOS)
+                //{
+                //    return;
+                //}
 
                 AddXcodePlist(report.summary.outputPath);
                 AddXcodeCapabilities(report.summary.outputPath);

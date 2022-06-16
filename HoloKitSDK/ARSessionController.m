@@ -274,14 +274,14 @@ void HoloKitSDK_GetCurrentARWorldMap(void) {
     [[ARSessionController sharedInstance] getCurentARWorldMap];
 }
 
-void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChanged)(int),
-                                                     void (*OnCameraChangedTrackingState)(int),
-                                                     void (*OnARWorldMapStatusChanged)(int),
-                                                     void (*OnGotCurrentARWorldMap)(void)) {
-    OnThermalStateChanged = OnThermalStateChanged;
-    OnCameraChangedTrackingState = OnCameraChangedTrackingState;
-    OnARWorldMapStatusChanged = OnARWorldMapStatusChanged;
-    OnGotCurrentARWorldMap = OnGotCurrentARWorldMap;
+void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChangedDelegate)(int),
+                                                     void (*OnCameraChangedTrackingStateDelegate)(int),
+                                                     void (*OnARWorldMapStatusChangedDelegate)(int),
+                                                     void (*OnGotCurrentARWorldMapDelegate)(void)) {
+    OnThermalStateChanged = OnThermalStateChangedDelegate;
+    OnCameraChangedTrackingState = OnCameraChangedTrackingStateDelegate;
+    OnARWorldMapStatusChanged = OnARWorldMapStatusChangedDelegate;
+    OnGotCurrentARWorldMap = OnGotCurrentARWorldMapDelegate;
 }
 
 //bool UnityHoloKit_RetrieveARWorldMap(const char *mapName) {
