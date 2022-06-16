@@ -55,12 +55,12 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
 
 - (void)getCurentARWorldMap {
     if (self.currentARWorldMappingStatus != ARWorldMappingStatusMapped) {
-        NSLog(@"[ARWorldMap] current ARWorldMap is not available");
+        NSLog(@"[ARWorldMap] Current ARWorldMap is not available");
         return;
     }
     [self.session getCurrentWorldMapWithCompletionHandler:^(ARWorldMap * _Nullable worldMap, NSError * _Nullable error) {
         if (error != nil) {
-            NSLog(@"[ARWorldMap] failed to get current ARWorldMap");
+            NSLog(@"[ARWorldMap] Failed to get current ARWorldMap");
             return;
         }
         self.worldMap = worldMap;
@@ -168,7 +168,7 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
 - (void)session:(ARSession *)session cameraDidChangeTrackingState:(ARCamera *)camera {
     switch (camera.trackingState) {
         case ARTrackingStateNotAvailable:
-            NSLog(@"[ARSessionObserver] camera tracking state changed to not available");
+            NSLog(@"[ARSessionObserver] Camera tracking state changed to not available");
             if (OnCameraChangedTrackingState != NULL) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     OnCameraChangedTrackingState(0);
@@ -178,7 +178,7 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
         case ARTrackingStateLimited:
             switch(camera.trackingStateReason) {
                 case ARTrackingStateReasonNone:
-                    NSLog(@"[ARSessionObserver] camera tracking state changed to limited, with reason: None");
+                    NSLog(@"[ARSessionObserver] Camera tracking state changed to limited, with reason: None");
                     if (OnCameraChangedTrackingState != NULL) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             OnCameraChangedTrackingState(1);
@@ -186,7 +186,7 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
                     }
                     break;
                 case ARTrackingStateReasonInitializing:
-                    NSLog(@"[ARSessionObserver] camera tracking state changed to limited, with reason: Initializing");
+                    NSLog(@"[ARSessionObserver] Camera tracking state changed to limited, with reason: Initializing");
                     if (OnCameraChangedTrackingState != NULL) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             OnCameraChangedTrackingState(2);
@@ -194,7 +194,7 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
                     }
                     break;
                 case ARTrackingStateReasonExcessiveMotion:
-                    NSLog(@"[ARSessionObserver] camera tracking state changed to limited, with reason: Excessive motion");
+                    NSLog(@"[ARSessionObserver] Camera tracking state changed to limited, with reason: Excessive motion");
                     if (OnCameraChangedTrackingState != NULL) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             OnCameraChangedTrackingState(3);
@@ -202,7 +202,7 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
                     }
                     break;
                 case ARTrackingStateReasonInsufficientFeatures:
-                    NSLog(@"[ARSessionObserver] camera tracking state changed to limited, with reason: Insufficient features");
+                    NSLog(@"[ARSessionObserver] Camera tracking state changed to limited, with reason: Insufficient features");
                     if (OnCameraChangedTrackingState != NULL) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             OnCameraChangedTrackingState(4);
@@ -210,7 +210,7 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
                     }
                     break;
                 case ARTrackingStateReasonRelocalizing:
-                    NSLog(@"[ARSessionObserver] camera tracking state changed to limited, with reason: Relocalizing");
+                    NSLog(@"[ARSessionObserver] Camera tracking state changed to limited, with reason: Relocalizing");
                     if (OnCameraChangedTrackingState != NULL) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             OnCameraChangedTrackingState(5);
@@ -220,7 +220,7 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
             }
             break;
         case ARTrackingStateNormal:
-            NSLog(@"[ARSessionObserver] camera tracking state changed to normal");
+            NSLog(@"[ARSessionObserver] Camera tracking state changed to normal");
             if (OnCameraChangedTrackingState != NULL) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     OnCameraChangedTrackingState(6);
@@ -231,15 +231,15 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
 }
 
 - (void)sessionWasInterrupted:(ARSession *)session {
-    NSLog(@"[ARSessionObserver] session was interrupted");
+    NSLog(@"[ARSessionObserver] Session was interrupted");
 }
 
 - (void)sessionInterruptionEnded:(ARSession *)session {
-    NSLog(@"[ARSessionObserver] session interruption ended");
+    NSLog(@"[ARSessionObserver] Session interruption ended");
 }
 
 - (BOOL)sessionShouldAttemptRelocalization:(ARSession *)session {
-    NSLog(@"[ARSessionObserver] sessionShouldAttemptRelocalization %d", self.sessionShouldAttemptRelocalization);
+    NSLog(@"[ARSessionObserver] SessionShouldAttemptRelocalization %d", self.sessionShouldAttemptRelocalization);
     return self.sessionShouldAttemptRelocalization;
 }
 
@@ -247,7 +247,7 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
 
 void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSessionPtr) {
     if (nativeARSessionPtr == nil) {
-        NSLog(@"[HoloKitSDK]: native ARSession is NULL");
+        NSLog(@"[HoloKitSDK] Native ARSession is NULL");
         return;
     }
     ARSession* sessionPtr = (__bridge ARSession*)nativeARSessionPtr->sessionPtr;
@@ -255,6 +255,23 @@ void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSe
     arSessionDelegateController.unityARSessionDelegate = sessionPtr.delegate;
     [arSessionDelegateController setSession:sessionPtr];
     [sessionPtr setDelegate:arSessionDelegateController];
+}
+
+int HoloKitSDK_GetThermalState(void) {
+    NSProcessInfoThermalState thermalState = [[NSProcessInfo processInfo] thermalState];
+    return (int)thermalState;
+}
+
+void HoloKitSDK_SetSessionShouldAttemptRelocalization(bool value) {
+    [[ARSessionController sharedInstance] setSessionShouldAttemptRelocalization:value];
+}
+
+void HoloKitSDK_SetScaningEnvironment(bool value) {
+    [[ARSessionController sharedInstance] setScaningEnvironment:value];
+}
+
+void HoloKitSDK_GetCurrentARWorldMap(void) {
+    [[ARSessionController sharedInstance] getCurentARWorldMap];
 }
 
 void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChanged)(int),
@@ -265,23 +282,6 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
     OnCameraChangedTrackingState = OnCameraChangedTrackingState;
     OnARWorldMapStatusChanged = OnARWorldMapStatusChanged;
     OnGotCurrentARWorldMap = OnGotCurrentARWorldMap;
-}
-
-void HoloKitSDK_SetSessionShouldAttemptRelocalization(bool value) {
-    [[ARSessionController sharedInstance] setSessionShouldAttemptRelocalization:value];
-}
-
-int HoloKitSDK_GetThermalState(void) {
-    NSProcessInfoThermalState thermalState = [[NSProcessInfo processInfo] thermalState];
-    return (int)thermalState;
-}
-
-void HoloKitSDK_SetScaningEnvironment(bool value) {
-    [[ARSessionController sharedInstance] setScaningEnvironment:value];
-}
-
-void HoloKitSDK_GetCurrentARWorldMap(void) {
-    [[ARSessionController sharedInstance] getCurentARWorldMap];
 }
 
 //bool UnityHoloKit_RetrieveARWorldMap(const char *mapName) {

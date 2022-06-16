@@ -161,8 +161,8 @@ void (*OnNFCSessionCompleted)(bool) = NULL;
 
 @end
 
-void HoloKitSDK_RegisterNFCSessionControllerDelegates(void (*OnNFCSessionCompleted)(bool)) {
-    OnNFCSessionCompleted = OnNFCSessionCompleted;
+void HoloKitSDK_EnableNFCSession(bool value) {
+    [[NFCSessionController sharedInstance] setEnabled:value];
 }
 
 void HoloKitSDK_StartNFCSession(const char *alertMessage) {
@@ -173,6 +173,6 @@ void HoloKitSDK_StartNFCSession(const char *alertMessage) {
     }
 }
 
-void HoloKitSDK_EnableNFCSession(bool value) {
-    [[NFCSessionController sharedInstance] setEnabled:value];
+void HoloKitSDK_RegisterNFCSessionControllerDelegates(void (*OnNFCSessionCompleted)(bool)) {
+    OnNFCSessionCompleted = OnNFCSessionCompleted;
 }

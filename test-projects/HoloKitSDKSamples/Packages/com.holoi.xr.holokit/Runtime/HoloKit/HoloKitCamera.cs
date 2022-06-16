@@ -122,19 +122,20 @@ namespace HoloKit
                 _monoCamera.enabled = true;
                 _arCameraBackground.enabled = true;
                 _centerEye.gameObject.SetActive(false);
+                _blackCamera.gameObject.SetActive(false);
             }
         }
 
         private void Update()
         {
-            if (_blackCamera.gameObject.activeSelf && _blackCameraFrameCount < 1)
-            {
-                _blackCameraFrameCount++;
-            }
-            else
-            {
-                //_blackCamera.gameObject.SetActive(false);
-            }
+            //if (_blackCamera.gameObject.activeSelf && _blackCameraFrameCount < 1)
+            //{
+            //    _blackCameraFrameCount++;
+            //}
+            //else
+            //{
+            //    //_blackCamera.gameObject.SetActive(false);
+            //}
         }
     }
 }

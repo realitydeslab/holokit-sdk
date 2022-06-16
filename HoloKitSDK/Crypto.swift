@@ -1,10 +1,3 @@
-//
-//  Whatever.swift
-//  holokit-sdk
-//
-//  Created by Yuchen Zhang on 2022/1/9.
-//
-
 import Foundation
 import CryptoKit
 

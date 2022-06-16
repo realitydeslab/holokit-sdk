@@ -5,10 +5,10 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.unity.xr.management": "4.0.7",
-        "com.unity.xr.arfoundation": "4.2.1",
-        "com.unity.xr.arkit": "4.2.1",
-        "com.unity.render-pipelines.universal": "12.1.1"
+        "com.unity.xr.arfoundation": "5.0.0-pre.12",
+        "com.unity.xr.arkit": "5.0.0-pre.12",
+        "com.unity.xr.management": "4.2.0",
+        "com.unity.render-pipelines.universal": "13.1.8"
       }
     },
     "com.unity.burst": {
