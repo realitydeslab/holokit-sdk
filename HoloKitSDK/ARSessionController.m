@@ -5,6 +5,8 @@ void (*OnThermalStateChanged)(int) = NULL;
 void (*OnCameraChangedTrackingState)(int) = NULL;
 void (*OnARWorldMapStatusChanged)(int) = NULL;
 void (*OnGotCurrentARWorldMap)(void) = NULL;
+void (*OnSavedCurrentARWorldMap)(const char *, float) = NULL;
+void (*OnGotARWorldMapFromDisk)(const char *, unsigned char *, int) = NULL;
 
 @interface ARSessionController : NSObject
 
@@ -53,6 +55,18 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
     }
 }
 
+- (void)pauseCurrentARSession {
+    if (self.session != nil) {
+        [self.session pause];
+    }
+}
+
+- (void)resumeCurrentARSession {
+    if (self.session != nil) {
+        [self.session runWithConfiguration:self.session.configuration];
+    }
+}
+
 - (void)getCurentARWorldMap {
     if (self.currentARWorldMappingStatus != ARWorldMappingStatusMapped) {
         NSLog(@"[ARWorldMap] Current ARWorldMap is not available");
@@ -72,52 +86,84 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
     }];
 }
 
-- (void)saveCurrentARWorldMapWithMapName:(NSString *)mapName {
-    // Serialize map data
-//    NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:worldMap requiringSecureCoding:NO error:nil];
-//    // Create map folder if necessary
-//    NSString *directoryPath = [NSString stringWithFormat:@"%@%@", NSHomeDirectory(), @"/Documents/Maps/"];
-//    if (![[NSFileManager defaultManager] fileExistsAtPath:directoryPath]) {
-//        NSLog(@"[File] create directory %@", directoryPath);
-//        [[NSFileManager defaultManager] createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:nil];
-//    }
-//    // Generate map file path
-//    NSString *filePath = [NSString stringWithFormat:@"%@%@%@", directoryPath, mapName, @".arexperience"];
-//    // Save map data to the path
-//    [mapData writeToFile:filePath atomically:YES];
-//    NSLog(@"[world_map] map name: %@\nmap size: %f mb\nmap path: %@", mapName, mapData.length / (1024.0 * 1024.0), filePath);
-}
-
-- (BOOL)retrieveARWorldMap:(NSString *)mapName {
-    NSString *filePath = [NSString stringWithFormat:@"%@%@%@%@", NSHomeDirectory(), @"/Documents/Maps/", mapName, @".arexperience"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-        NSData *mapData = [[NSData alloc] initWithContentsOfFile:filePath];
-        ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:mapData error:nil];
-        if (worldMap == nil) {
-            NSLog(@"[world_map] failed to decode ARWorldMap data");
-            return NO;
-        }
-        NSLog(@"[world_map] did retrieve ARWorldMap of size %f mb at path %@", mapData.length / (1024.0 * 1024.0), filePath);
-        self.worldMap = worldMap;
-        return YES;
-    } else {
-        NSLog(@"[world_map] failed to find map file at %@", filePath);
-        return NO;
-    }
-}
-
-- (void)loadARWorldMap {
+- (void)saveCurrentARWorldMapWithName:(NSString *)mapName {
     if (self.worldMap == nil) {
-        NSLog(@"[world_map] there is no ARWorldMap to load");
+        NSLog(@"[ARSession] There is no current ARWorldMap");
         return;
     }
     
-    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.session.configuration;
-    configuration.initialWorldMap = self.worldMap;
-    [self.session runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
-    //self.worldMap = nil;
-    NSLog(@"[world_map] did load ARWorldMap");
+    NSData *mapData = [NSKeyedArchiver archivedDataWithRootObject:self.worldMap requiringSecureCoding:NO error:nil];
+    // Create map folder if necessary
+    NSString *directoryPath = [NSString stringWithFormat:@"%@%@", NSHomeDirectory(), @"/Documents/ARWorldMaps/"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:directoryPath]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    // Generate map file path
+    NSString *filePath = [NSString stringWithFormat:@"%@%@%@", directoryPath, mapName, @".arexperience"];
+    // Save map data to the path
+    [mapData writeToFile:filePath atomically:YES];
+    
+    float mapSizeInMegabytes = mapData.length / (1024.0 * 1024.0);
+    if (OnSavedCurrentARWorldMap != NULL) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            OnSavedCurrentARWorldMap([mapName UTF8String], mapSizeInMegabytes);
+        });
+    }
 }
+
+- (void)getARWorldMapFromDiskWithName:(NSString *)mapName {
+    NSString *filePath = [NSString stringWithFormat:@"%@%@%@%@", NSHomeDirectory(), @"/Documents/ARWorldMaps/", mapName, @".arexperience"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        NSData *mapData = [[NSData alloc] initWithContentsOfFile:filePath];
+        self.worldMap = nil;
+        self.worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:mapData error:nil];
+        if (self.worldMap == nil) {
+            NSLog(@"[ARSessionController] Failed to get ARWorldMap from path: %@", filePath);
+            return;
+        }
+        NSLog(@"[ARSessionController] Got ARWorldMap %@ from disk with size %lu bytes", mapName, mapData.length);
+        // Marshal map data back to C#
+        unsigned char *data = (unsigned char *)[mapData bytes];
+        if (OnGotARWorldMapFromDisk != NULL) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                OnGotARWorldMapFromDisk([mapName UTF8String], data, (int)mapData.length);
+            });
+        }
+    } else {
+        NSLog(@"[ARSessionController] Failed to get ARWorldMap from path: %@", filePath);
+    }
+}
+
+//- (BOOL)retrieveARWorldMap:(NSString *)mapName {
+//    NSString *filePath = [NSString stringWithFormat:@"%@%@%@%@", NSHomeDirectory(), @"/Documents/Maps/", mapName, @".arexperience"];
+//    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+//        NSData *mapData = [[NSData alloc] initWithContentsOfFile:filePath];
+//        ARWorldMap *worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:mapData error:nil];
+//        if (worldMap == nil) {
+//            NSLog(@"[world_map] failed to decode ARWorldMap data");
+//            return NO;
+//        }
+//        NSLog(@"[world_map] did retrieve ARWorldMap of size %f mb at path %@", mapData.length / (1024.0 * 1024.0), filePath);
+//        self.worldMap = worldMap;
+//        return YES;
+//    } else {
+//        NSLog(@"[world_map] failed to find map file at %@", filePath);
+//        return NO;
+//    }
+//}
+
+//- (void)loadARWorldMap {
+//    if (self.worldMap == nil) {
+//        NSLog(@"[world_map] there is no ARWorldMap to load");
+//        return;
+//    }
+//
+//    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.session.configuration;
+//    configuration.initialWorldMap = self.worldMap;
+//    [self.session runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
+//    //self.worldMap = nil;
+//    NSLog(@"[world_map] did load ARWorldMap");
+//}
 
 #pragma mark - ARSessionDelegate
 
@@ -129,6 +175,20 @@ void (*OnGotCurrentARWorldMap)(void) = NULL;
     // ARWorldMap status
     if (self.scaningEnvironment) {
         if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
+            switch (self.currentARWorldMappingStatus) {
+                case ARWorldMappingStatusNotAvailable:
+                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to not available");
+                    break;
+                case ARWorldMappingStatusLimited:
+                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to limited");
+                    break;
+                case ARWorldMappingStatusExtending:
+                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to extending");
+                    break;
+                case ARWorldMappingStatusMapped:
+                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to mapped");
+                    break;
+            }
             self.currentARWorldMappingStatus = frame.worldMappingStatus;
             if (OnARWorldMapStatusChanged != NULL) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -262,6 +322,14 @@ int HoloKitSDK_GetThermalState(void) {
     return (int)thermalState;
 }
 
+void HoloKitSDK_PauseCurrentARSession(void) {
+    [[ARSessionController sharedInstance] pauseCurrentARSession];
+}
+
+void HoloKitSDK_ResumeCurrentARSession(void) {
+    [[ARSessionController sharedInstance] resumeCurrentARSession];
+}
+
 void HoloKitSDK_SetSessionShouldAttemptRelocalization(bool value) {
     [[ARSessionController sharedInstance] setSessionShouldAttemptRelocalization:value];
 }
@@ -274,20 +342,24 @@ void HoloKitSDK_GetCurrentARWorldMap(void) {
     [[ARSessionController sharedInstance] getCurentARWorldMap];
 }
 
+void HoloKitSDK_SaveCurrentARWorldMapWithName(const char *mapName) {
+    [[ARSessionController sharedInstance] saveCurrentARWorldMapWithName:[NSString stringWithUTF8String:mapName]];
+}
+
+void HoloKitSDK_GetARWorldMapFromDiskWithName(const char *mapName) {
+    [[ARSessionController sharedInstance] getARWorldMapFromDiskWithName:[NSString stringWithUTF8String:mapName]];
+}
+
 void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChangedDelegate)(int),
                                                      void (*OnCameraChangedTrackingStateDelegate)(int),
                                                      void (*OnARWorldMapStatusChangedDelegate)(int),
-                                                     void (*OnGotCurrentARWorldMapDelegate)(void)) {
+                                                     void (*OnGotCurrentARWorldMapDelegate)(void),
+                                                     void (*OnSavedCurrentARWorldMapDelegate)(const char *, float),
+                                                     void (*OnGotARWorldMapFromDiskDelegate)(const char *, unsigned char *, int)) {
     OnThermalStateChanged = OnThermalStateChangedDelegate;
     OnCameraChangedTrackingState = OnCameraChangedTrackingStateDelegate;
     OnARWorldMapStatusChanged = OnARWorldMapStatusChangedDelegate;
     OnGotCurrentARWorldMap = OnGotCurrentARWorldMapDelegate;
+    OnSavedCurrentARWorldMap = OnSavedCurrentARWorldMapDelegate;
+    OnGotARWorldMapFromDisk = OnGotARWorldMapFromDiskDelegate;
 }
-
-//bool UnityHoloKit_RetrieveARWorldMap(const char *mapName) {
-//    return [[ARSessionController sharedInstance] retrieveARWorldMap:[NSString stringWithUTF8String:mapName]];
-//}
-//
-//void nityHoloKit_LoadARWorldMap() {
-//    [[ARSessionController sharedInstance] loadARWorldMap];
-//}
