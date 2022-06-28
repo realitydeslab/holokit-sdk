@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
@@ -15,7 +16,7 @@ namespace HoloKit
         public Vector3 CenterEyeToLeftEyeOffset;
         public Vector3 CenterEyeToRightEyeOffset;
         // The horizontal distance from the screen center in pixels
-        public float HorizontalAlignmentMarkerOffset; 
+        public float AlignmentMarkerOffset; 
     }
 
     public enum HoloKitRenderMode
@@ -30,7 +31,9 @@ namespace HoloKit
 
         private static HoloKitCamera _instance;
 
-        [SerializeField] private Transform _centerEye;
+        public Transform CenterEyePose => _centerEyePose;
+
+        [SerializeField] private Transform _centerEyePose;
 
         [SerializeField] private Camera _monoCamera;
 
@@ -56,18 +59,19 @@ namespace HoloKit
                 if (_renderMode != value)
                 {
                     _renderMode = value;
-                    OnRenderModeChanged();
+                    ChangeRenderMode();
+                    OnRenderModeChanged?.Invoke();
                 }
             }
         }
 
-        public float HorizontalAlignmentMarkerOffset => _horizontalAlignmentMarkerOffset;
+        public float AlignmentMarkerOffset => _alignmentMarkerOffset;
 
-        private float _horizontalAlignmentMarkerOffset;
+        private float _alignmentMarkerOffset;
 
         private ARCameraBackground _arCameraBackground;
 
-        private int _blackCameraFrameCount;
+        public static event Action OnRenderModeChanged;
 
         private void Awake()
         {
@@ -81,7 +85,7 @@ namespace HoloKit
             }
             SetupHoloKitCameraData();
             _arCameraBackground = GetComponent<ARCameraBackground>();
-            OnRenderModeChanged();
+            ChangeRenderMode();
         }
 
         private void SetupHoloKitCameraData()
@@ -89,7 +93,7 @@ namespace HoloKit
             HoloKitCameraData holokitCameraData = HoloKitOptics.GetHoloKitCameraData(
                 HoloKitProfile.GetHoloKitModel(HoloKitType.HoloKitX),
                 HoloKitProfile.GetPhoneModel(), _ipd, _farClipPlane);
-            _centerEye.localPosition = holokitCameraData.CameraToCenterEyeOffset;
+            _centerEyePose.localPosition = holokitCameraData.CameraToCenterEyeOffset;
             _leftEyeCamera.transform.localPosition = holokitCameraData.CenterEyeToLeftEyeOffset;
             _rightEyeCamera.transform.localPosition = holokitCameraData.CenterEyeToRightEyeOffset;
 
@@ -104,38 +108,27 @@ namespace HoloKit
             _rightEyeCamera.rect = holokitCameraData.RightViewportRect;
             _rightEyeCamera.projectionMatrix = holokitCameraData.RightProjectionMatrix;
 
-            _horizontalAlignmentMarkerOffset = holokitCameraData.HorizontalAlignmentMarkerOffset;
+            _alignmentMarkerOffset = holokitCameraData.AlignmentMarkerOffset;
         }
 
-        private void OnRenderModeChanged()
+        private void ChangeRenderMode()
         {
             if (_renderMode == HoloKitRenderMode.Stereo)
             {
                 _monoCamera.enabled = false;
                 _arCameraBackground.enabled = false;
-                _centerEye.gameObject.SetActive(true);
+                _leftEyeCamera.gameObject.SetActive(true);
+                _rightEyeCamera.gameObject.SetActive(true);
                 _blackCamera.gameObject.SetActive(true);
-                _blackCameraFrameCount = 0;
             }
             else
             {
                 _monoCamera.enabled = true;
                 _arCameraBackground.enabled = true;
-                _centerEye.gameObject.SetActive(false);
+                _leftEyeCamera.gameObject.SetActive(false);
+                _rightEyeCamera.gameObject.SetActive(false);
                 _blackCamera.gameObject.SetActive(false);
             }
-        }
-
-        private void Update()
-        {
-            //if (_blackCamera.gameObject.activeSelf && _blackCameraFrameCount < 1)
-            //{
-            //    _blackCameraFrameCount++;
-            //}
-            //else
-            //{
-            //    //_blackCamera.gameObject.SetActive(false);
-            //}
         }
     }
 }

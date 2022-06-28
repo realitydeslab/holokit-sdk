@@ -228,7 +228,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5626992624695367093}
   m_Layer: 0
-  m_Name: Center Eye Offset
+  m_Name: Center Eye Pose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -313,7 +313,7 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: 0
+  m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 0
@@ -429,7 +429,7 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: 0
+  m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -618,7 +618,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 758d1be03faa6407f91143b9c0d9e82d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _centerEye: {fileID: 5626992624695367093}
+  _centerEyePose: {fileID: 5626992624695367093}
   _monoCamera: {fileID: 5626992625800642046}
   _leftEyeCamera: {fileID: 5626992624492686537}
   _rightEyeCamera: {fileID: 5626992624204144705}

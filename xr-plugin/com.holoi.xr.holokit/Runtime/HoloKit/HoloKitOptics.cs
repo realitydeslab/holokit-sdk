@@ -47,6 +47,8 @@ namespace HoloKit
             Vector3 centerEyeToLeftEyeOffset = new(-ipd / 2f, 0f, 0f);
             Vector3 centerEyeToRightEyeOffset = new(ipd / 2f, 0f, 0f);
 
+            float alignmentMarkerOffset = holokitModel.HorizontalAlignmentMarkerOffset / phoneModel.ScreenWidth * Screen.width;
+
             return new HoloKitCameraData
             {
                 LeftViewportRect = leftViewportRect,
@@ -57,7 +59,8 @@ namespace HoloKit
                 RightProjectionMatrix = rightProjectionMatrix,
                 CameraToCenterEyeOffset = cameraToCenterEyeOffset,
                 CenterEyeToLeftEyeOffset = centerEyeToLeftEyeOffset,
-                CenterEyeToRightEyeOffset = centerEyeToRightEyeOffset
+                CenterEyeToRightEyeOffset = centerEyeToRightEyeOffset,
+                AlignmentMarkerOffset = alignmentMarkerOffset
             };
         }
     }
