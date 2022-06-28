@@ -7,7 +7,7 @@ Library: lib_burst_generated64
 --float-precision=Standard
 --format=MachO
 --disable-warnings=BC1370
---compilation-defines=UNITY_2022_1_0
+--compilation-defines=UNITY_2022_1_5
 --compilation-defines=UNITY_2022_1
 --compilation-defines=UNITY_2022
 --compilation-defines=UNITY_5_3_OR_NEWER
@@ -31,6 +31,7 @@ Library: lib_burst_generated64
 --compilation-defines=UNITY_2020_3_OR_NEWER
 --compilation-defines=UNITY_2021_1_OR_NEWER
 --compilation-defines=UNITY_2021_2_OR_NEWER
+--compilation-defines=UNITY_2021_3_OR_NEWER
 --compilation-defines=UNITY_2022_1_OR_NEWER
 --compilation-defines=USE_SEARCH_ENGINE_API
 --compilation-defines=USE_SEARCH_TABLE
@@ -180,10 +181,10 @@ Library: lib_burst_generated64
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.Core.ShaderLibrary.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/UnityEngine.SpatialTracking.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.Services.Core.Configuration.dll
+--root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Assembly-CSharp.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.Subsystem.Registration.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.Universal.Shaders.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll
---root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Assembly-CSharp.dll
 --assembly-folder=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/
 --pdb-search-paths=Temp/ManagedSymbols/
 --method=Unity.Jobs.IJobForExtensions+ForJobStruct`1[[UnityEngine.Rendering.Universal.ReorderJob`1[[UnityEngine.Rendering.Universal.LightMinMaxZ, Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Execute(UnityEngine.Rendering.Universal.ReorderJob`1[[UnityEngine.Rendering.Universal.LightMinMaxZ, Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]&, Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Jobs.LowLevel.Unsafe.JobRanges&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--e943843acfb78f5f2f3716a6553740d9

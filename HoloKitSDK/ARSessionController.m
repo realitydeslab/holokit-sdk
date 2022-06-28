@@ -1,12 +1,13 @@
 #import <ARKit/ARKit.h>
 #import "UnityPluginApi/XR/UnityXRNativePtrs.h"
+#import "HandTrackingController.h"
 
 void (*OnThermalStateChanged)(int) = NULL;
 void (*OnCameraChangedTrackingState)(int) = NULL;
 void (*OnARWorldMapStatusChanged)(int) = NULL;
 void (*OnGotCurrentARWorldMap)(void) = NULL;
-void (*OnCurrentARWorldMapSaved)(const char *, float) = NULL;
-void (*OnGotARWorldMapFromDisk)(const char *, unsigned char *, int) = NULL;
+void (*OnCurrentARWorldMapSaved)(const char *, int) = NULL;
+void (*OnGotARWorldMapFromDisk)(bool, const char *, unsigned char *, int) = NULL;
 void (*OnARWorldMapLoaded)(void) = NULL;
 void (*OnRelocalizationSucceeded)(void) = NULL;
 
@@ -106,23 +107,36 @@ void (*OnRelocalizationSucceeded)(void) = NULL;
     NSString *filePath = [NSString stringWithFormat:@"%@%@%@", directoryPath, mapName, @".arexperience"];
     // Save map data to the path
     [mapData writeToFile:filePath atomically:YES];
-    
-    float mapSizeInMegabytes = mapData.length / (1024.0 * 1024.0);
+    NSLog(@"[ARSessionController] Saved current ARWorldMapSaved with name %@ and size %lu bytes", mapName, mapData.length);
     if (OnCurrentARWorldMapSaved != NULL) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            OnCurrentARWorldMapSaved([mapName UTF8String], mapSizeInMegabytes);
+            OnCurrentARWorldMapSaved([mapName UTF8String], (int)mapData.length);
         });
     }
 }
 
-- (void)getARWorldMapFromDiskWithName:(NSString *)mapName {
+- (void)getARWorldMapFromDiskWithName:(NSString *)mapName mapSizeInBytes:(int)mapSizeInBytes {
     NSString *filePath = [NSString stringWithFormat:@"%@%@%@%@", NSHomeDirectory(), @"/Documents/ARWorldMaps/", mapName, @".arexperience"];
     if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
         NSData *mapData = [[NSData alloc] initWithContentsOfFile:filePath];
+        if (mapData.length != mapSizeInBytes) {
+            NSLog(@"[ARSessionController] Map on disk does not match the size");
+            if (OnGotARWorldMapFromDisk != NULL) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    OnGotARWorldMapFromDisk(false, NULL, NULL, 0);
+                });
+            }
+            return;
+        }
         self.worldMap = nil;
         self.worldMap = [NSKeyedUnarchiver unarchivedObjectOfClass:[ARWorldMap class] fromData:mapData error:nil];
         if (self.worldMap == nil) {
             NSLog(@"[ARSessionController] Failed to get ARWorldMap from path: %@", filePath);
+            if (OnGotARWorldMapFromDisk != NULL) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    OnGotARWorldMapFromDisk(false, NULL, NULL, 0);
+                });
+            }
             return;
         }
         NSLog(@"[ARSessionController] Got ARWorldMap %@ from disk with size %lu bytes", mapName, mapData.length);
@@ -130,12 +144,21 @@ void (*OnRelocalizationSucceeded)(void) = NULL;
         unsigned char *data = (unsigned char *)[mapData bytes];
         if (OnGotARWorldMapFromDisk != NULL) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                OnGotARWorldMapFromDisk([mapName UTF8String], data, (int)mapData.length);
+                OnGotARWorldMapFromDisk(true, [mapName UTF8String], data, (int)mapData.length);
             });
         }
     } else {
         NSLog(@"[ARSessionController] Failed to get ARWorldMap from path: %@", filePath);
+        if (OnGotARWorldMapFromDisk != NULL) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                OnGotARWorldMapFromDisk(false, NULL, NULL, 0);
+            });
+        }
     }
+}
+
+- (void)nullifyCurrentARWorldMap {
+    self.worldMap = nil;
 }
 
 - (void)loadARWorldMapWithData:(NSData *)mapData {
@@ -173,7 +196,7 @@ void (*OnRelocalizationSucceeded)(void) = NULL;
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
-
+    
     // ARWorldMap status
     if (self.scaningEnvironment) {
         if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
@@ -198,6 +221,12 @@ void (*OnRelocalizationSucceeded)(void) = NULL;
                 });
             }
         }
+    }
+    
+    // Hand tracking
+    HandTrackingController *handTracker = [HandTrackingController sharedInstance];
+    if ([handTracker active]) {
+        [handTracker performHumanHandPoseRequest:frame];
     }
 }
 
@@ -356,8 +385,12 @@ void HoloKitSDK_SaveCurrentARWorldMapWithName(const char *mapName) {
     [[ARSessionController sharedInstance] saveCurrentARWorldMapWithName:[NSString stringWithUTF8String:mapName]];
 }
 
-void HoloKitSDK_GetARWorldMapFromDiskWithName(const char *mapName) {
-    [[ARSessionController sharedInstance] getARWorldMapFromDiskWithName:[NSString stringWithUTF8String:mapName]];
+void HoloKitSDK_GetARWorldMapFromDiskWithName(const char *mapName, int mapSizeInBytes) {
+    [[ARSessionController sharedInstance] getARWorldMapFromDiskWithName:[NSString stringWithUTF8String:mapName] mapSizeInBytes:mapSizeInBytes];
+}
+
+void HoloKitSDK_NullifyCurrentARWorldMap(void) {
+    [[ARSessionController sharedInstance] nullifyCurrentARWorldMap];
 }
 
 void HoloKitSDK_LoadARWorldMapWithData(unsigned char *mapData, int dataSizeInBytes) {
@@ -373,8 +406,8 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
                                                      void (*OnCameraChangedTrackingStateDelegate)(int),
                                                      void (*OnARWorldMapStatusChangedDelegate)(int),
                                                      void (*OnGotCurrentARWorldMapDelegate)(void),
-                                                     void (*OnCurrentARWorldMapSavedDelegate)(const char *, float),
-                                                     void (*OnGotARWorldMapFromDiskDelegate)(const char *, unsigned char *, int),
+                                                     void (*OnCurrentARWorldMapSavedDelegate)(const char *, int),
+                                                     void (*OnGotARWorldMapFromDiskDelegate)(bool, const char *, unsigned char *, int),
                                                      void (*OnARWorldMapLoadedDelegate)(void),
                                                      void (*OnRelocalizationSucceededDelegate)(void)) {
     OnThermalStateChanged = OnThermalStateChangedDelegate;

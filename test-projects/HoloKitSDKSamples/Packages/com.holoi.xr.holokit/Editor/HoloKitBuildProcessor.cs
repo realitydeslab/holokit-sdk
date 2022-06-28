@@ -87,7 +87,7 @@ namespace HoloInteractive.HoloKit.Editor
                 AddXcodePlist(report.summary.outputPath);
                 AddXcodeCapabilities(report.summary.outputPath);
                 AddXcodeBuildSettings(report.summary.outputPath);
-                //AddDynamicFramework(report.summary.outputPath);
+                AddDynamicFramework(report.summary.outputPath);
             }
 
             static void AddXcodePlist(string path) 
@@ -104,10 +104,10 @@ namespace HoloInteractive.HoloKit.Editor
                 nfcArray.AddString("D2760000850101");
 
                 // AR collaboration
-                rootDict.SetString("NSLocalNetworkUsageDescription", "For HoloKit to enable nearby AR collaboration.");
-                PlistElementArray array = rootDict.CreateArray("NSBonjourServices");
-                array.AddString("_magikverse-app._tcp");
-                array.AddString("_magikverse-app._udp");
+                //rootDict.SetString("NSLocalNetworkUsageDescription", "For HoloKit to enable nearby AR collaboration.");
+                //PlistElementArray array = rootDict.CreateArray("NSBonjourServices");
+                //array.AddString("_magikverse-app._tcp");
+                //array.AddString("_magikverse-app._udp");
 
                 // CoreLocation
                 //rootDict.SetString("NSLocationWhenInUseUsageDescription", "For thatReality to locate your current location.");
@@ -132,7 +132,7 @@ namespace HoloInteractive.HoloKit.Editor
                 string unityFrameworkTargetGuid = proj.GetUnityFrameworkTargetGuid();
 
                 proj.AddBuildProperty(unityFrameworkTargetGuid, "LIBRARY_SEARCH_PATHS", "$(SDKROOT)/usr/lib/swift");
-                proj.SetBuildProperty(mainTargetGuid, "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD", "NO"); // This is fucking comfortable
+                proj.SetBuildProperty(mainTargetGuid, "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD", "NO");
 
                 proj.WriteToFile(projPath);
             }
@@ -149,12 +149,12 @@ namespace HoloInteractive.HoloKit.Editor
                 proj.SetBuildProperty(mainTargetGuid, "ENABLE_BITCODE", "NO");
                 proj.SetBuildProperty(unityFrameworkTargetGuid, "ENABLE_BITCODE", "NO");
 
-                string framework = "com.unity.xr.holokit/Runtime/ios/arm64/HandTracker.framework";
-                string fileGuid = proj.AddFile(framework, "Frameworks/" + framework, PBXSourceTree.Source);
+                //string framework = "com.unity.xr.holokit/Runtime/ios/arm64/HandTracker.framework";
+                //string fileGuid = proj.AddFile(framework, "Frameworks/" + framework, PBXSourceTree.Source);
            
-                PBXProjectExtensions.AddFileToEmbedFrameworks(proj, mainTargetGuid, fileGuid);
-                proj.SetBuildProperty(unityFrameworkTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
-                proj.SetBuildProperty(mainTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
+                //PBXProjectExtensions.AddFileToEmbedFrameworks(proj, mainTargetGuid, fileGuid);
+                //proj.SetBuildProperty(unityFrameworkTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
+                //proj.SetBuildProperty(mainTargetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
 
                 proj.WriteToFile(projPath);
             }
