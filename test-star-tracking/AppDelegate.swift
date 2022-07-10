@@ -1,8 +1,8 @@
 //
 //  AppDelegate.swift
-//  factory-app-nfc
+//  test-star-tracking
 //
-//  Created by Yuchen on 2021/4/15.
+//  Created by Botao Hu on 7/8/22.
 //
 
 import UIKit

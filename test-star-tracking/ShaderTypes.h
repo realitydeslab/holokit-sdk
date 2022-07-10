@@ -1,8 +1,8 @@
 //
 //  ShaderTypes.h
-//  test-monocular-handtracking
+//  test-star-tracking
 //
-//  Created by Yuchen on 2021/2/21.
+//  Created by Botao Hu on 7/8/22.
 //
 
 //
@@ -46,6 +46,10 @@ typedef struct {
     matrix_float4x4 projectionMatrix;
     matrix_float4x4 viewMatrix;
     
+    //Added(StAR)
+    matrix_float4x4 projectionMatrixPerEye[2];
+    matrix_float4x4 viewMatrixPerEye[2];
+    
     // Lighting Properties
     vector_float3 ambientLightColor;
     vector_float3 directionalLightDirection;
@@ -57,8 +61,6 @@ typedef struct {
 //    Metal shaders matches the layout of uniform data set in C code
 typedef struct {
     matrix_float4x4 modelMatrix;
-    simd_float4 anchorColor;
-    float scale;
 } InstanceUniforms;
 
 #endif /* ShaderTypes_h */

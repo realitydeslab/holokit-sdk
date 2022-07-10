@@ -1,8 +1,8 @@
 //
 //  Shaders.metal
-//  test-monocular-handtracking
+//  test-star-tracking
 //
-//  Created by Yuchen on 2021/2/21.
+//  Created by Botao Hu on 7/8/22.
 //
 
 #include <metal_stdlib>
@@ -22,11 +22,12 @@ typedef struct {
 typedef struct {
     float4 position [[position]];
     float2 texCoord;
+    ushort viewport [[viewport_array_index]];     //Added(StAR)
 } ImageColorInOut;
 
 
 // Captured image vertex function
-vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]]) {
+vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]], ushort amp_id [[amplification_id]], ushort amp_count [[amplification_count]]) {
     ImageColorInOut out;
     
     // Pass through the image vertex's position
@@ -34,7 +35,11 @@ vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]])
     
     // Pass through the texture coordinate
     out.texCoord = in.texCoord;
-    
+
+    //Added(StAR)
+    out.viewport = amp_id;
+
+
     return out;
 }
 
@@ -75,6 +80,7 @@ typedef struct {
     float4 color;
     half3  eyePosition;
     half3  normal;
+    ushort viewport [[viewport_array_index]]; //Added(StAR)
 } ColorInOut;
 
 
@@ -83,26 +89,19 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
                                                 constant SharedUniforms &sharedUniforms [[ buffer(kBufferIndexSharedUniforms) ]],
                                                 constant InstanceUniforms *instanceUniforms [[ buffer(kBufferIndexInstanceUniforms) ]],
                                                 ushort vid [[vertex_id]],
-                                                ushort iid [[instance_id]]) {
+                                                ushort iid [[instance_id]],
+                                                ushort amp_id [[amplification_id]],
+                                                ushort amp_count [[amplification_count]]) {
     ColorInOut out;
     
     // Make position a float4 to perform 4x4 matrix math on it
     float4 position = float4(in.position, 1.0);
     
     float4x4 modelMatrix = instanceUniforms[iid].modelMatrix;
-    // use this matrix to scale down the anchor size
-    float4x4 scaleMatrix = float4x4(0);
-    scaleMatrix.columns[0].x = 0.1;
-    scaleMatrix.columns[1].y = 0.1;
-    scaleMatrix.columns[2].z = 0.1;
-    scaleMatrix.columns[3].w = 1;
-    // the order matters
-    modelMatrix = modelMatrix * scaleMatrix;
-    
-    float4x4 modelViewMatrix = sharedUniforms.viewMatrix * modelMatrix;
+    float4x4 modelViewMatrix = sharedUniforms.viewMatrixPerEye[amp_id] * modelMatrix;
     
     // Calculate the position of our vertex in clip space and output for clipping and rasterization
-    out.position = sharedUniforms.projectionMatrix * modelViewMatrix * position;
+    out.position = sharedUniforms.projectionMatrixPerEye[amp_id] * modelViewMatrix * position;
     
     // Color each face a different color
     ushort colorID = vid / 4 % 6;
@@ -112,8 +111,6 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
               : colorID == 3 ? float4(1.0, 0.5, 0.0, 1.0) // Bottom face
               : colorID == 4 ? float4(1.0, 1.0, 0.0, 1.0) // Back face
               : float4(1.0, 1.0, 1.0, 1.0); // Front face
-    // set landmark anchor color
-    out.color = instanceUniforms[iid].anchorColor;
     
     // Calculate the position of our vertex in eye space
     out.eyePosition = half3((modelViewMatrix * position).xyz);
@@ -122,14 +119,7 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     float4 normal = modelMatrix * float4(in.normal.x, in.normal.y, in.normal.z, 0.0f);
     out.normal = normalize(half3(normal.xyz));
     
-    // manually set the position according to the screen space
-    //out.position.x = instanceUniforms->modelMatrix.columns[0].x * 2 - 1;
-    //out.position.y = instanceUniforms->modelMatrix.columns[0].y * 2 - 1;
-    //out.position.x = 0;
-    //out.position.y = 0;
-    //out.position.z = -1;
-    //out.position.w = 1;
-    //out.position.x = out.position.x / 2;
+    out.viewport = amp_id;
     
     return out;
 }

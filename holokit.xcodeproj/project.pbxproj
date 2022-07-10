@@ -7,45 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B06977225ECADA3009D51BD /* Vision.framework */; };
 		4B14AC652812E0DE00B7FEFB /* local_network_permission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCFBF0F281104930000873A /* local_network_permission.swift */; };
 		4B188AD026F432B4001FD67D /* hand_tracker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B188ACF26F432B4001FD67D /* hand_tracker.mm */; };
 		4B260C9926368C280004B771 /* multipeer_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B260C9826368C280004B771 /* multipeer_session.m */; };
-		4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FF925E23E94002AC24F /* AppDelegate.m */; };
-		4B2B2FFC25E23E94002AC24F /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FFB25E23E94002AC24F /* Shaders.metal */; };
-		4B2B300025E23E94002AC24F /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B2FFF25E23E94002AC24F /* Renderer.m */; };
-		4B2B300325E23E94002AC24F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B300225E23E94002AC24F /* ViewController.m */; };
-		4B2B300625E23E94002AC24F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B2B300425E23E94002AC24F /* Main.storyboard */; };
-		4B2B300825E23E95002AC24F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2B300725E23E95002AC24F /* Assets.xcassets */; };
-		4B2B300B25E23E95002AC24F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B2B300925E23E95002AC24F /* LaunchScreen.storyboard */; };
-		4B2B300E25E23E95002AC24F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2B300D25E23E95002AC24F /* main.m */; };
-		4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A4E882682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage */; };
 		4B69FF4126C611D200843FCF /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B69FF4026C611D200843FCF /* main.mm */; };
-		4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6AD99125E343EB008F9911 /* MathHelper.m */; };
-		4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C84E825E3F19B00B04F03 /* MathHelper.m */; };
 		4B6C9420261493E300CBDFB4 /* ar_session.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ar_session.mm */; };
 		4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
-		4B6CC26A25D42C2C0068CB66 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26925D42C2C0068CB66 /* AppDelegate.m */; };
-		4B6CC26C25D42C2C0068CB66 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26B25D42C2C0068CB66 /* Shaders.metal */; };
-		4B6CC27025D42C2C0068CB66 /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC26F25D42C2C0068CB66 /* Renderer.m */; };
-		4B6CC27325D42C2C0068CB66 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC27225D42C2C0068CB66 /* ViewController.m */; };
-		4B6CC27625D42C2C0068CB66 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27425D42C2C0068CB66 /* Main.storyboard */; };
-		4B6CC27825D42C2D0068CB66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27725D42C2D0068CB66 /* Assets.xcassets */; };
-		4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B6CC27925D42C2D0068CB66 /* LaunchScreen.storyboard */; };
-		4B6CC27E25D42C2D0068CB66 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6CC27D25D42C2D0068CB66 /* main.m */; };
 		4B921B0526DCE6D600EC359F /* watch_connectivity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0426DCE6D600EC359F /* watch_connectivity.mm */; };
 		4B921B0C26DDE4B400EC359F /* core_location.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B921B0B26DDE4B400EC359F /* core_location.m */; };
 		4B9304D32625A4AA005D9975 /* libceres.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666EA042572610200A7F127 /* libceres.a */; };
 		4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B9C5283261EF0FE0020E4C8 /* holokit_profile.mm */; };
 		4BB5587326205B7D00DC0213 /* nfc_session.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* nfc_session.m */; };
-		4BC45AE2262813BD00BA98E4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE1262813BD00BA98E4 /* AppDelegate.swift */; };
-		4BC45AE4262813BD00BA98E4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE3262813BD00BA98E4 /* Shaders.metal */; };
-		4BC45AE7262813BD00BA98E4 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE6262813BD00BA98E4 /* Renderer.swift */; };
-		4BC45AE9262813BD00BA98E4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC45AE8262813BD00BA98E4 /* ViewController.swift */; };
-		4BC45AEC262813BD00BA98E4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEA262813BD00BA98E4 /* Main.storyboard */; };
-		4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AED262813BE00BA98E4 /* Assets.xcassets */; };
-		4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */; };
 		4BCFBF0E2810F8860000873A /* permissions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BCFBF0D2810F8860000873A /* permissions.m */; };
 		4BD9A6A1278AA53C000BD266 /* crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* crypto.swift */; };
 		4BE7B62226110504001F39F2 /* display.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B62126110504001F39F2 /* display.mm */; };
@@ -53,19 +26,6 @@
 		4BE7B64F26110544001F39F2 /* load.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B64D26110544001F39F2 /* load.mm */; };
 		4BE7B66B2611055A001F39F2 /* math_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B66A2611055A001F39F2 /* math_helpers.mm */; };
 		4BE7B6CA26117AE1001F39F2 /* holokit_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE7B6C826117AE1001F39F2 /* holokit_api.mm */; };
-		965106AB2576659000F076B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965106AA2576659000F076B5 /* AppDelegate.swift */; };
-		965106AD2576659000F076B5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965106AC2576659000F076B5 /* SceneDelegate.swift */; };
-		965106AF2576659000F076B5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965106AE2576659000F076B5 /* ViewController.swift */; };
-		965106B22576659000F076B5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 965106B02576659000F076B5 /* Main.storyboard */; };
-		965106B42576659100F076B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 965106B32576659100F076B5 /* Assets.xcassets */; };
-		965106B72576659100F076B5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 965106B52576659100F076B5 /* LaunchScreen.storyboard */; };
-		965106DD25766AB200F076B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965106DC25766AB200F076B5 /* AppDelegate.swift */; };
-		965106DF25766AB200F076B5 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 965106DE25766AB200F076B5 /* GameScene.sks */; };
-		965106E125766AB200F076B5 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 965106E025766AB200F076B5 /* Actions.sks */; };
-		965106E325766AB200F076B5 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965106E225766AB200F076B5 /* GameScene.swift */; };
-		965106E525766AB200F076B5 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965106E425766AB200F076B5 /* GameViewController.swift */; };
-		965106E825766AB200F076B5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 965106E625766AB200F076B5 /* Main.storyboard */; };
-		965106EA25766AB200F076B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 965106E925766AB200F076B5 /* Assets.xcassets */; };
 		966021ED25393723004019A5 /* display.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021A525393723004019A5 /* display.cc */; };
 		966021EF25393723004019A5 /* lowpass_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AB25393723004019A5 /* lowpass_filter.cc */; };
 		966021F025393723004019A5 /* median_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 966021AC25393723004019A5 /* median_filter.cc */; };
@@ -101,13 +61,19 @@
 		968D69CC253AC4C900CFBBB3 /* distortion_renderer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 968D69CB253AC4C900CFBBB3 /* distortion_renderer.cc */; };
 		9699F6692575D0010011D823 /* HandTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9666E9902572395C00A7F127 /* HandTracker.framework */; };
 		9699F66A2575D0010011D823 /* HandTracker.framework in Embed Frameworks (2 items) */ = {isa = PBXBuildFile; fileRef = 9666E9902572395C00A7F127 /* HandTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		9699F67E2575E2160011D823 /* ActionRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9699F67D2575E2160011D823 /* ActionRequestHandler.swift */; };
 		96BC684425394820008B557A /* head_tracker.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC684325394820008B557A /* head_tracker.cc */; };
 		96BC68C025396851008B557A /* lens_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BA25396851008B557A /* lens_distortion.cc */; };
 		96BC68C125396851008B557A /* polynomial_radial_distortion.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BC25396851008B557A /* polynomial_radial_distortion.cc */; };
 		96BC68C225396851008B557A /* distortion_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68BD25396851008B557A /* distortion_mesh.cc */; };
 		96BC68CF25396B40008B557A /* screen_params.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96BC68CE25396B40008B557A /* screen_params.mm */; };
 		96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C102C0279152B30052AF2B /* CryptoKit.framework */; };
+		96D4A4BD2878C71C0063442D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D4A4BC2878C71C0063442D /* AppDelegate.swift */; };
+		96D4A4BF2878C71C0063442D /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96D4A4BE2878C71C0063442D /* Shaders.metal */; };
+		96D4A4C22878C71C0063442D /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D4A4C12878C71C0063442D /* Renderer.swift */; };
+		96D4A4C42878C71C0063442D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D4A4C32878C71C0063442D /* ViewController.swift */; };
+		96D4A4C72878C71C0063442D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 96D4A4C52878C71C0063442D /* Main.storyboard */; };
+		96D4A4C92878C71D0063442D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96D4A4C82878C71D0063442D /* Assets.xcassets */; };
+		96D4A4CC2878C71D0063442D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 96D4A4CA2878C71D0063442D /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,26 +87,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4B2B2FE925E23588002AC24F /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B2B302725E23F5B002AC24F /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4B69FF3C26C611D200843FCF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 8;
@@ -198,7 +144,6 @@
 		4B188ACF26F432B4001FD67D /* hand_tracker.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hand_tracker.mm; sourceTree = "<group>"; };
 		4B260C9826368C280004B771 /* multipeer_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = multipeer_session.m; sourceTree = "<group>"; };
 		4B260CA926368C3A0004B771 /* multipeer_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = multipeer_session.h; sourceTree = "<group>"; };
-		4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-monocular-handtracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2B2FF825E23E94002AC24F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B2B2FF925E23E94002AC24F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4B2B2FFB25E23E94002AC24F /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
@@ -222,7 +167,6 @@
 		4B6C84E825E3F19B00B04F03 /* MathHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MathHelper.m; sourceTree = "<group>"; };
 		4B6C84F225E3F1A700B04F03 /* MathHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MathHelper.h; sourceTree = "<group>"; };
 		4B6C941F261493E300CBDFB4 /* ar_session.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ar_session.mm; sourceTree = "<group>"; };
-		4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-stereoscopic-rendering.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B6CC26825D42C2C0068CB66 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4B6CC26925D42C2C0068CB66 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4B6CC26B25D42C2C0068CB66 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
@@ -245,18 +189,6 @@
 		4B9C52BE261F0B330020E4C8 /* ar_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ar_session.h; sourceTree = "<group>"; };
 		4BB5587226205B7D00DC0213 /* nfc_session.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = nfc_session.m; sourceTree = "<group>"; };
 		4BB5588226205B8E00DC0213 /* nfc_session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nfc_session.h; sourceTree = "<group>"; };
-		4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "factory-app-nfc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4BC45AE1262813BD00BA98E4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		4BC45AE3262813BD00BA98E4 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
-		4BC45AE5262813BD00BA98E4 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
-		4BC45AE6262813BD00BA98E4 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
-		4BC45AE8262813BD00BA98E4 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		4BC45AEB262813BD00BA98E4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		4BC45AED262813BE00BA98E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		4BC45AF0262813BE00BA98E4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		4BC45AF2262813BE00BA98E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4BC45AF3262813BE00BA98E4 /* factory_app_nfc-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "factory_app_nfc-Bridging-Header.h"; sourceTree = "<group>"; };
-		4BC45B06262813CA00BA98E4 /* factory-app-nfc.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "factory-app-nfc.entitlements"; sourceTree = "<group>"; };
 		4BC45B25262815CB00BA98E4 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
 		4BCFBF0C2810F8730000873A /* permissions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = permissions.h; sourceTree = "<group>"; };
 		4BCFBF0D2810F8860000873A /* permissions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = permissions.m; sourceTree = "<group>"; };
@@ -276,32 +208,6 @@
 		961B8AFF253BBABF0025BA7D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		961B8B02253BBACC0025BA7D /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
 		963CA049253C5CB300345591 /* holokit_xr_plugin.lds */ = {isa = PBXFileReference; lastKnownFileType = text; path = holokit_xr_plugin.lds; sourceTree = "<group>"; };
-		9651053C2575FC9800F076B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		9651053E2575FC9800F076B5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		965105402575FC9800F076B5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		965105432575FC9800F076B5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		965105452575FC9900F076B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		965105482575FC9900F076B5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9651054A2575FC9900F076B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		965105B12575FDD500F076B5 /* official-app.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "official-app.entitlements"; sourceTree = "<group>"; };
-		965106A82576659000F076B5 /* holokit-app-clip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "holokit-app-clip.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		965106AA2576659000F076B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		965106AC2576659000F076B5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		965106AE2576659000F076B5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		965106B12576659000F076B5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		965106B32576659100F076B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		965106B62576659100F076B5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		965106B82576659100F076B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		965106B92576659100F076B5 /* holokit_app_clip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = holokit_app_clip.entitlements; sourceTree = "<group>"; };
-		965106DA25766AB100F076B5 /* test-external-holokit-game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-external-holokit-game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		965106DC25766AB200F076B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		965106DE25766AB200F076B5 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
-		965106E025766AB200F076B5 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
-		965106E225766AB200F076B5 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
-		965106E425766AB200F076B5 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
-		965106E725766AB200F076B5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		965106E925766AB200F076B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		965106EB25766AB200F076B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		965D7EC9253AECD7000B1B60 /* printc.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = printc.mm; sourceTree = "<group>"; };
 		965D7ED2253AECFB000B1B60 /* printc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = printc.h; sourceTree = "<group>"; };
 		965D7FD8253B16C3000B1B60 /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsMetal.h; sourceTree = "<group>"; };
@@ -411,10 +317,6 @@
 		968D697B253AC0FC00CFBBB3 /* holokit.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = holokit.cc; sourceTree = "<group>"; };
 		968D69CA253AC4C900CFBBB3 /* distortion_renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = distortion_renderer.h; sourceTree = "<group>"; };
 		968D69CB253AC4C900CFBBB3 /* distortion_renderer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = distortion_renderer.cc; sourceTree = "<group>"; };
-		9699F6792575E2160011D823 /* holokit-app-extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "holokit-app-extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9699F67D2575E2160011D823 /* ActionRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionRequestHandler.swift; sourceTree = "<group>"; };
-		9699F6812575E2160011D823 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9699F6B02575E6C10011D823 /* nfcverification.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = nfcverification.entitlements; sourceTree = "<group>"; };
 		9699F6BB2575E6F20011D823 /* test-headtracking2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "test-headtracking2.entitlements"; sourceTree = "<group>"; };
 		96BC684225394820008B557A /* head_tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = head_tracker.h; sourceTree = "<group>"; };
 		96BC684325394820008B557A /* head_tracker.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = head_tracker.cc; sourceTree = "<group>"; };
@@ -429,34 +331,22 @@
 		96BC68CE25396B40008B557A /* screen_params.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = screen_params.mm; sourceTree = "<group>"; };
 		96BC68D625396BF5008B557A /* holokit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = holokit.h; sourceTree = "<group>"; };
 		96C102C0279152B30052AF2B /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/CryptoKit.framework; sourceTree = DEVELOPER_DIR; };
+		96D4A4BA2878C71C0063442D /* test-star-tracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "test-star-tracking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96D4A4BC2878C71C0063442D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		96D4A4BE2878C71C0063442D /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		96D4A4C02878C71C0063442D /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		96D4A4C12878C71C0063442D /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		96D4A4C32878C71C0063442D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		96D4A4C62878C71C0063442D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		96D4A4C82878C71D0063442D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		96D4A4CB2878C71D0063442D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		96D4A4CD2878C71D0063442D /* test_star_tracking-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "test_star_tracking-Bridging-Header.h"; sourceTree = "<group>"; };
 		96F95491253AA8BE007CE50B /* input.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = input.cc; sourceTree = "<group>"; };
 		96F95492253AA8C0007CE50B /* display.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = display.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		4B2B2FF325E23E94002AC24F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4B69FF3B26C611D200843FCF /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B6CC26325D42C2C0068CB66 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4B06977425ECADD8009D51BD /* Vision.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4BC45ADC262813BD00BA98E4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -470,20 +360,6 @@
 				96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */,
 				4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */,
 				4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		965106A52576659000F076B5 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		965106D725766AB100F076B5 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -512,7 +388,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9699F6762575E2160011D823 /* Frameworks */ = {
+		96D4A4B72878C71C0063442D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -575,24 +451,6 @@
 			path = "test-stereoscopic-rendering";
 			sourceTree = "<group>";
 		};
-		4BC45AE0262813BD00BA98E4 /* factory-app-nfc */ = {
-			isa = PBXGroup;
-			children = (
-				4BC45B06262813CA00BA98E4 /* factory-app-nfc.entitlements */,
-				4BC45AE1262813BD00BA98E4 /* AppDelegate.swift */,
-				4BC45AE3262813BD00BA98E4 /* Shaders.metal */,
-				4BC45AE5262813BD00BA98E4 /* ShaderTypes.h */,
-				4BC45AE6262813BD00BA98E4 /* Renderer.swift */,
-				4BC45AE8262813BD00BA98E4 /* ViewController.swift */,
-				4BC45AEA262813BD00BA98E4 /* Main.storyboard */,
-				4BC45AED262813BE00BA98E4 /* Assets.xcassets */,
-				4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */,
-				4BC45AF2262813BE00BA98E4 /* Info.plist */,
-				4BC45AF3262813BE00BA98E4 /* factory_app_nfc-Bridging-Header.h */,
-			);
-			path = "factory-app-nfc";
-			sourceTree = "<group>";
-		};
 		4BE7B60C261104ED001F39F2 /* holokit-sdk */ = {
 			isa = PBXGroup;
 			children = (
@@ -626,65 +484,16 @@
 			path = "holokit-sdk";
 			sourceTree = "<group>";
 		};
-		9651053B2575FC9800F076B5 /* official-app */ = {
-			isa = PBXGroup;
-			children = (
-				965105B12575FDD500F076B5 /* official-app.entitlements */,
-				9651053C2575FC9800F076B5 /* AppDelegate.swift */,
-				9651053E2575FC9800F076B5 /* SceneDelegate.swift */,
-				965105402575FC9800F076B5 /* ViewController.swift */,
-				965105422575FC9800F076B5 /* Main.storyboard */,
-				965105452575FC9900F076B5 /* Assets.xcassets */,
-				965105472575FC9900F076B5 /* LaunchScreen.storyboard */,
-				9651054A2575FC9900F076B5 /* Info.plist */,
-			);
-			path = "official-app";
-			sourceTree = "<group>";
-		};
-		965106A92576659000F076B5 /* test-holokit-app-clip */ = {
-			isa = PBXGroup;
-			children = (
-				965106AA2576659000F076B5 /* AppDelegate.swift */,
-				965106AC2576659000F076B5 /* SceneDelegate.swift */,
-				965106AE2576659000F076B5 /* ViewController.swift */,
-				965106B02576659000F076B5 /* Main.storyboard */,
-				965106B32576659100F076B5 /* Assets.xcassets */,
-				965106B52576659100F076B5 /* LaunchScreen.storyboard */,
-				965106B82576659100F076B5 /* Info.plist */,
-				965106B92576659100F076B5 /* holokit_app_clip.entitlements */,
-			);
-			path = "test-holokit-app-clip";
-			sourceTree = "<group>";
-		};
-		965106DB25766AB100F076B5 /* test-external-holokit-game */ = {
-			isa = PBXGroup;
-			children = (
-				965106DC25766AB200F076B5 /* AppDelegate.swift */,
-				965106DE25766AB200F076B5 /* GameScene.sks */,
-				965106E025766AB200F076B5 /* Actions.sks */,
-				965106E225766AB200F076B5 /* GameScene.swift */,
-				965106E425766AB200F076B5 /* GameViewController.swift */,
-				965106E625766AB200F076B5 /* Main.storyboard */,
-				965106E925766AB200F076B5 /* Assets.xcassets */,
-				965106EB25766AB200F076B5 /* Info.plist */,
-			);
-			path = "test-external-holokit-game";
-			sourceTree = "<group>";
-		};
 		96602134253930CC004019A5 = {
 			isa = PBXGroup;
 			children = (
-				9651053B2575FC9800F076B5 /* official-app */,
 				4BE7B60C261104ED001F39F2 /* holokit-sdk */,
 				9660219C25393723004019A5 /* sdk */,
 				9666E9E3257260D800A7F127 /* test-headtracking2 */,
-				9699F67A2575E2160011D823 /* test-holokit-app-extension */,
-				965106A92576659000F076B5 /* test-holokit-app-clip */,
-				965106DB25766AB100F076B5 /* test-external-holokit-game */,
 				4B6CC26725D42C2C0068CB66 /* test-stereoscopic-rendering */,
 				4B2B2FF725E23E94002AC24F /* test-monocular-handtracking */,
-				4BC45AE0262813BD00BA98E4 /* factory-app-nfc */,
 				4B69FF3F26C611D200843FCF /* low-latency-tracking-api-test */,
+				96D4A4BB2878C71C0063442D /* test-star-tracking */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -696,14 +505,9 @@
 				9660213D253930CC004019A5 /* libholokit.a */,
 				96602151253934A4004019A5 /* libholokit-xr-plugin.a */,
 				9666E9E2257260D800A7F127 /* test-headtracking2.app */,
-				9699F6792575E2160011D823 /* holokit-app-extension.appex */,
-				965106A82576659000F076B5 /* holokit-app-clip.app */,
-				965106DA25766AB100F076B5 /* test-external-holokit-game.app */,
-				4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */,
-				4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */,
 				4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */,
-				4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */,
 				4B69FF3E26C611D200843FCF /* low-latency-tracking-api-test */,
+				96D4A4BA2878C71C0063442D /* test-star-tracking.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -936,16 +740,6 @@
 			path = LowLatencyTracking;
 			sourceTree = "<group>";
 		};
-		9699F67A2575E2160011D823 /* test-holokit-app-extension */ = {
-			isa = PBXGroup;
-			children = (
-				9699F6B02575E6C10011D823 /* nfcverification.entitlements */,
-				9699F67D2575E2160011D823 /* ActionRequestHandler.swift */,
-				9699F6812575E2160011D823 /* Info.plist */,
-			);
-			path = "test-holokit-app-extension";
-			sourceTree = "<group>";
-		};
 		96BC68B925396851008B557A /* calibrations */ = {
 			isa = PBXGroup;
 			children = (
@@ -977,6 +771,22 @@
 			path = include;
 			sourceTree = "<group>";
 		};
+		96D4A4BB2878C71C0063442D /* test-star-tracking */ = {
+			isa = PBXGroup;
+			children = (
+				96D4A4BC2878C71C0063442D /* AppDelegate.swift */,
+				96D4A4BE2878C71C0063442D /* Shaders.metal */,
+				96D4A4C02878C71C0063442D /* ShaderTypes.h */,
+				96D4A4C12878C71C0063442D /* Renderer.swift */,
+				96D4A4C32878C71C0063442D /* ViewController.swift */,
+				96D4A4C52878C71C0063442D /* Main.storyboard */,
+				96D4A4C82878C71D0063442D /* Assets.xcassets */,
+				96D4A4CA2878C71D0063442D /* LaunchScreen.storyboard */,
+				96D4A4CD2878C71D0063442D /* test_star_tracking-Bridging-Header.h */,
+			);
+			path = "test-star-tracking";
+			sourceTree = "<group>";
+		};
 		96F95490253AA8A9007CE50B /* xr_dummy */ = {
 			isa = PBXGroup;
 			children = (
@@ -994,24 +804,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4B2B2FF525E23E94002AC24F /* test-monocular-handtracking */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4B2B300F25E23E95002AC24F /* Build configuration list for PBXNativeTarget "test-monocular-handtracking" */;
-			buildPhases = (
-				4B2B2FF225E23E94002AC24F /* Sources */,
-				4B2B2FF325E23E94002AC24F /* Frameworks */,
-				4B2B2FF425E23E94002AC24F /* Resources */,
-				4B2B302725E23F5B002AC24F /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "test-monocular-handtracking";
-			productName = "test-monocular-handtracking";
-			productReference = 4B2B2FF625E23E94002AC24F /* test-monocular-handtracking.app */;
-			productType = "com.apple.product-type.application";
-		};
 		4B69FF3D26C611D200843FCF /* low-latency-tracking-api-test */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4B69FF4426C611D200843FCF /* Build configuration list for PBXNativeTarget "low-latency-tracking-api-test" */;
@@ -1028,41 +820,6 @@
 			productName = "low-latency-tracking-api-test";
 			productReference = 4B69FF3E26C611D200843FCF /* low-latency-tracking-api-test */;
 			productType = "com.apple.product-type.tool";
-		};
-		4B6CC26525D42C2C0068CB66 /* test-stereoscopic-rendering */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4B6CC28125D42C2D0068CB66 /* Build configuration list for PBXNativeTarget "test-stereoscopic-rendering" */;
-			buildPhases = (
-				4B6CC26225D42C2C0068CB66 /* Sources */,
-				4B6CC26325D42C2C0068CB66 /* Frameworks */,
-				4B6CC26425D42C2C0068CB66 /* Resources */,
-				4B2B2FE925E23588002AC24F /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "test-stereoscopic-rendering";
-			productName = "test-stereoscopic-rendering";
-			productReference = 4B6CC26625D42C2C0068CB66 /* test-stereoscopic-rendering.app */;
-			productType = "com.apple.product-type.application";
-		};
-		4BC45ADE262813BD00BA98E4 /* factory-app-nfc */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4BC45AF4262813BE00BA98E4 /* Build configuration list for PBXNativeTarget "factory-app-nfc" */;
-			buildPhases = (
-				4BC45ADB262813BD00BA98E4 /* Sources */,
-				4BC45ADC262813BD00BA98E4 /* Frameworks */,
-				4BC45ADD262813BD00BA98E4 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "factory-app-nfc";
-			productName = "factory-app-nfc";
-			productReference = 4BC45ADF262813BD00BA98E4 /* factory-app-nfc.app */;
-			productType = "com.apple.product-type.application";
 		};
 		4BE7B60A261104ED001F39F2 /* holokit-sdk */ = {
 			isa = PBXNativeTarget;
@@ -1081,40 +838,6 @@
 			productName = "holokit-sdk-skeleton";
 			productReference = 4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */;
 			productType = "com.apple.product-type.library.static";
-		};
-		965106A72576659000F076B5 /* holokit-app-clip */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 965106BD2576659100F076B5 /* Build configuration list for PBXNativeTarget "holokit-app-clip" */;
-			buildPhases = (
-				965106A42576659000F076B5 /* Sources */,
-				965106A52576659000F076B5 /* Frameworks */,
-				965106A62576659000F076B5 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "holokit-app-clip";
-			productName = "holokit-app-clip";
-			productReference = 965106A82576659000F076B5 /* holokit-app-clip.app */;
-			productType = "com.apple.product-type.application.on-demand-install-capable";
-		};
-		965106D925766AB100F076B5 /* test-external-holokit-game */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 965106EC25766AB200F076B5 /* Build configuration list for PBXNativeTarget "test-external-holokit-game" */;
-			buildPhases = (
-				965106D625766AB100F076B5 /* Sources */,
-				965106D725766AB100F076B5 /* Frameworks */,
-				965106D825766AB100F076B5 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "test-external-holokit-game";
-			productName = "test-external-holokit-game";
-			productReference = 965106DA25766AB100F076B5 /* test-external-holokit-game.app */;
-			productType = "com.apple.product-type.application";
 		};
 		9660213C253930CC004019A5 /* holokit */ = {
 			isa = PBXNativeTarget;
@@ -1169,22 +892,22 @@
 			productReference = 9666E9E2257260D800A7F127 /* test-headtracking2.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9699F6782575E2160011D823 /* holokit-app-extension */ = {
+		96D4A4B92878C71C0063442D /* test-star-tracking */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9699F6852575E2160011D823 /* Build configuration list for PBXNativeTarget "holokit-app-extension" */;
+			buildConfigurationList = 96D4A4CE2878C71D0063442D /* Build configuration list for PBXNativeTarget "test-star-tracking" */;
 			buildPhases = (
-				9699F6752575E2160011D823 /* Sources */,
-				9699F6762575E2160011D823 /* Frameworks */,
-				9699F6772575E2160011D823 /* Resources */,
+				96D4A4B62878C71C0063442D /* Sources */,
+				96D4A4B72878C71C0063442D /* Frameworks */,
+				96D4A4B82878C71C0063442D /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "holokit-app-extension";
-			productName = nfcverification;
-			productReference = 9699F6792575E2160011D823 /* holokit-app-extension.appex */;
-			productType = "com.apple.product-type.app-extension";
+			name = "test-star-tracking";
+			productName = "test-star-tracking";
+			productReference = 96D4A4BA2878C71C0063442D /* test-star-tracking.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -1192,30 +915,15 @@
 		96602135253930CC004019A5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1300;
+				LastSwiftUpdateCheck = 1400;
 				LastUpgradeCheck = 1220;
 				TargetAttributes = {
-					4B2B2FF525E23E94002AC24F = {
-						CreatedOnToolsVersion = 12.4;
-					};
 					4B69FF3D26C611D200843FCF = {
 						CreatedOnToolsVersion = 13.0;
-					};
-					4B6CC26525D42C2C0068CB66 = {
-						CreatedOnToolsVersion = 12.3;
-					};
-					4BC45ADE262813BD00BA98E4 = {
-						CreatedOnToolsVersion = 12.4;
 					};
 					4BE7B60A261104ED001F39F2 = {
 						CreatedOnToolsVersion = 12.4;
 						LastSwiftMigration = 1320;
-					};
-					965106A72576659000F076B5 = {
-						CreatedOnToolsVersion = 12.2;
-					};
-					965106D925766AB100F076B5 = {
-						CreatedOnToolsVersion = 12.2;
 					};
 					9660213C253930CC004019A5 = {
 						CreatedOnToolsVersion = 12.2;
@@ -1226,8 +934,8 @@
 					9666E9E1257260D800A7F127 = {
 						CreatedOnToolsVersion = 12.2;
 					};
-					9699F6782575E2160011D823 = {
-						CreatedOnToolsVersion = 12.2;
+					96D4A4B92878C71C0063442D = {
+						CreatedOnToolsVersion = 14.0;
 					};
 				};
 			};
@@ -1247,70 +955,14 @@
 				9660213C253930CC004019A5 /* holokit */,
 				96602150253934A4004019A5 /* holokit-xr-plugin */,
 				9666E9E1257260D800A7F127 /* test-headtracking2 */,
-				9699F6782575E2160011D823 /* holokit-app-extension */,
-				965106A72576659000F076B5 /* holokit-app-clip */,
-				965106D925766AB100F076B5 /* test-external-holokit-game */,
-				4B6CC26525D42C2C0068CB66 /* test-stereoscopic-rendering */,
-				4B2B2FF525E23E94002AC24F /* test-monocular-handtracking */,
 				4BE7B60A261104ED001F39F2 /* holokit-sdk */,
-				4BC45ADE262813BD00BA98E4 /* factory-app-nfc */,
 				4B69FF3D26C611D200843FCF /* low-latency-tracking-api-test */,
+				96D4A4B92878C71C0063442D /* test-star-tracking */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		4B2B2FF425E23E94002AC24F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4B2B300B25E23E95002AC24F /* LaunchScreen.storyboard in Resources */,
-				4B2B300825E23E95002AC24F /* Assets.xcassets in Resources */,
-				4B2B300625E23E94002AC24F /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B6CC26425D42C2C0068CB66 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4B6CC27B25D42C2D0068CB66 /* LaunchScreen.storyboard in Resources */,
-				4B6CC27825D42C2D0068CB66 /* Assets.xcassets in Resources */,
-				4B6CC27625D42C2C0068CB66 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4BC45ADD262813BD00BA98E4 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4BC45AF1262813BE00BA98E4 /* LaunchScreen.storyboard in Resources */,
-				4BC45AEE262813BE00BA98E4 /* Assets.xcassets in Resources */,
-				4BC45AEC262813BD00BA98E4 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		965106A62576659000F076B5 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				965106B72576659100F076B5 /* LaunchScreen.storyboard in Resources */,
-				965106B42576659100F076B5 /* Assets.xcassets in Resources */,
-				965106B22576659000F076B5 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		965106D825766AB100F076B5 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				965106E825766AB200F076B5 /* Main.storyboard in Resources */,
-				965106DF25766AB200F076B5 /* GameScene.sks in Resources */,
-				965106EA25766AB200F076B5 /* Assets.xcassets in Resources */,
-				965106E125766AB200F076B5 /* Actions.sks in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		9666E9E0257260D800A7F127 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1321,10 +973,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9699F6772575E2160011D823 /* Resources */ = {
+		96D4A4B82878C71C0063442D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96D4A4CC2878C71D0063442D /* LaunchScreen.storyboard in Resources */,
+				96D4A4C92878C71D0063442D /* Assets.xcassets in Resources */,
+				96D4A4C72878C71C0063442D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1351,49 +1006,11 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		4B2B2FF225E23E94002AC24F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4B2B300E25E23E95002AC24F /* main.m in Sources */,
-				4B2B2FFC25E23E94002AC24F /* Shaders.metal in Sources */,
-				4B2B2FFA25E23E94002AC24F /* AppDelegate.m in Sources */,
-				4B3A4E892682D35200F474F1 /* MyHandPoseClassifier01 1.mlpackage in Sources */,
-				4B2B300325E23E94002AC24F /* ViewController.m in Sources */,
-				4B2B300025E23E94002AC24F /* Renderer.m in Sources */,
-				4B6AD99225E343EB008F9911 /* MathHelper.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4B69FF3A26C611D200843FCF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				4B69FF4126C611D200843FCF /* main.mm in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B6CC26225D42C2C0068CB66 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4B6CC27E25D42C2D0068CB66 /* main.m in Sources */,
-				4B6CC26C25D42C2C0068CB66 /* Shaders.metal in Sources */,
-				4B6CC26A25D42C2C0068CB66 /* AppDelegate.m in Sources */,
-				4B6CC27325D42C2C0068CB66 /* ViewController.m in Sources */,
-				4B6CC27025D42C2C0068CB66 /* Renderer.m in Sources */,
-				4B6C84E925E3F19B00B04F03 /* MathHelper.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4BC45ADB262813BD00BA98E4 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4BC45AE4262813BD00BA98E4 /* Shaders.metal in Sources */,
-				4BC45AE7262813BD00BA98E4 /* Renderer.swift in Sources */,
-				4BC45AE9262813BD00BA98E4 /* ViewController.swift in Sources */,
-				4BC45AE2262813BD00BA98E4 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1416,26 +1033,6 @@
 				4B9C5284261EF0FE0020E4C8 /* holokit_profile.mm in Sources */,
 				4BE7B64F26110544001F39F2 /* load.mm in Sources */,
 				4BD9A6A1278AA53C000BD266 /* crypto.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		965106A42576659000F076B5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				965106AF2576659000F076B5 /* ViewController.swift in Sources */,
-				965106AB2576659000F076B5 /* AppDelegate.swift in Sources */,
-				965106AD2576659000F076B5 /* SceneDelegate.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		965106D625766AB100F076B5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				965106E325766AB200F076B5 /* GameScene.swift in Sources */,
-				965106E525766AB200F076B5 /* GameViewController.swift in Sources */,
-				965106DD25766AB200F076B5 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1493,11 +1090,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9699F6752575E2160011D823 /* Sources */ = {
+		96D4A4B62878C71C0063442D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9699F67E2575E2160011D823 /* ActionRequestHandler.swift in Sources */,
+				96D4A4BF2878C71C0063442D /* Shaders.metal in Sources */,
+				96D4A4C22878C71C0063442D /* Renderer.swift in Sources */,
+				96D4A4C42878C71C0063442D /* ViewController.swift in Sources */,
+				96D4A4BD2878C71C0063442D /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1544,62 +1144,6 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
-		4BC45AEA262813BD00BA98E4 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4BC45AEB262813BD00BA98E4 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		4BC45AEF262813BE00BA98E4 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4BC45AF0262813BE00BA98E4 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		965105422575FC9800F076B5 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				965105432575FC9800F076B5 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		965105472575FC9900F076B5 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				965105482575FC9900F076B5 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		965106B02576659000F076B5 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				965106B12576659000F076B5 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		965106B52576659100F076B5 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				965106B62576659100F076B5 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		965106E625766AB200F076B5 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				965106E725766AB200F076B5 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		9666E9ED257260D900A7F127 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1616,57 +1160,25 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		96D4A4C52878C71C0063442D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96D4A4C62878C71C0063442D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		96D4A4CA2878C71D0063442D /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96D4A4CB2878C71D0063442D /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		4B2B301025E23E95002AC24F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
-				INFOPLIST_FILE = "test-monocular-handtracking/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-monocular-handtracking";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		4B2B301125E23E95002AC24F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
-				INFOPLIST_FILE = "test-monocular-handtracking/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-monocular-handtracking";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		4B69FF4226C611D200843FCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1710,102 +1222,6 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-			};
-			name = Release;
-		};
-		4B6CC27F25D42C2D0068CB66 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = P9TVSH3F53;
-				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
-				INFOPLIST_FILE = "test-stereoscopic-rendering/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-stereoscopic-rendering";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		4B6CC28025D42C2D0068CB66 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = P9TVSH3F53;
-				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
-				INFOPLIST_FILE = "test-stereoscopic-rendering/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "Holoi.test-stereoscopic-rendering";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		4BC45AF5262813BE00BA98E4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "factory-app-nfc/factory-app-nfc.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				INFOPLIST_FILE = "factory-app-nfc/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.factory-app";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OBJC_BRIDGING_HEADER = "factory-app-nfc/factory_app_nfc-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		4BC45AF6262813BE00BA98E4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "factory-app-nfc/factory-app-nfc.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				INFOPLIST_FILE = "factory-app-nfc/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.factory-app";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OBJC_BRIDGING_HEADER = "factory-app-nfc/factory_app_nfc-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1865,92 +1281,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		965106BE2576659100F076B5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "holokit-app-clip/holokit_app_clip.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				INFOPLIST_FILE = "holokit-app-clip/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.official-app.Clip";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		965106BF2576659100F076B5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "holokit-app-clip/holokit_app_clip.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				INFOPLIST_FILE = "holokit-app-clip/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.official-app.Clip";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		965106ED25766AB200F076B5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				INFOPLIST_FILE = "test-external-holokit-game/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-official-app.test-external-holokit-game";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		965106EE25766AB200F076B5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				INFOPLIST_FILE = "test-external-holokit-game/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-official-app.test-external-holokit-game";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2159,7 +1489,7 @@
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
 				);
 				INFOPLIST_FILE = "test-headtracking2/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2194,7 +1524,7 @@
 					"$(SRCROOT)/sdk/third_party/ceres-solver/include",
 				);
 				INFOPLIST_FILE = "test-headtracking2/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2210,44 +1540,68 @@
 			};
 			name = Release;
 		};
-		9699F6862575E2160011D823 /* Debug */ = {
+		96D4A4CF2878C71D0063442D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "holokit-app-extension/nfcverification.entitlements";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
-				INFOPLIST_FILE = "holokit-app-extension/Info.plist";
+				GCC_NO_COMMON_BLOCKS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arkit metal";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationLandscapeRight;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.official-app.app-extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-star-tracking";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "test-star-tracking/test_star_tracking-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		9699F6872575E2160011D823 /* Release */ = {
+		96D4A4D02878C71D0063442D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "holokit-app-extension/nfcverification.entitlements";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
-				INFOPLIST_FILE = "holokit-app-extension/Info.plist";
+				GCC_NO_COMMON_BLOCKS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arkit metal";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationLandscapeRight;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.official-app.app-extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.xr.holokit.test-star-tracking";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "test-star-tracking/test_star_tracking-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2257,15 +1611,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4B2B300F25E23E95002AC24F /* Build configuration list for PBXNativeTarget "test-monocular-handtracking" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4B2B301025E23E95002AC24F /* Debug */,
-				4B2B301125E23E95002AC24F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		4B69FF4426C611D200843FCF /* Build configuration list for PBXNativeTarget "low-latency-tracking-api-test" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2275,47 +1620,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4B6CC28125D42C2D0068CB66 /* Build configuration list for PBXNativeTarget "test-stereoscopic-rendering" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4B6CC27F25D42C2D0068CB66 /* Debug */,
-				4B6CC28025D42C2D0068CB66 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4BC45AF4262813BE00BA98E4 /* Build configuration list for PBXNativeTarget "factory-app-nfc" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4BC45AF5262813BE00BA98E4 /* Debug */,
-				4BC45AF6262813BE00BA98E4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		4BE7B613261104ED001F39F2 /* Build configuration list for PBXNativeTarget "holokit-sdk" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4BE7B611261104ED001F39F2 /* Debug */,
 				4BE7B612261104ED001F39F2 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		965106BD2576659100F076B5 /* Build configuration list for PBXNativeTarget "holokit-app-clip" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				965106BE2576659100F076B5 /* Debug */,
-				965106BF2576659100F076B5 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		965106EC25766AB200F076B5 /* Build configuration list for PBXNativeTarget "test-external-holokit-game" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				965106ED25766AB200F076B5 /* Debug */,
-				965106EE25766AB200F076B5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2356,11 +1665,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9699F6852575E2160011D823 /* Build configuration list for PBXNativeTarget "holokit-app-extension" */ = {
+		96D4A4CE2878C71D0063442D /* Build configuration list for PBXNativeTarget "test-star-tracking" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9699F6862575E2160011D823 /* Debug */,
-				9699F6872575E2160011D823 /* Release */,
+				96D4A4CF2878C71D0063442D /* Debug */,
+				96D4A4D02878C71D0063442D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

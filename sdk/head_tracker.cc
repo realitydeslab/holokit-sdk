@@ -57,7 +57,7 @@ void HeadTracker::GetPose(int64_t timestamp_ns,
         "Head Tracker not fully initialized yet. Using pose prediction only.");
     predicted_rotation = pose_prediction::PredictPose(timestamp_ns, pose_state);
   } else {
-    predicted_rotation = pose_state.sensor_from_start_rotation;
+    predicted_rotxation = pose_state.sensor_from_start_rotation;
   }
 
   // In order to update our pose as the sensor changes, we begin with the
