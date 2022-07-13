@@ -87,7 +87,7 @@ namespace HoloInteractive.HoloKit.Editor
                 AddXcodePlist(report.summary.outputPath);
                 AddXcodeCapabilities(report.summary.outputPath);
                 AddXcodeBuildSettings(report.summary.outputPath);
-                AddDynamicFramework(report.summary.outputPath);
+                //AddDynamicFramework(report.summary.outputPath);
             }
 
             static void AddXcodePlist(string path) 
@@ -181,7 +181,7 @@ namespace HoloInteractive.HoloKit.Editor
                 PBXCapabilityType nfcCapability = (PBXCapabilityType)constructor.Invoke(new object[] { "com.apple.NearFieldCommunicationTagReading", true, "", false });
                 project.AddCapability(target, nfcCapability, entitlementFileName);
 
-                projectCapabilityManager.AddSignInWithApple();
+                //projectCapabilityManager.AddSignInWithApple();
 
                 projectCapabilityManager.WriteToFile();
             }
@@ -193,7 +193,7 @@ namespace HoloInteractive.HoloKit.Editor
 
                 PlistElementDict dictionary = entitlementDoc.root;
                 PlistElementArray array = dictionary.CreateArray("com.apple.developer.nfc.readersession.formats");
-                array.values.Add(new PlistElementString("NDEF"));
+                //array.values.Add(new PlistElementString("NDEF"));
                 array.values.Add(new PlistElementString("TAG"));
 
                 return entitlementDoc;

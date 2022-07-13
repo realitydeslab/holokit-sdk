@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
 
 namespace HoloKit
 {
@@ -29,6 +31,36 @@ namespace HoloKit
 
     public class HoloKitHandTracker : MonoBehaviour
     {
+        public static HoloKitHandTracker Instance { get { return _instance; } }
+
+        private static HoloKitHandTracker _instance;
+
+        public bool Active
+        {
+            get => _active;
+            set
+            {
+                _active = value;
+                EnableAROcclusionManager(_active);
+                HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_active);
+            }
+        }
+
+        public bool Valid
+        {
+            get
+            {
+                if (_hand.activeSelf)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         [SerializeField] private bool _active;
 
         [SerializeField] private float _fadeOutDelay;
@@ -39,10 +71,22 @@ namespace HoloKit
 
         private float _lastUpdateTime;
 
+        public static event Action<bool> OnHandValidityChanged;
+
         private void Awake()
         {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                _instance = this;
+            }
+
             HoloKitHandTrackingControllerAPI.OnHandPoseUpdated += OnHandPoseUpdated;
             HoloKitHandTrackingControllerAPI.RegisterHandTrackingControllerDelegates();
+            EnableAROcclusionManager(_active);
             HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_active);
             SetupHandJointColors();
         }
@@ -100,6 +144,7 @@ namespace HoloKit
             if (!_hand.activeSelf)
             {
                 _hand.SetActive(true);
+                OnHandValidityChanged?.Invoke(true);
             }
             for (int i = 0; i < 21; i++)
             {
@@ -112,6 +157,26 @@ namespace HoloKit
             if (Time.time - _lastUpdateTime > _fadeOutDelay)
             {
                 _hand.SetActive(false);
+                OnHandValidityChanged?.Invoke(false);
+            }
+        }
+
+        public Vector3 GetHandJointPosition(HandJoint joint)
+        {
+            if (!_hand.activeSelf)
+            {
+                return Vector3.zero;
+            }
+
+            return _handJoints[(int)joint].position;
+        }
+
+        private void EnableAROcclusionManager(bool enabled)
+        {
+            var arOcclusionManager = FindObjectOfType<AROcclusionManager>(true);
+            if (arOcclusionManager != null)
+            {
+                arOcclusionManager.enabled = enabled;
             }
         }
     }

@@ -46,9 +46,20 @@ namespace HoloKit {
 
         public static string ARWorldMapName => s_arWorldMapName;
 
+        public static bool UnityARSessionIntercepted
+        {
+            get => s_unityARSessionIntercepted;
+            set
+            {
+                s_unityARSessionIntercepted = value;
+            }
+        }
+
         private static byte[] s_arWorldMapData;
 
         private static string s_arWorldMapName;
+
+        private static bool s_unityARSessionIntercepted;
 
         [DllImport("__Internal")]
         private static extern void HoloKitSDK_InterceptUnityARSessionDelegate(IntPtr ptr);
@@ -92,7 +103,7 @@ namespace HoloKit {
             Action<int> OnCameraChangedTrackingState,
             Action<int> OnARWorldMapStatusChanged,
             Action OnGotCurrentARWorldMap,
-            Action<string, float> OnCurrentARWorldMapSaved,
+            Action<string, int> OnCurrentARWorldMapSaved,
             Action<bool, string, IntPtr, int> OnGotARWorldMapFromDisk,
             Action OnARWorldMapLoaded,
             Action OnRelocalizationSucceeded);
@@ -121,20 +132,20 @@ namespace HoloKit {
             OnGotCurrentARWorldMap?.Invoke();
         }
 
-        [AOT.MonoPInvokeCallback(typeof(Action<string, float>))]
-        private static void OnCurrentARWorldMapSavedDelegate(string mapName, float mapSizeInMegabytes)
+        [AOT.MonoPInvokeCallback(typeof(Action<string, int>))]
+        private static void OnCurrentARWorldMapSavedDelegate(string mapName, int mapSize)
         {
-            OnCurrentARWorldMapSaved?.Invoke(mapName, mapSizeInMegabytes);
+            OnCurrentARWorldMapSaved?.Invoke(mapName, mapSize);
         }
 
         [AOT.MonoPInvokeCallback(typeof(Action<string, IntPtr, int>))]
-        private static void OnGotARWorldMapFromDiskDelegate(bool success, string mapName, IntPtr mapPtr, int mapSizeInBytes)
+        private static void OnGotARWorldMapFromDiskDelegate(bool success, string mapName, IntPtr mapPtr, int mapSize)
         {
             if (success)
             {
                 s_arWorldMapName = mapName;
-                byte[] data = new byte[mapSizeInBytes];
-                Marshal.Copy(mapPtr, data, 0, mapSizeInBytes);
+                byte[] data = new byte[mapSize];
+                Marshal.Copy(mapPtr, data, 0, mapSize);
                 s_arWorldMapData = data;
             }
             OnGotARWorldMapFromDisk(success);
@@ -160,7 +171,7 @@ namespace HoloKit {
 
         public static event Action OnGotCurrentARWorldMap;
 
-        public static event Action<string, float> OnCurrentARWorldMapSaved;
+        public static event Action<string, int> OnCurrentARWorldMapSaved;
 
         public static event Action<bool> OnGotARWorldMapFromDisk;
 
@@ -184,6 +195,13 @@ namespace HoloKit {
 
         public static void InterceptUnityARSessionDelegate()
         {
+            if (s_unityARSessionIntercepted)
+            {
+                Debug.Log("[HoloKitARSessionControllerAPI] Unity ARSession already intercepted");
+                return;
+            }
+            s_unityARSessionIntercepted = true;
+            Debug.Log("[HoloKitARSessionControllerAPI] InterceptUnityARSessionDelegate");
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
             if (xrSessionSubsystem != null)
             {
