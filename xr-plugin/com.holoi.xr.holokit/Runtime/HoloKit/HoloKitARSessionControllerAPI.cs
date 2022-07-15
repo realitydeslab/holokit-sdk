@@ -133,19 +133,19 @@ namespace HoloKit {
         }
 
         [AOT.MonoPInvokeCallback(typeof(Action<string, int>))]
-        private static void OnCurrentARWorldMapSavedDelegate(string mapName, int mapSize)
+        private static void OnCurrentARWorldMapSavedDelegate(string mapName, int mapSizeInBytes)
         {
-            OnCurrentARWorldMapSaved?.Invoke(mapName, mapSize);
+            OnCurrentARWorldMapSaved?.Invoke(mapName, mapSizeInBytes);
         }
 
         [AOT.MonoPInvokeCallback(typeof(Action<string, IntPtr, int>))]
-        private static void OnGotARWorldMapFromDiskDelegate(bool success, string mapName, IntPtr mapPtr, int mapSize)
+        private static void OnGotARWorldMapFromDiskDelegate(bool success, string mapName, IntPtr mapPtr, int mapSizeInBytes)
         {
             if (success)
             {
                 s_arWorldMapName = mapName;
-                byte[] data = new byte[mapSize];
-                Marshal.Copy(mapPtr, data, 0, mapSize);
+                byte[] data = new byte[mapSizeInBytes];
+                Marshal.Copy(mapPtr, data, 0, mapSizeInBytes);
                 s_arWorldMapData = data;
             }
             OnGotARWorldMapFromDisk(success);
