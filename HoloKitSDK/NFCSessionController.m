@@ -100,62 +100,128 @@ void (*OnNFCSessionCompleted)(bool) = NULL;
         }
         id<NFCISO7816Tag> sTag = [tag asNFCISO7816Tag];
         if (sTag == nil) {
-            [session invalidateSessionWithErrorMessage:@"This tag is not compliant to ISO7816"];
-            return;
-        }
-        NSString *uid = [NFCSessionController stringWithDeviceToken:[sTag identifier]];
-        uid = [uid uppercaseString];
-        uid = [NSString stringWithFormat:@"%@%@", @"0x", uid];
-        NSLog(@"[nfc_session] tag uid %@", uid);
-        [sTag queryNDEFStatusWithCompletionHandler:^(NFCNDEFStatus status, NSUInteger capacity, NSError * _Nullable error) {
-            if (error != nil) {
-                [session invalidateSessionWithErrorMessage:@"Failed to query NDEF status of the tag"];
+            id<NFCMiFareTag> sTag2 = [tag asNFCMiFareTag];
+            if (sTag2 == nil) {
+                [session invalidateSessionWithErrorMessage:@"This tag is not compliant to ISO7816 or MiFare"];
                 return;
             }
-            switch (status) {
-                case NFCNDEFStatusNotSupported: {
-                    [session invalidateSessionWithErrorMessage:@"NDEF is not supported on this tag"];
-                    return;
-                }
-                case NFCNDEFStatusReadOnly: {
-                    [session invalidateSessionWithErrorMessage:@"This tag is read only"];
-                    return;
-                }
-                case NFCNDEFStatusReadWrite: {
-                    [sTag readNDEFWithCompletionHandler:^(NFCNDEFMessage * _Nullable message, NSError * _Nullable error) {
-                        if ([message.records count] < 1 || message.records[0].payload == nil) {
-                            [session invalidateSessionWithErrorMessage:@"There is no data in this tag"];
+            [self processMiFareTag:sTag2 session:session];
+        }
+        [self processISO7816Tag:sTag session:session];
+    }];
+}
+
+- (void)processISO7816Tag:(id<NFCISO7816Tag>)sTag session:(NFCTagReaderSession *)session{
+    NSString *uid = [NFCSessionController stringWithDeviceToken:[sTag identifier]];
+    uid = [uid uppercaseString];
+    uid = [NSString stringWithFormat:@"%@%@", @"0x", uid];
+    //NSLog(@"[nfc_session] tag uid %@", uid);
+    [sTag queryNDEFStatusWithCompletionHandler:^(NFCNDEFStatus status, NSUInteger capacity, NSError * _Nullable error) {
+        if (error != nil) {
+            [session invalidateSessionWithErrorMessage:@"Failed to query NDEF status of the tag"];
+            return;
+        }
+        switch (status) {
+            case NFCNDEFStatusNotSupported: {
+                [session invalidateSessionWithErrorMessage:@"NDEF is not supported on this tag"];
+                return;
+            }
+            case NFCNDEFStatusReadOnly: {
+                [session invalidateSessionWithErrorMessage:@"This tag is read only"];
+                return;
+            }
+            case NFCNDEFStatusReadWrite: {
+                [sTag readNDEFWithCompletionHandler:^(NFCNDEFMessage * _Nullable message, NSError * _Nullable error) {
+                    if (error != nil) {
+                        [session invalidateSessionWithErrorMessage:@"Failed to write data to the tag"];
+                        return;
+                    }
+                    if ([message.records count] < 1 || message.records[0].payload == nil) {
+                        [session invalidateSessionWithErrorMessage:@"There is no data in this tag"];
+                        return;
+                    }
+                    NSString *rawContent = [[NSString alloc] initWithData:message.records[0].payload encoding:NSUTF8StringEncoding];
+                    NSString *signature = [NFCSessionController getSignatureFromRawContent:rawContent];
+                    NSString *content = [NFCSessionController getContentFromRawContent:rawContent];
+                    if ([content isEqualToString:uid]) {
+                        if ([Crypto validateSignatureWithSignature:signature content:content]) {
+                            self.success = YES;
+                            [session setAlertMessage:@"NFC authentication succeeded"];
+                            [session invalidateSession];
                             return;
-                        }
-                        NSString *rawContent = [[NSString alloc] initWithData:message.records[0].payload encoding:NSUTF8StringEncoding];
-                        //NSLog(@"[nfc_session] raw content %@", rawContent);
-                        NSString *signature = [NFCSessionController getSignatureFromRawContent:rawContent];
-                        //NSLog(@"[nfc_session] signature %@", signature);
-                        NSString *content = [NFCSessionController getContentFromRawContent:rawContent];
-                        //NSLog(@"[nfc_session] content %@", content);
-                        if ([content isEqualToString:uid]) {
-                            if ([Crypto validateSignatureWithSignature:signature content:content]) {
-                                self.success = YES;
-                                [session setAlertMessage:@"NFC authentication succeeded"];
-                                [session invalidateSession];
-                                return;
-                            } else {
-                                [session invalidateSessionWithErrorMessage:@"NFC authentication failed"];
-                                return;
-                            }
                         } else {
                             [session invalidateSessionWithErrorMessage:@"NFC authentication failed"];
                             return;
                         }
-                    }];
-                    break;
-                }
-                default: {
-                    
-                    break;
-                }
+                    } else {
+                        [session invalidateSessionWithErrorMessage:@"NFC authentication failed"];
+                        return;
+                    }
+                }];
+                break;
             }
-        }];
+            default: {
+                [session invalidateSessionWithErrorMessage:@"Failed to write data to the tag"];
+                return;
+            }
+        }
+    }];
+}
+
+- (void)processMiFareTag:(id<NFCMiFareTag>)sTag session:(NFCTagReaderSession *)session{
+    NSString *uid = [NFCSessionController stringWithDeviceToken:[sTag identifier]];
+    uid = [uid uppercaseString];
+    uid = [NSString stringWithFormat:@"%@%@", @"0x", uid];
+    //NSLog(@"[nfc_session] tag uid %@", uid);
+    [sTag queryNDEFStatusWithCompletionHandler:^(NFCNDEFStatus status, NSUInteger capacity, NSError * _Nullable error) {
+        if (error != nil) {
+            [session invalidateSessionWithErrorMessage:@"Failed to query NDEF status of the tag"];
+            return;
+        }
+        switch (status) {
+            case NFCNDEFStatusNotSupported: {
+                [session invalidateSessionWithErrorMessage:@"NDEF is not supported on this tag"];
+                return;
+            }
+            case NFCNDEFStatusReadOnly: {
+                [session invalidateSessionWithErrorMessage:@"This tag is read only"];
+                return;
+            }
+            case NFCNDEFStatusReadWrite: {
+                [sTag readNDEFWithCompletionHandler:^(NFCNDEFMessage * _Nullable message, NSError * _Nullable error) {
+                    if (error != nil) {
+                        [session invalidateSessionWithErrorMessage:@"Failed to write data to the tag"];
+                        return;
+                    }
+                    if ([message.records count] < 1 || message.records[0].payload == nil) {
+                        [session invalidateSessionWithErrorMessage:@"There is no data in this tag"];
+                        return;
+                    }
+                    NSString *rawContent = [[NSString alloc] initWithData:message.records[0].payload encoding:NSUTF8StringEncoding];
+                    NSString *signature = [NFCSessionController getSignatureFromRawContent:rawContent];
+                    NSString *content = [NFCSessionController getContentFromRawContent:rawContent];
+                    if ([content isEqualToString:uid]) {
+                        if ([Crypto validateSignatureWithSignature:signature content:content]) {
+                            self.success = YES;
+                            [session setAlertMessage:@"NFC authentication succeeded"];
+                            [session invalidateSession];
+                            return;
+                        } else {
+                            [session invalidateSessionWithErrorMessage:@"NFC authentication failed"];
+                            return;
+                        }
+                    } else {
+                        [session invalidateSessionWithErrorMessage:@"NFC authentication failed"];
+                        return;
+                    }
+                }];
+                break;
+            }
+            default: {
+                [session invalidateSessionWithErrorMessage:@"Failed to write data to the tag"];
+                return;
+            }
+        }
     }];
 }
 
