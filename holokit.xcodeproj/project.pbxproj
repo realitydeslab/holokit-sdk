@@ -14,6 +14,8 @@
 		4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		4BB5587326205B7D00DC0213 /* NFCSessionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* NFCSessionController.m */; };
 		4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* Crypto.swift */; };
+		4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE74F4928853F6E0086FB89 /* HoloKitProfile.m */; };
+		4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */; };
 		96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C102C0279152B30052AF2B /* CryptoKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +64,9 @@
 		4BB5587226205B7D00DC0213 /* NFCSessionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NFCSessionController.m; sourceTree = "<group>"; };
 		4BC45B25262815CB00BA98E4 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
 		4BD9A6A0278AA53C000BD266 /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
+		4BE74F4928853F6E0086FB89 /* HoloKitProfile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HoloKitProfile.m; sourceTree = "<group>"; };
+		4BE74F4B28853F910086FB89 /* HoloKitProfile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HoloKitProfile.h; sourceTree = "<group>"; };
+		4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HoloKitOptics.mm; sourceTree = "<group>"; };
 		4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		961B8AFF253BBABF0025BA7D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		961B8B02253BBACC0025BA7D /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
@@ -129,6 +134,9 @@
 				4B188ACF26F432B4001FD67D /* HandTrackingController.mm */,
 				4BD9A6A0278AA53C000BD266 /* Crypto.swift */,
 				4B341B1E2859F0B7006AB99C /* Secrets.swift */,
+				4BE74F4B28853F910086FB89 /* HoloKitProfile.h */,
+				4BE74F4928853F6E0086FB89 /* HoloKitProfile.m */,
+				4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */,
 			);
 			path = HoloKitSDK;
 			sourceTree = "<group>";
@@ -248,8 +256,10 @@
 			files = (
 				4BB5587326205B7D00DC0213 /* NFCSessionController.m in Sources */,
 				4B341B1F2859F0B7006AB99C /* Secrets.swift in Sources */,
+				4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */,
 				4B6C9420261493E300CBDFB4 /* ARSessionController.m in Sources */,
 				4B188AD026F432B4001FD67D /* HandTrackingController.mm in Sources */,
+				4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */,
 				4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -198,11 +198,13 @@ void (*OnHandPoseUpdated)(float *) = NULL;
 @end
 
 extern "C" {
-    void HoloKitSDK_SetHandTrackingActive(bool active) {
-        [[HandTrackingController sharedInstance] setActive:active];
-    }
-    
-    void HoloKitSDK_RegisterHandTrackingControllerDelegates(void (*OnHandPoseUpdatedDelegate)(float *)) {
-        OnHandPoseUpdated = OnHandPoseUpdatedDelegate;
-    }
+
+void HoloKitSDK_SetHandTrackingActive(bool active) {
+    [[HandTrackingController sharedInstance] setActive:active];
+}
+
+void HoloKitSDK_RegisterHandTrackingControllerDelegates(void (*OnHandPoseUpdatedDelegate)(float *)) {
+    OnHandPoseUpdated = OnHandPoseUpdatedDelegate;
+}
+
 }

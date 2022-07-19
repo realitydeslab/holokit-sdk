@@ -13,10 +13,11 @@ namespace HoloKit
         public Matrix4x4 LeftProjectionMatrix;
         public Matrix4x4 RightProjectionMatrix;
         public Vector3 CameraToCenterEyeOffset;
+        public Vector3 CameraToScreenCenterOffset;
         public Vector3 CenterEyeToLeftEyeOffset;
         public Vector3 CenterEyeToRightEyeOffset;
         // The horizontal distance from the screen center in pixels
-        public float AlignmentMarkerOffset; 
+        public float AlignmentMarkerOffset;
     }
 
     public enum HoloKitRenderMode
@@ -93,6 +94,19 @@ namespace HoloKit
             HoloKitCameraData holokitCameraData = HoloKitOptics.GetHoloKitCameraData(
                 HoloKitProfile.GetHoloKitModel(HoloKitType.HoloKitX),
                 HoloKitProfile.GetPhoneModel(), _ipd, _farClipPlane);
+            HoloKitCameraData holokitCameraData2 = HoloKitOpticsAPI.GetHoloKitCameraData(HoloKitType.HoloKitX, _ipd, _farClipPlane);
+            Debug.Log($"LeftViewport: {holokitCameraData.LeftViewportRect} : {holokitCameraData2.LeftViewportRect}");
+            Debug.Log($"RightViewport: {holokitCameraData.RightViewportRect} : {holokitCameraData2.RightViewportRect}");
+            Debug.Log($"NearClipPlane: {holokitCameraData.NearClipPlane} : {holokitCameraData2.NearClipPlane}");
+            Debug.Log($"FarClipPlane: {holokitCameraData.FarClipPlane} : {holokitCameraData2.FarClipPlane}");
+            Debug.Log($"LeftProjectionMatrix: {holokitCameraData.LeftProjectionMatrix} : {holokitCameraData2.LeftProjectionMatrix}");
+            Debug.Log($"RightProjectionMatrix: {holokitCameraData.RightProjectionMatrix} : {holokitCameraData2.RightProjectionMatrix}");
+            Debug.Log($"CameraToCenterEyeOffset: {holokitCameraData.CameraToCenterEyeOffset} : {holokitCameraData2.CameraToCenterEyeOffset}");
+            Debug.Log($"CameraToScreenCenterOffset: {holokitCameraData.CameraToScreenCenterOffset} : {holokitCameraData2.CameraToScreenCenterOffset}");
+            Debug.Log($"CenterEyeToLeftEyeOffset: {holokitCameraData.CenterEyeToLeftEyeOffset} : {holokitCameraData2.CenterEyeToLeftEyeOffset}");
+            Debug.Log($"CenterEyeToRightEyeOffset: {holokitCameraData.CenterEyeToRightEyeOffset} : {holokitCameraData2.CenterEyeToRightEyeOffset}");
+            Debug.Log($"AlignmentMarkerOffset: {holokitCameraData.AlignmentMarkerOffset} : {holokitCameraData2.AlignmentMarkerOffset}");
+
             _centerEyePose.localPosition = holokitCameraData.CameraToCenterEyeOffset;
             _leftEyeCamera.transform.localPosition = holokitCameraData.CenterEyeToLeftEyeOffset;
             _rightEyeCamera.transform.localPosition = holokitCameraData.CenterEyeToRightEyeOffset;
