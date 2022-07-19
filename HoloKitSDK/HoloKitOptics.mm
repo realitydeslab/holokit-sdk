@@ -5,28 +5,8 @@
 //  Created by Yuchen Zhang on 2022/7/18.
 //
 
-#import "HoloKitProfile.h"
-#import <simd/simd.h>
+#import "HoloKitOptics.h"
 #import <UIKit/UIKit.h>
-
-typedef struct {
-    simd_float4 LeftViewportRect;
-    simd_float4 RightViewportRect;
-    float NearClipPlane;
-    float FarClipPlane;
-    simd_float4x4 LeftProjectionMatrix;
-    simd_float4x4 RightProjectionMatrix;
-    simd_float3 CameraToCenterEyeOffset;
-    simd_float3 CameraToScreenCenterOffset;
-    simd_float3 CenterEyeToLeftEyeOffset;
-    simd_float3 CenterEyeToRightEyeOffset;
-    // The horizontal distance from the screen center in pixels
-    float AlignmentMarkerOffset;
-} HoloKitCameraData;
-
-@interface HoloKitOptics : NSObject
-
-@end
 
 @implementation HoloKitOptics
 
@@ -91,12 +71,7 @@ typedef struct {
     return holokitCameraData;
 }
 
-@end
-
-extern "C" {
-
-float* HoloKitSDK_GetHoloKitCameraData(int holokitType, float ipd, float farClipPlane) {
-    HoloKitModel holokitModel = [HoloKitProfile getHoloKitModel:(HoloKitType)holokitType];
++ (float *)getHoloKitCameraDataPtr:(HoloKitModel)holokitModel ipd:(float)ipd farClipPlane:(float)farClipPlane {
     HoloKitCameraData holokitCameraData = [HoloKitOptics getHoloKitCameraData:holokitModel ipd:ipd farClipPlane:farClipPlane];
     float *result = new float[55];
     result[0] = holokitCameraData.LeftViewportRect.x;
@@ -150,4 +125,4 @@ float* HoloKitSDK_GetHoloKitCameraData(int holokitType, float ipd, float farClip
     return result;
 }
 
-}
+@end

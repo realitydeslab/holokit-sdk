@@ -1,7 +1,9 @@
 #import <CoreNFC/CoreNFC.h>
 #import "holokit_sdk-Swift.h"
+#import "HoloKitOptics.h"
+#import "HoloKitProfile.h"
 
-void (*OnNFCSessionCompleted)(bool) = NULL;
+void (*OnNFCSessionCompleted)(bool, float *) = NULL;
 
 @interface NFCSessionController : NSObject
 
@@ -11,7 +13,9 @@ void (*OnNFCSessionCompleted)(bool) = NULL;
 
 @property (nonatomic, strong) NFCTagReaderSession* readerSession;
 @property (assign) BOOL success;
-@property (assign) BOOL enabled;
+@property (assign) int holokitType;
+@property (assign) float ipd;
+@property (assign) float farClipPlane;
 
 @end
 
@@ -20,7 +24,7 @@ void (*OnNFCSessionCompleted)(bool) = NULL;
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.enabled = true;
+
     }
     return self;
 }
@@ -35,19 +39,10 @@ void (*OnNFCSessionCompleted)(bool) = NULL;
 }
 
 - (void)startReaderSessionWithAlertMessage:(NSString *)alertMessage {
-    if (self.enabled) {
-        self.success = NO;
-        self.readerSession = [[NFCTagReaderSession alloc] initWithPollingOption:NFCPollingISO14443 delegate:self queue:nil];
-        self.readerSession.alertMessage = alertMessage;
-        [self.readerSession beginSession];
-    }
-    else {
-        if (OnNFCSessionCompleted != NULL) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                OnNFCSessionCompleted(YES);
-            });
-        }
-    }
+    self.success = NO;
+    self.readerSession = [[NFCTagReaderSession alloc] initWithPollingOption:NFCPollingISO14443 delegate:self queue:nil];
+    self.readerSession.alertMessage = alertMessage;
+    [self.readerSession beginSession];
 }
 
 // https://stackoverflow.com/questions/9372815/how-can-i-convert-my-device-token-nsdata-into-an-nsstring
@@ -82,7 +77,13 @@ void (*OnNFCSessionCompleted)(bool) = NULL;
 - (void)tagReaderSession:(NFCTagReaderSession *)session didInvalidateWithError:(NSError *)error {
     if (OnNFCSessionCompleted != NULL) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            OnNFCSessionCompleted(self.success);
+            if (self.success) {
+                HoloKitModel holokitModel = [HoloKitProfile getHoloKitModel:(HoloKitType)self.holokitType];
+                float *cameraDataPtr = [HoloKitOptics getHoloKitCameraDataPtr:holokitModel ipd:self.ipd farClipPlane:self.farClipPlane];
+                OnNFCSessionCompleted(self.success, cameraDataPtr);
+            } else {
+                OnNFCSessionCompleted(self.success, nil);
+            }
         });
     }
 }
@@ -227,18 +228,18 @@ void (*OnNFCSessionCompleted)(bool) = NULL;
 
 @end
 
-void HoloKitSDK_EnableNFCSession(bool value) {
-    [[NFCSessionController sharedInstance] setEnabled:value];
-}
-
-void HoloKitSDK_StartNFCSession(const char *alertMessage) {
+void HoloKitSDK_StartNFCSession(const char *alertMessage, int holokitType, float ipd, float farClipPlane) {
+    NFCSessionController *controller = [NFCSessionController sharedInstance];
+    controller.holokitType = holokitType;
+    controller.ipd = ipd;
+    controller.farClipPlane = farClipPlane;
     if (alertMessage == NULL) {
-        [[NFCSessionController sharedInstance] startReaderSessionWithAlertMessage:nil];
+        [controller startReaderSessionWithAlertMessage:nil];
     } else {
-        [[NFCSessionController sharedInstance] startReaderSessionWithAlertMessage:[NSString stringWithUTF8String:alertMessage]];
+        [controller startReaderSessionWithAlertMessage:[NSString stringWithUTF8String:alertMessage]];
     }
 }
 
-void HoloKitSDK_RegisterNFCSessionControllerDelegates(void (*OnNFCSessionCompletedDelegate)(bool)) {
+void HoloKitSDK_RegisterNFCSessionControllerDelegates(void (*OnNFCSessionCompletedDelegate)(bool, float *)) {
     OnNFCSessionCompleted = OnNFCSessionCompletedDelegate;
 }

@@ -35,6 +35,7 @@
 /* Begin PBXFileReference section */
 		4B04D8A9260CCCA20055020F /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B06977225ECADA3009D51BD /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = System/Library/Frameworks/Vision.framework; sourceTree = SDKROOT; };
+		4B137E6B2886A37A00E10B38 /* HoloKitOptics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HoloKitOptics.h; sourceTree = "<group>"; };
 		4B188ACF26F432B4001FD67D /* HandTrackingController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HandTrackingController.mm; sourceTree = "<group>"; };
 		4B341B092859DEB0006AB99C /* IUnityInterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityInterface.h; sourceTree = "<group>"; };
 		4B341B0B2859DEB0006AB99C /* IUnityXRDisplayShadingRateExt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityXRDisplayShadingRateExt.h; sourceTree = "<group>"; };
@@ -136,6 +137,7 @@
 				4B341B1E2859F0B7006AB99C /* Secrets.swift */,
 				4BE74F4B28853F910086FB89 /* HoloKitProfile.h */,
 				4BE74F4928853F6E0086FB89 /* HoloKitProfile.m */,
+				4B137E6B2886A37A00E10B38 /* HoloKitOptics.h */,
 				4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */,
 			);
 			path = HoloKitSDK;

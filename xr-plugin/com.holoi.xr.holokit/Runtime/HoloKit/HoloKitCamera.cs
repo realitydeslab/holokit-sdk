@@ -50,8 +50,6 @@ namespace HoloKit
 
         [SerializeField] private float _farClipPlane = 50f;
 
-        [SerializeField] private HoloKitRenderMode _renderMode;
-
         public HoloKitRenderMode RenderMode
         {
             get => _renderMode;
@@ -60,19 +58,18 @@ namespace HoloKit
                 if (_renderMode != value)
                 {
                     _renderMode = value;
-                    ChangeRenderMode();
-                    OnRenderModeChanged?.Invoke();
+                    OnRenderModeChanged();
                 }
             }
         }
 
         public float AlignmentMarkerOffset => _alignmentMarkerOffset;
 
+        private HoloKitRenderMode _renderMode = HoloKitRenderMode.Mono;
+
         private float _alignmentMarkerOffset;
 
         private ARCameraBackground _arCameraBackground;
-
-        public static event Action OnRenderModeChanged;
 
         private void Awake()
         {
@@ -84,29 +81,12 @@ namespace HoloKit
             {
                 _instance = this;
             }
-            SetupHoloKitCameraData();
             _arCameraBackground = GetComponent<ARCameraBackground>();
-            ChangeRenderMode();
+            RenderMode = HoloKitRenderMode.Mono;
         }
 
-        private void SetupHoloKitCameraData()
+        public void SetupHoloKitCameraData(HoloKitCameraData holokitCameraData)
         {
-            HoloKitCameraData holokitCameraData = HoloKitOptics.GetHoloKitCameraData(
-                HoloKitProfile.GetHoloKitModel(HoloKitType.HoloKitX),
-                HoloKitProfile.GetPhoneModel(), _ipd, _farClipPlane);
-            HoloKitCameraData holokitCameraData2 = HoloKitOpticsAPI.GetHoloKitCameraData(HoloKitType.HoloKitX, _ipd, _farClipPlane);
-            Debug.Log($"LeftViewport: {holokitCameraData.LeftViewportRect} : {holokitCameraData2.LeftViewportRect}");
-            Debug.Log($"RightViewport: {holokitCameraData.RightViewportRect} : {holokitCameraData2.RightViewportRect}");
-            Debug.Log($"NearClipPlane: {holokitCameraData.NearClipPlane} : {holokitCameraData2.NearClipPlane}");
-            Debug.Log($"FarClipPlane: {holokitCameraData.FarClipPlane} : {holokitCameraData2.FarClipPlane}");
-            Debug.Log($"LeftProjectionMatrix: {holokitCameraData.LeftProjectionMatrix} : {holokitCameraData2.LeftProjectionMatrix}");
-            Debug.Log($"RightProjectionMatrix: {holokitCameraData.RightProjectionMatrix} : {holokitCameraData2.RightProjectionMatrix}");
-            Debug.Log($"CameraToCenterEyeOffset: {holokitCameraData.CameraToCenterEyeOffset} : {holokitCameraData2.CameraToCenterEyeOffset}");
-            Debug.Log($"CameraToScreenCenterOffset: {holokitCameraData.CameraToScreenCenterOffset} : {holokitCameraData2.CameraToScreenCenterOffset}");
-            Debug.Log($"CenterEyeToLeftEyeOffset: {holokitCameraData.CenterEyeToLeftEyeOffset} : {holokitCameraData2.CenterEyeToLeftEyeOffset}");
-            Debug.Log($"CenterEyeToRightEyeOffset: {holokitCameraData.CenterEyeToRightEyeOffset} : {holokitCameraData2.CenterEyeToRightEyeOffset}");
-            Debug.Log($"AlignmentMarkerOffset: {holokitCameraData.AlignmentMarkerOffset} : {holokitCameraData2.AlignmentMarkerOffset}");
-
             _centerEyePose.localPosition = holokitCameraData.CameraToCenterEyeOffset;
             _leftEyeCamera.transform.localPosition = holokitCameraData.CenterEyeToLeftEyeOffset;
             _rightEyeCamera.transform.localPosition = holokitCameraData.CenterEyeToRightEyeOffset;
@@ -125,7 +105,7 @@ namespace HoloKit
             _alignmentMarkerOffset = holokitCameraData.AlignmentMarkerOffset;
         }
 
-        private void ChangeRenderMode()
+        private void OnRenderModeChanged()
         {
             if (_renderMode == HoloKitRenderMode.Stereo)
             {
