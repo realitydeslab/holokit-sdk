@@ -1,6 +1,5 @@
 using UnityEngine;
 using TMPro;
-using HoloKit;
 
 namespace HoloKit.Samples.StereoscopicRendering
 {

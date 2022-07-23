@@ -172,11 +172,8 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 8886067853043016057, guid: e9b83ea6f8cc948a2acfc7e79b955ac8, type: 2}
-  - {fileID: 11400000, guid: 9b7eb16928b2240c0bbbb8691fd167ea, type: 2}
   - {fileID: 0}
-  - {fileID: 4800000, guid: e7c77f6eaab324a819efdc13b8125a39, type: 3}
-  - {fileID: 4800000, guid: 6743a50a812740be8c0aa3fccc46fae9, type: 3}
+  - {fileID: 0}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -586,7 +583,7 @@ PlayerSettings:
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: Need camera
+  cameraUsageDescription: For AR
   locationUsageDescription: 
   microphoneUsageDescription: 
   bluetoothUsageDescription: 

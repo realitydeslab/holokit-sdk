@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2017903587197792492}
   - component: {fileID: 1804403616280314360}
   m_Layer: 0
-  m_Name: LiteHandTrackingManager
+  m_Name: Lite Hand Tracking Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

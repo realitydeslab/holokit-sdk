@@ -1260,6 +1260,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _active: 1
+  _visible: 1
   _fadeOutDelay: 1.2
   _hand: {fileID: 3231388504386293999}
   _handJoints:

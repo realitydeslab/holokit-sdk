@@ -22,8 +22,8 @@ namespace HoloKit
 
     public enum HoloKitRenderMode
     {
-        Stereo = 0,
-        Mono = 1
+        Mono = 0,
+        Stereo = 1
     }
 
     public class HoloKitCamera : MonoBehaviour

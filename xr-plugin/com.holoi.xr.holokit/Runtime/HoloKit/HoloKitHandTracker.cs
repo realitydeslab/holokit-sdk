@@ -46,6 +46,16 @@ namespace HoloKit
             }
         }
 
+        public bool Visible
+        {
+            get => _visible;
+            set
+            {
+                _visible = value;
+                SetHandJointsVisible(value);
+            }
+        }
+
         public bool Valid
         {
             get
@@ -63,7 +73,9 @@ namespace HoloKit
 
         [SerializeField] private bool _active;
 
-        [SerializeField] private float _fadeOutDelay;
+        [SerializeField] private bool _visible;
+
+        [SerializeField] private float _fadeOutDelay = 1.2f;
 
         [SerializeField] private GameObject _hand;
 
@@ -89,6 +101,7 @@ namespace HoloKit
             EnableAROcclusionManager(_active);
             HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_active);
             SetupHandJointColors();
+            SetHandJointsVisible(_visible);
         }
 
         private void OnDestroy()
@@ -135,6 +148,14 @@ namespace HoloKit
                         _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.blue;
                         break;
                 }
+            }
+        }
+
+        private void SetHandJointsVisible(bool visible)
+        {
+            for (int i = 0; i < 21; i++)
+            {
+                _handJoints[i].GetComponent<MeshRenderer>().enabled = visible;
             }
         }
 
