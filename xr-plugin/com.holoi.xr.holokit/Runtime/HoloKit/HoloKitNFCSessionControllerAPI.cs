@@ -7,9 +7,6 @@ namespace HoloKit
     public static class HoloKitNFCSessionControllerAPI
     {
         [DllImport("__Internal")]
-        private static extern void HoloKitSDK_EnableNFCSession(bool value);
-
-        [DllImport("__Internal")]
         private static extern void HoloKitSDK_StartNFCSession(string alertMessage, int holoKitType, float ipd, float farClipPlane);
 
         [DllImport("__Internal")]
@@ -24,7 +21,6 @@ namespace HoloKit
                 if (HoloKitCamera.Instance != null)
                 {
                     HoloKitCamera.Instance.SetupHoloKitCameraData(cameraData);
-                    HoloKitCamera.Instance.RenderMode = HoloKitRenderMode.Stereo;
                 }
             }
             OnNFCSessionCompleted?.Invoke(success);
@@ -32,13 +28,9 @@ namespace HoloKit
 
         public static event Action<bool> OnNFCSessionCompleted;
 
-        public static void EnableNFCSession(bool value)
+        public static void StartNFCSession(HoloKitType holoKitType, float ipd, float farClipPlane)
         {
-            HoloKitSDK_EnableNFCSession(value);
-        }
-
-        public static void StartNFCSession(string alertMessage, HoloKitType holoKitType, float ipd, float farClipPlane)
-        {
+            string alertMessage = "Please put your iPhone onto the HoloKit";
             HoloKitSDK_StartNFCSession(alertMessage, (int)holoKitType, ipd, farClipPlane);
         }
 

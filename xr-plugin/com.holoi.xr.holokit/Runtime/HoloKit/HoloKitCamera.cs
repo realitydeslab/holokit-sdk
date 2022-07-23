@@ -57,8 +57,16 @@ namespace HoloKit
             {
                 if (_renderMode != value)
                 {
-                    _renderMode = value;
-                    OnRenderModeChanged();
+                    if (value == HoloKitRenderMode.Stereo)
+                    {
+                        HoloKitNFCSessionControllerAPI.StartNFCSession(HoloKitType.HoloKitX, _ipd, _farClipPlane);
+                    }
+                    else
+                    {
+                        _renderMode = HoloKitRenderMode.Mono;
+                        OnRenderModeChanged();
+                        OnHoloKitRenderModeChanged?.Invoke(HoloKitRenderMode.Mono);
+                    }
                 }
             }
         }
@@ -70,6 +78,8 @@ namespace HoloKit
         private float _alignmentMarkerOffset;
 
         private ARCameraBackground _arCameraBackground;
+
+        public static event Action<HoloKitRenderMode> OnHoloKitRenderModeChanged;
 
         private void Awake()
         {
@@ -83,6 +93,13 @@ namespace HoloKit
             }
             _arCameraBackground = GetComponent<ARCameraBackground>();
             RenderMode = HoloKitRenderMode.Mono;
+            OnRenderModeChanged();
+            HoloKitNFCSessionControllerAPI.OnNFCSessionCompleted += OnNFCSessionCompleted;
+        }
+
+        private void OnDestroy()
+        {
+            HoloKitNFCSessionControllerAPI.OnNFCSessionCompleted -= OnNFCSessionCompleted;
         }
 
         public void SetupHoloKitCameraData(HoloKitCameraData holokitCameraData)
@@ -122,6 +139,16 @@ namespace HoloKit
                 _leftEyeCamera.gameObject.SetActive(false);
                 _rightEyeCamera.gameObject.SetActive(false);
                 _blackCamera.gameObject.SetActive(false);
+            }
+        }
+
+        private void OnNFCSessionCompleted(bool success)
+        {
+            if (success)
+            {
+                _renderMode = HoloKitRenderMode.Stereo;
+                OnRenderModeChanged();
+                OnHoloKitRenderModeChanged?.Invoke(HoloKitRenderMode.Stereo);
             }
         }
     }
