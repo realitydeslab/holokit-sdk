@@ -201,7 +201,6 @@ namespace HoloKit {
                 return;
             }
             s_unityARSessionIntercepted = true;
-            Debug.Log("[HoloKitARSessionControllerAPI] InterceptUnityARSessionDelegate");
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
             if (xrSessionSubsystem != null)
             {
@@ -269,7 +268,9 @@ namespace HoloKit {
 
         public static void RegisterARSessionControllerDelegates()
         {
-            HoloKitSDK_RegisterARSessionControllerDelegates(
+            if (HoloKitHelper.IsRuntime)
+            {
+                HoloKitSDK_RegisterARSessionControllerDelegates(
                 OnThermalStateChangedDelegate,
                 OnCameraChangedTrackingStateDelegate,
                 OnARWorldMapStatusChangedDelegate,
@@ -278,6 +279,7 @@ namespace HoloKit {
                 OnGotARWorldMapFromDiskDelegate,
                 OnARWorldMapLoadedDelegate,
                 OnRelocalizationSucceededDelegate);
+            }
         }
 
         public static List<ARWorldMapDescription> GetARWorldMapListFromDisk()

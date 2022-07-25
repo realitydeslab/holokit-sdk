@@ -36,7 +36,10 @@ namespace HoloKit
 
         public static void RegisterNFCSessionControllerDelegates()
         {
-            HoloKitSDK_RegisterNFCSessionControllerDelegates(OnNFCSessionCompletedDelegate);
+            if (HoloKitHelper.IsRuntime)
+            {
+                HoloKitSDK_RegisterNFCSessionControllerDelegates(OnNFCSessionCompletedDelegate);
+            }
         }
 
         private static HoloKitCameraData ParseHoloKitCameraData(IntPtr cameraDataPtr)

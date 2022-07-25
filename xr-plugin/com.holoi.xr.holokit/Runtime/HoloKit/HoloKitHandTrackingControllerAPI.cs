@@ -24,12 +24,18 @@ namespace HoloKit
 
         public static void SetHandTrackingActive(bool active)
         {
-            HoloKitSDK_SetHandTrackingActive(active);
+            if (HoloKitHelper.IsRuntime)
+            {
+                HoloKitSDK_SetHandTrackingActive(active);
+            }
         }
 
         public static void RegisterHandTrackingControllerDelegates()
         {
-            HoloKitSDK_RegisterHandTrackingControllerDelegates(OnHandPoseUpdatedDelegate);
+            if (HoloKitHelper.IsRuntime)
+            {
+                HoloKitSDK_RegisterHandTrackingControllerDelegates(OnHandPoseUpdatedDelegate);
+            }
         }
     }
 }
