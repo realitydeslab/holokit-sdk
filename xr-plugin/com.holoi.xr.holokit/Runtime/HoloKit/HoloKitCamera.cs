@@ -26,13 +26,18 @@ namespace HoloKit
         Stereo = 1
     }
 
+    public enum VideoEnhancementMode
+    {
+        None = 0,      // Default HD
+        HighRes = 1,   // 4K
+        HighResWithHDR // 4K with HDR
+    }
+
     public class HoloKitCamera : MonoBehaviour
     {
         public static HoloKitCamera Instance { get { return _instance; } }
 
         private static HoloKitCamera _instance;
-
-        public Transform CenterEyePose => _centerEyePose;
 
         [SerializeField] private Transform _centerEyePose;
 
@@ -49,6 +54,10 @@ namespace HoloKit
         private float _ipd = 0.064f;
 
         [SerializeField] private float _farClipPlane = 50f;
+
+        [SerializeField] private VideoEnhancementMode _videoEnhancementMode = VideoEnhancementMode.None;
+
+        public Transform CenterEyePose => _centerEyePose;
 
         public HoloKitRenderMode RenderMode
         {
@@ -68,6 +77,15 @@ namespace HoloKit
                         OnHoloKitRenderModeChanged?.Invoke(HoloKitRenderMode.Mono);
                     }
                 }
+            }
+        }
+
+        public VideoEnhancementMode VideoEnhancementMode
+        {
+            get => _videoEnhancementMode;
+            set
+            {
+                _videoEnhancementMode = value;
             }
         }
 
@@ -94,6 +112,7 @@ namespace HoloKit
             _arCameraBackground = GetComponent<ARCameraBackground>();
             RenderMode = HoloKitRenderMode.Mono;
             OnRenderModeChanged();
+            HoloKitARSessionControllerAPI.SetVideoEnhancementMode(_videoEnhancementMode);
             HoloKitNFCSessionControllerAPI.OnNFCSessionCompleted += OnNFCSessionCompleted;
         }
 

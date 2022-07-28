@@ -11,6 +11,12 @@ void (*OnGotARWorldMapFromDisk)(bool, const char *, unsigned char *, int) = NULL
 void (*OnARWorldMapLoaded)(void) = NULL;
 void (*OnRelocalizationSucceeded)(void) = NULL;
 
+typedef enum {
+    VideoEnhancementModeNone = 0,
+    VideoEnhancementModeHighRes = 1,
+    VideoEnhancementModeHighResWithHDR = 2
+} VideoEnhancementMode;
+
 @interface ARSessionController : NSObject
 
 @end
@@ -24,6 +30,8 @@ void (*OnRelocalizationSucceeded)(void) = NULL;
 @property (assign) ARWorldMappingStatus currentARWorldMappingStatus;
 @property (assign) BOOL sessionShouldAttemptRelocalization;
 @property (assign) BOOL isRelocalizing;
+@property (assign) BOOL notFirstFrame;
+@property (assign) VideoEnhancementMode videoEnhancementMode;
 
 @end
 
@@ -34,8 +42,9 @@ void (*OnRelocalizationSucceeded)(void) = NULL;
     if (self = [super init]) {
         self.scaningEnvironment = NO;
         self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
-        self.sessionShouldAttemptRelocalization = false;
-        self.isRelocalizing = false;
+        self.sessionShouldAttemptRelocalization = NO;
+        self.isRelocalizing = NO;
+        self.notFirstFrame = NO;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(OnThermalStateChanged) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -195,6 +204,36 @@ void (*OnRelocalizationSucceeded)(void) = NULL;
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
     if (self.unityARSessionDelegate != NULL) {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
+    }
+    
+    if (!self.notFirstFrame) {
+        self.notFirstFrame = YES;
+        
+        ARWorldTrackingConfiguration *config = (ARWorldTrackingConfiguration *)self.session.configuration;
+        // Video enhancement
+        if (@available(iOS 16, *)) {
+            if (self.videoEnhancementMode != VideoEnhancementModeNone) {
+                if (ARWorldTrackingConfiguration.recommendedVideoFormatFor4KResolution != nil) {
+                    config.videoFormat = ARWorldTrackingConfiguration.recommendedVideoFormatFor4KResolution;
+                    //NSLog(@"4K enabled");
+                    if (self.videoEnhancementMode == VideoEnhancementModeHighResWithHDR) {
+                        if (config.videoFormat.isVideoHDRSupported) {
+                            config.videoHDRAllowed = true;
+                            //NSLog(@"HDR enabled");
+                        } else {
+                            NSLog(@"HDR is not supported on this device");
+                        }
+                    }
+                } else {
+                    NSLog(@"4K video is not supported on this device");
+                }
+            }
+        } else {
+            NSLog(@"Only iOS 16 supports video enhancement");
+        }
+        // TODO: Initial world map
+        
+        [self.session runWithConfiguration:config];
     }
     
     // ARWorldMap status
@@ -400,6 +439,10 @@ void HoloKitSDK_LoadARWorldMapWithData(unsigned char *mapData, int dataSizeInByt
 
 void HoloKitSDK_RelocalizeToLoadedARWorldMap(void) {
     [[ARSessionController sharedInstance] relocalizeToLoadedARWorldMap];
+}
+
+void HoloKitSDK_SetVideoEnhancementMode(int mode) {
+    [[ARSessionController sharedInstance] setVideoEnhancementMode:(VideoEnhancementMode)mode];
 }
 
 void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChangedDelegate)(int),

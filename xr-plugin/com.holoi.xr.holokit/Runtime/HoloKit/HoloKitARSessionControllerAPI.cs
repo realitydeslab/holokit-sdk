@@ -98,6 +98,9 @@ namespace HoloKit {
         private static extern void HoloKitSDK_RelocalizeToLoadedARWorldMap();
 
         [DllImport("__Internal")]
+        private static extern void HoloKitSDK_SetVideoEnhancementMode(int mode);
+
+        [DllImport("__Internal")]
         private static extern void HoloKitSDK_RegisterARSessionControllerDelegates(
             Action<int> OnThermalStateChanged,
             Action<int> OnCameraChangedTrackingState,
@@ -264,6 +267,14 @@ namespace HoloKit {
         {
             OnRelocalizationStarted?.Invoke();
             HoloKitSDK_RelocalizeToLoadedARWorldMap();
+        }
+
+        public static void SetVideoEnhancementMode(VideoEnhancementMode mode)
+        {
+            if (HoloKitHelper.IsRuntime)
+            {
+                HoloKitSDK_SetVideoEnhancementMode((int)mode);
+            }
         }
 
         public static void RegisterARSessionControllerDelegates()

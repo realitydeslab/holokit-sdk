@@ -5,10 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Samples/StereoRendering/Scenes/StereoRendering.unity
     guid: 856285e806b4b42aab4b0e0063fec70e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/HandTracking/Scenes/HandTracking.unity
     guid: 4b9b3bdbd919042c78320117b59ed678
   m_configObjects:

@@ -726,6 +726,10 @@ PrefabInstance:
       propertyPath: _renderMode
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5626992625800642041, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
+      propertyPath: _videoEnhancementMode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5626992625800642044, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
       propertyPath: m_LightEstimation
       value: 0
