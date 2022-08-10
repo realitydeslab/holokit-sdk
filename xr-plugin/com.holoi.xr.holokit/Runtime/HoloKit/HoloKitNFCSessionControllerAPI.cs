@@ -10,6 +10,9 @@ namespace HoloKit
         private static extern void HoloKitSDK_StartNFCSession(string alertMessage, int holoKitType, float ipd, float farClipPlane);
 
         [DllImport("__Internal")]
+        private static extern void HoloKitSDK_SkipNFCSessionWithPassword(string password, int holoKitType, float ipd, float farClipPlane);
+
+        [DllImport("__Internal")]
         private static extern void HoloKitSDK_RegisterNFCSessionControllerDelegates(Action<bool, IntPtr> OnNFCSessionCompleted);
 
         [AOT.MonoPInvokeCallback(typeof(Action<bool>))]
@@ -32,6 +35,11 @@ namespace HoloKit
         {
             string alertMessage = "Please put your iPhone onto the HoloKit";
             HoloKitSDK_StartNFCSession(alertMessage, (int)holoKitType, ipd, farClipPlane);
+        }
+
+        public static void SkipNFCSessionWithPassword(string password, HoloKitType holoKitType, float ipd, float farClipPlane)
+        {
+            HoloKitSDK_SkipNFCSessionWithPassword(password, (int)holoKitType, ipd, farClipPlane);
         }
 
         public static void RegisterNFCSessionControllerDelegates()

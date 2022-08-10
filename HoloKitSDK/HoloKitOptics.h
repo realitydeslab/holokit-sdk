@@ -26,6 +26,6 @@ typedef struct {
 
 @interface HoloKitOptics : NSObject
 
-+ (float *)getHoloKitCameraDataPtr:(HoloKitModel)holokitModel ipd:(float)ipd farClipPlane:(float)farClipPlane;
++ (HoloKitCameraData)getHoloKitCameraData:(HoloKitModel)holokitModel ipd:(float)ipd farClipPlane:(float)farClipPlane;
 
 @end

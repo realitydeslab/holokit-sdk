@@ -158,6 +158,7 @@ namespace HoloKit
                 _leftEyeCamera.gameObject.SetActive(false);
                 _rightEyeCamera.gameObject.SetActive(false);
                 _blackCamera.gameObject.SetActive(false);
+                _centerEyePose.localPosition = Vector3.zero;
             }
         }
 
@@ -169,6 +170,11 @@ namespace HoloKit
                 OnRenderModeChanged();
                 OnHoloKitRenderModeChanged?.Invoke(HoloKitRenderMode.Stereo);
             }
+        }
+
+        public void OpenStereoWithoutNFC(string password)
+        {
+            HoloKitNFCSessionControllerAPI.SkipNFCSessionWithPassword(password, HoloKitType.HoloKitX, _ipd, _farClipPlane);
         }
     }
 }

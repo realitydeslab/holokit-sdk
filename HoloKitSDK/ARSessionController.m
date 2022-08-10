@@ -45,6 +45,7 @@ typedef enum {
         self.sessionShouldAttemptRelocalization = NO;
         self.isRelocalizing = NO;
         self.notFirstFrame = NO;
+        self.videoEnhancementMode = VideoEnhancementModeNone;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(OnThermalStateChanged) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
