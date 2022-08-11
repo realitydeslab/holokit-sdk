@@ -25,8 +25,8 @@ namespace HoloKit.Samples.StereoscopicRendering
             }
             else
             {
-                //HoloKitCamera.Instance.RenderMode = HoloKitRenderMode.Stereo;
-                HoloKitCamera.Instance.OpenStereoWithoutNFC("SomethingForNothing");
+                HoloKitCamera.Instance.RenderMode = HoloKitRenderMode.Stereo;
+                //HoloKitCamera.Instance.OpenStereoWithoutNFC("SomethingForNothing");
             }
         }
 
