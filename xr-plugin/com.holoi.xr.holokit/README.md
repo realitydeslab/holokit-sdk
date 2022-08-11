@@ -21,7 +21,7 @@ HoloKit Unity SDK is compatible with ARFoundation, which helps experienced AR de
 
 ## Install HoloKit Unity SDK
 
-HoloKit Unity SDK is only compatible with Unity **2021.2.+**.
+HoloKit Unity SDK is only compatible with Unity **2021.3+**.
 
 1. In your Unity project, from the menu bar, navigate to **Window > Package Manager**.
 2. Click the plus sign in the **Package Manager** and **select Add package from git URL**.    
