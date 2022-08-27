@@ -116,3 +116,4 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+sdk/third_party/ceres-solver

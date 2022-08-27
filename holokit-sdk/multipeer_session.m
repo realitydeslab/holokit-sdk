@@ -24,9 +24,13 @@ DidReceiveHostLocalIpAddress DidReceiveHostLocalIpAddressDelegate = NULL;
 typedef void (*DidReceivePhotonRoomName)(const char *roomName);
 DidReceivePhotonRoomName DidReceivePhotonRoomNameDelegate = NULL;
 
+typedef void (*DidReceiveUTPRelayJoinCode)(const char *joinCode);
+DidReceiveUTPRelayJoinCode DidReceiveUTPRelayJoinCodeDelegate = NULL;
+
 typedef enum {
     NetcodeTransportPhoton = 0,
     NetcodeTransportWifi = 1,
+    NetcodeTransportUTPRelay = 2
 } NetcodeTransport;
 
 @interface MultipeerSession () <MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate>
@@ -39,6 +43,7 @@ typedef enum {
 @property (assign) NetcodeTransport netcodeTransport;
 @property (nonatomic, strong) NSString *hostLocalIpAddress;
 @property (nonatomic, strong) NSString *photonRoomName;
+@property (nonatomic, strong) NSString *utpRelayJoinCode;
 
 @end
 
@@ -164,6 +169,17 @@ typedef enum {
     free(data);
 }
 
+- (void)sendUTPRelayJoinCode2Peer:(MCPeerID *)peerID {
+    const char *str = [self.utpRelayJoinCode cStringUsingEncoding:NSUTF8StringEncoding];
+    unsigned char *data = malloc(2 + strlen(str));
+    data[0] = 2;
+    data[1] = strlen(str);
+    memcpy(data + 2, str, strlen(str));
+    NSData *dataReadyToBeSent = [NSData dataWithBytes:data length:(2 + strlen(str))];
+    [self sendToPeer:dataReadyToBeSent peer:peerID sendDataMode:MCSessionSendDataReliable];
+    free(data);
+}
+
 - (void)sendARWorldMap:(MCPeerID *)peerID {
     NSLog(@"[world map] send ARWorldMap to %@", peerID.displayName);
     ARWorldMap *worldMap = [[ARSessionDelegateController sharedInstance] worldMap];
@@ -217,6 +233,9 @@ typedef enum {
                     case NetcodeTransportPhoton:
                         [self sendPhotonRoomName2Peer:peerID];
                         break;
+                    case NetcodeTransportUTPRelay:
+                        [self sendUTPRelayJoinCode2Peer:peerID];
+                        break;
                 }
                 [self sendARWorldMap:peerID];
             } else {
@@ -258,6 +277,20 @@ typedef enum {
             if (DidReceiveHostLocalIpAddressDelegate) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     DidReceiveHostLocalIpAddressDelegate([hostLocalIpAddress UTF8String]);
+                });
+            }
+            break;
+        }
+        case 2: {
+            // UTP relay join code
+            int strlen = (int)decodedData[1];
+            char *str = malloc(strlen);
+            memcpy(str, decodedData + 2, strlen);
+            NSString *utpRelayJoinCode = [[NSString alloc] initWithBytes:str length:strlen encoding:NSUTF8StringEncoding];
+            free(str);
+            if (DidReceiveUTPRelayJoinCodeDelegate != NULL) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    DidReceiveUTPRelayJoinCodeDelegate([utpRelayJoinCode UTF8String]);
                 });
             }
             break;
@@ -380,6 +413,16 @@ UnityHoloKit_MPCSetHostLocalIpAddress(const char *ip) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_MPCSetDidReceiveHostLocalIpAddressDelegate(DidReceiveHostLocalIpAddress callback) {
     DidReceiveHostLocalIpAddressDelegate = callback;
+}
+
+void UnityHoloKit_MPCSetUTPRelayJoinCode(const char *joinCode) {
+    MultipeerSession *session = [MultipeerSession sharedInstance];
+    [session setUtpRelayJoinCode:[NSString stringWithUTF8String:joinCode]];
+    [session setNetcodeTransport:NetcodeTransportUTPRelay];
+}
+
+void UnityHoloKit_MPCSetDidReceiveUTPRelayJoinCodeDelegate(DidReceiveUTPRelayJoinCode callback) {
+    DidReceiveUTPRelayJoinCodeDelegate = callback;
 }
 
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
