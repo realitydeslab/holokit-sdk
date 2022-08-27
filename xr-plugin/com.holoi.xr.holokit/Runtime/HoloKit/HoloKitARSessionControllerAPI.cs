@@ -101,6 +101,9 @@ namespace HoloKit {
         private static extern void HoloKitSDK_SetVideoEnhancementMode(int mode);
 
         [DllImport("__Internal")]
+        private static extern void HoloKitSDK_ResetOrigin(float[] position, float[] rotation);
+
+        [DllImport("__Internal")]
         private static extern void HoloKitSDK_RegisterARSessionControllerDelegates(
             Action<int> OnThermalStateChanged,
             Action<int> OnCameraChangedTrackingState,
@@ -350,6 +353,13 @@ namespace HoloKit {
             {
                 Debug.Log($"[ARSessionController] ARWorldMap folder {folderPath} does not exist");
             }
+        }
+
+        public static void ResetOrigin(Vector3 position, Quaternion rotation)
+        {
+            float[] p = { position.x, position.y, position.z };
+            float[] r = { rotation.x, rotation.y, rotation.z, rotation.w };
+            HoloKitSDK_ResetOrigin(p, r);
         }
     }
 }

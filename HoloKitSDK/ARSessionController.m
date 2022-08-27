@@ -1,6 +1,7 @@
 #import <ARKit/ARKit.h>
 #import "UnityPluginApi/XR/UnityXRNativePtrs.h"
 #import "HandTrackingController.h"
+#import "Utils.h"
 
 void (*OnThermalStateChanged)(int) = NULL;
 void (*OnCameraChangedTrackingState)(int) = NULL;
@@ -24,7 +25,7 @@ typedef enum {
 @interface ARSessionController() <ARSessionDelegate>
 
 @property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
-@property (nonatomic, strong, nullable) ARSession* session;
+@property (nonatomic, strong, nullable) ARSession *arSession;
 @property (nonatomic, strong, nullable) ARWorldMap *worldMap;
 @property (assign) BOOL scaningEnvironment;
 @property (assign) ARWorldMappingStatus currentARWorldMappingStatus;
@@ -71,14 +72,14 @@ typedef enum {
 }
 
 - (void)pauseCurrentARSession {
-    if (self.session != nil) {
-        [self.session pause];
+    if (self.arSession != nil) {
+        [self.arSession pause];
     }
 }
 
 - (void)resumeCurrentARSession {
-    if (self.session != nil) {
-        [self.session runWithConfiguration:self.session.configuration];
+    if (self.arSession != nil) {
+        [self.arSession runWithConfiguration:self.arSession.configuration];
     }
 }
 
@@ -87,7 +88,7 @@ typedef enum {
         NSLog(@"[ARWorldMap] Current ARWorldMap is not available");
         return;
     }
-    [self.session getCurrentWorldMapWithCompletionHandler:^(ARWorldMap * _Nullable worldMap, NSError * _Nullable error) {
+    [self.arSession getCurrentWorldMapWithCompletionHandler:^(ARWorldMap * _Nullable worldMap, NSError * _Nullable error) {
         if (error != nil) {
             NSLog(@"[ARWorldMap] Failed to get current ARWorldMap");
             return;
@@ -190,13 +191,13 @@ typedef enum {
         NSLog(@"[ARSessionController] There is no ARWorldMap to relocalize");
         return;
     }
-    if (self.session == nil) {
+    if (self.arSession == nil) {
         NSLog(@"[ARSessionController] There is no ARSession available");
         return;
     }
-    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.session.configuration;
+    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.arSession.configuration;
     configuration.initialWorldMap = self.worldMap;
-    [self.session runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
+    [self.arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
     self.isRelocalizing = true;
 }
 
@@ -210,7 +211,7 @@ typedef enum {
     if (!self.notFirstFrame) {
         self.notFirstFrame = YES;
         
-        ARWorldTrackingConfiguration *config = (ARWorldTrackingConfiguration *)self.session.configuration;
+        ARWorldTrackingConfiguration *config = (ARWorldTrackingConfiguration *)self.arSession.configuration;
         // Video enhancement
         if (@available(iOS 16, *)) {
             if (self.videoEnhancementMode != VideoEnhancementModeNone) {
@@ -234,7 +235,7 @@ typedef enum {
         }
         // TODO: Initial world map
         
-        [self.session runWithConfiguration:config];
+        [self.arSession runWithConfiguration:config];
     }
     
     // ARWorldMap status
@@ -392,7 +393,7 @@ void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSe
     ARSession* sessionPtr = (__bridge ARSession*)nativeARSessionPtr->sessionPtr;
     ARSessionController* arSessionDelegateController = [ARSessionController sharedInstance];
     arSessionDelegateController.unityARSessionDelegate = sessionPtr.delegate;
-    [arSessionDelegateController setSession:sessionPtr];
+    [arSessionDelegateController setArSession:sessionPtr];
     [sessionPtr setDelegate:arSessionDelegateController];
 }
 
@@ -462,4 +463,9 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
     OnGotARWorldMapFromDisk = OnGotARWorldMapFromDiskDelegate;
     OnARWorldMapLoaded = OnARWorldMapLoadedDelegate;
     OnRelocalizationSucceeded = OnRelocalizationSucceededDelegate;
+}
+
+void HoloKitSDK_ResetOrigin(float position[3], float rotation[4]) {
+    simd_float4x4 transform_matrix = [Utils getSimdFloat4x4WithPosition:position rotation:rotation];
+    [[[ARSessionController sharedInstance] arSession] setWorldOrigin:transform_matrix];
 }

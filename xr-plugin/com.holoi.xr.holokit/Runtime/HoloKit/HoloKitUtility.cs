@@ -8,6 +8,8 @@ namespace HoloKit
     {
         [SerializeField] private string[] _arSceneNames;
 
+        [SerializeField] private bool _sessionShouldAttemptRelocalization = false;
+
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
@@ -15,6 +17,7 @@ namespace HoloKit
             HoloKitARSessionControllerAPI.RegisterARSessionControllerDelegates();
             HoloKitARSessionControllerAPI.InterceptUnityARSessionDelegate();
             SceneManager.sceneUnloaded += OnSceneUnloaded;
+            HoloKitARSessionControllerAPI.SetSessionShouldAttemptRelocalization(_sessionShouldAttemptRelocalization);
         }
 
         private void OnDestroy()
