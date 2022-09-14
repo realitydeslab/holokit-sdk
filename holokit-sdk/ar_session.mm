@@ -42,6 +42,8 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
 @property (assign) ARWorldMappingStatus currentARWorldMappingStatus;
 @property (assign) BOOL sessionShouldAttemptRelocalization;
 
+@property (assign) BOOL enable4k;
+
 @end
 
 @implementation ARSessionDelegateController
@@ -52,7 +54,9 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
         self.scanEnvironment = NO;
         self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
         
-        self.sessionShouldAttemptRelocalization = false;
+        self.sessionShouldAttemptRelocalization = NO;
+        
+        self.enable4k = NO;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(thermalStateDidChange) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -138,9 +142,35 @@ DidAddNativeAnchor DidAddNativeAnchorDelegate = NULL;
     
     ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.arSession.configuration;
     configuration.initialWorldMap = self.worldMap;
+    
+    if (@available(iOS 16, *)) {
+        if (self.enable4k) {
+            if (ARWorldTrackingConfiguration.recommendedVideoFormatFor4KResolution != nil) {
+                configuration.videoFormat = ARWorldTrackingConfiguration.recommendedVideoFormatFor4KResolution;
+                NSLog(@"4K enabled");
+                if (configuration.videoFormat.isVideoHDRSupported) {
+                    configuration.videoHDRAllowed = true;
+                    NSLog(@"HDR enabled");
+                } else {
+                    NSLog(@"HDR is not supported on this device");
+                }
+            } else {
+                NSLog(@"4K video is not supported on this device");
+            }
+        }
+    } else {
+        NSLog(@"Only iOS 16 supports video enhancement");
+    }
+
     [self.arSession runWithConfiguration:configuration options:ARSessionRunOptionResetTracking|ARSessionRunOptionRemoveExistingAnchors];
     //self.worldMap = nil;
     NSLog(@"[world_map] did load ARWorldMap");
+}
+
+- (void)cleanARWorldMap {
+    ARWorldTrackingConfiguration *configuration = (ARWorldTrackingConfiguration *)self.arSession.configuration;
+    configuration.initialWorldMap = nil;
+    [self.arSession runWithConfiguration:configuration];
 }
 
 - (void)setARCollaboration:(BOOL)value {
@@ -408,6 +438,14 @@ UnityHoloKit_RetrieveARWorldMap(const char *mapName) {
 void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
 UnityHoloKit_LoadARWorldMap() {
     [[ARSessionDelegateController sharedInstance] loadARWorldMap];
+}
+
+void UnityHoloKit_CleanARWorldMap() {
+    [[ARSessionDelegateController sharedInstance] cleanARWorldMap];
+}
+
+void UnityHoloKit_Enable4KHDR() {
+    [[ARSessionDelegateController sharedInstance] setEnable4k:YES];
 }
 
 } // extern "C"
