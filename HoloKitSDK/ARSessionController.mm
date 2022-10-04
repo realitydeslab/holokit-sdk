@@ -213,7 +213,6 @@ typedef enum {
         // https://stackoverflow.com/questions/1263072/changing-a-matrix-from-right-handed-to-left-handed-coordinate-system/71168853#71168853
         float *matrix = new float[16] { frame.camera.transform.columns[0].x, frame.camera.transform.columns[2].x, frame.camera.transform.columns[1].x, frame.camera.transform.columns[3].x,                                 frame.camera.transform.columns[0].z, frame.camera.transform.columns[2].z, frame.camera.transform.columns[1].z, frame.camera.transform.columns[3].z,                                 frame.camera.transform.columns[0].y, frame.camera.transform.columns[2].y, frame.camera.transform.columns[1].y, frame.camera.transform.columns[3].y,                                 frame.camera.transform.columns[0].w, frame.camera.transform.columns[1].w, frame.camera.transform.columns[2].w, frame.camera.transform.columns[3].w };
         dispatch_async(dispatch_get_main_queue(), ^{
-            // TODO
             OnARSessionUpdatedFrame(frame.timestamp, matrix);
             delete[](matrix);
         });
