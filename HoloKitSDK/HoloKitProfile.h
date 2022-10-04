@@ -73,7 +73,7 @@ typedef struct {
     float ScreenBottom;
     
     // The distance from the center of the display to the rendering center
-    float CenterLineOffset;
+    //float CenterLineOffset;
     
     // The 3D offset vector from center of the camera to the center of the display area's bottomline
     simd_float3 CameraOffset;

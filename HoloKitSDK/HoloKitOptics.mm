@@ -36,7 +36,7 @@
     rightProjectionMatrix.columns[2].x = -leftProjectionMatrix.columns[2].x;
     
     // 2. Calculate viewport rects
-    float centerX = 0.5 + phoneModel.CenterLineOffset / phoneModel.ScreenWidth;
+    float centerX = 0.5;
     float centerY = (holokitModel.AxisToBottom - phoneModel.ScreenBottom) / phoneModel.ScreenHeight;
     float fullWidth = viewportsFullWidthInMeters / phoneModel.ScreenWidth;
     float width = viewportWidthInMeters / phoneModel.ScreenWidth;

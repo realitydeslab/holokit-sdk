@@ -11,6 +11,7 @@ void (*OnCurrentARWorldMapSaved)(const char *, int) = NULL;
 void (*OnGotARWorldMapFromDisk)(bool, const char *, unsigned char *, int) = NULL;
 void (*OnARWorldMapLoaded)(void) = NULL;
 void (*OnRelocalizationSucceeded)(void) = NULL;
+void (*OnARSessionUpdatedFrame)(double, float *);
 
 typedef enum {
     VideoEnhancementModeNone = 0,
@@ -208,6 +209,16 @@ typedef enum {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
     
+    if (OnARSessionUpdatedFrame != NULL) {
+        // https://stackoverflow.com/questions/1263072/changing-a-matrix-from-right-handed-to-left-handed-coordinate-system/71168853#71168853
+        float *matrix = new float[16] { frame.camera.transform.columns[0].x, frame.camera.transform.columns[2].x, frame.camera.transform.columns[1].x, frame.camera.transform.columns[3].x,                                 frame.camera.transform.columns[0].z, frame.camera.transform.columns[2].z, frame.camera.transform.columns[1].z, frame.camera.transform.columns[3].z,                                 frame.camera.transform.columns[0].y, frame.camera.transform.columns[2].y, frame.camera.transform.columns[1].y, frame.camera.transform.columns[3].y,                                 frame.camera.transform.columns[0].w, frame.camera.transform.columns[1].w, frame.camera.transform.columns[2].w, frame.camera.transform.columns[3].w };
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // TODO
+            OnARSessionUpdatedFrame(frame.timestamp, matrix);
+            delete[](matrix);
+        });
+    }
+    
     if (!self.notFirstFrame) {
         self.notFirstFrame = YES;
         
@@ -385,6 +396,8 @@ typedef enum {
 
 @end
 
+extern "C" {
+
 void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSessionPtr) {
     if (nativeARSessionPtr == NULL) {
         NSLog(@"[HoloKitSDK] Native ARSession is NULL");
@@ -454,7 +467,8 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
                                                      void (*OnCurrentARWorldMapSavedDelegate)(const char *, int),
                                                      void (*OnGotARWorldMapFromDiskDelegate)(bool, const char *, unsigned char *, int),
                                                      void (*OnARWorldMapLoadedDelegate)(void),
-                                                     void (*OnRelocalizationSucceededDelegate)(void)) {
+                                                     void (*OnRelocalizationSucceededDelegate)(void),
+                                                     void (*OnARSessionUpdatedFrameDelegate)(double, float *)) {
     OnThermalStateChanged = OnThermalStateChangedDelegate;
     OnCameraChangedTrackingState = OnCameraChangedTrackingStateDelegate;
     OnARWorldMapStatusChanged = OnARWorldMapStatusChangedDelegate;
@@ -463,9 +477,16 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
     OnGotARWorldMapFromDisk = OnGotARWorldMapFromDiskDelegate;
     OnARWorldMapLoaded = OnARWorldMapLoadedDelegate;
     OnRelocalizationSucceeded = OnRelocalizationSucceededDelegate;
+    OnARSessionUpdatedFrame = OnARSessionUpdatedFrameDelegate;
 }
 
 void HoloKitSDK_ResetOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = [Utils getSimdFloat4x4WithPosition:position rotation:rotation];
     [[[ARSessionController sharedInstance] arSession] setWorldOrigin:transform_matrix];
+}
+
+double HoloKitSDK_GetSystemUptime(void) {
+    return [[NSProcessInfo processInfo] systemUptime];
+}
+
 }

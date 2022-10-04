@@ -8,9 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		4B188AD026F432B4001FD67D /* HandTrackingController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B188ACF26F432B4001FD67D /* HandTrackingController.mm */; };
-		4B341B1F2859F0B7006AB99C /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B341B1E2859F0B7006AB99C /* Secrets.swift */; };
 		4B507AF528A8DC44001FD1D7 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B507AF428A8DC44001FD1D7 /* Utils.m */; };
-		4B6C9420261493E300CBDFB4 /* ARSessionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ARSessionController.m */; };
+		4B6C9420261493E300CBDFB4 /* ARSessionController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ARSessionController.mm */; };
 		4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
 		4BB5587326205B7D00DC0213 /* NFCSessionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BB5587226205B7D00DC0213 /* NFCSessionController.m */; };
@@ -58,12 +57,11 @@
 		4B341B1B2859DEB0006AB99C /* IUnityRenderingExtensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityRenderingExtensions.h; sourceTree = "<group>"; };
 		4B341B1C2859DEB0006AB99C /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsMetal.h; sourceTree = "<group>"; };
 		4B341B1D2859DEB0006AB99C /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
-		4B341B1E2859F0B7006AB99C /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		4B507AF228A8DC29001FD1D7 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		4B507AF428A8DC44001FD1D7 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
-		4B6C941F261493E300CBDFB4 /* ARSessionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARSessionController.m; sourceTree = "<group>"; };
+		4B6C941F261493E300CBDFB4 /* ARSessionController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ARSessionController.mm; sourceTree = "<group>"; };
 		4B981F922869B8180021F1EF /* HandTrackingController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HandTrackingController.h; sourceTree = "<group>"; };
 		4BB5587226205B7D00DC0213 /* NFCSessionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NFCSessionController.m; sourceTree = "<group>"; };
 		4BC45B25262815CB00BA98E4 /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
@@ -132,12 +130,11 @@
 			isa = PBXGroup;
 			children = (
 				4B341B082859DEB0006AB99C /* UnityPluginApi */,
-				4B6C941F261493E300CBDFB4 /* ARSessionController.m */,
+				4B6C941F261493E300CBDFB4 /* ARSessionController.mm */,
 				4BB5587226205B7D00DC0213 /* NFCSessionController.m */,
 				4B981F922869B8180021F1EF /* HandTrackingController.h */,
 				4B188ACF26F432B4001FD67D /* HandTrackingController.mm */,
 				4BD9A6A0278AA53C000BD266 /* Crypto.swift */,
-				4B341B1E2859F0B7006AB99C /* Secrets.swift */,
 				4BE74F4B28853F910086FB89 /* HoloKitProfile.h */,
 				4BE74F4928853F6E0086FB89 /* HoloKitProfile.m */,
 				4B137E6B2886A37A00E10B38 /* HoloKitOptics.h */,
@@ -262,10 +259,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BB5587326205B7D00DC0213 /* NFCSessionController.m in Sources */,
-				4B341B1F2859F0B7006AB99C /* Secrets.swift in Sources */,
 				4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */,
 				4B507AF528A8DC44001FD1D7 /* Utils.m in Sources */,
-				4B6C9420261493E300CBDFB4 /* ARSessionController.m in Sources */,
+				4B6C9420261493E300CBDFB4 /* ARSessionController.mm in Sources */,
 				4B188AD026F432B4001FD67D /* HandTrackingController.mm in Sources */,
 				4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */,
 				4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */,
