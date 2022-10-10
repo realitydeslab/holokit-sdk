@@ -23,8 +23,12 @@ typedef enum {
     iPhone13 = 7,
     iPhone13Pro = 8,
     iPhone13ProMax = 9,
-    iPad = 10, // all iPads are the same to us
-    Unknown = 11
+    iPhone14 = 10,
+    iPhone14Plus = 11,
+    iPhone14Pro = 12,
+    iPhone14ProMax = 13,
+    iPad = 101, // all iPads are the same to us
+    Unknown = 999
 } PhoneType;
 
 typedef struct {
@@ -32,6 +36,7 @@ typedef struct {
     float OpticalAxisDistance;
     
     // 3D offset from the center of bottomline of the holokit phone display to the center of two eyes.
+    // Left-handedness
     simd_float3 MrOffset;
     
     // Eye view area width
@@ -76,6 +81,7 @@ typedef struct {
     //float CenterLineOffset;
     
     // The 3D offset vector from center of the camera to the center of the display area's bottomline
+    // Left-handedness
     simd_float3 CameraOffset;
 } PhoneModel;
 

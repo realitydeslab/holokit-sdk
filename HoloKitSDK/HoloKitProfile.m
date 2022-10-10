@@ -78,52 +78,54 @@
             phoneModel.ScreenWidth = 0.135097;
             phoneModel.ScreenHeight = 0.062391;
             phoneModel.ScreenBottom = 0.00391;
-            //phoneModel.CenterLineOffset = 0.0;
             phoneModel.CameraOffset = simd_make_float3(0.05986, -0.055215, -0.0091);
             break;
         case iPhoneXSMax:
             phoneModel.ScreenWidth = 0.14971;
             phoneModel.ScreenHeight = 0.06961;
             phoneModel.ScreenBottom = 0.00391;
-            //phoneModel.CenterLineOffset = -0.006;
             phoneModel.CameraOffset = simd_make_float3(0.06694, -0.09405, -0.00591);
             break;
         case iPhone11Pro:
             phoneModel.ScreenWidth = 0.13495;
             phoneModel.ScreenHeight = 0.06233;
             phoneModel.ScreenBottom = 0.00452;
-            //phoneModel.CenterLineOffset = 0.0;
             phoneModel.CameraOffset = simd_make_float3(0.05996, -0.02364 - 0.03494, -0.00591);
             break;
         case iPhone11ProMax:
             phoneModel.ScreenWidth = 0.14891;
             phoneModel.ScreenHeight = 0.06881;
             phoneModel.ScreenBottom = 0.00452;
-            //phoneModel.CenterLineOffset = 0.0;
             phoneModel.CameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
             break;
         case iPhone12:
-        case iPhone13:
-            phoneModel.ScreenWidth = 0.13977;
-            phoneModel.ScreenHeight = 0.06458;
-            phoneModel.ScreenBottom = 0.00347;
-            //phoneModel.CenterLineOffset = 0.0;
-            phoneModel.CameraOffset = simd_make_float3(0.05996, -0.02364 - 0.03494, -0.00591);
-            break;
         case iPhone12Pro:
+        case iPhone13:
         case iPhone13Pro:
+        case iPhone14:
             phoneModel.ScreenWidth = 0.13977;
             phoneModel.ScreenHeight = 0.06458;
             phoneModel.ScreenBottom = 0.00347;
-            //phoneModel.CenterLineOffset = 0.0;
             phoneModel.CameraOffset = simd_make_float3(0.05996, -0.02364 - 0.03494, -0.00591);
             break;
         case iPhone12ProMax:
         case iPhone13ProMax:
+        case iPhone14Plus:
             phoneModel.ScreenWidth = 0.15390;
             phoneModel.ScreenHeight = 0.07113;
             phoneModel.ScreenBottom = 0.00347;
-            //phoneModel.CenterLineOffset = 0.0;
+            phoneModel.CameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
+            break;
+        case iPhone14Pro: // TODO: Not correct
+            phoneModel.ScreenWidth = 0.13977;
+            phoneModel.ScreenHeight = 0.06458;
+            phoneModel.ScreenBottom = 0.00347;
+            phoneModel.CameraOffset = simd_make_float3(0.05996, -0.02364 - 0.03494, -0.00591);
+            break;
+        case iPhone14ProMax: // TODO: Not correct
+            phoneModel.ScreenWidth = 0.15390;
+            phoneModel.ScreenHeight = 0.07113;
+            phoneModel.ScreenBottom = 0.00347;
             phoneModel.CameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
             break;
         case iPad:
@@ -132,7 +134,6 @@
             phoneModel.ScreenWidth = 0.15390;
             phoneModel.ScreenHeight = 0.07113;
             phoneModel.ScreenBottom = 0.00347;
-            //phoneModel.CenterLineOffset = 0.0;
             phoneModel.CameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
             break;
     }

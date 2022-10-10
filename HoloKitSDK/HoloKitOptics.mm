@@ -76,3 +76,36 @@
 }
 
 @end
+
+extern "C" {
+
+float * HoloKitSDK_GetPhoneModelCameraOffsetPtr(int holokitType) {
+    PhoneModel phoneModel = [HoloKitProfile getPhoneModel];
+    float *ptr = new float[3] {
+        phoneModel.CameraOffset.x,
+        phoneModel.CameraOffset.y,
+        phoneModel.CameraOffset.z
+    };
+    return ptr;
+}
+
+void HoloKitSDK_ReleasePhoneModelCameraOffsetPtr(float *ptr) {
+    delete[](ptr);
+}
+
+float HoloKitSDK_GetHoloKitModelPhoneFrameWidth(int holokitType) {
+    HoloKitModel holokitModel = [HoloKitProfile getHoloKitModel:(HoloKitType)holokitType];
+    return holokitModel.OpticalAxisDistance + 2 * holokitModel.ViewportOuter;
+}
+
+float HoloKitSDK_GetHoloKitModelPhoneFrameHeight(int holokitType) {
+    HoloKitModel holokitModel = [HoloKitProfile getHoloKitModel:(HoloKitType)holokitType];
+    return holokitModel.ViewportTop + holokitModel.ViewportBottom;
+}
+
+float HoloKitSDK_GetHoloKitModelHorizontalAlignmentMarkerOffset(int holokitType) {
+    HoloKitModel holokitModel = [HoloKitProfile getHoloKitModel:(HoloKitType)holokitType];
+    return holokitModel.HorizontalAlignmentMarkerOffset;
+}
+
+}

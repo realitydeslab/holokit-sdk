@@ -210,8 +210,7 @@ typedef enum {
     }
     
     if (OnARSessionUpdatedFrame != NULL) {
-        // https://stackoverflow.com/questions/1263072/changing-a-matrix-from-right-handed-to-left-handed-coordinate-system/71168853#71168853
-        float *matrix = new float[16] { frame.camera.transform.columns[0].x, frame.camera.transform.columns[2].x, frame.camera.transform.columns[1].x, frame.camera.transform.columns[3].x,                                 frame.camera.transform.columns[0].z, frame.camera.transform.columns[2].z, frame.camera.transform.columns[1].z, frame.camera.transform.columns[3].z,                                 frame.camera.transform.columns[0].y, frame.camera.transform.columns[2].y, frame.camera.transform.columns[1].y, frame.camera.transform.columns[3].y,                                 frame.camera.transform.columns[0].w, frame.camera.transform.columns[1].w, frame.camera.transform.columns[2].w, frame.camera.transform.columns[3].w };
+        float *matrix = new float[16] { frame.camera.transform.columns[1].x, -frame.camera.transform.columns[0].x, -frame.camera.transform.columns[2].x, frame.camera.transform.columns[3].x,                                 frame.camera.transform.columns[1].y, -frame.camera.transform.columns[0].y, -frame.camera.transform.columns[2].y, frame.camera.transform.columns[3].y,                                 -frame.camera.transform.columns[1].z, frame.camera.transform.columns[0].z, frame.camera.transform.columns[2].z, -frame.camera.transform.columns[3].z,                                 frame.camera.transform.columns[0].w, frame.camera.transform.columns[1].w, frame.camera.transform.columns[2].w, frame.camera.transform.columns[3].w };
         dispatch_async(dispatch_get_main_queue(), ^{
             OnARSessionUpdatedFrame(frame.timestamp, matrix);
             delete[](matrix);
@@ -466,8 +465,7 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
                                                      void (*OnCurrentARWorldMapSavedDelegate)(const char *, int),
                                                      void (*OnGotARWorldMapFromDiskDelegate)(bool, const char *, unsigned char *, int),
                                                      void (*OnARWorldMapLoadedDelegate)(void),
-                                                     void (*OnRelocalizationSucceededDelegate)(void),
-                                                     void (*OnARSessionUpdatedFrameDelegate)(double, float *)) {
+                                                     void (*OnRelocalizationSucceededDelegate)(void)) {
     OnThermalStateChanged = OnThermalStateChangedDelegate;
     OnCameraChangedTrackingState = OnCameraChangedTrackingStateDelegate;
     OnARWorldMapStatusChanged = OnARWorldMapStatusChangedDelegate;
@@ -476,6 +474,9 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
     OnGotARWorldMapFromDisk = OnGotARWorldMapFromDiskDelegate;
     OnARWorldMapLoaded = OnARWorldMapLoadedDelegate;
     OnRelocalizationSucceeded = OnRelocalizationSucceededDelegate;
+}
+
+void HoloKitSDK_RegisterARSessionUpdatedFrameDelegate(void (*OnARSessionUpdatedFrameDelegate)(double, float *)) {
     OnARSessionUpdatedFrame = OnARSessionUpdatedFrameDelegate;
 }
 
