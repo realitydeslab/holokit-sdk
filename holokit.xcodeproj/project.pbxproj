@@ -16,7 +16,11 @@
 		4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* Crypto.swift */; };
 		4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE74F4928853F6E0086FB89 /* HoloKitProfile.m */; };
 		4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */; };
+		96B06FBA28FC4FBF00A2FE93 /* HoloKitCoreMotion.m in Sources */ = {isa = PBXBuildFile; fileRef = 96B06FB928FC4FBF00A2FE93 /* HoloKitCoreMotion.m */; };
 		96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C102C0279152B30052AF2B /* CryptoKit.framework */; };
+		96FD967628FB287500442AF9 /* LowLatencyTracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96FD967428FB287500442AF9 /* LowLatencyTracking.mm */; };
+		96FD967E28FB313800442AF9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 96FD967D28FB313800442AF9 /* main.m */; };
+		96FD968228FB315D00442AF9 /* LowLatencyTracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96FD967428FB287500442AF9 /* LowLatencyTracking.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +33,15 @@
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96FD967928FB313800442AF9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -74,7 +87,14 @@
 		961B8B02253BBACC0025BA7D /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
 		9666E9902572395C00A7F127 /* HandTracker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HandTracker.framework; path = sdk/third_party/HandTracker.framework; sourceTree = "<group>"; };
 		9666EAB32572692700A7F127 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		969D881028FF2642007356B1 /* low-latency-tracking-mockapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "low-latency-tracking-mockapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96B06FB928FC4FBF00A2FE93 /* HoloKitCoreMotion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HoloKitCoreMotion.m; sourceTree = "<group>"; };
+		96B06FBB28FC4FE700A2FE93 /* HoloKitCoreMotion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HoloKitCoreMotion.h; sourceTree = "<group>"; };
 		96C102C0279152B30052AF2B /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/CryptoKit.framework; sourceTree = DEVELOPER_DIR; };
+		96FD967428FB287500442AF9 /* LowLatencyTracking.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LowLatencyTracking.mm; sourceTree = "<group>"; };
+		96FD967528FB287500442AF9 /* LowLatencyTracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LowLatencyTracking.h; sourceTree = "<group>"; };
+		96FD967B28FB313800442AF9 /* low-latency-tracking-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "low-latency-tracking-test"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96FD967D28FB313800442AF9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +105,20 @@
 				96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */,
 				4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */,
 				4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		969D880D28FF2642007356B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96FD967828FB313800442AF9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +163,7 @@
 		4BE7B60C261104ED001F39F2 /* HoloKitSDK */ = {
 			isa = PBXGroup;
 			children = (
+				96FD967328FB285900442AF9 /* LowLatencyTracking */,
 				4B341B082859DEB0006AB99C /* UnityPluginApi */,
 				4B6C941F261493E300CBDFB4 /* ARSessionController.mm */,
 				4BB5587226205B7D00DC0213 /* NFCSessionController.m */,
@@ -149,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				4BE7B60C261104ED001F39F2 /* HoloKitSDK */,
+				96FD967C28FB313800442AF9 /* low-latency-tracking-test */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -158,6 +194,8 @@
 			isa = PBXGroup;
 			children = (
 				4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */,
+				96FD967B28FB313800442AF9 /* low-latency-tracking-test */,
+				969D881028FF2642007356B1 /* low-latency-tracking-mockapp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -177,6 +215,25 @@
 				961B8AFF253BBABF0025BA7D /* Metal.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		96FD967328FB285900442AF9 /* LowLatencyTracking */ = {
+			isa = PBXGroup;
+			children = (
+				96FD967428FB287500442AF9 /* LowLatencyTracking.mm */,
+				96FD967528FB287500442AF9 /* LowLatencyTracking.h */,
+				96B06FB928FC4FBF00A2FE93 /* HoloKitCoreMotion.m */,
+				96B06FBB28FC4FE700A2FE93 /* HoloKitCoreMotion.h */,
+			);
+			path = LowLatencyTracking;
+			sourceTree = "<group>";
+		};
+		96FD967C28FB313800442AF9 /* low-latency-tracking-test */ = {
+			isa = PBXGroup;
+			children = (
+				96FD967D28FB313800442AF9 /* main.m */,
+			);
+			path = "low-latency-tracking-test";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,18 +257,58 @@
 			productReference = 4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		969D880F28FF2642007356B1 /* low-latency-tracking-mockapp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 969D882428FF2643007356B1 /* Build configuration list for PBXNativeTarget "low-latency-tracking-mockapp" */;
+			buildPhases = (
+				969D880C28FF2642007356B1 /* Sources */,
+				969D880D28FF2642007356B1 /* Frameworks */,
+				969D880E28FF2642007356B1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "low-latency-tracking-mockapp";
+			productName = "low-latency-tracking-mockapp";
+			productReference = 969D881028FF2642007356B1 /* low-latency-tracking-mockapp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		96FD967A28FB313800442AF9 /* low-latency-tracking-test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96FD967F28FB313800442AF9 /* Build configuration list for PBXNativeTarget "low-latency-tracking-test" */;
+			buildPhases = (
+				96FD967728FB313800442AF9 /* Sources */,
+				96FD967828FB313800442AF9 /* Frameworks */,
+				96FD967928FB313800442AF9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "low-latency-tracking-test";
+			productName = "low-latency-tracking-tset";
+			productReference = 96FD967B28FB313800442AF9 /* low-latency-tracking-test */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		96602135253930CC004019A5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1300;
+				LastSwiftUpdateCheck = 1400;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					4BE7B60A261104ED001F39F2 = {
 						CreatedOnToolsVersion = 12.4;
 						LastSwiftMigration = 1320;
+					};
+					969D880F28FF2642007356B1 = {
+						CreatedOnToolsVersion = 14.0;
+					};
+					96FD967A28FB313800442AF9 = {
+						CreatedOnToolsVersion = 14.0;
 					};
 				};
 			};
@@ -229,9 +326,21 @@
 			projectRoot = "";
 			targets = (
 				4BE7B60A261104ED001F39F2 /* holokit-sdk */,
+				96FD967A28FB313800442AF9 /* low-latency-tracking-test */,
+				969D880F28FF2642007356B1 /* low-latency-tracking-mockapp */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		969D880E28FF2642007356B1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		4BE7B6F22611CE4B001F39F2 /* ShellScript */ = {
@@ -258,6 +367,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96B06FBA28FC4FBF00A2FE93 /* HoloKitCoreMotion.m in Sources */,
+				96FD967628FB287500442AF9 /* LowLatencyTracking.mm in Sources */,
 				4BB5587326205B7D00DC0213 /* NFCSessionController.m in Sources */,
 				4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */,
 				4B507AF528A8DC44001FD1D7 /* Utils.m in Sources */,
@@ -265,6 +376,22 @@
 				4B188AD026F432B4001FD67D /* HandTrackingController.mm in Sources */,
 				4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */,
 				4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		969D880C28FF2642007356B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96FD967728FB313800442AF9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96FD967E28FB313800442AF9 /* main.m in Sources */,
+				96FD968228FB315D00442AF9 /* LowLatencyTracking.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,22 +403,19 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
+				DEVELOPMENT_TEAM = KR9H35SQQ9;
+				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk/third_party/sophus",
 					"$(SRCROOT)/sdk/third_party/eigen",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -307,22 +431,19 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E5MH87P5T3;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
+				DEVELOPMENT_TEAM = KR9H35SQQ9;
+				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
+					"$(SRCROOT)/sdk/third_party/sophus",
 					"$(SRCROOT)/sdk/third_party/eigen",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -445,6 +566,117 @@
 			};
 			name = Release;
 		};
+		969D882528FF2643007356B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KR9H35SQQ9;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arkit metal";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.holokit-sdk.low-latency-tracking-mockapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "low-latency-tracking-mockapp/low_latency_tracking_mockapp-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		969D882628FF2643007356B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KR9H35SQQ9;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arkit metal";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.holoi.holokit.holokit-sdk.low-latency-tracking-mockapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "low-latency-tracking-mockapp/low_latency_tracking_mockapp-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		96FD968028FB313800442AF9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KR9H35SQQ9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include/eigen3,
+					/usr/local/include,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		96FD968128FB313800442AF9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = KR9H35SQQ9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include/eigen3,
+					/usr/local/include,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -462,6 +694,24 @@
 			buildConfigurations = (
 				96602144253930CC004019A5 /* Debug */,
 				96602145253930CC004019A5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		969D882428FF2643007356B1 /* Build configuration list for PBXNativeTarget "low-latency-tracking-mockapp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				969D882528FF2643007356B1 /* Debug */,
+				969D882628FF2643007356B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96FD967F28FB313800442AF9 /* Build configuration list for PBXNativeTarget "low-latency-tracking-test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96FD968028FB313800442AF9 /* Debug */,
+				96FD968128FB313800442AF9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

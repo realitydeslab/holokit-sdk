@@ -1,3 +1,15 @@
+[submodule "sdk/third_party/ceres-solver"]
+	path = sdk/third_party/ceres-solver
+	url = https://github.com/ceres-solver/ceres-solver
+	branch = master
+
 [submodule "sdk/third_party/eigen"]
 	path = sdk/third_party/eigen
-	url = https://github.com/eigenteam/eigen-git-mirror
+	url = https://gitlab.com/libeigen/eigen 
+        branch = 3.4
+
+[submodule "sdk/third_party/sophus"]
+	path = sdk/third_party/sophus
+	url = git@github.com:strasdat/Sophus.git
+	branch = v22.10
+
