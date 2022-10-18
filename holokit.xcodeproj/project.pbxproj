@@ -23,7 +23,6 @@
 		969D883828FF412B007356B1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 969D883628FF412B007356B1 /* Main.storyboard */; };
 		969D883A28FF412C007356B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 969D883928FF412C007356B1 /* Assets.xcassets */; };
 		969D883D28FF412C007356B1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 969D883B28FF412C007356B1 /* LaunchScreen.storyboard */; };
-		96B06FBA28FC4FBF00A2FE93 /* HoloKitCoreMotion.m in Sources */ = {isa = PBXBuildFile; fileRef = 96B06FB928FC4FBF00A2FE93 /* HoloKitCoreMotion.m */; };
 		96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C102C0279152B30052AF2B /* CryptoKit.framework */; };
 		96FD967628FB287500442AF9 /* LowLatencyTracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96FD967428FB287500442AF9 /* LowLatencyTracking.mm */; };
 		96FD967E28FB313800442AF9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 96FD967D28FB313800442AF9 /* main.m */; };
@@ -104,8 +103,6 @@
 		969D883928FF412C007356B1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		969D883C28FF412C007356B1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		969D883E28FF412C007356B1 /* low_latency_tracking_mockapp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "low_latency_tracking_mockapp-Bridging-Header.h"; sourceTree = "<group>"; };
-		96B06FB928FC4FBF00A2FE93 /* HoloKitCoreMotion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HoloKitCoreMotion.m; sourceTree = "<group>"; };
-		96B06FBB28FC4FE700A2FE93 /* HoloKitCoreMotion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HoloKitCoreMotion.h; sourceTree = "<group>"; };
 		96C102C0279152B30052AF2B /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/CryptoKit.framework; sourceTree = DEVELOPER_DIR; };
 		96FD967428FB287500442AF9 /* LowLatencyTracking.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LowLatencyTracking.mm; sourceTree = "<group>"; };
 		96FD967528FB287500442AF9 /* LowLatencyTracking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LowLatencyTracking.h; sourceTree = "<group>"; };
@@ -255,8 +252,6 @@
 			children = (
 				96FD967428FB287500442AF9 /* LowLatencyTracking.mm */,
 				96FD967528FB287500442AF9 /* LowLatencyTracking.h */,
-				96B06FB928FC4FBF00A2FE93 /* HoloKitCoreMotion.m */,
-				96B06FBB28FC4FE700A2FE93 /* HoloKitCoreMotion.h */,
 			);
 			path = LowLatencyTracking;
 			sourceTree = "<group>";
@@ -403,7 +398,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96B06FBA28FC4FBF00A2FE93 /* HoloKitCoreMotion.m in Sources */,
 				96FD967628FB287500442AF9 /* LowLatencyTracking.mm in Sources */,
 				4BB5587326205B7D00DC0213 /* NFCSessionController.m in Sources */,
 				4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */,
@@ -644,8 +638,6 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -682,8 +674,6 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

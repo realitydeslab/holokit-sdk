@@ -10,11 +10,6 @@
 #import <os/log.h>
 #import <os/signpost.h>
 
-//#import "core_motion.h"
-//#import "math_helpers.h"
-//#import "utility.h"
-
-
 namespace holokit {
 
 std::unique_ptr<LowLatencyTracking> LowLatencyTracking::low_latency_tracking_;

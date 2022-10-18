@@ -46,9 +46,7 @@ struct ARKitPoseData {
     Eigen::Matrix3d intrinsics;
 };
 
-struct EKFState {
-    double timestamp;
-    
+class EKFState {
     
     Sophus::SE3d::Tangent GetRotationTagent();
     Sophus::SE3d::Tangent GetAngluarRateTagent();
@@ -56,10 +54,45 @@ struct EKFState {
     Eigen::Vector3d GetVelocity();
     Eigen::Vector3d GetGyroBias();
     Eigen::Vector3d GetAccelBias();
-
+    
+    
+public:
+    typedef Eigen::Matrix<double, nErrorStatesAtCompileTime,
+          nErrorStatesAtCompileTime> P_type;
+    typedef P_type F_type;
+    typedef P_type Q_type;
+    
     Eigen::Vector<double, 21> X;
     Eigen::Matrix<double, 21, 21> P;
+    
+    double timestamp; ///< Time of this state estimate.
+    P_type P;  ///< Error state covariance.
+    F_type Fd;   ///< Discrete state propagation matrix.
+    Q_type Qd;   ///< Discrete propagation noise matrix.
+    
+    inline void Correct(
+        const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction);
+    {
+        
+    }
+    
+    void Reset(
+          msf_core::StateVisitor<GenericState_T<StateSequence_T,
+                                                StateDefinition_T> >*
+               GetUserCalc = nullptr) {
+        
+    }
+    
 };
+
+class Measurement {
+    Measurement(;
+  void CalculateAndApplyCorrection(
+      shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
+      const Eigen::MatrixBase<H_type>& H,
+      const Eigen::MatrixBase<Res_type>& residual,
+      const Eigen::MatrixBase<R_type>& R);
+}
 
 
 class LowLatencyTracking {

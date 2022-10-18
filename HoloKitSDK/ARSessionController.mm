@@ -210,7 +210,9 @@ typedef enum {
     }
     
     if (OnARSessionUpdatedFrame != NULL) {
-        float *matrix = new float[16] { frame.camera.transform.columns[1].x, -frame.camera.transform.columns[0].x, -frame.camera.transform.columns[2].x, frame.camera.transform.columns[3].x,                                 frame.camera.transform.columns[1].y, -frame.camera.transform.columns[0].y, -frame.camera.transform.columns[2].y, frame.camera.transform.columns[3].y,                                 -frame.camera.transform.columns[1].z, frame.camera.transform.columns[0].z, frame.camera.transform.columns[2].z, -frame.camera.transform.columns[3].z,                                 frame.camera.transform.columns[0].w, frame.camera.transform.columns[1].w, frame.camera.transform.columns[2].w, frame.camera.transform.columns[3].w };
+        simd_float4x4 transform = [frame.camera viewMatrixForOrientation:UIInterfaceOrientationLandscapeRight];
+        
+        float *matrix = new float[16] { transform.columns[1].x, -transform.columns[0].x, -transform.columns[2].x, transform.columns[3].x, transform.columns[1].y, -transform.columns[0].y, -transform.columns[2].y, transform.columns[3].y, -transform.columns[1].z, transform.columns[0].z, transform.columns[2].z, -transform.columns[3].z,                                 transform.columns[0].w, transform.columns[1].w, transform.columns[2].w, transform.columns[3].w };
         double timestamp = frame.timestamp;
         // DANGER: Never use frame in an async, because frames will be destroyed
         dispatch_async(dispatch_get_main_queue(), ^{
