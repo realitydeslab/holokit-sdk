@@ -10,6 +10,49 @@ import Metal
 import MetalKit
 import ARKit
 
+
+let kUserInterpupillaryDistance: Float = 0.064
+
+struct HoloKitModel {
+    let opticalAxisDistance: Float = 0.064
+    // 3D offset from the center of bottomline of the holokit phone display to the center of two eyes.
+    // x is right
+    // y is up
+    // z is backforward
+    let mrOffset = simd_float3(0, -0.02894, 0.07055) //right handed
+    let distortion: Float = 0.0
+    let viewportInner: Float = 0.0292
+    let viewportOuter: Float = 0.0292
+    let viewportTop: Float = 0.02386
+    let viewportBottom: Float = 0.02386
+    let focalLength: Float = 0.065
+    let screenToLens: Float = 0.02715 + 0.03136 + 0.002
+    let lensToEye: Float = 0.02497 + 0.03898
+    let axisToBottom: Float = 0.02990
+    let viewportCushion: Float = 0.0000
+    let horizontalAlignmentMarkerOffset: Float = 0.05075
+}
+/*
+struct PhoneModel {
+    let screenWidth: Float = 0.13977 //Checked
+    let screenHeight: Float = 0.06458 //Checked
+    let screenBottom: Float = 0.00347
+    let centerLineOffset: Float = 0.0
+    // The 3D offset vector from center of the camera to the center of the display area's bottomline. (in meters)
+    let cameraOffset = simd_float3(0.05996, -0.02364 - 0.03494, 0.00591) //left handed
+}
+*/
+
+struct PhoneModel {
+    let screenWidth: Float = 0.15390 //Checked
+    let screenHeight: Float = 0.07113 //Checked
+    let screenBottom: Float = 0.00347
+    let centerLineOffset: Float = 0.0
+    // The 3D offset vector from center of the camera to the center of the display area's bottomline. (in meters)
+    let cameraOffset = simd_float3(0.066945, -0.061695, 0.0091) //left handed
+}
+
+
 protocol RenderDestinationProvider {
     var currentRenderPassDescriptor: MTLRenderPassDescriptor? { get }
     var currentDrawable: CAMetalDrawable? { get }
@@ -54,6 +97,8 @@ class Renderer {
     var anchorDepthState: MTLDepthStencilState!
     var capturedImageTextureY: CVMetalTexture?
     var capturedImageTextureCbCr: CVMetalTexture?
+    var viewportPerEye: [MTLViewport]?
+
     
     // Captured image texture cache
     var capturedImageTextureCache: CVMetalTextureCache!
@@ -90,6 +135,8 @@ class Renderer {
     // Flag for viewport size changes
     var viewportSizeDidChange: Bool = false
     
+    var drawableSize: CGSize = CGSize()
+    
     
     init(session: ARSession, metalDevice device: MTLDevice, renderDestination: RenderDestinationProvider) {
         self.session = session
@@ -99,8 +146,9 @@ class Renderer {
         loadAssets()
     }
     
-    func drawRectResized(size: CGSize) {
-        viewportSize = size
+    func drawRectResized(size: CGSize, drawableSize: CGSize) {
+        self.viewportSize = size
+        self.drawableSize = drawableSize
         viewportSizeDidChange = true
     }
     
@@ -136,7 +184,8 @@ class Renderer {
                 
                 renderEncoder.label = "MyRenderEncoder"
                 
-                drawCapturedImage(renderEncoder: renderEncoder)
+                //For black background
+                //drawCapturedImage(renderEncoder: renderEncoder)
                 drawAnchorGeometry(renderEncoder: renderEncoder)
                 
                 // We're done encoding commands
@@ -217,7 +266,8 @@ class Renderer {
         capturedImagePipelineStateDescriptor.colorAttachments[0].pixelFormat = renderDestination.colorPixelFormat
         capturedImagePipelineStateDescriptor.depthAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
         capturedImagePipelineStateDescriptor.stencilAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
-        
+        capturedImagePipelineStateDescriptor.maxVertexAmplificationCount = 2
+
         do {
             try capturedImagePipelineState = device.makeRenderPipelineState(descriptor: capturedImagePipelineStateDescriptor)
         } catch let error {
@@ -278,7 +328,8 @@ class Renderer {
         anchorPipelineStateDescriptor.colorAttachments[0].pixelFormat = renderDestination.colorPixelFormat
         anchorPipelineStateDescriptor.depthAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
         anchorPipelineStateDescriptor.stencilAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
-        
+        anchorPipelineStateDescriptor.maxVertexAmplificationCount = 2 //Added
+
         do {
             try anchorPipelineState = device.makeRenderPipelineState(descriptor: anchorPipelineStateDescriptor)
         } catch let error {
@@ -358,11 +409,71 @@ class Renderer {
     
     func updateSharedUniforms(frame: ARFrame) {
         // Update the shared uniforms of the frame
+        // Update the shared uniforms of the frame
+              
+        let phone = PhoneModel()
+        let hme = HoloKitModel()
+
+        let centerX = 0.5 * phone.screenWidth + phone.centerLineOffset
+        let centerY = phone.screenHeight - (hme.axisToBottom - phone.screenBottom)
+
+        let fullWidth = hme.viewportOuter * 2 + hme.opticalAxisDistance + hme.viewportCushion * 4
+        let width = hme.viewportOuter + hme.viewportInner + hme.viewportCushion * 2
+        let height = hme.viewportTop + hme.viewportBottom + hme.viewportCushion * 2
+
+
+        let ipd = kUserInterpupillaryDistance
+        let near = hme.lensToEye
+        let far: Float  = 1000.0
+
+        var leftEyeProjectionMatrix = matrix_float4x4()
+        leftEyeProjectionMatrix.columns.0.x = 2 * near / width
+        leftEyeProjectionMatrix.columns.1.y = 2 * near / height
+        leftEyeProjectionMatrix.columns.2.x = (fullWidth - ipd - width) / width
+        //  print( (fullWidth - ipd - width) )
+        leftEyeProjectionMatrix.columns.2.y = (hme.viewportTop - hme.viewportBottom) / height
+        leftEyeProjectionMatrix.columns.2.z = -(far + near) / (far - near)
+        leftEyeProjectionMatrix.columns.3.z = -(2.0 * far * near) / (far - near)
+        leftEyeProjectionMatrix.columns.2.w = -1.0
+
+
+        var rightEyeProjectionMatrix = leftEyeProjectionMatrix
+        rightEyeProjectionMatrix.columns.2.x = (width + ipd - fullWidth) / width
+
+        let yMinInPixel = Double((centerY - (hme.viewportTop + hme.viewportCushion))  / phone.screenHeight * Float(drawableSize.height))
+        let xMinRightInPixel = Double((centerX + fullWidth / 2 - width) / phone.screenWidth * Float(drawableSize.width))
+        let xMinLeftInPixel = Double((centerX - fullWidth / 2) / phone.screenWidth * Float(drawableSize.width))
+
+        let widthInPixel = Double(width / phone.screenWidth * Float(drawableSize.width))
+        let heightInPixel = Double(height / phone.screenHeight * Float(drawableSize.height))
+
+        let rightViewport = MTLViewport(originX: xMinRightInPixel, originY: yMinInPixel, width: widthInPixel, height: heightInPixel, znear: 0, zfar: 1)
+        let leftViewport = MTLViewport(originX: xMinLeftInPixel, originY: yMinInPixel, width: widthInPixel, height: heightInPixel, znear: 0, zfar: 1)
+        //print("left viewport")
+        //print(leftViewport)
+
+        self.viewportPerEye = [leftViewport, rightViewport]
+        
         
         let uniforms = sharedUniformBufferAddress.assumingMemoryBound(to: SharedUniforms.self)
         
         uniforms.pointee.viewMatrix = frame.camera.viewMatrix(for: .landscapeRight)
         uniforms.pointee.projectionMatrix = frame.camera.projectionMatrix(for: .landscapeRight, viewportSize: viewportSize, zNear: 0.001, zFar: 1000)
+        
+        
+        let offset = hme.mrOffset + phone.cameraOffset
+        let cameraTransform = frame.camera.transform
+        let translation_left = cameraTransform * simd_float4(offset.x - ipd / 2, offset.y, offset.z, 1)
+        let translation_right = cameraTransform * simd_float4(offset.x + ipd / 2, offset.y, offset.z, 1)
+        var cameraTransform_left = cameraTransform
+        cameraTransform_left.columns.3 = translation_left
+        var cameraTransform_right = cameraTransform
+        cameraTransform_right.columns.3 = translation_right
+
+        uniforms.pointee.viewMatrixPerEye.0 = cameraTransform_left.inverse
+        uniforms.pointee.viewMatrixPerEye.1 = cameraTransform_right.inverse
+        uniforms.pointee.projectionMatrixPerEye.0 = leftEyeProjectionMatrix
+        uniforms.pointee.projectionMatrixPerEye.1 = rightEyeProjectionMatrix
 
         // Set up lighting for the scene using the ambient intensity if provided
         var ambientIntensity: Float = 1.0
@@ -480,12 +591,14 @@ class Renderer {
         
         // Push a debug group allowing us to identify render commands in the GPU Frame Capture tool
         renderEncoder.pushDebugGroup("DrawAnchors")
-        
+        renderEncoder.setVertexAmplificationCount(2, viewMappings: nil)
+
         // Set render command encoder state
         renderEncoder.setCullMode(.back)
         renderEncoder.setRenderPipelineState(anchorPipelineState)
         renderEncoder.setDepthStencilState(anchorDepthState)
-        
+        renderEncoder.setViewports(self.viewportPerEye!)
+
         // Set any buffers fed into our render pipeline
         renderEncoder.setVertexBuffer(anchorUniformBuffer, offset: anchorUniformBufferOffset, index: Int(kBufferIndexInstanceUniforms.rawValue))
         renderEncoder.setVertexBuffer(sharedUniformBuffer, offset: sharedUniformBufferOffset, index: Int(kBufferIndexSharedUniforms.rawValue))

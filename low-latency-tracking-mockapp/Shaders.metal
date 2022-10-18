@@ -22,11 +22,14 @@ typedef struct {
 typedef struct {
     float4 position [[position]];
     float2 texCoord;
+    ushort viewport [[viewport_array_index]];
 } ImageColorInOut;
 
 
 // Captured image vertex function
-vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]]) {
+vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]],
+                                                    ushort amp_id [[amplification_id]],
+                                                    ushort amp_count [[amplification_count]]) {
     ImageColorInOut out;
     
     // Pass through the image vertex's position
@@ -35,6 +38,8 @@ vertex ImageColorInOut capturedImageVertexTransform(ImageVertex in [[stage_in]])
     // Pass through the texture coordinate
     out.texCoord = in.texCoord;
     
+    out.viewport = amp_id;
+
     return out;
 }
 
@@ -75,6 +80,7 @@ typedef struct {
     float4 color;
     half3  eyePosition;
     half3  normal;
+    ushort viewport [[viewport_array_index]];
 } ColorInOut;
 
 
@@ -83,7 +89,10 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
                                                 constant SharedUniforms &sharedUniforms [[ buffer(kBufferIndexSharedUniforms) ]],
                                                 constant InstanceUniforms *instanceUniforms [[ buffer(kBufferIndexInstanceUniforms) ]],
                                                 ushort vid [[vertex_id]],
-                                                ushort iid [[instance_id]]) {
+                                                ushort iid [[instance_id]],
+                                                ushort amp_id [[amplification_id]],
+                                                ushort amp_count [[amplification_count]]
+                                                ) {
     ColorInOut out;
     
     // Make position a float4 to perform 4x4 matrix math on it
@@ -111,6 +120,8 @@ vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
     float4 normal = modelMatrix * float4(in.normal.x, in.normal.y, in.normal.z, 0.0f);
     out.normal = normalize(half3(normal.xyz));
     
+    out.viewport = amp_id;
+
     return out;
 }
 

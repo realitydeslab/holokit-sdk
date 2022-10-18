@@ -46,6 +46,9 @@ typedef struct {
     matrix_float4x4 projectionMatrix;
     matrix_float4x4 viewMatrix;
     
+    matrix_float4x4 projectionMatrixPerEye[2];
+    matrix_float4x4 viewMatrixPerEye[2];
+
     // Lighting Properties
     vector_float3 ambientLightColor;
     vector_float3 directionalLightDirection;
