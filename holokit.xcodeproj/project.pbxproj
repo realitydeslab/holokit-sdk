@@ -16,6 +16,13 @@
 		4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* Crypto.swift */; };
 		4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE74F4928853F6E0086FB89 /* HoloKitProfile.m */; };
 		4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */; };
+		969D882E28FF412B007356B1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969D882D28FF412B007356B1 /* AppDelegate.swift */; };
+		969D883028FF412B007356B1 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 969D882F28FF412B007356B1 /* Shaders.metal */; };
+		969D883328FF412B007356B1 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969D883228FF412B007356B1 /* Renderer.swift */; };
+		969D883528FF412B007356B1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969D883428FF412B007356B1 /* ViewController.swift */; };
+		969D883828FF412B007356B1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 969D883628FF412B007356B1 /* Main.storyboard */; };
+		969D883A28FF412C007356B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 969D883928FF412C007356B1 /* Assets.xcassets */; };
+		969D883D28FF412C007356B1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 969D883B28FF412C007356B1 /* LaunchScreen.storyboard */; };
 		96B06FBA28FC4FBF00A2FE93 /* HoloKitCoreMotion.m in Sources */ = {isa = PBXBuildFile; fileRef = 96B06FB928FC4FBF00A2FE93 /* HoloKitCoreMotion.m */; };
 		96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C102C0279152B30052AF2B /* CryptoKit.framework */; };
 		96FD967628FB287500442AF9 /* LowLatencyTracking.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96FD967428FB287500442AF9 /* LowLatencyTracking.mm */; };
@@ -87,7 +94,16 @@
 		961B8B02253BBACC0025BA7D /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
 		9666E9902572395C00A7F127 /* HandTracker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HandTracker.framework; path = sdk/third_party/HandTracker.framework; sourceTree = "<group>"; };
 		9666EAB32572692700A7F127 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		969D881028FF2642007356B1 /* low-latency-tracking-mockapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "low-latency-tracking-mockapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		969D882B28FF412B007356B1 /* low-latency-tracking-mockapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "low-latency-tracking-mockapp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		969D882D28FF412B007356B1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		969D882F28FF412B007356B1 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		969D883128FF412B007356B1 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		969D883228FF412B007356B1 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		969D883428FF412B007356B1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		969D883728FF412B007356B1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		969D883928FF412C007356B1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		969D883C28FF412C007356B1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		969D883E28FF412C007356B1 /* low_latency_tracking_mockapp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "low_latency_tracking_mockapp-Bridging-Header.h"; sourceTree = "<group>"; };
 		96B06FB928FC4FBF00A2FE93 /* HoloKitCoreMotion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HoloKitCoreMotion.m; sourceTree = "<group>"; };
 		96B06FBB28FC4FE700A2FE93 /* HoloKitCoreMotion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HoloKitCoreMotion.h; sourceTree = "<group>"; };
 		96C102C0279152B30052AF2B /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/CryptoKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -108,7 +124,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		969D880D28FF2642007356B1 /* Frameworks */ = {
+		969D882828FF412B007356B1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -185,6 +201,7 @@
 			children = (
 				4BE7B60C261104ED001F39F2 /* HoloKitSDK */,
 				96FD967C28FB313800442AF9 /* low-latency-tracking-test */,
+				969D882C28FF412B007356B1 /* low-latency-tracking-mockapp */,
 				9660213E253930CC004019A5 /* Products */,
 				96602188253935D7004019A5 /* Frameworks */,
 			);
@@ -195,7 +212,7 @@
 			children = (
 				4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */,
 				96FD967B28FB313800442AF9 /* low-latency-tracking-test */,
-				969D881028FF2642007356B1 /* low-latency-tracking-mockapp.app */,
+				969D882B28FF412B007356B1 /* low-latency-tracking-mockapp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -215,6 +232,22 @@
 				961B8AFF253BBABF0025BA7D /* Metal.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		969D882C28FF412B007356B1 /* low-latency-tracking-mockapp */ = {
+			isa = PBXGroup;
+			children = (
+				969D882D28FF412B007356B1 /* AppDelegate.swift */,
+				969D882F28FF412B007356B1 /* Shaders.metal */,
+				969D883128FF412B007356B1 /* ShaderTypes.h */,
+				969D883228FF412B007356B1 /* Renderer.swift */,
+				969D883428FF412B007356B1 /* ViewController.swift */,
+				969D883628FF412B007356B1 /* Main.storyboard */,
+				969D883928FF412C007356B1 /* Assets.xcassets */,
+				969D883B28FF412C007356B1 /* LaunchScreen.storyboard */,
+				969D883E28FF412C007356B1 /* low_latency_tracking_mockapp-Bridging-Header.h */,
+			);
+			path = "low-latency-tracking-mockapp";
 			sourceTree = "<group>";
 		};
 		96FD967328FB285900442AF9 /* LowLatencyTracking */ = {
@@ -257,13 +290,13 @@
 			productReference = 4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		969D880F28FF2642007356B1 /* low-latency-tracking-mockapp */ = {
+		969D882A28FF412B007356B1 /* low-latency-tracking-mockapp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 969D882428FF2643007356B1 /* Build configuration list for PBXNativeTarget "low-latency-tracking-mockapp" */;
+			buildConfigurationList = 969D883F28FF412C007356B1 /* Build configuration list for PBXNativeTarget "low-latency-tracking-mockapp" */;
 			buildPhases = (
-				969D880C28FF2642007356B1 /* Sources */,
-				969D880D28FF2642007356B1 /* Frameworks */,
-				969D880E28FF2642007356B1 /* Resources */,
+				969D882728FF412B007356B1 /* Sources */,
+				969D882828FF412B007356B1 /* Frameworks */,
+				969D882928FF412B007356B1 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -271,7 +304,7 @@
 			);
 			name = "low-latency-tracking-mockapp";
 			productName = "low-latency-tracking-mockapp";
-			productReference = 969D881028FF2642007356B1 /* low-latency-tracking-mockapp.app */;
+			productReference = 969D882B28FF412B007356B1 /* low-latency-tracking-mockapp.app */;
 			productType = "com.apple.product-type.application";
 		};
 		96FD967A28FB313800442AF9 /* low-latency-tracking-test */ = {
@@ -304,7 +337,7 @@
 						CreatedOnToolsVersion = 12.4;
 						LastSwiftMigration = 1320;
 					};
-					969D880F28FF2642007356B1 = {
+					969D882A28FF412B007356B1 = {
 						CreatedOnToolsVersion = 14.0;
 					};
 					96FD967A28FB313800442AF9 = {
@@ -327,16 +360,19 @@
 			targets = (
 				4BE7B60A261104ED001F39F2 /* holokit-sdk */,
 				96FD967A28FB313800442AF9 /* low-latency-tracking-test */,
-				969D880F28FF2642007356B1 /* low-latency-tracking-mockapp */,
+				969D882A28FF412B007356B1 /* low-latency-tracking-mockapp */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		969D880E28FF2642007356B1 /* Resources */ = {
+		969D882928FF412B007356B1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				969D883D28FF412C007356B1 /* LaunchScreen.storyboard in Resources */,
+				969D883A28FF412C007356B1 /* Assets.xcassets in Resources */,
+				969D883828FF412B007356B1 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,10 +415,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		969D880C28FF2642007356B1 /* Sources */ = {
+		969D882728FF412B007356B1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				969D883028FF412B007356B1 /* Shaders.metal in Sources */,
+				969D883328FF412B007356B1 /* Renderer.swift in Sources */,
+				969D883528FF412B007356B1 /* ViewController.swift in Sources */,
+				969D882E28FF412B007356B1 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,6 +436,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		969D883628FF412B007356B1 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				969D883728FF412B007356B1 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		969D883B28FF412C007356B1 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				969D883C28FF412C007356B1 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4BE7B611261104ED001F39F2 /* Debug */ = {
@@ -566,7 +625,7 @@
 			};
 			name = Release;
 		};
-		969D882528FF2643007356B1 /* Debug */ = {
+		969D884028FF412C007356B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -604,7 +663,7 @@
 			};
 			name = Debug;
 		};
-		969D882628FF2643007356B1 /* Release */ = {
+		969D884128FF412C007356B1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -698,11 +757,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		969D882428FF2643007356B1 /* Build configuration list for PBXNativeTarget "low-latency-tracking-mockapp" */ = {
+		969D883F28FF412C007356B1 /* Build configuration list for PBXNativeTarget "low-latency-tracking-mockapp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				969D882528FF2643007356B1 /* Debug */,
-				969D882628FF2643007356B1 /* Release */,
+				969D884028FF412C007356B1 /* Debug */,
+				969D884128FF412C007356B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
