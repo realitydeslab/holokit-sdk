@@ -60,6 +60,14 @@
         return iPhone13Pro;
     } else if ([deviceName isEqualToString:@"iPhone14,3"]) {
         return iPhone13ProMax;
+    } else if ([deviceName isEqualToString:@"iPhone14,7"]) {
+        return iPhone14;
+    } else if ([deviceName isEqualToString:@"iPhone14,8"]) {
+        return iPhone14Plus;
+    } else if ([deviceName isEqualToString:@"iPhone15,2"]) {
+        return iPhone14Pro;
+    } else if ([deviceName isEqualToString:@"iPhone15,3"]) {
+        return iPhone13ProMax;
     } else if ([deviceName isEqualToString:@"iPad13,8"] ||
                [deviceName isEqualToString:@"iPad13,9"] ||
                [deviceName isEqualToString:@"iPad13,10"] ||
