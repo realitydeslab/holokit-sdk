@@ -17,16 +17,18 @@ typedef enum {
     iPhoneXSMax = 1,
     iPhone11Pro = 2,
     iPhone11ProMax = 3,
-    iPhone12 = 4,
-    iPhone12Pro = 5,
-    iPhone12ProMax = 6,
-    iPhone13 = 7,
-    iPhone13Pro = 8,
-    iPhone13ProMax = 9,
-    iPhone14 = 10,
-    iPhone14Plus = 11,
-    iPhone14Pro = 12,
-    iPhone14ProMax = 13,
+    iPhone12mini = 4,
+    iPhone12 = 5,
+    iPhone12Pro = 6,
+    iPhone12ProMax = 7,
+    iPhone13mini = 8,
+    iPhone13 = 9,
+    iPhone13Pro = 10,
+    iPhone13ProMax = 11,
+    iPhone14 = 12,
+    iPhone14Plus = 13,
+    iPhone14Pro = 14,
+    iPhone14ProMax = 15,
     iPad = 101, // all iPads are the same to us
     Unknown = 999
 } PhoneType;
@@ -77,12 +79,11 @@ typedef struct {
     // The distance from the bottom of display area to the touching surface of the holokit phone holder
     float ScreenBottom;
     
-    // The distance from the center of the display to the rendering center
-    //float CenterLineOffset;
-    
     // The 3D offset vector from center of the camera to the center of the display area's bottomline
     // Left-handedness
     simd_float3 CameraOffset;
+    
+    float ScreenDpi;
 } PhoneModel;
 
 @interface HoloKitProfile : NSObject
