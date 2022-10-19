@@ -8,6 +8,10 @@
 #import "HoloKitOptics.h"
 #import <UIKit/UIKit.h>
 
+const float PHONE_FRAME_WIDTH_IN_METER = 0.129871;
+const float PHONE_FRAME_HEIGHT_IN_METER = 0.056322;
+const float METER_TO_INCH_RATIO = 39.3701;
+
 @interface HoloKitOptics()
 
 @end
@@ -93,19 +97,20 @@ void HoloKitSDK_ReleasePhoneModelCameraOffsetPtr(float *ptr) {
     delete[](ptr);
 }
 
-float HoloKitSDK_GetHoloKitModelPhoneFrameWidth(int holokitType) {
-    HoloKitModel holokitModel = [HoloKitProfile getHoloKitModel:(HoloKitType)holokitType];
-    return holokitModel.OpticalAxisDistance + 2 * holokitModel.ViewportOuter;
+float HoloKitSDK_GetHoloKitModelPhoneFrameWidthInPixel() {
+    PhoneModel phoneModel = [HoloKitProfile getPhoneModel];
+    return PHONE_FRAME_WIDTH_IN_METER * METER_TO_INCH_RATIO * phoneModel.ScreenDpi;
 }
 
-float HoloKitSDK_GetHoloKitModelPhoneFrameHeight(int holokitType) {
-    HoloKitModel holokitModel = [HoloKitProfile getHoloKitModel:(HoloKitType)holokitType];
-    return holokitModel.ViewportTop + holokitModel.ViewportBottom;
+float HoloKitSDK_GetHoloKitModelPhoneFrameHeightInPixel() {
+    PhoneModel phoneModel = [HoloKitProfile getPhoneModel];
+    return PHONE_FRAME_HEIGHT_IN_METER * METER_TO_INCH_RATIO * phoneModel.ScreenDpi;
 }
 
-float HoloKitSDK_GetHoloKitModelHorizontalAlignmentMarkerOffset(int holokitType) {
+float HoloKitSDK_GetHoloKitModelHorizontalAlignmentMarkerOffsetInPixel(int holokitType) {
+    PhoneModel phoneModel = [HoloKitProfile getPhoneModel];
     HoloKitModel holokitModel = [HoloKitProfile getHoloKitModel:(HoloKitType)holokitType];
-    return holokitModel.HorizontalAlignmentMarkerOffset;
+    return holokitModel.HorizontalAlignmentMarkerOffset * METER_TO_INCH_RATIO * phoneModel.ScreenDpi;
 }
 
 }
