@@ -97,6 +97,11 @@ void HoloKitSDK_ReleasePhoneModelCameraOffsetPtr(float *ptr) {
     delete[](ptr);
 }
 
+float HoloKitSDK_GetPhoneModelScreenDpi() {
+    PhoneModel phoneModel = [HoloKitProfile getPhoneModel];
+    return phoneModel.ScreenDpi;
+}
+
 float HoloKitSDK_GetHoloKitModelPhoneFrameWidthInPixel() {
     PhoneModel phoneModel = [HoloKitProfile getPhoneModel];
     return PHONE_FRAME_WIDTH_IN_METER * METER_TO_INCH_RATIO * phoneModel.ScreenDpi;
