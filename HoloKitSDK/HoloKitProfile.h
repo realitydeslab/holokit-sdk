@@ -92,4 +92,10 @@ typedef struct {
 
 + (PhoneModel)getPhoneModel;
 
++ (BOOL)IsCurrentDeviceSupportedByHoloKit;
+
++ (BOOL)IsCurrentDeviceIpad;
+
++ (BOOL)IsCurrentDeviceEquippedWithLiDAR;
+
 @end

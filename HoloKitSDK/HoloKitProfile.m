@@ -211,4 +211,37 @@
     return phoneModel;
 }
 
++ (BOOL)IsCurrentDeviceSupportedByHoloKit {
+    PhoneType phoneType = [HoloKitProfile getPhoneType];
+    return phoneType != Unknown;
+}
+
++ (BOOL)IsCurrentDeviceIpad {
+    PhoneType phoneType = [HoloKitProfile getPhoneType];
+    return phoneType == iPad;
+}
+
++ (BOOL)IsCurrentDeviceEquippedWithLiDAR {
+    PhoneType phoneType = [HoloKitProfile getPhoneType];
+    if (phoneType == iPhone12Pro) {
+        return true;
+    }
+    if (phoneType == iPhone12ProMax) {
+        return true;
+    }
+    if (phoneType == iPhone13Pro) {
+        return true;
+    }
+    if (phoneType == iPhone13ProMax) {
+        return true;
+    }
+    if (phoneType == iPhone14Pro) {
+        return true;
+    }
+    if (phoneType == iPhone14ProMax) {
+        return true;
+    }
+    return false;
+}
+
 @end

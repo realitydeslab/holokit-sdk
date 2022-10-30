@@ -118,4 +118,16 @@ float HoloKitSDK_GetHoloKitModelHorizontalAlignmentMarkerOffsetInPixel(int holok
     return holokitModel.HorizontalAlignmentMarkerOffset * METER_TO_INCH_RATIO * phoneModel.ScreenDpi;
 }
 
+bool HoloKitSDK_IsCurrentDeviceSupportedByHoloKit() {
+    return [HoloKitProfile IsCurrentDeviceSupportedByHoloKit];
+}
+
+bool HoloKitSDK_IsCurrentDeviceIpad() {
+    return [HoloKitProfile IsCurrentDeviceIpad];
+}
+
+bool HoloKitSDK_IsCurrentDeviceEquippedWithLiDAR() {
+    return [HoloKitProfile IsCurrentDeviceEquippedWithLiDAR];
+}
+
 }
