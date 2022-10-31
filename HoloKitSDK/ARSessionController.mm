@@ -32,8 +32,8 @@ typedef enum {
 @property (assign) ARWorldMappingStatus currentARWorldMappingStatus;
 @property (assign) BOOL sessionShouldAttemptRelocalization;
 @property (assign) BOOL isRelocalizing;
-@property (assign) BOOL notFirstFrame;
 @property (assign) VideoEnhancementMode videoEnhancementMode;
+@property (assign) BOOL isNotFirstARSessionFrame;
 
 @end
 
@@ -46,8 +46,8 @@ typedef enum {
         self.currentARWorldMappingStatus = ARWorldMappingStatusNotAvailable;
         self.sessionShouldAttemptRelocalization = NO;
         self.isRelocalizing = NO;
-        self.notFirstFrame = NO;
         self.videoEnhancementMode = VideoEnhancementModeNone;
+        self.isNotFirstARSessionFrame = NO;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(OnThermalStateChanged) name:NSProcessInfoThermalStateDidChangeNotification object:nil];
     }
@@ -202,6 +202,36 @@ typedef enum {
     self.isRelocalizing = true;
 }
 
+- (void)updateVideoEnhancementMode:(VideoEnhancementMode)videoEnhancementMode {
+    if (@available(iOS 16, *)) {
+        ARWorldTrackingConfiguration *config = (ARWorldTrackingConfiguration *)self.arSession.configuration;
+        if (ARWorldTrackingConfiguration.recommendedVideoFormatFor4KResolution == nil) {
+            NSLog(@"[HoloKitSDK] Current device does not support 4K resolution video format");
+            return;
+        }
+        
+        if (videoEnhancementMode == VideoEnhancementModeNone) {
+            //config.videoFormat = ARWorldTrackingConfiguration.supportedVideoFormats[0];
+            NSLog(@"[HoloKitSDK] Default video format enabled");
+            return;
+        } else {
+            config.videoFormat = ARWorldTrackingConfiguration.recommendedVideoFormatFor4KResolution;
+            NSLog(@"[HoloKitSDK] 4K resolution video format enabled");
+            if (videoEnhancementMode == VideoEnhancementModeHighResWithHDR) {
+                if (!config.videoFormat.videoHDRSupported) {
+                    NSLog(@"[HoloKitSDK] Current device does not support HDR video format");
+                    return;
+                }
+                config.videoHDRAllowed = true;
+                NSLog(@"[HoloKitSDK] HDR video format enabled");
+            }
+        }
+        [self.arSession runWithConfiguration:config];
+    } else {
+        NSLog(@"[HoloKitSDK] Video enhancement is only supported on iOS 16");
+    }
+}
+
 #pragma mark - ARSessionDelegate
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame {
@@ -219,61 +249,37 @@ typedef enum {
         });
     }
     
-    if (!self.notFirstFrame) {
-        self.notFirstFrame = YES;
-        
-        ARWorldTrackingConfiguration *config = (ARWorldTrackingConfiguration *)self.arSession.configuration;
-        // Video enhancement
-        if (@available(iOS 16, *)) {
-            if (self.videoEnhancementMode != VideoEnhancementModeNone) {
-                if (ARWorldTrackingConfiguration.recommendedVideoFormatFor4KResolution != nil) {
-                    config.videoFormat = ARWorldTrackingConfiguration.recommendedVideoFormatFor4KResolution;
-                    //NSLog(@"4K enabled");
-                    if (self.videoEnhancementMode == VideoEnhancementModeHighResWithHDR) {
-                        if (config.videoFormat.isVideoHDRSupported) {
-                            config.videoHDRAllowed = true;
-                            //NSLog(@"HDR enabled");
-                        } else {
-                            NSLog(@"HDR is not supported on this device");
-                        }
-                    }
-                } else {
-                    NSLog(@"4K video is not supported on this device");
-                }
-            }
-        } else {
-            NSLog(@"Only iOS 16 supports video enhancement");
-        }
-        // TODO: Initial world map
-        
-        [self.arSession runWithConfiguration:config];
+    if (!self.isNotFirstARSessionFrame) {
+        NSLog(@"[HoloKitSDK] This is the first frame of the current ARSession");
+        self.isNotFirstARSessionFrame = YES;
+        [self updateVideoEnhancementMode:self.videoEnhancementMode];
     }
     
     // ARWorldMap status
-    if (self.scaningEnvironment) {
-        if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
-            switch (self.currentARWorldMappingStatus) {
-                case ARWorldMappingStatusNotAvailable:
-                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to not available");
-                    break;
-                case ARWorldMappingStatusLimited:
-                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to limited");
-                    break;
-                case ARWorldMappingStatusExtending:
-                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to extending");
-                    break;
-                case ARWorldMappingStatusMapped:
-                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to mapped");
-                    break;
-            }
-            self.currentARWorldMappingStatus = frame.worldMappingStatus;
-            if (OnARWorldMapStatusChanged != NULL) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    OnARWorldMapStatusChanged((int)self.currentARWorldMappingStatus);
-                });
-            }
-        }
-    }
+//    if (self.scaningEnvironment) {
+//        if (self.currentARWorldMappingStatus != frame.worldMappingStatus) {
+//            switch (self.currentARWorldMappingStatus) {
+//                case ARWorldMappingStatusNotAvailable:
+//                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to not available");
+//                    break;
+//                case ARWorldMappingStatusLimited:
+//                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to limited");
+//                    break;
+//                case ARWorldMappingStatusExtending:
+//                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to extending");
+//                    break;
+//                case ARWorldMappingStatusMapped:
+//                    NSLog(@"[ARSessionController] Current ARWorldMapStatus changed to mapped");
+//                    break;
+//            }
+//            self.currentARWorldMappingStatus = frame.worldMappingStatus;
+//            if (OnARWorldMapStatusChanged != NULL) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    OnARWorldMapStatusChanged((int)self.currentARWorldMappingStatus);
+//                });
+//            }
+//        }
+//    }
     
     // Hand tracking
     HandTrackingController *handTracker = [HandTrackingController sharedInstance];
@@ -408,6 +414,7 @@ void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSe
     arSessionDelegateController.unityARSessionDelegate = sessionPtr.delegate;
     [arSessionDelegateController setArSession:sessionPtr];
     [sessionPtr setDelegate:arSessionDelegateController];
+    [arSessionDelegateController setIsNotFirstARSessionFrame:NO];
 }
 
 int HoloKitSDK_GetThermalState(void) {
