@@ -213,7 +213,19 @@
 
 + (BOOL)IsCurrentDeviceSupportedByHoloKit {
     PhoneType phoneType = [HoloKitProfile getPhoneType];
-    return phoneType != Unknown;
+    if (phoneType == iPhone12mini) {
+        return false;
+    }
+    if (phoneType == iPhone13mini) {
+        return false;
+    }
+    if (phoneType == iPad) {
+        return false;
+    }
+    if (phoneType == Unknown) {
+        return false;
+    }
+    return true;
 }
 
 + (BOOL)IsCurrentDeviceIpad {
