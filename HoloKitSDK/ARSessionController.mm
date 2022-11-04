@@ -239,6 +239,12 @@ typedef enum {
         [self.unityARSessionDelegate session:session didUpdateFrame:frame];
     }
     
+    if (!self.isNotFirstARSessionFrame) {
+        NSLog(@"[HoloKitSDK] This is the first frame of the current ARSession");
+        self.isNotFirstARSessionFrame = YES;
+        [self updateVideoEnhancementMode:self.videoEnhancementMode];
+    }
+    
     if (OnARSessionUpdatedFrame != NULL) {
         float *matrix = new float[16] { frame.camera.transform.columns[1].x, -frame.camera.transform.columns[0].x, -frame.camera.transform.columns[2].x, frame.camera.transform.columns[3].x,                                 frame.camera.transform.columns[1].y, -frame.camera.transform.columns[0].y, -frame.camera.transform.columns[2].y, frame.camera.transform.columns[3].y,                                 -frame.camera.transform.columns[1].z, frame.camera.transform.columns[0].z, frame.camera.transform.columns[2].z, -frame.camera.transform.columns[3].z,                                 frame.camera.transform.columns[0].w, frame.camera.transform.columns[1].w, frame.camera.transform.columns[2].w, frame.camera.transform.columns[3].w };
         double timestamp = frame.timestamp;
@@ -247,12 +253,6 @@ typedef enum {
             OnARSessionUpdatedFrame(timestamp, matrix);
             delete[](matrix);
         });
-    }
-    
-    if (!self.isNotFirstARSessionFrame) {
-        NSLog(@"[HoloKitSDK] This is the first frame of the current ARSession");
-        self.isNotFirstARSessionFrame = YES;
-        [self updateVideoEnhancementMode:self.videoEnhancementMode];
     }
     
     // ARWorldMap status
@@ -414,7 +414,6 @@ void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSe
     arSessionDelegateController.unityARSessionDelegate = sessionPtr.delegate;
     [arSessionDelegateController setArSession:sessionPtr];
     [sessionPtr setDelegate:arSessionDelegateController];
-    [arSessionDelegateController setIsNotFirstARSessionFrame:NO];
 }
 
 int HoloKitSDK_GetThermalState(void) {
@@ -496,4 +495,8 @@ double HoloKitSDK_GetSystemUptime(void) {
     return [[NSProcessInfo processInfo] systemUptime];
 }
 
+void HoloKitSDK_ResetARSessionFirstFrame() {
+    [[ARSessionController sharedInstance] setIsNotFirstARSessionFrame:NO];
+}
+ 
 }
