@@ -498,5 +498,13 @@ double HoloKitSDK_GetSystemUptime(void) {
 void HoloKitSDK_ResetARSessionFirstFrame() {
     [[ARSessionController sharedInstance] setIsNotFirstARSessionFrame:NO];
 }
+
+double HoloKitSDK_GetScreenBrightness() {
+    return [[UIScreen mainScreen] brightness];
+}
+
+void HoloKitSDK_SetScreenBrightness(double value) {
+    [[UIScreen mainScreen] setBrightness:value];
+}
  
 }

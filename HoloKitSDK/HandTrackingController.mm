@@ -44,6 +44,7 @@ void (*OnHandPoseUpdated)(float *) = NULL;
 - (void)performHumanHandPoseRequest:(ARFrame *)frame {
     if (frame.sceneDepth == nil) {
         NSLog(@"[HandTracking] Failed to get scene depth");
+        return;
     }
     
     VNImageRequestHandler *requestHandler = [[VNImageRequestHandler alloc]
