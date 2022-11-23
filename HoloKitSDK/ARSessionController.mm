@@ -12,6 +12,7 @@ void (*OnGotARWorldMapFromDisk)(bool, const char *, unsigned char *, int) = NULL
 void (*OnARWorldMapLoaded)(void) = NULL;
 void (*OnRelocalizationSucceeded)(void) = NULL;
 void (*OnARSessionUpdatedFrame)(double, const float *);
+void (*OnARSessionUpdatedImageAnchor)(double, const float *);
 
 typedef enum {
     VideoEnhancementModeNone = 0,
@@ -246,9 +247,8 @@ typedef enum {
     }
     
     if (OnARSessionUpdatedFrame != NULL) {
-        float *matrix = new float[16] { frame.camera.transform.columns[1].x, -frame.camera.transform.columns[0].x, -frame.camera.transform.columns[2].x, frame.camera.transform.columns[3].x,                                 frame.camera.transform.columns[1].y, -frame.camera.transform.columns[0].y, -frame.camera.transform.columns[2].y, frame.camera.transform.columns[3].y,                                 -frame.camera.transform.columns[1].z, frame.camera.transform.columns[0].z, frame.camera.transform.columns[2].z, -frame.camera.transform.columns[3].z,                                 frame.camera.transform.columns[0].w, frame.camera.transform.columns[1].w, frame.camera.transform.columns[2].w, frame.camera.transform.columns[3].w };
+        float *matrix = [Utils getUnityMatrix:frame.camera.transform];
         double timestamp = frame.timestamp;
-        // DANGER: Never use frame in an async, because frames will be destroyed
         dispatch_async(dispatch_get_main_queue(), ^{
             OnARSessionUpdatedFrame(timestamp, matrix);
             delete[](matrix);
@@ -297,6 +297,21 @@ typedef enum {
 - (void)session:(ARSession *)session didUpdateAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
     if (self.unityARSessionDelegate) {
         [self.unityARSessionDelegate session:session didUpdateAnchors:anchors];
+    }
+    
+    for (ARAnchor *anchor in anchors) {
+        if ([anchor isKindOfClass:[ARImageAnchor class]]) {
+            if (OnARSessionUpdatedImageAnchor != NULL) {
+                float *matrix = [Utils getUnityMatrix:session.currentFrame.camera.transform];
+                double timestamp = session.currentFrame.timestamp;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    OnARSessionUpdatedImageAnchor(timestamp, matrix);
+                    delete[](matrix);
+                });
+            }
+            // There should only be one image anchor
+            return;
+        }
     }
 }
     
@@ -474,7 +489,8 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
                                                      void (*OnGotARWorldMapFromDiskDelegate)(bool, const char *, unsigned char *, int),
                                                      void (*OnARWorldMapLoadedDelegate)(void),
                                                      void (*OnRelocalizationSucceededDelegate)(void),
-                                                     void (*OnARSessionUpdatedFrameDelegate)(double, const float *)) {
+                                                     void (*OnARSessionUpdatedFrameDelegate)(double, const float *),
+                                                     void (*OnARSessionUpdatedImageAnchorDelegate)(double, const float *)) {
     OnThermalStateChanged = OnThermalStateChangedDelegate;
     OnCameraChangedTrackingState = OnCameraChangedTrackingStateDelegate;
     OnARWorldMapStatusChanged = OnARWorldMapStatusChangedDelegate;
@@ -484,6 +500,7 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
     OnARWorldMapLoaded = OnARWorldMapLoadedDelegate;
     OnRelocalizationSucceeded = OnRelocalizationSucceededDelegate;
     OnARSessionUpdatedFrame = OnARSessionUpdatedFrameDelegate;
+    OnARSessionUpdatedImageAnchor = OnARSessionUpdatedImageAnchorDelegate;
 }
 
 void HoloKitSDK_ResetOrigin(float position[3], float rotation[4]) {

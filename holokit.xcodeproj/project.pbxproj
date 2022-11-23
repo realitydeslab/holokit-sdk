@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4B188AD026F432B4001FD67D /* HandTrackingController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B188ACF26F432B4001FD67D /* HandTrackingController.mm */; };
-		4B507AF528A8DC44001FD1D7 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B507AF428A8DC44001FD1D7 /* Utils.m */; };
+		4B507AF528A8DC44001FD1D7 /* Utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B507AF428A8DC44001FD1D7 /* Utils.mm */; };
 		4B6C9420261493E300CBDFB4 /* ARSessionController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B6C941F261493E300CBDFB4 /* ARSessionController.mm */; };
 		4B6C944A2614B70900CBDFB4 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A325F39FED00CC4E81 /* Metal.framework */; };
 		4B6C944B2614B70D00CBDFB4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B6615A125F39FE000CC4E81 /* ARKit.framework */; };
@@ -58,7 +58,7 @@
 		4B341B1C2859DEB0006AB99C /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsMetal.h; sourceTree = "<group>"; };
 		4B341B1D2859DEB0006AB99C /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
 		4B507AF228A8DC29001FD1D7 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
-		4B507AF428A8DC44001FD1D7 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
+		4B507AF428A8DC44001FD1D7 /* Utils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Utils.mm; sourceTree = "<group>"; };
 		4B6615A125F39FE000CC4E81 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		4B6615A325F39FED00CC4E81 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		4B6C941F261493E300CBDFB4 /* ARSessionController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ARSessionController.mm; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 				4B137E6B2886A37A00E10B38 /* HoloKitOptics.h */,
 				4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */,
 				4B507AF228A8DC29001FD1D7 /* Utils.h */,
-				4B507AF428A8DC44001FD1D7 /* Utils.m */,
+				4B507AF428A8DC44001FD1D7 /* Utils.mm */,
 			);
 			path = HoloKitSDK;
 			sourceTree = "<group>";
@@ -260,7 +260,7 @@
 			files = (
 				4BB5587326205B7D00DC0213 /* NFCSessionController.m in Sources */,
 				4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */,
-				4B507AF528A8DC44001FD1D7 /* Utils.m in Sources */,
+				4B507AF528A8DC44001FD1D7 /* Utils.mm in Sources */,
 				4B6C9420261493E300CBDFB4 /* ARSessionController.mm in Sources */,
 				4B188AD026F432B4001FD67D /* HandTrackingController.mm in Sources */,
 				4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */,
