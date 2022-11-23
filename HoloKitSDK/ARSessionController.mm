@@ -299,20 +299,20 @@ typedef enum {
         [self.unityARSessionDelegate session:session didUpdateAnchors:anchors];
     }
     
-    for (ARAnchor *anchor in anchors) {
-        if ([anchor isKindOfClass:[ARImageAnchor class]]) {
-            if (OnARSessionUpdatedImageAnchor != NULL) {
-                float *matrix = [Utils getUnityMatrix:session.currentFrame.camera.transform];
-                double timestamp = session.currentFrame.timestamp;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    OnARSessionUpdatedImageAnchor(timestamp, matrix);
-                    delete[](matrix);
-                });
-            }
-            // There should only be one image anchor
-            return;
-        }
-    }
+//    for (ARAnchor *anchor in anchors) {
+//        if ([anchor isKindOfClass:[ARImageAnchor class]]) {
+//            if (OnARSessionUpdatedImageAnchor != NULL) {
+//                float *matrix = [Utils getUnityMatrix:anchor.transform];
+//                double timestamp = session.currentFrame.timestamp;
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    OnARSessionUpdatedImageAnchor(timestamp, matrix);
+//                    delete[](matrix);
+//                });
+//            }
+//            // There should only be one image anchor
+//            return;
+//        }
+//    }
 }
     
 - (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors {
