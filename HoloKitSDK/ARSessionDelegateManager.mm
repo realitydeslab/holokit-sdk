@@ -1,6 +1,6 @@
 #import <ARKit/ARKit.h>
 #import "UnityPluginApi/XR/UnityXRNativePtrs.h"
-#import "HandTracker.h"
+#import "HandTrackingController.h"
 #import "Utils.h"
 
 void (*OnThermalStateChanged)(int) = NULL;
@@ -20,11 +20,11 @@ typedef enum {
     VideoEnhancementModeHighResWithHDR = 2
 } VideoEnhancementMode;
 
-@interface ARSessionDelegateManager : NSObject
+@interface ARSessionController : NSObject
 
 @end
 
-@interface ARSessionDelegateManager() <ARSessionDelegate>
+@interface ARSessionController() <ARSessionDelegate>
 
 @property (nonatomic, weak, nullable) id <ARSessionDelegate> unityARSessionDelegate;
 @property (nonatomic, strong, nullable) ARSession *arSession;
@@ -38,7 +38,7 @@ typedef enum {
 
 @end
 
-@implementation ARSessionDelegateManager
+@implementation ARSessionController
 
 #pragma mark - init
 - (instancetype)init {
@@ -282,7 +282,7 @@ typedef enum {
 //    }
     
     // Hand tracking
-    HandTracker *handTracker = [HandTracker sharedInstance];
+    HandTrackingController *handTracker = [HandTrackingController sharedInstance];
     if ([handTracker active]) {
         [handTracker performHumanHandPoseRequest:frame];
     }
@@ -425,7 +425,7 @@ void HoloKitSDK_InterceptUnityARSessionDelegate(UnityXRNativeSession* nativeARSe
         return;
     }
     ARSession* sessionPtr = (__bridge ARSession*)nativeARSessionPtr->sessionPtr;
-    ARSessionDelegateManager* arSessionDelegateController = [ARSessionDelegateManager sharedInstance];
+    ARSessionController* arSessionDelegateController = [ARSessionController sharedInstance];
     arSessionDelegateController.unityARSessionDelegate = sessionPtr.delegate;
     [arSessionDelegateController setArSession:sessionPtr];
     [sessionPtr setDelegate:arSessionDelegateController];
@@ -437,48 +437,48 @@ int HoloKitSDK_GetThermalState(void) {
 }
 
 void HoloKitSDK_PauseCurrentARSession(void) {
-    [[ARSessionDelegateManager sharedInstance] pauseCurrentARSession];
+    [[ARSessionController sharedInstance] pauseCurrentARSession];
 }
 
 void HoloKitSDK_ResumeCurrentARSession(void) {
-    [[ARSessionDelegateManager sharedInstance] resumeCurrentARSession];
+    [[ARSessionController sharedInstance] resumeCurrentARSession];
 }
 
 void HoloKitSDK_SetSessionShouldAttemptRelocalization(bool value) {
-    [[ARSessionDelegateManager sharedInstance] setSessionShouldAttemptRelocalization:value];
+    [[ARSessionController sharedInstance] setSessionShouldAttemptRelocalization:value];
 }
 
 void HoloKitSDK_SetScaningEnvironment(bool value) {
-    [[ARSessionDelegateManager sharedInstance] setScaningEnvironment:value];
+    [[ARSessionController sharedInstance] setScaningEnvironment:value];
 }
 
 void HoloKitSDK_GetCurrentARWorldMap(void) {
-    [[ARSessionDelegateManager sharedInstance] getCurentARWorldMap];
+    [[ARSessionController sharedInstance] getCurentARWorldMap];
 }
 
 void HoloKitSDK_SaveCurrentARWorldMapWithName(const char *mapName) {
-    [[ARSessionDelegateManager sharedInstance] saveCurrentARWorldMapWithName:[NSString stringWithUTF8String:mapName]];
+    [[ARSessionController sharedInstance] saveCurrentARWorldMapWithName:[NSString stringWithUTF8String:mapName]];
 }
 
 void HoloKitSDK_GetARWorldMapFromDiskWithName(const char *mapName, int mapSizeInBytes) {
-    [[ARSessionDelegateManager sharedInstance] getARWorldMapFromDiskWithName:[NSString stringWithUTF8String:mapName] mapSizeInBytes:mapSizeInBytes];
+    [[ARSessionController sharedInstance] getARWorldMapFromDiskWithName:[NSString stringWithUTF8String:mapName] mapSizeInBytes:mapSizeInBytes];
 }
 
 void HoloKitSDK_NullifyCurrentARWorldMap(void) {
-    [[ARSessionDelegateManager sharedInstance] nullifyCurrentARWorldMap];
+    [[ARSessionController sharedInstance] nullifyCurrentARWorldMap];
 }
 
 void HoloKitSDK_LoadARWorldMapWithData(unsigned char *mapData, int dataSizeInBytes) {
     NSData *nsMapData = [NSData dataWithBytes:mapData length:dataSizeInBytes];
-    [[ARSessionDelegateManager sharedInstance] loadARWorldMapWithData:nsMapData];
+    [[ARSessionController sharedInstance] loadARWorldMapWithData:nsMapData];
 }
 
 void HoloKitSDK_RelocalizeToLoadedARWorldMap(void) {
-    [[ARSessionDelegateManager sharedInstance] relocalizeToLoadedARWorldMap];
+    [[ARSessionController sharedInstance] relocalizeToLoadedARWorldMap];
 }
 
 void HoloKitSDK_SetVideoEnhancementMode(int mode) {
-    [[ARSessionDelegateManager sharedInstance] setVideoEnhancementMode:(VideoEnhancementMode)mode];
+    [[ARSessionController sharedInstance] setVideoEnhancementMode:(VideoEnhancementMode)mode];
 }
 
 void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChangedDelegate)(int),
@@ -505,7 +505,7 @@ void HoloKitSDK_RegisterARSessionControllerDelegates(void (*OnThermalStateChange
 
 void HoloKitSDK_ResetOrigin(float position[3], float rotation[4]) {
     simd_float4x4 transform_matrix = [Utils getSimdFloat4x4WithPosition:position rotation:rotation];
-    [[[ARSessionDelegateManager sharedInstance] arSession] setWorldOrigin:transform_matrix];
+    [[[ARSessionController sharedInstance] arSession] setWorldOrigin:transform_matrix];
 }
 
 double HoloKitSDK_GetSystemUptime(void) {
@@ -513,7 +513,7 @@ double HoloKitSDK_GetSystemUptime(void) {
 }
 
 void HoloKitSDK_ResetARSessionFirstFrame() {
-    [[ARSessionDelegateManager sharedInstance] setIsNotFirstARSessionFrame:NO];
+    [[ARSessionController sharedInstance] setIsNotFirstARSessionFrame:NO];
 }
 
 double HoloKitSDK_GetScreenBrightness() {
