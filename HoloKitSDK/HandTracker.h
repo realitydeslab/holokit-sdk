@@ -8,7 +8,7 @@
 #import <Vision/Vision.h>
 #import <ARKit/ARKit.h>
 
-@interface HandTrackingController : NSObject
+@interface HandTracker : NSObject
 
 @property (assign) BOOL active;
 

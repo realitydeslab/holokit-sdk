@@ -24,8 +24,8 @@ namespace HoloKit.Editor
 
             void PostprocessBuild(BuildReport report)
             {
-                AddXcodePlist(report.summary.outputPath);
-                AddXcodeCapabilities(report.summary.outputPath);
+                //AddXcodePlist(report.summary.outputPath);
+                //AddXcodeCapabilities(report.summary.outputPath);
                 AddXcodeBuildSettings(report.summary.outputPath);
             }
 
@@ -37,7 +37,7 @@ namespace HoloKit.Editor
 
                 PlistElementDict rootDict = plist.root;
 
-                // NFC
+                // NFC Plist
                 rootDict.SetString("NFCReaderUsageDescription", "For NFC authentication");
                 PlistElementArray nfcArray = rootDict.CreateArray("com.apple.developer.nfc.readersession.iso7816.select-identifiers");
                 nfcArray.AddString("D2760000850101");
@@ -48,15 +48,16 @@ namespace HoloKit.Editor
             private static void AddXcodeBuildSettings(string pathToBuiltProject)
             {
                 string projPath = PBXProject.GetPBXProjectPath(pathToBuiltProject);
-                PBXProject proj = new PBXProject();
+                PBXProject proj = new();
                 proj.ReadFromString(File.ReadAllText(projPath));
 
                 string mainTargetGuid = proj.GetUnityMainTargetGuid();
                 string unityFrameworkTargetGuid = proj.GetUnityFrameworkTargetGuid();
 
+                proj.SetBuildProperty(mainTargetGuid, "SUPPORTED_PLATFORMS", "iphonesimulator iphoneos");
+                proj.SetBuildProperty(unityFrameworkTargetGuid, "SUPPORTED_PLATFORMS", "iphonesimulator iphoneos");
                 proj.SetBuildProperty(mainTargetGuid, "ENABLE_BITCODE", "NO");
                 proj.SetBuildProperty(unityFrameworkTargetGuid, "ENABLE_BITCODE", "NO");
-
                 proj.AddBuildProperty(unityFrameworkTargetGuid, "LIBRARY_SEARCH_PATHS", "$(SDKROOT)/usr/lib/swift");
                 proj.SetBuildProperty(mainTargetGuid, "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD", "NO");
 
@@ -66,7 +67,7 @@ namespace HoloKit.Editor
             private static void AddXcodeCapabilities(string buildPath)
             {
                 string projectPath = PBXProject.GetPBXProjectPath(buildPath);
-                PBXProject project = new PBXProject();
+                PBXProject project = new();
                 project.ReadFromFile(projectPath);
                 string target = project.GetUnityMainTargetGuid();
 
@@ -74,7 +75,7 @@ namespace HoloKit.Editor
                 string name = packageName.Substring(packageName.LastIndexOf('.') + 1);
                 string entitlementFileName = name + ".entitlements";
                 string entitlementPath = Path.Combine(buildPath, entitlementFileName);
-                ProjectCapabilityManager projectCapabilityManager = new ProjectCapabilityManager(projectPath, entitlementFileName, null, target);
+                ProjectCapabilityManager projectCapabilityManager = new(projectPath, entitlementFileName, null, target);
                 PlistDocument entitlementDocument = AddNFCEntitlement(projectCapabilityManager);
                 entitlementDocument.WriteToFile(entitlementPath);
 
@@ -95,7 +96,6 @@ namespace HoloKit.Editor
 
                 PlistElementDict dictionary = entitlementDoc.root;
                 PlistElementArray array = dictionary.CreateArray("com.apple.developer.nfc.readersession.formats");
-                //array.values.Add(new PlistElementString("NDEF"));
                 array.values.Add(new PlistElementString("TAG"));
 
                 return entitlementDoc;

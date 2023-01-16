@@ -46,20 +46,9 @@ namespace HoloKit {
 
         public static string ARWorldMapName => s_arWorldMapName;
 
-        public static bool UnityARSessionIntercepted
-        {
-            get => s_unityARSessionIntercepted;
-            set
-            {
-                s_unityARSessionIntercepted = value;
-            }
-        }
-
         private static byte[] s_arWorldMapData;
 
         private static string s_arWorldMapName;
-
-        private static bool s_unityARSessionIntercepted;
 
         [DllImport("__Internal")]
         private static extern void HoloKitSDK_InterceptUnityARSessionDelegate(IntPtr ptr);
@@ -112,7 +101,21 @@ namespace HoloKit {
             Action<string, int> OnCurrentARWorldMapSaved,
             Action<bool, string, IntPtr, int> OnGotARWorldMapFromDisk,
             Action OnARWorldMapLoaded,
-            Action OnRelocalizationSucceeded);
+            Action OnRelocalizationSucceeded,
+            Action<double, IntPtr> OnARSessionUpdatedFrame,
+            Action<double, IntPtr> OnARSessionUpdatedImageAnchor);
+
+        [DllImport("__Internal")]
+        private static extern double HoloKitSDK_GetSystemUptime();
+
+        [DllImport("__Internal")]
+        private static extern void HoloKitSDK_ResetARSessionFirstFrame();
+
+        [DllImport("__Internal")]
+        private static extern double HoloKitSDK_GetScreenBrightness();
+
+        [DllImport("__Internal")]
+        private static extern void HoloKitSDK_SetScreenBrightness(double value);
 
         [AOT.MonoPInvokeCallback(typeof(Action<int>))]
         private static void OnThermalStateChangedDelegate(int state)
@@ -144,7 +147,7 @@ namespace HoloKit {
             OnCurrentARWorldMapSaved?.Invoke(mapName, mapSizeInBytes);
         }
 
-        [AOT.MonoPInvokeCallback(typeof(Action<string, IntPtr, int>))]
+        [AOT.MonoPInvokeCallback(typeof(Action<bool, string, IntPtr, int>))]
         private static void OnGotARWorldMapFromDiskDelegate(bool success, string mapName, IntPtr mapPtr, int mapSizeInBytes)
         {
             if (success)
@@ -169,6 +172,42 @@ namespace HoloKit {
             OnRelocalizationSucceeded?.Invoke();
         }
 
+        [AOT.MonoPInvokeCallback(typeof(Action<double, IntPtr>))]
+        private static void OnARSessionUpdatedFrameDelegate(double timestamp, IntPtr matrixPtr)
+        {
+            if (OnARSessionUpdatedFrame == null) return;
+
+            float[] matrixData = new float[16];
+            Marshal.Copy(matrixPtr, matrixData, 0, 16);
+            Matrix4x4 matrix = new();
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    matrix[i, j] = matrixData[(4 * i) + j];
+                }
+            }
+            OnARSessionUpdatedFrame(timestamp, matrix);
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(Action<double, IntPtr>))]
+        private static void OnARSessionUpdatedImageAnchorDelegate(double timestamp, IntPtr matrixPtr)
+        {
+            if (OnARSessionUpdatedImageAnchor == null) return;
+
+            float[] matrixData = new float[16];
+            Marshal.Copy(matrixPtr, matrixData, 0, 16);
+            Matrix4x4 matrix = new();
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    matrix[i, j] = matrixData[(4 * i) + j];
+                }
+            }
+            OnARSessionUpdatedImageAnchor(timestamp, matrix);
+        }
+
         public static event Action<ThermalState> OnThermalStateChanged;
 
         public static event Action<CameraTrackingState> OnCameraChangedTrackingState;
@@ -187,6 +226,10 @@ namespace HoloKit {
 
         public static event Action OnRelocalizationSucceeded;
 
+        public static event Action<double, Matrix4x4> OnARSessionUpdatedFrame;
+
+        public static event Action<double, Matrix4x4> OnARSessionUpdatedImageAnchor;
+
         private static XRSessionSubsystem GetLoadedXRSessionSubsystem()
         {
             List<XRSessionSubsystem> xrSessionSubsystems = new();
@@ -199,18 +242,15 @@ namespace HoloKit {
             return null;
         }
 
+        // This function can only be called once per ARSession.
+        // Errors will occur if this function is called improperly. Be very careful on this.
         public static void InterceptUnityARSessionDelegate()
         {
-            if (s_unityARSessionIntercepted)
-            {
-                Debug.Log("[HoloKitARSessionControllerAPI] Unity ARSession already intercepted");
-                return;
-            }
-            s_unityARSessionIntercepted = true;
             var xrSessionSubsystem = GetLoadedXRSessionSubsystem();
             if (xrSessionSubsystem != null)
             {
                 HoloKitSDK_InterceptUnityARSessionDelegate(xrSessionSubsystem.nativePtr);
+                Debug.Log("[HoloKitARSessionControllerAPI] Unity ARSession intercepted");
             }
         }
 
@@ -274,7 +314,7 @@ namespace HoloKit {
 
         public static void SetVideoEnhancementMode(VideoEnhancementMode mode)
         {
-            if (HoloKitHelper.IsRuntime)
+            if (HoloKitUtils.IsRuntime)
             {
                 HoloKitSDK_SetVideoEnhancementMode((int)mode);
             }
@@ -282,17 +322,19 @@ namespace HoloKit {
 
         public static void RegisterARSessionControllerDelegates()
         {
-            if (HoloKitHelper.IsRuntime)
+            if (HoloKitUtils.IsRuntime)
             {
                 HoloKitSDK_RegisterARSessionControllerDelegates(
-                OnThermalStateChangedDelegate,
-                OnCameraChangedTrackingStateDelegate,
-                OnARWorldMapStatusChangedDelegate,
-                OnGotCurrentARWorldMapDelegate,
-                OnCurrentARWorldMapSavedDelegate,
-                OnGotARWorldMapFromDiskDelegate,
-                OnARWorldMapLoadedDelegate,
-                OnRelocalizationSucceededDelegate);
+                    OnThermalStateChangedDelegate,
+                    OnCameraChangedTrackingStateDelegate,
+                    OnARWorldMapStatusChangedDelegate,
+                    OnGotCurrentARWorldMapDelegate,
+                    OnCurrentARWorldMapSavedDelegate,
+                    OnGotARWorldMapFromDiskDelegate,
+                    OnARWorldMapLoadedDelegate,
+                    OnRelocalizationSucceededDelegate,
+                    OnARSessionUpdatedFrameDelegate,
+                    OnARSessionUpdatedImageAnchorDelegate);
             }
         }
 
@@ -360,6 +402,41 @@ namespace HoloKit {
             float[] p = { position.x, position.y, position.z };
             float[] r = { rotation.x, rotation.y, rotation.z, rotation.w };
             HoloKitSDK_ResetOrigin(p, r);
+        }
+
+        public static double GetSystemUptime()
+        {
+            if (HoloKitUtils.IsRuntime)
+            {
+                return HoloKitSDK_GetSystemUptime();
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public static void ResetARSessionFirstFrame()
+        {
+            if (HoloKitUtils.IsRuntime)
+            {
+                HoloKitSDK_ResetARSessionFirstFrame();
+            }
+        }
+
+        public static double GetScreenBrightness()
+        {
+            return HoloKitSDK_GetScreenBrightness();
+        }
+
+        public static void SetScreenBrightness(double value)
+        {
+            if (HoloKitUtils.IsEditor) { return; }
+            if (value > 1f || value < 0f)
+            {
+                Debug.Log("Screen brightness value can only be within 0 and 1");
+            }
+            HoloKitSDK_SetScreenBrightness(value);
         }
     }
 }

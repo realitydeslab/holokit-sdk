@@ -1,10 +1,9 @@
 using System;
 using UnityEngine;
-using UnityEngine.XR.ARFoundation;
 
 namespace HoloKit
 {
-    public enum HandJoint
+    public enum HoloKitHandJoint
     {
         Wrist = 0,
         Thumb0 = 1,
@@ -35,51 +34,52 @@ namespace HoloKit
 
         private static HoloKitHandTracker _instance;
 
-        public bool Active
-        {
-            get => _active;
-            set
-            {
-                _active = value;
-                EnableAROcclusionManager(_active);
-                HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_active);
-            }
-        }
+        [SerializeField] private bool _isActive;
 
-        public bool Visible
-        {
-            get => _visible;
-            set
-            {
-                _visible = value;
-                SetHandJointsVisible(value);
-            }
-        }
-
-        public bool Valid
-        {
-            get
-            {
-                if (_hand.activeSelf)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        [SerializeField] private bool _active;
-
-        [SerializeField] private bool _visible;
+        [SerializeField] private bool _isVisible;
 
         [SerializeField] private float _fadeOutDelay = 1.2f;
 
         [SerializeField] private GameObject _hand;
 
         [SerializeField] private Transform[] _handJoints;
+
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                if (_isActive != value)
+                {
+                    _isActive = value;
+                    HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_isActive);
+                }
+            }
+        }
+
+        public bool IsVisible
+        {
+            get => _isVisible;
+            set
+            {
+                if (_isVisible != value)
+                {
+                    _isVisible = value;
+                    SetHandJointsVisible(value);
+                } 
+            }
+        }
+
+        public bool IsValid
+        {
+            get
+            {
+                if(HoloKitUtils.IsEditor) { return true; }
+                return _isValid;
+            }
+        }
+
+        private bool _isValid = false;
 
         private float _lastUpdateTime;
 
@@ -90,61 +90,70 @@ namespace HoloKit
             if (_instance != null && _instance != this)
             {
                 Destroy(gameObject);
+                return;
             }
             else
             {
                 _instance = this;
             }
+            HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_isActive);
+        }
 
+        private void Start()
+        {
             HoloKitHandTrackingControllerAPI.OnHandPoseUpdated += OnHandPoseUpdated;
             HoloKitHandTrackingControllerAPI.RegisterHandTrackingControllerDelegates();
-            EnableAROcclusionManager(_active);
-            HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_active);
             SetupHandJointColors();
-            SetHandJointsVisible(_visible);
+            SetHandJointsVisible(_isVisible);
+
+            if (HoloKitUtils.IsEditor)
+            {
+                _isValid = true;
+            }
         }
 
         private void OnDestroy()
         {
             HoloKitHandTrackingControllerAPI.OnHandPoseUpdated -= OnHandPoseUpdated;
+            HoloKitHandTrackingControllerAPI.SetHandTrackingActive(false);
         }
 
         private void SetupHandJointColors()
         {
             for (int i = 0; i < 21; i++)
             {
-                HandJoint joint = (HandJoint)i;
+                HoloKitHandJoint joint = (HoloKitHandJoint)i;
                 switch (joint)
                 {
-                    case HandJoint.Wrist:
+                    case HoloKitHandJoint.Wrist:
                         _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.red;
                         break;
-                    case HandJoint.Thumb0:
-                    case HandJoint.Index0:
-                    case HandJoint.Middle0:
-                    case HandJoint.Ring0:
-                    case HandJoint.Little0:
+                    case HoloKitHandJoint.Thumb0:
+                    case HoloKitHandJoint.Index0:
+                    case HoloKitHandJoint.Middle0:
+                    case HoloKitHandJoint.Ring0:
+                    case HoloKitHandJoint.Little0:
                         _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.yellow;
                         break;
-                    case HandJoint.Thumb1:
-                    case HandJoint.Index1:
-                    case HandJoint.Middle1:
-                    case HandJoint.Ring1:
-                    case HandJoint.Little1:
+                    case HoloKitHandJoint.Thumb1:
+                    case HoloKitHandJoint.Index1:
+                    case HoloKitHandJoint.Middle1:
+                    case HoloKitHandJoint.Ring1:
+                    case HoloKitHandJoint.Little1:
                         _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.green;
                         break;
-                    case HandJoint.Thumb2:
-                    case HandJoint.Index2:
-                    case HandJoint.Middle2:
-                    case HandJoint.Ring2:
-                    case HandJoint.Little2:
+                    case HoloKitHandJoint.Thumb2:
+                    case HoloKitHandJoint.Index2:
+                    case HoloKitHandJoint.Middle2:
+                    case HoloKitHandJoint.Ring2:
+                    case HoloKitHandJoint.Little2:
                         _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.cyan;
                         break;
-                    case HandJoint.Thumb3:
-                    case HandJoint.Index3:
-                    case HandJoint.Middle3:
-                    case HandJoint.Ring3:
-                    case HandJoint.Little3:
+                    case HoloKitHandJoint.Thumb3:
+                    case HoloKitHandJoint.Index3:
+                    case HoloKitHandJoint.Middle3:
+                    case HoloKitHandJoint.Ring3:
+                    case HoloKitHandJoint.Little3:
                         _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.blue;
                         break;
                 }
@@ -162,8 +171,9 @@ namespace HoloKit
         private void OnHandPoseUpdated(float[] poses)
         {
             _lastUpdateTime = Time.time;
-            if (!_hand.activeSelf)
+            if (!_isValid)
             {
+                _isValid = true;
                 _hand.SetActive(true);
                 OnHandValidityChanged?.Invoke(true);
             }
@@ -175,30 +185,24 @@ namespace HoloKit
 
         private void Update()
         {
-            if (Time.time - _lastUpdateTime > _fadeOutDelay)
+            if (!_isActive) { return; }
+
+            if (HoloKitUtils.IsEditor) { return; }
+
+            if (_isValid)
             {
-                _hand.SetActive(false);
-                OnHandValidityChanged?.Invoke(false);
+                if (Time.time - _lastUpdateTime > _fadeOutDelay)
+                {
+                    _isValid = false;
+                    _hand.SetActive(false);
+                    OnHandValidityChanged?.Invoke(false);
+                }
             }
         }
 
-        public Vector3 GetHandJointPosition(HandJoint joint)
+        public Vector3 GetHandJointPosition(HoloKitHandJoint joint)
         {
-            if (!_hand.activeSelf)
-            {
-                return Vector3.zero;
-            }
-
             return _handJoints[(int)joint].position;
-        }
-
-        private void EnableAROcclusionManager(bool enabled)
-        {
-            var arOcclusionManager = FindObjectOfType<AROcclusionManager>(true);
-            if (arOcclusionManager != null)
-            {
-                arOcclusionManager.enabled = enabled;
-            }
         }
     }
 }

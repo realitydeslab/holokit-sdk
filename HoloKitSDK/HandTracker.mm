@@ -5,7 +5,7 @@
 //  Created by Yuchen on 2021/9/17.
 //
 
-#import "HandTrackingController.h"
+#import "HandTracker.h"
 
 static const float kMaxLandmarkDepth = 0.6f;
 static const float kMaxLandmarkStartInterval = 0.12f;
@@ -15,13 +15,13 @@ static const float kMaxLandmarkEndInterval = 0.024f;
 
 void (*OnHandPoseUpdated)(float *) = NULL;
 
-@interface HandTrackingController()
+@interface HandTracker()
 
 @property (nonatomic, strong) VNDetectHumanHandPoseRequest *handPoseRequest;
 
 @end
 
-@implementation HandTrackingController
+@implementation HandTracker
 
 - (instancetype)init {
     if (self = [super init]) {
@@ -68,7 +68,7 @@ void (*OnHandPoseUpdated)(float *) = NULL;
         float landmarkDepths[21];
         float *resultLandmarks = new float[63];
         for (int landmarkIndex = 0; landmarkIndex < 21; landmarkIndex++) {
-            VNRecognizedPointKey key = [HandTrackingController landmarkIndexToHumanHandPoseKey:landmarkIndex];
+            VNRecognizedPointKey key = [HandTracker landmarkIndexToHumanHandPoseKey:landmarkIndex];
             VNRecognizedPoint *landmark = [landmarks objectForKey:key];
             // Calculate the coordinate of this point in depth buffer space.
             int depthX = landmark.x * depthBufferWidth;
@@ -81,7 +81,7 @@ void (*OnHandPoseUpdated)(float *) = NULL;
                 return;
             }
             if (landmarkIndex != 0) {
-                int landmarkParentIndex = [HandTrackingController getParentLandmarkIndex:landmarkIndex];
+                int landmarkParentIndex = [HandTracker getParentLandmarkIndex:landmarkIndex];
                 if (landmarkDepth > kMaxLandmarkDepth) {
                     landmarkDepth = landmarkDepths[landmarkParentIndex];
                 }
@@ -109,7 +109,7 @@ void (*OnHandPoseUpdated)(float *) = NULL;
             CGFloat screenX = (CGFloat)landmark.x * frame.camera.imageResolution.width;
             CGFloat screenY = (CGFloat)(1 - landmark.y) * frame.camera.imageResolution.height;
             CGPoint screenPoint = CGPointMake(screenX, screenY);
-            simd_float3 unprojectedPoint = [HandTrackingController unprojectScreenPoint:screenPoint depth:landmarkDepth frame:frame];
+            simd_float3 unprojectedPoint = [HandTracker unprojectScreenPoint:screenPoint depth:landmarkDepth frame:frame];
             resultLandmarks[landmarkIndex * 3 + 0] = unprojectedPoint.x;
             resultLandmarks[landmarkIndex * 3 + 1] = unprojectedPoint.y;
             resultLandmarks[landmarkIndex * 3 + 2] = -unprojectedPoint.z;
@@ -201,7 +201,7 @@ void (*OnHandPoseUpdated)(float *) = NULL;
 extern "C" {
 
 void HoloKitSDK_SetHandTrackingActive(bool active) {
-    [[HandTrackingController sharedInstance] setActive:active];
+    [[HandTracker sharedInstance] setActive:active];
 }
 
 void HoloKitSDK_RegisterHandTrackingControllerDelegates(void (*OnHandPoseUpdatedDelegate)(float *)) {

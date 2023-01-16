@@ -18,7 +18,7 @@ namespace HoloKit
         [AOT.MonoPInvokeCallback(typeof(Action<bool>))]
         private static void OnNFCSessionCompletedDelegate(bool success, IntPtr cameraDataPtr)
         {
-            if (success && cameraDataPtr != null)
+            if (success && HoloKitUtils.IsRuntime)
             {
                 HoloKitCameraData cameraData = ParseHoloKitCameraData(cameraDataPtr);
                 if (HoloKitCamera.Instance != null)
@@ -33,18 +33,28 @@ namespace HoloKit
 
         public static void StartNFCSession(HoloKitType holoKitType, float ipd, float farClipPlane)
         {
-            string alertMessage = "Please put your iPhone onto the HoloKit";
-            HoloKitSDK_StartNFCSession(alertMessage, (int)holoKitType, ipd, farClipPlane);
+            if (HoloKitUtils.IsRuntime)
+            {
+                string alertMessage = "Please put your iPhone onto the HoloKit";
+                HoloKitSDK_StartNFCSession(alertMessage, (int)holoKitType, ipd, farClipPlane);
+            }
         }
 
         public static void SkipNFCSessionWithPassword(string password, HoloKitType holoKitType, float ipd, float farClipPlane)
         {
-            HoloKitSDK_SkipNFCSessionWithPassword(password, (int)holoKitType, ipd, farClipPlane);
+            if (HoloKitUtils.IsRuntime)
+            {
+                HoloKitSDK_SkipNFCSessionWithPassword(password, (int)holoKitType, ipd, farClipPlane);
+            }
+            else
+            {
+                OnNFCSessionCompletedDelegate(true, (IntPtr)null);
+            }
         }
 
         public static void RegisterNFCSessionControllerDelegates()
         {
-            if (HoloKitHelper.IsRuntime)
+            if (HoloKitUtils.IsRuntime)
             {
                 HoloKitSDK_RegisterNFCSessionControllerDelegates(OnNFCSessionCompletedDelegate);
             }
