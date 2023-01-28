@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.InputSystem.XR;
 using Holoi.HoloKit.NativeInterface;
+using Holoi.HoloKit.Utils;
 
 namespace Holoi.HoloKit
 {
@@ -34,6 +35,8 @@ namespace Holoi.HoloKit
 
         [SerializeField] private float _farClipPlane = 50f;
 
+        [SerializeField] private BackgroundVideoFormat _backgroundVideoFormat = BackgroundVideoFormat.VideoFormat2K;
+
         public Transform CenterEyePose
         {
             get
@@ -47,19 +50,18 @@ namespace Holoi.HoloKit
             get => _renderMode;
             set
             {
-                if (_renderMode != value)
-                {
-                    if (value == HoloKitRenderMode.Stereo)
-                    {
-                        //HoloKitNFCSessionControllerAPI.StartNFCSession(HoloKitType.HoloKitX, _ipd, _farClipPlane);
-                    }
-                    else
-                    {
-                        _renderMode = HoloKitRenderMode.Mono;
-                        OnRenderModeChanged();
-                        OnHoloKitRenderModeChanged?.Invoke(HoloKitRenderMode.Mono);
-                    }
-                }
+                _renderMode = value;
+                SetupRenderMode();
+                OnRenderModeChanged?.Invoke(HoloKitRenderMode.Mono);
+            }
+        }
+
+        public BackgroundVideoFormat BackgroundVideoFormat
+        {
+            get => _backgroundVideoFormat;
+            set
+            {
+                _backgroundVideoFormat = value;
             }
         }
 
@@ -68,6 +70,8 @@ namespace Holoi.HoloKit
         public float ARSessionStartTime => _arSessionStartTime;
 
         private HoloKitRenderMode _renderMode = HoloKitRenderMode.Mono;
+
+        private Vector3 _cameraToCenterEyeOffset;
 
         private float _alignmentMarkerOffset;
 
@@ -89,9 +93,12 @@ namespace Holoi.HoloKit
         /// <summary>
         /// Increase iOS screen brightness gradually in each frame.
         /// </summary>
-        private const float ScreenBrightnessIncreaseStep = 0.005f;
+        private const float SCREEN_BRIGHTNESS_INCREASE_STEP = 0.005f;
 
-        public static event Action<HoloKitRenderMode> OnHoloKitRenderModeChanged;
+        /// <summary>
+        /// Invoked when the render mode changes.
+        /// </summary>
+        public static event Action<HoloKitRenderMode> OnRenderModeChanged;
 
         private void Awake()
         {
@@ -107,57 +114,52 @@ namespace Holoi.HoloKit
 
         private void Start()
         {
-            // iOS screen system settings
-            //if (HoloKitUtils.IsRuntime)
-            //{
-            //    UnityEngine.iOS.Device.hideHomeButton = true;
-            //    Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            //}
+            if (PlatformChecker.IsRuntime)
+            {
+                UnityEngine.iOS.Device.hideHomeButton = true;
+                Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            }
 
-            //// Get the reference of tracked pose drivers
-            //_defaultTrackedPoseDriver = GetComponent<TrackedPoseDriver>();
-            //_holokitTrackedPoseDriver = GetComponent<HoloKitTrackedPoseDriver>();
+            // Get the reference of tracked pose drivers
+            _defaultTrackedPoseDriver = GetComponent<TrackedPoseDriver>();
+            _holokitTrackedPoseDriver = GetComponent<HoloKitTrackedPoseDriver>();
 
-            //HoloKitNFCSessionControllerAPI.OnNFCSessionCompleted += OnNFCSessionCompleted;
-            ////HoloKitARSessionControllerAPI.ResetARSessionFirstFrame();
-            ////HoloKitARSessionControllerAPI.SetVideoEnhancementMode(_videoEnhancementMode);
+            // HoloKitARSessionControllerAPI.SetVideoEnhancementMode(_videoEnhancementMode);
+            HoloKitARSessionManagerNativeInterface.SetBackgroundVideoFormat(_backgroundVideoFormat);
 
-            //_arCameraBackground = GetComponent<ARCameraBackground>();
-            //OnRenderModeChanged();
-  
-            //_arSessionStartTime = Time.time;
+            SetupHoloKitCameraData(HoloKitStarManagerNativeInterface.GetHoloKitCameraData(_ipd, _farClipPlane));
+
+            _arCameraBackground = GetComponent<ARCameraBackground>();
+            SetupRenderMode();
+
+            _arSessionStartTime = Time.time;
         }
 
         private void Update()
         {
             if (_renderMode == HoloKitRenderMode.Stereo)
             {
-                //if (HoloKitUtils.IsRuntime)
-                //{
-                //    // Force screen brightness to be 1 in StAR mode
-                //    //var screenBrightness = HoloKitARSessionControllerAPI.GetScreenBrightness();
-                //    //if (screenBrightness < 1f)
-                //    //{
-                //    //    var newScreenBrightness = screenBrightness + ScreenBrightnessIncreaseStep;
-                //    //    if (newScreenBrightness > 1f) newScreenBrightness = 1f;
-                //    //    HoloKitARSessionControllerAPI.SetScreenBrightness(newScreenBrightness);
-                //    //    HoloKitARSessionControllerAPI.SetScreenBrightness(1f);
-                //    //}
-                //}
+                if (PlatformChecker.IsRuntime)
+                {
+                    // Force screen brightness to be 1 in StAR mode
+                    var screenBrightness = HoloKitIOSManagerNativeInterface.GetScreenBrightness();
+                    if (screenBrightness < 1f)
+                    {
+                        var newScreenBrightness = screenBrightness + SCREEN_BRIGHTNESS_INCREASE_STEP;
+                        if (newScreenBrightness > 1f)
+                            newScreenBrightness = 1f;
+                        HoloKitIOSManagerNativeInterface.SetScreenBrightness(newScreenBrightness);
+                        HoloKitIOSManagerNativeInterface.SetScreenBrightness(1f);
+                    }
+                }
 
                 if (Screen.orientation != ScreenOrientation.LandscapeLeft)
                     Screen.orientation = ScreenOrientation.LandscapeLeft;
             }
         }
 
-        private void OnDestroy()
-        {
-            //HoloKitNFCSessionControllerAPI.OnNFCSessionCompleted -= OnNFCSessionCompleted;
-        }
-
         public void SetupHoloKitCameraData(HoloKitCameraData holokitCameraData)
         {
-            _centerEyePose.localPosition = holokitCameraData.CameraToCenterEyeOffset;
             _leftEyeCamera.transform.localPosition = holokitCameraData.CenterEyeToLeftEyeOffset;
             _rightEyeCamera.transform.localPosition = holokitCameraData.CenterEyeToRightEyeOffset;
 
@@ -172,10 +174,11 @@ namespace Holoi.HoloKit
             _rightEyeCamera.rect = holokitCameraData.RightViewportRect;
             _rightEyeCamera.projectionMatrix = holokitCameraData.RightProjectionMatrix;
 
+            _cameraToCenterEyeOffset = holokitCameraData.CameraToCenterEyeOffset;
             _alignmentMarkerOffset = holokitCameraData.AlignmentMarkerOffset;
         }
 
-        private void OnRenderModeChanged()
+        private void SetupRenderMode()
         {
             if (_renderMode == HoloKitRenderMode.Stereo)
             {
@@ -186,6 +189,8 @@ namespace Holoi.HoloKit
                 _leftEyeCamera.gameObject.SetActive(true);
                 _rightEyeCamera.gameObject.SetActive(true);
                 _blackCamera.gameObject.SetActive(true);
+                // Set center eye pose offset
+                _centerEyePose.localPosition = _cameraToCenterEyeOffset;
                 // Switch tracked pose driver
                 _defaultTrackedPoseDriver.enabled = false;
                 _holokitTrackedPoseDriver.IsActive = true;
@@ -205,21 +210,6 @@ namespace Holoi.HoloKit
                 _defaultTrackedPoseDriver.enabled = true;
                 _holokitTrackedPoseDriver.IsActive = false;
             }
-        }
-
-        private void OnNFCSessionCompleted(bool success)
-        {
-            if (success)
-            {
-                _renderMode = HoloKitRenderMode.Stereo;
-                OnRenderModeChanged();
-                OnHoloKitRenderModeChanged?.Invoke(HoloKitRenderMode.Stereo);
-            }
-        }
-
-        public void OpenStereoWithoutNFC(string password)
-        {
-            //HoloKitNFCSessionControllerAPI.SkipNFCSessionWithPassword(password, HoloKitType.HoloKitX, _ipd, _farClipPlane);
         }
     }
 }

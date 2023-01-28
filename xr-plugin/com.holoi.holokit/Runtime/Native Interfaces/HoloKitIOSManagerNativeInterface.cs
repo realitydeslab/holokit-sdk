@@ -41,6 +41,20 @@ namespace Holoi.HoloKit.NativeInterface
         private static extern double HoloKitSDK_GetSystemUptime();
 
         /// <summary>
+        /// Set the screen brightness.
+        /// </summary>
+        /// <param name="brightness">Should be between 0 and 1</param>
+        [DllImport("__Internal")]
+        private static extern void HoloKitSDK_SetScreenBrightness(float brightness);
+
+        /// <summary>
+        /// Get the current screen brightness.
+        /// </summary>
+        /// <returns>The current screen brightness</returns>
+        [DllImport("__Internal")]
+        private static extern float HoloKitSDK_GetScreenBrightness();
+
+        /// <summary>
         /// Links to an Objective-C delegate which is invoked when the iOS thermal
         /// state changes.
         /// </summary>
@@ -96,6 +110,26 @@ namespace Holoi.HoloKit.NativeInterface
             else
             {
                 return 0;
+            }
+        }
+
+        public static void SetScreenBrightness(float brightness)
+        {
+            if (PlatformChecker.IsRuntime)
+            {
+                HoloKitSDK_SetScreenBrightness(brightness);
+            }
+        }
+
+        public static float GetScreenBrightness()
+        {
+            if (PlatformChecker.IsRuntime)
+            {
+                return HoloKitSDK_GetScreenBrightness();
+            }
+            else
+            {
+                return 1f;
             }
         }
     }

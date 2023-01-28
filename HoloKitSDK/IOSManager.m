@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 void (*OnThermalStateChanged)(int) = NULL;
 
@@ -51,4 +52,12 @@ int HoloKitSDK_GetThermalState(void) {
 
 double HoloKitSDK_GetSystemUptime(void) {
     return [[NSProcessInfo processInfo] systemUptime];
+}
+
+void HoloKitSDK_SetScreenBrightness(float brightness) {
+    [[UIScreen mainScreen] setBrightness:brightness];
+}
+
+float HoloKitSDK_GetScreenBrightness(void) {
+    return [[UIScreen mainScreen] brightness];
 }
