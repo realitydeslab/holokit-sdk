@@ -1,3 +1,4 @@
+using UnityEngine;
 using Holoi.HoloKit.NativeInterface;
 
 namespace Holoi.HoloKit
@@ -27,6 +28,16 @@ namespace Holoi.HoloKit
         public static float GetScreenDpi()
         {
             return HoloKitDeviceProfileNativeInterface.GetScreenDpi();
+        }
+
+        public static float GetScreenWidth()
+        {
+            return Screen.width > Screen.height ? Screen.width : Screen.height;
+        }
+
+        public static float GetScreenHeight()
+        {
+            return Screen.width < Screen.height ? Screen.width : Screen.height;
         }
     }
 }
