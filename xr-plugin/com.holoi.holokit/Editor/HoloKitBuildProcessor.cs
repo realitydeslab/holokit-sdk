@@ -22,20 +22,7 @@ namespace HoloKit.Editor
 
             void PostprocessBuild(BuildReport report)
             {
-                AddXcodePlist(report.summary.outputPath);
                 AddXcodeBuildSettings(report.summary.outputPath);
-            }
-
-            static void AddXcodePlist(string path) 
-            {
-                string plistPath = path + "/Info.plist";
-                PlistDocument plist = new();
-                plist.ReadFromFile(plistPath);
-                PlistElementDict rootDict = plist.root;
-
-                rootDict.SetString("NSCameraUsageDescription", "The app requires to use the camera to enable an immersive AR experience.");
-
-                File.WriteAllText(plistPath, plist.WriteToString());
             }
 
             private static void AddXcodeBuildSettings(string pathToBuiltProject)
