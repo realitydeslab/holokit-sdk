@@ -19,6 +19,8 @@ namespace Holoi.HoloKit
             {
                 HoloKitARSessionManagerNativeInterface.RegisterARSessionDelegates();
                 HoloKitARSessionManagerNativeInterface.SetSessionShouldAttemptRelocalization(_sessionShouldAttemptRelocalization);
+                HoloKitARSessionManagerNativeInterface.InterceptUnityARSessionDelegates();
+
                 HoloKitIOSManagerNativeInterface.RegisterIOSNativeDelegates();
                 HoloKitHandTrackerNativeInterface.RegisterHandTrackerDelegates();
             }

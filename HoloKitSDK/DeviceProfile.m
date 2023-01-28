@@ -1,10 +1,3 @@
-//
-//  HoloKitProfile.m
-//  holokit-sdk
-//
-//  Created by Yuchen Zhang on 2022/7/18.
-//
-
 #import "DeviceProfile.h"
 #import <sys/utsname.h>
 
@@ -211,7 +204,7 @@
     return phoneModel;
 }
 
-+ (BOOL)IsCurrentDeviceSupportedByHoloKit {
++ (BOOL)isSupported {
     PhoneType phoneType = [DeviceProfile getPhoneType];
     if (phoneType == iPhone12mini) {
         return false;
@@ -228,12 +221,12 @@
     return true;
 }
 
-+ (BOOL)IsCurrentDeviceIpad {
++ (BOOL)isIpad {
     PhoneType phoneType = [DeviceProfile getPhoneType];
     return phoneType == iPad;
 }
 
-+ (BOOL)IsCurrentDeviceEquippedWithLiDAR {
++ (BOOL)supportsLiDAR {
     PhoneType phoneType = [DeviceProfile getPhoneType];
     if (phoneType == iPhone12Pro) {
         return true;
@@ -257,3 +250,25 @@
 }
 
 @end
+
+bool HoloKitSDK_IsSupported(void) {
+    return [DeviceProfile isSupported];
+}
+
+bool HoloKitSDK_IsIpad(void) {
+    return [DeviceProfile isIpad];
+}
+
+bool HoloKitSDK_SupportsLiDAR(void) {
+    return [DeviceProfile supportsLiDAR];
+}
+
+float HoloKitSDK_GetHorizontalAlignmentMarkerOffset(void) {
+    HoloKitModel holokitModel = [DeviceProfile getHoloKitModel:HoloKitX];
+    return holokitModel.HorizontalAlignmentMarkerOffset;
+}
+
+float HoloKitSDK_GetScreenDpi(void) {
+    PhoneModel phoneModel = [DeviceProfile getPhoneModel];
+    return phoneModel.ScreenDpi;
+}

@@ -1,10 +1,3 @@
-//
-//  Utils.h
-//  holokit
-//
-//  Created by Yuchen Zhang on 2022/8/14.
-//
-
 #import <Foundation/Foundation.h>
 #import <simd/simd.h>
 

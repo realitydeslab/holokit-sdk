@@ -84,7 +84,8 @@ namespace Holoi.HoloKit.NativeInterface
         [AOT.MonoPInvokeCallback(typeof(Action<double, IntPtr>))]
         private static void OnARSessionUpdatedFrameDelegate(double timestamp, IntPtr matrixPtr)
         {
-            if (OnARSessionUpdatedFrame == null) return;
+            if (OnARSessionUpdatedFrame == null)
+                return;
 
             float[] matrixData = new float[16];
             Marshal.Copy(matrixPtr, matrixData, 0, 16);

@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using Holoi.HoloKit.Utils;
 
 namespace Holoi.HoloKit.NativeInterface
 {
@@ -16,8 +17,6 @@ namespace Holoi.HoloKit.NativeInterface
         public Vector3 CameraToScreenCenterOffset;
         public Vector3 CenterEyeToLeftEyeOffset;
         public Vector3 CenterEyeToRightEyeOffset;
-        // The horizontal distance from the screen center in pixels
-        public float AlignmentMarkerOffset;
     }
 
     public static class HoloKitStarManagerNativeInterface
@@ -30,10 +29,13 @@ namespace Holoi.HoloKit.NativeInterface
 
         public static HoloKitCameraData GetHoloKitCameraData(float ipd, float farClipPlane)
         {
+            if (PlatformChecker.IsEditor)
+                return new HoloKitCameraData();
+
             IntPtr cameraDataPtr = HoloKitSDK_GetHoloKitCameraData(ipd, farClipPlane);
 
-            float[] result = new float[55];
-            Marshal.Copy(cameraDataPtr, result, 0, 55);
+            float[] result = new float[54];
+            Marshal.Copy(cameraDataPtr, result, 0, 54);
             HoloKitSDK_ReleaseHoloKitCameraData(cameraDataPtr);
 
             Rect leftViewportRect = Rect.MinMaxRect(result[0], result[1], result[2], result[3]);
@@ -66,8 +68,7 @@ namespace Holoi.HoloKit.NativeInterface
                 CameraToCenterEyeOffset = new Vector3(result[42], result[43], result[44]),
                 CameraToScreenCenterOffset = new Vector3(result[45], result[46], result[47]),
                 CenterEyeToLeftEyeOffset = new Vector3(result[48], result[49], result[50]),
-                CenterEyeToRightEyeOffset = new Vector3(result[51], result[52], result[53]),
-                AlignmentMarkerOffset = result[54]
+                CenterEyeToRightEyeOffset = new Vector3(result[51], result[52], result[53])
             };
         }
     }

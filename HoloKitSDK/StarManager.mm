@@ -14,8 +14,6 @@ typedef struct {
     simd_float3 CameraToScreenCenterOffset;
     simd_float3 CenterEyeToLeftEyeOffset;
     simd_float3 CenterEyeToRightEyeOffset;
-    // The horizontal distance from the screen center in pixels
-    float AlignmentMarkerOffset;
 } HoloKitCameraData;
 
 @interface StarManager : NSObject
@@ -72,8 +70,6 @@ typedef struct {
     simd_float3 centerEyeToLeftEyeOffset = simd_make_float3(-ipd / 2.0, 0.0, 0.0);
     simd_float3 centerEyeToRightEyeOffset = simd_make_float3(ipd / 2.0, 0.0, 0.0);
     
-    float alignmentMarkerOffset = holokitModel.HorizontalAlignmentMarkerOffset / phoneModel.ScreenWidth * [[UIScreen mainScreen] bounds].size.width;
-    
     HoloKitCameraData holokitCameraData;
     holokitCameraData.LeftViewportRect = leftViewportRect;
     holokitCameraData.RightViewportRect = rightViewportRect;
@@ -85,7 +81,6 @@ typedef struct {
     holokitCameraData.CameraToScreenCenterOffset = cameraToScreenCenterOffset;
     holokitCameraData.CenterEyeToLeftEyeOffset = centerEyeToLeftEyeOffset;
     holokitCameraData.CenterEyeToRightEyeOffset = centerEyeToRightEyeOffset;
-    holokitCameraData.AlignmentMarkerOffset = alignmentMarkerOffset;
     return holokitCameraData;
 }
 
@@ -93,61 +88,64 @@ typedef struct {
 
 extern "C" {
     
-    float * HoloKitSDK_GetHoloKitCameraData(float ipd, float farClipPlane) {
-        
-        HoloKitModel holokitModel = [DeviceProfile getHoloKitModel:HoloKitX];
-        HoloKitCameraData holokitCameraData = [StarManager getHoloKitCameraData:holokitModel ipd:ipd farClipPlane:farClipPlane];
-        
-        float *result = (float *)malloc(sizeof(float) * 55);
-        result[0] = holokitCameraData.LeftViewportRect.x;
-        result[1] = holokitCameraData.LeftViewportRect.y;
-        result[2] = holokitCameraData.LeftViewportRect.z;
-        result[3] = holokitCameraData.LeftViewportRect.w;
-        result[4] = holokitCameraData.RightViewportRect.x;
-        result[5] = holokitCameraData.RightViewportRect.y;
-        result[6] = holokitCameraData.RightViewportRect.z;
-        result[7] = holokitCameraData.RightViewportRect.w;
-        result[8] = holokitCameraData.NearClipPlane;
-        result[9] = holokitCameraData.FarClipPlane;
-        for (int i = 10; i < 14; i++) {
-            result[i] = holokitCameraData.LeftProjectionMatrix.columns[i - 10].x;
-        }
-        for (int i = 14; i < 18; i++) {
-            result[i] = holokitCameraData.LeftProjectionMatrix.columns[i - 14].y;
-        }
-        for (int i = 18; i < 22; i++) {
-            result[i] = holokitCameraData.LeftProjectionMatrix.columns[i - 18].z;
-        }
-        for (int i = 22; i < 26; i++) {
-            result[i] = holokitCameraData.LeftProjectionMatrix.columns[i - 22].w;
-        }
-        for (int i = 26; i < 30; i++) {
-            result[i] = holokitCameraData.RightProjectionMatrix.columns[i - 26].x;
-        }
-        for (int i = 30; i < 34; i++) {
-            result[i] = holokitCameraData.RightProjectionMatrix.columns[i - 30].y;
-        }
-        for (int i = 34; i < 38; i++) {
-            result[i] = holokitCameraData.RightProjectionMatrix.columns[i - 34].z;
-        }
-        for (int i = 38; i < 42; i++) {
-            result[i] = holokitCameraData.RightProjectionMatrix.columns[i - 38].w;
-        }
-        result[42] = holokitCameraData.CameraToCenterEyeOffset.x;
-        result[43] = holokitCameraData.CameraToCenterEyeOffset.y;
-        result[44] = holokitCameraData.CameraToCenterEyeOffset.z;
-        result[45] = holokitCameraData.CameraToScreenCenterOffset.x;
-        result[46] = holokitCameraData.CameraToScreenCenterOffset.y;
-        result[47] = holokitCameraData.CameraToScreenCenterOffset.z;
-        result[48] = holokitCameraData.CenterEyeToLeftEyeOffset.x;
-        result[49] = holokitCameraData.CenterEyeToLeftEyeOffset.y;
-        result[50] = holokitCameraData.CenterEyeToLeftEyeOffset.z;
-        result[51] = holokitCameraData.CenterEyeToRightEyeOffset.x;
-        result[52] = holokitCameraData.CenterEyeToRightEyeOffset.y;
-        result[53] = holokitCameraData.CenterEyeToRightEyeOffset.z;
-        result[54] = holokitCameraData.AlignmentMarkerOffset;
-        
-        return result;
-    }
+float * HoloKitSDK_GetHoloKitCameraData(float ipd, float farClipPlane) {
     
+    HoloKitModel holokitModel = [DeviceProfile getHoloKitModel:HoloKitX];
+    HoloKitCameraData holokitCameraData = [StarManager getHoloKitCameraData:holokitModel ipd:ipd farClipPlane:farClipPlane];
+    
+    float *result = (float *)malloc(sizeof(float) * 54);
+    result[0] = holokitCameraData.LeftViewportRect.x;
+    result[1] = holokitCameraData.LeftViewportRect.y;
+    result[2] = holokitCameraData.LeftViewportRect.z;
+    result[3] = holokitCameraData.LeftViewportRect.w;
+    result[4] = holokitCameraData.RightViewportRect.x;
+    result[5] = holokitCameraData.RightViewportRect.y;
+    result[6] = holokitCameraData.RightViewportRect.z;
+    result[7] = holokitCameraData.RightViewportRect.w;
+    result[8] = holokitCameraData.NearClipPlane;
+    result[9] = holokitCameraData.FarClipPlane;
+    for (int i = 10; i < 14; i++) {
+        result[i] = holokitCameraData.LeftProjectionMatrix.columns[i - 10].x;
+    }
+    for (int i = 14; i < 18; i++) {
+        result[i] = holokitCameraData.LeftProjectionMatrix.columns[i - 14].y;
+    }
+    for (int i = 18; i < 22; i++) {
+        result[i] = holokitCameraData.LeftProjectionMatrix.columns[i - 18].z;
+    }
+    for (int i = 22; i < 26; i++) {
+        result[i] = holokitCameraData.LeftProjectionMatrix.columns[i - 22].w;
+    }
+    for (int i = 26; i < 30; i++) {
+        result[i] = holokitCameraData.RightProjectionMatrix.columns[i - 26].x;
+    }
+    for (int i = 30; i < 34; i++) {
+        result[i] = holokitCameraData.RightProjectionMatrix.columns[i - 30].y;
+    }
+    for (int i = 34; i < 38; i++) {
+        result[i] = holokitCameraData.RightProjectionMatrix.columns[i - 34].z;
+    }
+    for (int i = 38; i < 42; i++) {
+        result[i] = holokitCameraData.RightProjectionMatrix.columns[i - 38].w;
+    }
+    result[42] = holokitCameraData.CameraToCenterEyeOffset.x;
+    result[43] = holokitCameraData.CameraToCenterEyeOffset.y;
+    result[44] = holokitCameraData.CameraToCenterEyeOffset.z;
+    result[45] = holokitCameraData.CameraToScreenCenterOffset.x;
+    result[46] = holokitCameraData.CameraToScreenCenterOffset.y;
+    result[47] = holokitCameraData.CameraToScreenCenterOffset.z;
+    result[48] = holokitCameraData.CenterEyeToLeftEyeOffset.x;
+    result[49] = holokitCameraData.CenterEyeToLeftEyeOffset.y;
+    result[50] = holokitCameraData.CenterEyeToLeftEyeOffset.z;
+    result[51] = holokitCameraData.CenterEyeToRightEyeOffset.x;
+    result[52] = holokitCameraData.CenterEyeToRightEyeOffset.y;
+    result[53] = holokitCameraData.CenterEyeToRightEyeOffset.z;
+    
+    return result;
+}
+    
+void HoloKitSDK_ReleaseHoloKitCameraData(float *dataPtr) {
+    free(dataPtr);
+}
+
 }

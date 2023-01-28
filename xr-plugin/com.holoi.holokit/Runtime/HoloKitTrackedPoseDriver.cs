@@ -36,8 +36,7 @@ namespace Holoi.HoloKit
         {
             if (_isActive)
             {
-                if (Screen.orientation == ScreenOrientation.LandscapeLeft)
-                    matrix *= RotationMatrix;
+                matrix *= RotationMatrix;
                 transform.SetPositionAndRotation(matrix.GetPosition(), matrix.rotation);
             }
         }

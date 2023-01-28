@@ -1,10 +1,3 @@
-//
-//  Utils.m
-//  holokit-sdk
-//
-//  Created by Yuchen Zhang on 2022/8/14.
-//
-
 #import "Utils.h"
 
 @interface Utils()

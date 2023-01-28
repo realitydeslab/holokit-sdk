@@ -1,10 +1,3 @@
-//
-//  HoloKitProfile.h
-//  holokit
-//
-//  Created by Yuchen Zhang on 2022/7/18.
-//
-
 #import <Foundation/Foundation.h>
 #import <simd/simd.h>
 
@@ -92,10 +85,10 @@ typedef struct {
 
 + (PhoneModel)getPhoneModel;
 
-+ (BOOL)IsCurrentDeviceSupportedByHoloKit;
++ (BOOL)isSupported;
 
-+ (BOOL)IsCurrentDeviceIpad;
++ (BOOL)isIpad;
 
-+ (BOOL)IsCurrentDeviceEquippedWithLiDAR;
++ (BOOL)supportsLiDAR;
 
 @end

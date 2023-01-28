@@ -65,15 +65,11 @@ namespace Holoi.HoloKit
             }
         }
 
-        public float AlignmentMarkerOffset => _alignmentMarkerOffset;
-
         public float ARSessionStartTime => _arSessionStartTime;
 
         private HoloKitRenderMode _renderMode = HoloKitRenderMode.Mono;
 
         private Vector3 _cameraToCenterEyeOffset;
-
-        private float _alignmentMarkerOffset;
 
         private float _arSessionStartTime;
 
@@ -118,6 +114,8 @@ namespace Holoi.HoloKit
             {
                 UnityEngine.iOS.Device.hideHomeButton = true;
                 Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+                SetupHoloKitCameraData(HoloKitStarManagerNativeInterface.GetHoloKitCameraData(_ipd, _farClipPlane));
             }
 
             // Get the reference of tracked pose drivers
@@ -126,8 +124,6 @@ namespace Holoi.HoloKit
 
             // HoloKitARSessionControllerAPI.SetVideoEnhancementMode(_videoEnhancementMode);
             HoloKitARSessionManagerNativeInterface.SetBackgroundVideoFormat(_backgroundVideoFormat);
-
-            SetupHoloKitCameraData(HoloKitStarManagerNativeInterface.GetHoloKitCameraData(_ipd, _farClipPlane));
 
             _arCameraBackground = GetComponent<ARCameraBackground>();
             SetupRenderMode();
@@ -175,7 +171,6 @@ namespace Holoi.HoloKit
             _rightEyeCamera.projectionMatrix = holokitCameraData.RightProjectionMatrix;
 
             _cameraToCenterEyeOffset = holokitCameraData.CameraToCenterEyeOffset;
-            _alignmentMarkerOffset = holokitCameraData.AlignmentMarkerOffset;
         }
 
         private void SetupRenderMode()
