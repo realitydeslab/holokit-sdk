@@ -1,6 +1,7 @@
 using UnityEngine;
+using Holoi.HoloKit.NativeInterface;
 
-namespace HoloKit
+namespace Holoi.HoloKit
 {
     public class HoloKitTrackedPoseDriver : MonoBehaviour
     {
@@ -23,12 +24,12 @@ namespace HoloKit
 
         private void Awake()
         {
-            HoloKitARSessionControllerAPI.OnARSessionUpdatedFrame += OnARSessionUpdatedFrame;
+            HoloKitARSessionManagerNativeInterface.OnARSessionUpdatedFrame += OnARSessionUpdatedFrame;
         }
 
         private void OnDestroy()
         {
-            HoloKitARSessionControllerAPI.OnARSessionUpdatedFrame -= OnARSessionUpdatedFrame;
+            HoloKitARSessionManagerNativeInterface.OnARSessionUpdatedFrame -= OnARSessionUpdatedFrame;
         }
 
         private void OnARSessionUpdatedFrame(double timestamp, Matrix4x4 matrix)

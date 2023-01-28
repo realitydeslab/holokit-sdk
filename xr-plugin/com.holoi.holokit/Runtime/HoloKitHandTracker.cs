@@ -1,9 +1,10 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Holoi.HoloKit.NativeInterface;
 
-namespace HoloKit
+namespace Holoi.HoloKit
 {
-    public enum HoloKitHandJoint
+    public enum LandmarkType
     {
         Wrist = 0,
         Thumb0 = 1,
@@ -34,56 +35,49 @@ namespace HoloKit
 
         private static HoloKitHandTracker _instance;
 
-        [SerializeField] private bool _isActive;
+        [SerializeField] private bool _enabled;
 
-        [SerializeField] private bool _isVisible;
+        [SerializeField] private bool _debugMode;
 
-        [SerializeField] private float _fadeOutDelay = 1.2f;
-
-        [SerializeField] private GameObject _hand;
-
-        [SerializeField] private Transform[] _handJoints;
-
-        public bool IsActive
+        public bool Enabled
         {
-            get => _isActive;
+            get => _enabled;
             set
             {
-                if (_isActive != value)
-                {
-                    _isActive = value;
-                    HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_isActive);
-                }
+                _enabled = value;
+                HoloKitHandTrackerNativeInterface.SetHandTrackerEnabled(_enabled);
             }
         }
 
-        public bool IsVisible
+        public bool DebugMode
         {
-            get => _isVisible;
+            get => _debugMode;
             set
             {
-                if (_isVisible != value)
-                {
-                    _isVisible = value;
-                    SetHandJointsVisible(value);
-                } 
+                _debugMode = value;
+                SetLandmarksVisible(value); 
             }
         }
 
-        public bool IsValid
+        public int AvailableHandCount
         {
             get
             {
-                if(HoloKitUtils.IsEditor) { return true; }
-                return _isValid;
+                int count = 0;
+                foreach (var hand in _hands)
+                {
+                    if (hand.gameObject.activeSelf)
+                    {
+                        count++;
+                    }
+                }
+                return count;
             }
         }
 
-        private bool _isValid = false;
+        public List<HoloKitHand> Hands => _hands;
 
-        private float _lastUpdateTime;
-
-        public static event Action<bool> OnHandValidityChanged;
+        private readonly List<HoloKitHand> _hands = new();
 
         private void Awake()
         {
@@ -96,113 +90,101 @@ namespace HoloKit
             {
                 _instance = this;
             }
-            HoloKitHandTrackingControllerAPI.SetHandTrackingActive(_isActive);
         }
 
         private void Start()
         {
-            HoloKitHandTrackingControllerAPI.OnHandPoseUpdated += OnHandPoseUpdated;
-            HoloKitHandTrackingControllerAPI.RegisterHandTrackingControllerDelegates();
-            SetupHandJointColors();
-            SetHandJointsVisible(_isVisible);
-
-            if (HoloKitUtils.IsEditor)
+            for (int i = 0; i < transform.childCount; i++)
             {
-                _isValid = true;
+                var child = transform.GetChild(i);
+                if (child.TryGetComponent<HoloKitHand>(out var hand))
+                {
+                    _hands.Add(hand);
+                }
             }
+
+            HoloKitHandTrackerNativeInterface.OnHandPoseUpdated += OnHandPoseUpdated;
+            HoloKitHandTrackerNativeInterface.RegisterHandTrackerDelegates();
+            HoloKitHandTrackerNativeInterface.SetHandTrackerEnabled(_enabled);
+
+            SetupLandmarksColor();
+            SetLandmarksVisible(_debugMode);
         }
 
         private void OnDestroy()
         {
-            HoloKitHandTrackingControllerAPI.OnHandPoseUpdated -= OnHandPoseUpdated;
-            HoloKitHandTrackingControllerAPI.SetHandTrackingActive(false);
+            HoloKitHandTrackerNativeInterface.SetHandTrackerEnabled(false);
+            HoloKitHandTrackerNativeInterface.OnHandPoseUpdated -= OnHandPoseUpdated;
         }
 
-        private void SetupHandJointColors()
+        private void SetupLandmarksColor()
         {
-            for (int i = 0; i < 21; i++)
+            foreach (var hand in _hands)
             {
-                HoloKitHandJoint joint = (HoloKitHandJoint)i;
-                switch (joint)
+                for (int i = 0; i < HoloKitHand.MAX_LANDMARK_COUNT; i++)
                 {
-                    case HoloKitHandJoint.Wrist:
-                        _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.red;
-                        break;
-                    case HoloKitHandJoint.Thumb0:
-                    case HoloKitHandJoint.Index0:
-                    case HoloKitHandJoint.Middle0:
-                    case HoloKitHandJoint.Ring0:
-                    case HoloKitHandJoint.Little0:
-                        _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.yellow;
-                        break;
-                    case HoloKitHandJoint.Thumb1:
-                    case HoloKitHandJoint.Index1:
-                    case HoloKitHandJoint.Middle1:
-                    case HoloKitHandJoint.Ring1:
-                    case HoloKitHandJoint.Little1:
-                        _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.green;
-                        break;
-                    case HoloKitHandJoint.Thumb2:
-                    case HoloKitHandJoint.Index2:
-                    case HoloKitHandJoint.Middle2:
-                    case HoloKitHandJoint.Ring2:
-                    case HoloKitHandJoint.Little2:
-                        _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.cyan;
-                        break;
-                    case HoloKitHandJoint.Thumb3:
-                    case HoloKitHandJoint.Index3:
-                    case HoloKitHandJoint.Middle3:
-                    case HoloKitHandJoint.Ring3:
-                    case HoloKitHandJoint.Little3:
-                        _handJoints[i].GetComponent<MeshRenderer>().material.color = Color.blue;
-                        break;
+                    LandmarkType joint = (LandmarkType)i;
+                    switch (joint)
+                    {
+                        case LandmarkType.Wrist:
+                            hand.Landmarks[i].GetComponent<MeshRenderer>().material.color = Color.red;
+                            break;
+                        case LandmarkType.Thumb0:
+                        case LandmarkType.Index0:
+                        case LandmarkType.Middle0:
+                        case LandmarkType.Ring0:
+                        case LandmarkType.Little0:
+                            hand.Landmarks[i].GetComponent<MeshRenderer>().material.color = Color.yellow;
+                            break;
+                        case LandmarkType.Thumb1:
+                        case LandmarkType.Index1:
+                        case LandmarkType.Middle1:
+                        case LandmarkType.Ring1:
+                        case LandmarkType.Little1:
+                            hand.Landmarks[i].GetComponent<MeshRenderer>().material.color = Color.green;
+                            break;
+                        case LandmarkType.Thumb2:
+                        case LandmarkType.Index2:
+                        case LandmarkType.Middle2:
+                        case LandmarkType.Ring2:
+                        case LandmarkType.Little2:
+                            hand.Landmarks[i].GetComponent<MeshRenderer>().material.color = Color.cyan;
+                            break;
+                        case LandmarkType.Thumb3:
+                        case LandmarkType.Index3:
+                        case LandmarkType.Middle3:
+                        case LandmarkType.Ring3:
+                        case LandmarkType.Little3:
+                            hand.Landmarks[i].GetComponent<MeshRenderer>().material.color = Color.blue;
+                            break;
+                    }
                 }
             }
         }
 
-        private void SetHandJointsVisible(bool visible)
+        private void SetLandmarksVisible(bool visible)
         {
-            for (int i = 0; i < 21; i++)
+            foreach (var hand in _hands)
             {
-                _handJoints[i].GetComponent<MeshRenderer>().enabled = visible;
-            }
-        }
-
-        private void OnHandPoseUpdated(float[] poses)
-        {
-            _lastUpdateTime = Time.time;
-            if (!_isValid)
-            {
-                _isValid = true;
-                _hand.SetActive(true);
-                OnHandValidityChanged?.Invoke(true);
-            }
-            for (int i = 0; i < 21; i++)
-            {
-                _handJoints[i].position = new Vector3(poses[i * 3], poses[i * 3 + 1], poses[i * 3 + 2]);
-            }
-        }
-
-        private void Update()
-        {
-            if (!_isActive) { return; }
-
-            if (HoloKitUtils.IsEditor) { return; }
-
-            if (_isValid)
-            {
-                if (Time.time - _lastUpdateTime > _fadeOutDelay)
+                for (int i = 0; i < HoloKitHand.MAX_LANDMARK_COUNT; i++)
                 {
-                    _isValid = false;
-                    _hand.SetActive(false);
-                    OnHandValidityChanged?.Invoke(false);
+                    hand.Landmarks[i].GetComponent<MeshRenderer>().enabled = visible;
                 }
             }
         }
 
-        public Vector3 GetHandJointPosition(HoloKitHandJoint joint)
+        private void OnHandPoseUpdated(int handIndex, float[] poses)
         {
-            return _handJoints[(int)joint].position;
+            HoloKitHand hand = _hands[handIndex];
+            hand.LastUpdateTime = Time.time;
+            if (!hand.gameObject.activeSelf)
+            {
+                hand.gameObject.SetActive(true);
+            }
+            for (int i = 0; i < HoloKitHand.MAX_LANDMARK_COUNT; i++) {
+                hand.Landmarks[i].position = new Vector3(poses[i * 3], poses[i * 3 + 1], poses[i * 3 + 2]);
+            }
+
         }
     }
 }

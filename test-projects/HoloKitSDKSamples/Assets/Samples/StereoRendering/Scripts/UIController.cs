@@ -9,37 +9,37 @@ namespace HoloKit.Samples.StereoscopicRendering
 
         private void Awake()
         {
-            HoloKitCamera.OnHoloKitRenderModeChanged += OnHoloKitRenderModeChanged;
+            //HoloKitCamera.OnHoloKitRenderModeChanged += OnHoloKitRenderModeChanged;
         }
 
         private void OnDestroy()
         {
-            HoloKitCamera.OnHoloKitRenderModeChanged -= OnHoloKitRenderModeChanged;
+            //HoloKitCamera.OnHoloKitRenderModeChanged -= OnHoloKitRenderModeChanged;
         }
 
         public void ToggleRenderMode()
         {
-            if (HoloKitCamera.Instance.RenderMode == HoloKitRenderMode.Stereo)
-            {
-                HoloKitCamera.Instance.RenderMode = HoloKitRenderMode.Mono;
-            }
-            else
-            {
-                HoloKitCamera.Instance.RenderMode = HoloKitRenderMode.Stereo;
-                //HoloKitCamera.Instance.OpenStereoWithoutNFC("SomethingForNothing");
-            }
+            //if (HoloKitCamera.Instance.RenderMode == HoloKitRenderMode.Stereo)
+            //{
+            //    HoloKitCamera.Instance.RenderMode = HoloKitRenderMode.Mono;
+            //}
+            //else
+            //{
+            //    HoloKitCamera.Instance.RenderMode = HoloKitRenderMode.Stereo;
+            //    //HoloKitCamera.Instance.OpenStereoWithoutNFC("SomethingForNothing");
+            //}
         }
 
-        private void OnHoloKitRenderModeChanged(HoloKitRenderMode renderMode)
-        {
-            if (renderMode == HoloKitRenderMode.Stereo)
-            {
-                _renderModeText.text = "Mono";
-            }
-            else
-            {
-                _renderModeText.text = "Stereo";
-            }
-        }
+        //private void OnHoloKitRenderModeChanged(HoloKitRenderMode renderMode)
+        //{
+        //    if (renderMode == HoloKitRenderMode.Stereo)
+        //    {
+        //        _renderModeText.text = "Mono";
+        //    }
+        //    else
+        //    {
+        //        _renderModeText.text = "Stereo";
+        //    }
+        //}
     }
 }

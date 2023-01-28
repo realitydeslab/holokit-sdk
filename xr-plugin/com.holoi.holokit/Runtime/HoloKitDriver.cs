@@ -1,26 +1,28 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.ARFoundation;
+using Holoi.HoloKit.NativeInterface;
+using Holoi.HoloKit.Utils;
 
-namespace HoloKit
+namespace Holoi.HoloKit
 {
     public class HoloKitDriver : MonoBehaviour
     {
-        [SerializeField] private string[] _arSceneNames;
+        [SerializeField] private SceneField[] _arScenes;
 
         [SerializeField] private bool _sessionShouldAttemptRelocalization = false;
 
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
-            if (HoloKitUtils.IsRuntime)
+            if (PlatformChecker.IsRuntime)
             {
-                HoloKitNFCSessionControllerAPI.RegisterNFCSessionControllerDelegates();
-                HoloKitARSessionControllerAPI.RegisterARSessionControllerDelegates();
-                HoloKitARSessionControllerAPI.InterceptUnityARSessionDelegate();
-                HoloKitARSessionControllerAPI.SetSessionShouldAttemptRelocalization(_sessionShouldAttemptRelocalization);
-                SceneManager.sceneUnloaded += OnSceneUnloaded;
+                HoloKitARSessionManagerNativeInterface.RegisterARSessionDelegates();
+                HoloKitARSessionManagerNativeInterface.SetSessionShouldAttemptRelocalization(_sessionShouldAttemptRelocalization);
+                HoloKitIOSManagerNativeInterface.RegisterIOSNativeDelegates();
+                HoloKitHandTrackerNativeInterface.RegisterHandTrackerDelegates();
             }
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
         }
 
         private void OnDestroy()
@@ -30,13 +32,13 @@ namespace HoloKit
 
         private void OnSceneUnloaded(Scene scene)
         {
-            foreach (var arSceneName in _arSceneNames)
+            foreach (var arScene in _arScenes)
             {
-                if (scene.name.Equals(arSceneName))
+                if (scene.name.Equals(arScene.SceneName))
                 {
                     LoaderUtility.Deinitialize();
                     LoaderUtility.Initialize();
-                    HoloKitARSessionControllerAPI.InterceptUnityARSessionDelegate();
+                    HoloKitARSessionManagerNativeInterface.InterceptUnityARSessionDelegates();
                     return;
                 }
             }
