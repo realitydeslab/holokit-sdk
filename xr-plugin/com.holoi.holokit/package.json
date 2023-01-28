@@ -26,12 +26,12 @@
     {
       "displayName": "Stereoscopic Rendering",
       "description": "Contains sample project on how to setup a basic stereoscopic rendering scene",
-      "path": "Samples~/StereoscopicRendering"
+      "path": "Samples~/SamplesStereoscopicRendering"
     },
     {
       "displayName": "Hand Tracking",
       "description": "Contains sample project on how to setup a basic hand tracking scene",
-      "path": "Samples~/HandTracking"
+      "path": "Samples~/SamplesHandTracking"
     }
   ]
 }
