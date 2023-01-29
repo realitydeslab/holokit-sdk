@@ -70,6 +70,12 @@ namespace Holoi.HoloKit
 
         private void Start()
         {
+            if (!HoloKitDeviceProfile.SupportsLiDAR())
+            {
+                Debug.LogError("[HoloKitSDK] The current device doesn't support hand tracking since it doesn't have LiDAR sensor");
+                return;
+            }
+
             for (int i = 0; i < transform.childCount; i++)
             {
                 var child = transform.GetChild(i);

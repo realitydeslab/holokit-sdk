@@ -14,6 +14,13 @@ namespace Holoi.HoloKit
 
         private void Awake()
         {
+            // Check whether the current device is supported by HoloKit
+            if (!HoloKitDeviceProfile.IsSupported())
+            {
+                Debug.Log("[HoloKitSDK] The current device is not supported by HoloKit");
+                return;
+            }
+
             DontDestroyOnLoad(gameObject);
             if (PlatformChecker.IsRuntime)
             {
