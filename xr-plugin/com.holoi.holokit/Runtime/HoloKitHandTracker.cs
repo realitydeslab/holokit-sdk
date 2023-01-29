@@ -5,15 +5,23 @@ using Holoi.HoloKit.NativeInterface;
 
 namespace Holoi.HoloKit
 {
+    public enum MaxHandCount
+    {
+        OneHand = 0,
+        BothHands = 1
+    }
+
     public class HoloKitHandTracker : MonoBehaviour
     {
         public static HoloKitHandTracker Instance { get { return _instance; } }
 
         private static HoloKitHandTracker _instance;
 
-        [SerializeField] private bool _enabled;
+        [SerializeField] private bool _enabled = true;
 
-        [SerializeField] private bool _debugMode;
+        [SerializeField] private MaxHandCount _maxHandCount = MaxHandCount.BothHands;
+
+        [SerializeField] private bool _debugMode = true;
 
         public bool Enabled
         {
@@ -22,6 +30,16 @@ namespace Holoi.HoloKit
             {
                 _enabled = value;
                 SetHandTrackerEnabledInternal(_enabled);
+            }
+        }
+
+        public MaxHandCount MaxHandCount
+        {
+            get => _maxHandCount;
+            set
+            {
+                _maxHandCount = value;
+                SetMaxHandCountInternal(_maxHandCount);
             }
         }
 
@@ -87,6 +105,7 @@ namespace Holoi.HoloKit
 
             HoloKitHandTrackerNativeInterface.OnHandPoseUpdated += OnHandPoseUpdated;
             HoloKitHandTrackerNativeInterface.RegisterHandTrackerDelegates();
+            SetMaxHandCountInternal(_maxHandCount);
             SetHandTrackerEnabledInternal(_enabled);
 
             SetHandsVisible(_debugMode);
@@ -111,6 +130,18 @@ namespace Holoi.HoloKit
             }
 
             HoloKitHandTrackerNativeInterface.SetHandTrackerEnabled(_enabled);
+        }
+
+        private void SetMaxHandCountInternal(MaxHandCount maxHandCount)
+        {
+            if (maxHandCount == MaxHandCount.OneHand)
+            {
+                HoloKitHandTrackerNativeInterface.SetMaxHandCount(1);
+            }
+            else if (maxHandCount == MaxHandCount.BothHands)
+            {
+                HoloKitHandTrackerNativeInterface.SetMaxHandCount(2);
+            }
         }
 
         private void SetHandsVisible(bool visible)
