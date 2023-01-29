@@ -172,7 +172,6 @@ Library: lib_burst_generated64
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.Services.Core.Networking.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.Services.Core.Configuration.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/UnityEngine.SpatialTracking.dll
---root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Assembly-CSharp.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.Subsystem.Registration.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.Universal.Runtime.dll
 --root-assembly=/Users/yuchen/Projects/holoi-projects/HoloKitSDK/test-projects/HoloKitSDKSamples/Temp/StagingArea/Data/Managed/Unity.RenderPipelines.Core.Runtime.dll
