@@ -19,7 +19,7 @@ void (*OnHandPoseUpdated)(int, float *) = NULL;
 - (instancetype)init {
     if (self = [super init]) {
         self.handPoseRequest = [[VNDetectHumanHandPoseRequest alloc] init];
-        self.handPoseRequest.maximumHandCount = 1;
+        self.handPoseRequest.maximumHandCount = 2;
         self.isActive = false;
     }
     return self;
@@ -57,7 +57,7 @@ void (*OnHandPoseUpdated)(int, float *) = NULL;
         Float32 *depthBufferBaseAddress = (Float32 *)CVPixelBufferGetBaseAddress(frame.sceneDepth.depthMap);
 
         for (int i = 0; i < self.handPoseRequest.results.count; i++) {
-            VNHumanHandPoseObservation *handPoseObservation = self.handPoseRequest.results[0];
+            VNHumanHandPoseObservation *handPoseObservation = self.handPoseRequest.results[i];
             NSDictionary<VNRecognizedPointKey, VNRecognizedPoint*>* landmarks = [handPoseObservation recognizedPointsForGroupKey:VNRecognizedPointGroupKeyAll error:nil];
             float landmarkDepths[21];
             float *resultLandmarks = new float[63];
