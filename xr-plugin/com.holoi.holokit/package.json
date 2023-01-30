@@ -32,6 +32,11 @@
       "displayName": "Hand Tracking",
       "description": "Contains sample project on how to setup a basic hand tracking scene",
       "path": "Samples~/SamplesHandTracking"
+    },
+    {
+      "displayName": "Advanced Hand Tracking",
+      "description": "Contains sample project on demonstrating a common use case of hand tracking",
+      "path": "Samples~/SamplesAdvancedHandTracking"
     }
   ]
 }
