@@ -75,9 +75,9 @@ namespace Holoi.HoloKit
             }
         }
 
-        public Transform GetLandmark(LandmarkType landmarkType)
+        public Vector3 GetLandmarkPosition(LandmarkType landmarkType)
         {
-            return _landmarks[(int)landmarkType];
+            return _landmarks[(int)landmarkType].position;
         }
 
         private void SetupLandmarksColor()

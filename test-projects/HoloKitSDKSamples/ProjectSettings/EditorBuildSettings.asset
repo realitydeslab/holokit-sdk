@@ -8,9 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Samples/SamplesStereoscopicRendering/Scenes/StereoscopicRendering.unity
     guid: 856285e806b4b42aab4b0e0063fec70e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/SamplesHandTracking/Scenes/HandTracking.unity
     guid: 10d73bc17feaf46939843c09efa96a4f
+  - enabled: 1
+    path: Assets/Samples/SamplesAdvancedHandTracking/Scenes/AdvancedHandTracking.unity
+    guid: 7d821b24a265f490190ac6576481f063
   m_configObjects:
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 93af5de912d4a46bab8c38c8dcd72070, type: 2}
     UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: c71fe194885da4326b985c172881670f, type: 2}
