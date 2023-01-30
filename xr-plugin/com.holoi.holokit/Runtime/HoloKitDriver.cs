@@ -10,8 +10,6 @@ namespace Holoi.HoloKit
     {
         [SerializeField] private SceneField[] _arScenes;
 
-        [SerializeField] private bool _sessionShouldAttemptRelocalization = false;
-
         private void Awake()
         {
             // Check whether the current device is supported by HoloKit
@@ -25,7 +23,6 @@ namespace Holoi.HoloKit
             if (PlatformChecker.IsRuntime)
             {
                 HoloKitARSessionManagerNativeInterface.RegisterARSessionDelegates();
-                HoloKitARSessionManagerNativeInterface.SetSessionShouldAttemptRelocalization(_sessionShouldAttemptRelocalization);
                 HoloKitARSessionManagerNativeInterface.InterceptUnityARSessionDelegates();
 
                 HoloKitIOSManagerNativeInterface.RegisterIOSNativeDelegates();

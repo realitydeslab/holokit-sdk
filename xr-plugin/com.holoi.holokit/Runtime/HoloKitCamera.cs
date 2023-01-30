@@ -37,6 +37,8 @@ namespace Holoi.HoloKit
 
         [SerializeField] private BackgroundVideoFormat _backgroundVideoFormat = BackgroundVideoFormat.VideoFormat2K;
 
+        [SerializeField] private bool _sessionShouldAttemptRelocalization = false;
+
         public Transform CenterEyePose
         {
             get
@@ -62,6 +64,16 @@ namespace Holoi.HoloKit
             set
             {
                 _backgroundVideoFormat = value;
+            }
+        }
+
+        public bool SessionShouldAttemptRelocalization
+        {
+            get => _sessionShouldAttemptRelocalization;
+            set
+            {
+                _sessionShouldAttemptRelocalization = value;
+                HoloKitARSessionManagerNativeInterface.SetSessionShouldAttemptRelocalization(_sessionShouldAttemptRelocalization);
             }
         }
 
@@ -96,6 +108,8 @@ namespace Holoi.HoloKit
         /// </summary>
         public static event Action<HoloKitRenderMode> OnRenderModeChanged;
 
+        public static event Action<CameraTrackingState> OnCameraChangedTrackingState;
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -122,13 +136,20 @@ namespace Holoi.HoloKit
             _defaultTrackedPoseDriver = GetComponent<TrackedPoseDriver>();
             _holokitTrackedPoseDriver = GetComponent<HoloKitTrackedPoseDriver>();
 
-            // HoloKitARSessionControllerAPI.SetVideoEnhancementMode(_videoEnhancementMode);
             HoloKitARSessionManagerNativeInterface.SetBackgroundVideoFormat(_backgroundVideoFormat);
+            HoloKitARSessionManagerNativeInterface.SetSessionShouldAttemptRelocalization(_sessionShouldAttemptRelocalization);
 
             _arCameraBackground = GetComponent<ARCameraBackground>();
             SetupRenderMode();
 
             _arSessionStartTime = Time.time;
+
+            HoloKitARSessionManagerNativeInterface.OnCameraChangedTrackingState += OnCameraChangedTrackingState;
+        }
+
+        private void OnDestroy()
+        {
+            HoloKitARSessionManagerNativeInterface.OnCameraChangedTrackingState -= OnCameraChangedTrackingState;
         }
 
         private void Update()
