@@ -1,7 +1,7 @@
 {
   "name": "com.holoi.holokit",
   "displayName": "HoloKit SDK",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "unity": "2021.3",
   "description": "Provides stereoscopic rendering and hand tracking for the development of HoloKit applications.\n\nHoloKit SDK is compatible with ARFoundation.",
   "keywords": [
