@@ -3,7 +3,7 @@
   "displayName": "HoloKit SDK",
   "version": "0.0.1",
   "unity": "2021.3",
-  "description": "Provides stereoscopic rendering and hand tracking for the development of HoloKit applications.\n\nHoloKit SDK is compatible with ARFoundation.",
+  "description": "HoloKit Unity SDK enables Unity developers to develop StAR (Stereoscopic Augmented Reality) apps on HoloKit.\n\nIt provides two main features, which are stereoscopic rendering and hand tracking. The stereoscopic rendering feature allows developers to turn an AR project into a StAR one. The hand tracking feature provides a basic input method for the user to interact with the virtual contents in AR.\n\nHoloKit SDK is compatible with ARFoundation.",
   "keywords": [
     "holokit",
     "ar",
