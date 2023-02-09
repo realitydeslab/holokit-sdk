@@ -4,6 +4,9 @@ using Holoi.HoloKit.Utils;
 
 namespace Holoi.HoloKit
 {
+    /// <summary>
+    /// There are 21 landmarks for a single detected hand. This enum represent the type of a single landmark.
+    /// </summary>
     public enum LandmarkType
     {
         Wrist = 0,
@@ -42,12 +45,24 @@ namespace Holoi.HoloKit
             }
         }
 
+        /// <summary>
+        /// References of landmarks in this hand.
+        /// </summary>
         private readonly List<Transform> _landmarks = new();
 
+        /// <summary>
+        /// The timestamp of the last hand pose update.
+        /// </summary>
         private float _lastUpdateTime;
 
+        /// <summary>
+        /// There are totally 21 landmarks for a hand.
+        /// </summary>
         public const int MAX_LANDMARK_COUNT = 21;
 
+        /// <summary>
+        /// The delay before the hand changes to undetected state.
+        /// </summary>
         private const float DISAPPEAR_DELAY = 0.2f;
 
         private void Awake()
@@ -63,18 +78,28 @@ namespace Holoi.HoloKit
             SetupLandmarksColor();
 
             if (PlatformChecker.IsRuntime)
+            {
                 gameObject.SetActive(false);
+            } 
         }
 
         private void Update()
         {
+            // We set the hand to inactive when it is not detected
             if (Time.time - _lastUpdateTime > DISAPPEAR_DELAY)
             {
                 if (PlatformChecker.IsRuntime)
+                {
                     gameObject.SetActive(false);
+                }   
             }
         }
 
+        /// <summary>
+        /// Get the position of a specific landmark.
+        /// </summary>
+        /// <param name="landmarkType">The type of the desired landmark</param>
+        /// <returns>The position of the landmark</returns>
         public Vector3 GetLandmarkPosition(LandmarkType landmarkType)
         {
             return _landmarks[(int)landmarkType].position;
@@ -122,6 +147,10 @@ namespace Holoi.HoloKit
             }
         }
 
+        /// <summary>
+        /// Setting to true to make the hand landmarks visible in debug mode.
+        /// </summary>
+        /// <param name="visible">Landmark visibility</param>
         public void SetLandmarksVisible(bool visible)
         {
             for (int i = 0; i < MAX_LANDMARK_COUNT; i++)
