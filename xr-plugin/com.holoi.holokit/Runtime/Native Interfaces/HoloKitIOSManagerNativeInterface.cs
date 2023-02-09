@@ -4,6 +4,9 @@ using Holoi.HoloKit.Utils;
 
 namespace Holoi.HoloKit.NativeInterface
 {
+    /// <summary>
+    /// The thermal states of an iOS device.
+    /// </summary>
     public enum IOSThermalState
     {
         Nominal = 0,    // blue
@@ -13,14 +16,12 @@ namespace Holoi.HoloKit.NativeInterface
     }
 
     /// <summary>
-    /// This class controls some iOS native functionalities which are necessary
-    /// for HoloKit software development such as thermal state monitoring.
+    /// This native interface wraps some native iOS functionalities which are helpful when developing HoloKit apps.
     /// </summary>
     public static class HoloKitIOSManagerNativeInterface
     {
         /// <summary>
-        /// This function needs to be called at the beginning in order to receive
-        /// iOS native callbacks. This function only needs to be called once.
+        /// Needs to be called at the beginning to receive iOS native callbacks. Only needs to be called once in the app's lifecycle.
         /// </summary>
         /// <param name="OnThermalStateChanged">Invoked when the iOS thermal state changes</param>
         [DllImport("__Internal")]
@@ -55,8 +56,7 @@ namespace Holoi.HoloKit.NativeInterface
         private static extern float HoloKitSDK_GetScreenBrightness();
 
         /// <summary>
-        /// Links to an Objective-C delegate which is invoked when the iOS thermal
-        /// state changes.
+        /// Links to a native callback which is invoked when the iOS thermal state changes.
         /// </summary>
         /// <param name="state">The index of the new thermal state</param>
         [AOT.MonoPInvokeCallback(typeof(Action<int>))]
@@ -66,12 +66,12 @@ namespace Holoi.HoloKit.NativeInterface
         }
 
         /// <summary>
-        /// Invoked when the iOS thermal state changeds.
+        /// Invoked when the iOS thermal state changes.
         /// </summary>
         public static event Action<IOSThermalState> OnThermalStateChanged;
 
         /// <summary>
-        /// Call this function at the beginning of the app life cycle.
+        /// Needs to be called at the beginning to receive iOS native callbacks. Only needs to be called once in the app's lifecycle.
         /// </summary>
         public static void RegisterIOSNativeDelegates()
         {
@@ -113,6 +113,10 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Set the screen brightness, which is between 0 and 1.
+        /// </summary>
+        /// <param name="brightness">The new screen brightness value</param>
         public static void SetScreenBrightness(float brightness)
         {
             if (PlatformChecker.IsRuntime)
@@ -121,6 +125,10 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Get the current screen brightness value.
+        /// </summary>
+        /// <returns>The current screen brightness value</returns>
         public static float GetScreenBrightness()
         {
             if (PlatformChecker.IsRuntime)

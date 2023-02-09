@@ -5,6 +5,9 @@ using Holoi.HoloKit.Utils;
 
 namespace Holoi.HoloKit.NativeInterface
 {
+    /// <summary>
+    /// The data necessary to setup the stereo cameras.
+    /// </summary>
     public struct HoloKitCameraData
     {
         public Rect LeftViewportRect;
@@ -21,12 +24,28 @@ namespace Holoi.HoloKit.NativeInterface
 
     public static class HoloKitStarManagerNativeInterface
     {
+        /// <summary>
+        /// Get the camera data from the native SDK code.
+        /// </summary>
+        /// <param name="ipd">The ipd of the user</param>
+        /// <param name="farClipPlane">The far clip plane</param>
+        /// <returns>The pointer of the camera data</returns>
         [DllImport("__Internal")]
         private static extern IntPtr HoloKitSDK_GetHoloKitCameraData(float ipd, float farClipPlane);
 
+        /// <summary>
+        /// Release the pointer of the camera data.
+        /// </summary>
+        /// <param name="ptr">The pointer of the camera data</param>
         [DllImport("__Internal")]
         private static extern void HoloKitSDK_ReleaseHoloKitCameraData(IntPtr ptr);
 
+        /// <summary>
+        /// Get the parsed camera data.
+        /// </summary>
+        /// <param name="ipd">The ipd of the user</param>
+        /// <param name="farClipPlane">The far clip plane</param>
+        /// <returns>The parsed camera data</returns>
         public static HoloKitCameraData GetHoloKitCameraData(float ipd, float farClipPlane)
         {
             if (PlatformChecker.IsEditor)

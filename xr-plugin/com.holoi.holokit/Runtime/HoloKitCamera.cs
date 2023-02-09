@@ -243,7 +243,7 @@ namespace Holoi.HoloKit
         }
 
         /// <summary>
-        /// We use the parsed camera data from the native SDK to setup the stereo cameras.
+        /// We use the parsed camera data to setup the stereo cameras.
         /// </summary>
         /// <param name="holokitCameraData">The parsed camera data</param>
         private void SetupHoloKitCameraData(HoloKitCameraData holokitCameraData)

@@ -8,41 +8,42 @@ using Holoi.HoloKit.Utils;
 namespace Holoi.HoloKit.NativeInterface
 {
     /// <summary>
-    /// This class intercepts ARKit's ARSessionDelegates from ARFoundation.
+    /// This native interface wraps a corresponding native class for ARSession configuration and delegate.
     /// </summary>
     public static class HoloKitARSessionManagerNativeInterface
     {
         /// <summary>
-        /// This function needs to be called before the first ARSession arrives
-        /// so that we can receive Objective-C callbacks. This function only needs
-        /// to be called once.
+        /// This function needs to be called before the first ARSession arrives so that
+        /// we can receive native callbacks. This function only needs to be called once.
         /// </summary>
-        /// <param name="OnARSessionUpdatedFrame">Invoked when ARKit updated a new frame</param>
-        /// <param name="OnCameraChangedTrackingState">Invoked when the camera tracking state changed</param>
-        /// <param name="OnRelocalizationSucceeded">Invoked when relocalization succeeded</param>
+        /// <param name="OnARSessionUpdatedFrame">Invoked when ARSession updates a new frame</param>
+        /// <param name="OnCameraChangedTrackingState">Invoked when the camera changes its tracking state</param>
+        /// <param name="OnRelocalizationSucceeded">Invoked when relocalization succeeds</param>
         [DllImport("__Internal")]
         private static extern void HoloKitSDK_RegisterARSessionDelegates(Action<double, IntPtr> OnARSessionUpdatedFrame,
                                                                          Action<int> OnCameraChangedTrackingState,
                                                                          Action OnRelocalizationSucceeded);
 
         /// <summary>
-        /// This function also needs to be called before the first ARSession arrives
-        /// so that we can intercept ARKit's ARSessionDelegates from ARFoundation.
-        /// This function needs to be called before every new ARSession.
+        /// This function also needs to be called before the first ARSession arrives so that
+        /// we can intercept ARSessionDelegate from ARFoundation. This function needs to be called before every new ARSession.
         /// </summary>
-        /// <param name="nativeARSessionPtr"></param>
+        /// <param name="nativeARSessionPtr">The pointer of the native ARSession</param>
         [DllImport("__Internal")]
         private static extern void HoloKitSDK_InterceptUnityARSessionDelegates(IntPtr nativeARSessionPtr);
 
         /// <summary>
-        /// Set this to true to force the device to relocalize after its ARSession
-        /// has been interrupted. When set this to false, the ARSession will refresh
-        /// after being interrupted.
+        /// Setting to true to force the device to relocalize after the ARSession has been interrupted.
+        /// When setting to false, the ARSession will set its origin to the current pose after it resumes.
         /// </summary>
-        /// <param name="shouldRelocalize">Whether to relocalize after being interrupted</param>
+        /// <param name="shouldRelocalize">Whether to relocalize after an interruption</param>
         [DllImport("__Internal")]
         private static extern void HoloKitSDK_SetSessionShouldAttemptRelocalization(bool shouldRelocalize);
 
+        /// <summary>
+        /// Set the image quality of the background video feet.
+        /// </summary>
+        /// <param name="videoFormat">Background video format index</param>
         [DllImport("__Internal")]
         private static extern void HoloKitSDK_SetBackgroundVideoFormat(int videoFormat);
 
@@ -59,7 +60,7 @@ namespace Holoi.HoloKit.NativeInterface
         private static extern void HoloKitSDK_ResumeCurrentARSession();
 
         /// <summary>
-        /// Links to an Objective-C delegate which is invoked when ARKit updates a new ARSession frame. 
+        /// Links to a native callback which is invoked when ARSession updates a new frame. 
         /// </summary>
         /// <param name="timestamp">The timestamp of the ARFrame</param>
         /// <param name="matrixPtr">The pointer of the camera pose matrix</param>
@@ -83,7 +84,7 @@ namespace Holoi.HoloKit.NativeInterface
         }
 
         /// <summary>
-        /// Links to an Objective-C delegate which is invoked when camera tracking state changes.
+        /// Links to a native callback which is invoked when the camera changes its tracking state.
         /// </summary>
         /// <param name="state">The index of the new camera tracking state</param>
         [AOT.MonoPInvokeCallback(typeof(Action<int>))]
@@ -93,7 +94,7 @@ namespace Holoi.HoloKit.NativeInterface
         }
 
         /// <summary>
-        /// Links to an Objective-C delegate which is invoked when relocalization succeeds.
+        /// Links to a native callback which is invoked when relocalization succeeds.
         /// </summary>
         [AOT.MonoPInvokeCallback(typeof(Action))]
         private static void OnRelocalizationSucceededDelegate()
@@ -102,12 +103,14 @@ namespace Holoi.HoloKit.NativeInterface
         }
 
         /// <summary>
-        /// Invoked when ARKit updates a new ARFrame.
+        /// Invoked when ARSession updates a new frame.
+        /// The first parameter is the timestamp of the frame and the second parameter is the camera pose matrix.
         /// </summary>
         public static event Action<double, Matrix4x4> OnARSessionUpdatedFrame;
 
         /// <summary>
-        /// Invoked when camera tracking state changes.
+        /// Invoked when the camera changes its tracking state.
+        /// The parameter is the new camera tracking state.
         /// </summary>
         public static event Action<CameraTrackingState> OnCameraChangedTrackingState;
 
@@ -116,6 +119,10 @@ namespace Holoi.HoloKit.NativeInterface
         /// </summary>
         public static event Action OnRelocalizationSucceeded;
 
+        /// <summary>
+        /// Needs to be called before the first frame of the ARSession to register native callbacks.
+        /// Only needs to be called once in the app lifecycle.
+        /// </summary>
         public static void RegisterARSessionDelegates()
         {
             if (PlatformChecker.IsRuntime)
@@ -126,6 +133,10 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// A helper function to get the XRSessionSubsystem.
+        /// </summary>
+        /// <returns>XRSessionSubsystem</returns>
         private static XRSessionSubsystem GetLoadedXRSessionSubsystem()
         {
             List<XRSessionSubsystem> xrSessionSubsystems = new();
@@ -138,6 +149,10 @@ namespace Holoi.HoloKit.NativeInterface
             return null;
         }
 
+        /// <summary>
+        /// Needs to be called before the first frame of each ARSession. It will pass the native
+        /// ARSession pointer to the native SDK code and allow the native SDK code to relay the ARSessionDelegate.
+        /// </summary>
         public static void InterceptUnityARSessionDelegates()
         {
             if (PlatformChecker.IsEditor)
@@ -153,6 +168,11 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Setting to true to force the ARSession to relocalize after being interrupted.
+        /// Otherwise, the ARSession will set its current pose as its origin after the interruption ends.
+        /// </summary>
+        /// <param name="shouldRelocalize"></param>
         public static void SetSessionShouldAttemptRelocalization(bool shouldRelocalize)
         {
             if (PlatformChecker.IsRuntime)
@@ -161,6 +181,10 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Set the format of the background video feed.
+        /// </summary>
+        /// <param name="videoFormat"></param>
         public static void SetBackgroundVideoFormat(BackgroundVideoFormat videoFormat)
         {
             if (PlatformChecker.IsRuntime)
@@ -169,6 +193,9 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Pause the current ARSession.
+        /// </summary>
         public static void PauseCurrentARSession()
         {
             if (PlatformChecker.IsRuntime)
@@ -177,6 +204,9 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Resume the paused ARSession.
+        /// </summary>
         public static void ResumeCurrentARSession()
         {
             if (PlatformChecker.IsRuntime)

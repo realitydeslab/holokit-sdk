@@ -7,7 +7,7 @@ namespace Holoi.HoloKit.NativeInterface
     public static class HoloKitDeviceProfileNativeInterface
     {
         /// <summary>
-		/// Check if the current device is supported by HoloKit.
+		/// Check if the current device is supported by HoloKit SDK.
 		/// </summary>
 		/// <returns>Whether the device is supported</returns>
         [DllImport("__Internal")]
@@ -41,6 +41,10 @@ namespace Holoi.HoloKit.NativeInterface
         [DllImport("__Internal")]
         private static extern float HoloKitSDK_GetScreenDpi();
 
+        /// <summary>
+        /// Check if the current device is supported by HoloKit SDK.
+        /// </summary>
+        /// <returns>Returns true if supported</returns>
         public static bool IsSupported()
         {
             if (PlatformChecker.IsRuntime)
@@ -53,6 +57,10 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Check if the current device is an iPad supported by HoloKit SDK.
+        /// </summary>
+        /// <returns>Returns true for iPads</returns>
         public static bool IsIpad()
         {
             if (PlatformChecker.IsRuntime)
@@ -65,6 +73,10 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Check if the current device is equipped with LiDAR sensor.
+        /// </summary>
+        /// <returns>Returns true for supported</returns>
         public static bool SupportsLiDAR()
         {
             if (PlatformChecker.IsRuntime)
@@ -77,6 +89,11 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Get the horizontal alignment marker offset in meters. The horizontal alignment marker offset
+        /// is the horizontal distance between the middle of the HoloKit headset to the alignment marker.
+        /// </summary>
+        /// <returns>Offset in meters</returns>
         public static float GetHorizontalAlignmentMarkerOffset()
         {
             if (PlatformChecker.IsRuntime)
@@ -89,6 +106,10 @@ namespace Holoi.HoloKit.NativeInterface
             }
         }
 
+        /// <summary>
+        /// Get the screen dpi of the current device.
+        /// </summary>
+        /// <returns>The screen dpi</returns>
         public static float GetScreenDpi()
         {
             if (PlatformChecker.IsRuntime)
