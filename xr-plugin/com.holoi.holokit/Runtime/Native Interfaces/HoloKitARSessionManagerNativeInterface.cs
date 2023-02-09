@@ -7,24 +7,6 @@ using Holoi.HoloKit.Utils;
 
 namespace Holoi.HoloKit.NativeInterface
 {
-    public enum BackgroundVideoFormat
-    {
-        VideoFormat2K = 0,
-        VideoFormat4K = 1,
-        VideoFormat4KHDR = 2
-    }
-
-    public enum CameraTrackingState
-    {
-        NotAvailable = 0,
-        LimitedWithReasonNone = 1,
-        LimitedWithReasonInitializing = 2,
-        LimitedWithReasonExcessiveMotion = 3,
-        LimitedWithReasonInsufficientFeatures = 4,
-        LimitedWithReasonRelocalizing = 5,
-        Normal = 6
-    }
-
     /// <summary>
     /// This class intercepts ARKit's ARSessionDelegates from ARFoundation.
     /// </summary>
