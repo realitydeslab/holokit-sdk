@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [0.0.2] - 2023-02-10
 
-### Fixed
+### Changed
+
+- Updated "HoloKit UI Canvas" prefab with a more flexible button to switch render mode.
+
+## [0.0.1] - 2023-01-31
+
+This is the first release of HoloKit Unity SDK Package.
