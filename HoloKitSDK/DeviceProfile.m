@@ -65,10 +65,27 @@
         return iPhone14Pro;
     } else if ([deviceName isEqualToString:@"iPhone15,3"]) {
         return iPhone14ProMax;
-    } else if ([deviceName isEqualToString:@"iPad13,8"] ||
+    } else if ([deviceName isEqualToString:@"iPhone15,4"]) {
+        return iPhone15;
+    } else if ([deviceName isEqualToString:@"iPhone15,5"]) {
+        return iPhone15Plus;
+    } else if ([deviceName isEqualToString:@"iPhone16,1"]) {
+        return iPhone15Pro;
+    } else if ([deviceName isEqualToString:@"iPhone16,2"]) {
+        return iPhone15ProMax;
+    }else if ( [deviceName isEqualToString:@"iPad13,4"] ||
+               [deviceName isEqualToString:@"iPad13,5"] ||
+               [deviceName isEqualToString:@"iPad13,6"] ||
+               [deviceName isEqualToString:@"iPad13,7"] ||
+               [deviceName isEqualToString:@"iPad13,8"] ||
                [deviceName isEqualToString:@"iPad13,9"] ||
                [deviceName isEqualToString:@"iPad13,10"] ||
-               [deviceName isEqualToString:@"iPad13,11"]) {
+               [deviceName isEqualToString:@"iPad13,11"] ||
+               [deviceName isEqualToString:@"iPad14,3"] ||
+               [deviceName isEqualToString:@"iPad14,4"] ||
+               [deviceName isEqualToString:@"iPad14,5"] ||
+               [deviceName isEqualToString:@"iPad14,6"]
+              ) {
         return iPad;
     } else {
         return Unknown;
@@ -191,13 +208,41 @@
             phoneModel.CameraOffset = simd_make_float3(0.046835, -0.0633, -0.0078);
             phoneModel.ScreenDpi = 460;
             break;
+        case iPhone15:
+            phoneModel.ScreenWidth = 0.141136;
+            phoneModel.ScreenHeight = 0.0651013;
+            phoneModel.ScreenBottom = 0.003275;
+            phoneModel.CameraOffset = simd_make_float3(0.04818, -0.042715, -0.0069);
+            phoneModel.ScreenDpi = 460;
+            break;
+        case iPhone15Plus:
+            phoneModel.ScreenWidth = 0.154388;
+            phoneModel.ScreenHeight = 0.0712304;
+            phoneModel.ScreenBottom = 0.003275;
+            phoneModel.CameraOffset = simd_make_float3(0.054805, -0.048845, -0.0069);
+            phoneModel.ScreenDpi = 458;
+            break;
+        case iPhone15Pro:
+            phoneModel.ScreenWidth = 0.141136;
+            phoneModel.ScreenHeight = 0.0651013;
+            phoneModel.ScreenBottom = 0.00276;
+            phoneModel.CameraOffset = simd_make_float3(0.039895, -0.03254, -0.00759);
+            phoneModel.ScreenDpi = 460;
+            break;
+        case iPhone15ProMax:
+            phoneModel.ScreenWidth = 0.154388;
+            phoneModel.ScreenHeight = 0.0712304;
+            phoneModel.ScreenBottom = 0.00276;
+            phoneModel.CameraOffset = simd_make_float3(0.04652, -0.0598, -0.00773);
+            phoneModel.ScreenDpi = 460;
+            break;
         case iPad:
         case Unknown:
         default:
             phoneModel.ScreenWidth = 0.15390;
             phoneModel.ScreenHeight = 0.07113;
-            phoneModel.ScreenBottom = 0.00347;
-            phoneModel.CameraOffset = simd_make_float3(0.066945, -0.061695, -0.0091);
+            phoneModel.ScreenBottom = 0.00276;
+            phoneModel.CameraOffset = simd_make_float3(0.04652, -0.0598, -0.00773);
             phoneModel.ScreenDpi = 460;
             break;
     }
@@ -246,6 +291,13 @@
     if (phoneType == iPhone14ProMax) {
         return true;
     }
+    if (phoneType == iPhone15Pro) {
+        return true;
+    }
+    if (phoneType == iPhone15ProMax) {
+        return true;
+    }
+
     return false;
 }
 
