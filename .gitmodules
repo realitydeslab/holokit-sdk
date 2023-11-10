@@ -1,3 +1,0 @@
-[submodule "sdk/third_party/eigen"]
-	path = sdk/third_party/eigen
-	url = https://github.com/eigenteam/eigen-git-mirror
