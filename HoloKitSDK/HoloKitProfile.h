@@ -29,6 +29,10 @@ typedef enum {
     iPhone14Plus = 13,
     iPhone14Pro = 14,
     iPhone14ProMax = 15,
+    iPhone15 = 16,
+    iPhone15Plus = 17,
+    iPhone15Pro = 18,
+    iPhone15ProMax = 19,
     iPad = 101, // all iPads are the same to us
     Unknown = 999
 } PhoneType;

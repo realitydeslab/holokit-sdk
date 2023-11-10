@@ -189,7 +189,7 @@
 				4BE7B607261104ED001F39F2 /* Sources */,
 				4BE7B608261104ED001F39F2 /* Frameworks */,
 				4BE7B609261104ED001F39F2 /* Copy Files */,
-				4BE7B6F22611CE4B001F39F2 /* ShellScript */,
+				4BE7B6F22611CE4B001F39F2 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -234,7 +234,7 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4BE7B6F22611CE4B001F39F2 /* ShellScript */ = {
+		4BE7B6F22611CE4B001F39F2 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -243,6 +243,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -282,7 +283,7 @@
 					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
 					"$(SRCROOT)/sdk/third_party/eigen",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -313,7 +314,7 @@
 					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
 					"$(SRCROOT)/sdk/third_party/eigen",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
