@@ -16,6 +16,28 @@
 		4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9A6A0278AA53C000BD266 /* Crypto.swift */; };
 		4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE74F4928853F6E0086FB89 /* HoloKitProfile.m */; };
 		4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */; };
+		9605FE292AFE32B400925F49 /* LowLatencyTracking.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE282AFE325C00925F49 /* LowLatencyTracking.cc */; };
+		9605FE2A2AFE32C600925F49 /* matrixutils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE252AFE325C00925F49 /* matrixutils.cc */; };
+		9605FE2B2AFE32C700925F49 /* matrix_3x3.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE262AFE325C00925F49 /* matrix_3x3.cc */; };
+		9605FE2C2AFE32C900925F49 /* is_initialized.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE1E2AFE325C00925F49 /* is_initialized.cc */; };
+		9605FE2D2AFE32CB00925F49 /* matrix_4x4.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE1C2AFE325C00925F49 /* matrix_4x4.cc */; };
+		9605FE2E2AFE32CC00925F49 /* vectorutils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE1A2AFE325C00925F49 /* vectorutils.cc */; };
+		9605FE2F2AFE32CD00925F49 /* rotation.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE192AFE325C00925F49 /* rotation.cc */; };
+		9605FE302AFE32D100925F49 /* lowpass_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FDF62AFE325B00925F49 /* lowpass_filter.cc */; };
+		9605FE312AFE32D200925F49 /* median_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FDF72AFE325B00925F49 /* median_filter.cc */; };
+		9605FE322AFE32D300925F49 /* neck_model.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FDF82AFE325B00925F49 /* neck_model.cc */; };
+		9605FE332AFE32D400925F49 /* sensor_fusion_ekf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FDF92AFE325B00925F49 /* sensor_fusion_ekf.cc */; };
+		9605FE342AFE32D600925F49 /* gyroscope_bias_estimator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE072AFE325B00925F49 /* gyroscope_bias_estimator.cc */; };
+		9605FE352AFE32D700925F49 /* mean_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE0C2AFE325B00925F49 /* mean_filter.cc */; };
+		9605FE362AFE32DA00925F49 /* head_tracker.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE0F2AFE325B00925F49 /* head_tracker.cc */; };
+		9605FE372AFE32DB00925F49 /* cardboard.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FDF32AFE325B00925F49 /* cardboard.cc */; };
+		9605FE382AFE32DC00925F49 /* cardboard_input_api.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE152AFE325B00925F49 /* cardboard_input_api.mm */; };
+		9605FE3F2AFE331800925F49 /* device_gyroscope_sensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9605FDFD2AFE325B00925F49 /* device_gyroscope_sensor.mm */; };
+		9605FE412AFE331A00925F49 /* device_accelerometer_sensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9605FDFF2AFE325B00925F49 /* device_accelerometer_sensor.mm */; };
+		9605FE422AFE331B00925F49 /* sensor_event_producer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE002AFE325B00925F49 /* sensor_event_producer.mm */; };
+		9605FE432AFE331C00925F49 /* sensor_helper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE012AFE325B00925F49 /* sensor_helper.mm */; };
+		9605FE4B2AFE332900925F49 /* rotation_data.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE112AFE325B00925F49 /* rotation_data.cc */; };
+		9605FE4C2AFE332A00925F49 /* position_data.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE122AFE325B00925F49 /* position_data.cc */; };
 		96C102C1279152B30052AF2B /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96C102C0279152B30052AF2B /* CryptoKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +92,55 @@
 		4BE74F4B28853F910086FB89 /* HoloKitProfile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HoloKitProfile.h; sourceTree = "<group>"; };
 		4BE74F4E288540DD0086FB89 /* HoloKitOptics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HoloKitOptics.mm; sourceTree = "<group>"; };
 		4BE7B60B261104ED001F39F2 /* libholokit-sdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libholokit-sdk.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9605FDF32AFE325B00925F49 /* cardboard.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cardboard.cc; sourceTree = "<group>"; };
+		9605FDF52AFE325B00925F49 /* device_accelerometer_sensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = device_accelerometer_sensor.h; sourceTree = "<group>"; };
+		9605FDF62AFE325B00925F49 /* lowpass_filter.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lowpass_filter.cc; sourceTree = "<group>"; };
+		9605FDF72AFE325B00925F49 /* median_filter.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = median_filter.cc; sourceTree = "<group>"; };
+		9605FDF82AFE325B00925F49 /* neck_model.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = neck_model.cc; sourceTree = "<group>"; };
+		9605FDF92AFE325B00925F49 /* sensor_fusion_ekf.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sensor_fusion_ekf.cc; sourceTree = "<group>"; };
+		9605FDFA2AFE325B00925F49 /* lowpass_filter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lowpass_filter.h; sourceTree = "<group>"; };
+		9605FDFB2AFE325B00925F49 /* sensor_fusion_ekf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sensor_fusion_ekf.h; sourceTree = "<group>"; };
+		9605FDFD2AFE325B00925F49 /* device_gyroscope_sensor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = device_gyroscope_sensor.mm; sourceTree = "<group>"; };
+		9605FDFE2AFE325B00925F49 /* sensor_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sensor_helper.h; sourceTree = "<group>"; };
+		9605FDFF2AFE325B00925F49 /* device_accelerometer_sensor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = device_accelerometer_sensor.mm; sourceTree = "<group>"; };
+		9605FE002AFE325B00925F49 /* sensor_event_producer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_event_producer.mm; sourceTree = "<group>"; };
+		9605FE012AFE325B00925F49 /* sensor_helper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_helper.mm; sourceTree = "<group>"; };
+		9605FE022AFE325B00925F49 /* gyroscope_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gyroscope_data.h; sourceTree = "<group>"; };
+		9605FE032AFE325B00925F49 /* accelerometer_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = accelerometer_data.h; sourceTree = "<group>"; };
+		9605FE042AFE325B00925F49 /* device_gyroscope_sensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = device_gyroscope_sensor.h; sourceTree = "<group>"; };
+		9605FE052AFE325B00925F49 /* neck_model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = neck_model.h; sourceTree = "<group>"; };
+		9605FE062AFE325B00925F49 /* mean_filter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mean_filter.h; sourceTree = "<group>"; };
+		9605FE072AFE325B00925F49 /* gyroscope_bias_estimator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gyroscope_bias_estimator.cc; sourceTree = "<group>"; };
+		9605FE082AFE325B00925F49 /* gyroscope_bias_estimator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gyroscope_bias_estimator.h; sourceTree = "<group>"; };
+		9605FE092AFE325B00925F49 /* rotation_state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rotation_state.h; sourceTree = "<group>"; };
+		9605FE0A2AFE325B00925F49 /* sensor_event_producer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sensor_event_producer.h; sourceTree = "<group>"; };
+		9605FE0B2AFE325B00925F49 /* median_filter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = median_filter.h; sourceTree = "<group>"; };
+		9605FE0C2AFE325B00925F49 /* mean_filter.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mean_filter.cc; sourceTree = "<group>"; };
+		9605FE0D2AFE325B00925F49 /* head_tracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = head_tracker.h; sourceTree = "<group>"; };
+		9605FE0E2AFE325B00925F49 /* cardboard_input_api.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cardboard_input_api.h; sourceTree = "<group>"; };
+		9605FE0F2AFE325B00925F49 /* head_tracker.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = head_tracker.cc; sourceTree = "<group>"; };
+		9605FE112AFE325B00925F49 /* rotation_data.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rotation_data.cc; sourceTree = "<group>"; };
+		9605FE122AFE325B00925F49 /* position_data.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = position_data.cc; sourceTree = "<group>"; };
+		9605FE132AFE325B00925F49 /* rotation_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rotation_data.h; sourceTree = "<group>"; };
+		9605FE142AFE325B00925F49 /* position_data.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = position_data.h; sourceTree = "<group>"; };
+		9605FE152AFE325B00925F49 /* cardboard_input_api.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = cardboard_input_api.mm; sourceTree = "<group>"; };
+		9605FE172AFE325C00925F49 /* cardboard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cardboard.h; sourceTree = "<group>"; };
+		9605FE192AFE325C00925F49 /* rotation.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rotation.cc; sourceTree = "<group>"; };
+		9605FE1A2AFE325C00925F49 /* vectorutils.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = vectorutils.cc; sourceTree = "<group>"; };
+		9605FE1B2AFE325C00925F49 /* rotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rotation.h; sourceTree = "<group>"; };
+		9605FE1C2AFE325C00925F49 /* matrix_4x4.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = matrix_4x4.cc; sourceTree = "<group>"; };
+		9605FE1D2AFE325C00925F49 /* logging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
+		9605FE1E2AFE325C00925F49 /* is_initialized.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = is_initialized.cc; sourceTree = "<group>"; };
+		9605FE1F2AFE325C00925F49 /* matrixutils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = matrixutils.h; sourceTree = "<group>"; };
+		9605FE202AFE325C00925F49 /* vectorutils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vectorutils.h; sourceTree = "<group>"; };
+		9605FE212AFE325C00925F49 /* matrix_3x3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = matrix_3x3.h; sourceTree = "<group>"; };
+		9605FE222AFE325C00925F49 /* matrix_4x4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = matrix_4x4.h; sourceTree = "<group>"; };
+		9605FE232AFE325C00925F49 /* is_initialized.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = is_initialized.h; sourceTree = "<group>"; };
+		9605FE242AFE325C00925F49 /* vector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
+		9605FE252AFE325C00925F49 /* matrixutils.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = matrixutils.cc; sourceTree = "<group>"; };
+		9605FE262AFE325C00925F49 /* matrix_3x3.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = matrix_3x3.cc; sourceTree = "<group>"; };
+		9605FE272AFE325C00925F49 /* is_arg_null.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = is_arg_null.h; sourceTree = "<group>"; };
+		9605FE282AFE325C00925F49 /* LowLatencyTracking.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LowLatencyTracking.cc; sourceTree = "<group>"; };
 		961B8AFF253BBABF0025BA7D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		961B8B02253BBACC0025BA7D /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk/System/iOSSupport/System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
 		9666E9902572395C00A7F127 /* HandTracker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HandTracker.framework; path = sdk/third_party/HandTracker.framework; sourceTree = "<group>"; };
@@ -129,6 +200,7 @@
 		4BE7B60C261104ED001F39F2 /* HoloKitSDK */ = {
 			isa = PBXGroup;
 			children = (
+				9605FDF22AFE320000925F49 /* LowLatencyTracking */,
 				4B341B082859DEB0006AB99C /* UnityPluginApi */,
 				4B6C941F261493E300CBDFB4 /* ARSessionDelegateManager.mm */,
 				4BB5587226205B7D00DC0213 /* NFCSessionController.m */,
@@ -143,6 +215,102 @@
 				4B507AF428A8DC44001FD1D7 /* Utils.mm */,
 			);
 			path = HoloKitSDK;
+			sourceTree = "<group>";
+		};
+		9605FDF22AFE320000925F49 /* LowLatencyTracking */ = {
+			isa = PBXGroup;
+			children = (
+				9605FE0E2AFE325B00925F49 /* cardboard_input_api.h */,
+				9605FE152AFE325B00925F49 /* cardboard_input_api.mm */,
+				9605FDF32AFE325B00925F49 /* cardboard.cc */,
+				9605FE0F2AFE325B00925F49 /* head_tracker.cc */,
+				9605FE0D2AFE325B00925F49 /* head_tracker.h */,
+				9605FE162AFE325C00925F49 /* include */,
+				9605FDF42AFE325B00925F49 /* sensors */,
+				9605FE102AFE325B00925F49 /* sixdof */,
+				9605FE282AFE325C00925F49 /* LowLatencyTracking.cc */,
+				9605FE182AFE325C00925F49 /* util */,
+			);
+			path = LowLatencyTracking;
+			sourceTree = "<group>";
+		};
+		9605FDF42AFE325B00925F49 /* sensors */ = {
+			isa = PBXGroup;
+			children = (
+				9605FDF52AFE325B00925F49 /* device_accelerometer_sensor.h */,
+				9605FDF62AFE325B00925F49 /* lowpass_filter.cc */,
+				9605FDF72AFE325B00925F49 /* median_filter.cc */,
+				9605FDF82AFE325B00925F49 /* neck_model.cc */,
+				9605FDF92AFE325B00925F49 /* sensor_fusion_ekf.cc */,
+				9605FDFA2AFE325B00925F49 /* lowpass_filter.h */,
+				9605FDFB2AFE325B00925F49 /* sensor_fusion_ekf.h */,
+				9605FDFC2AFE325B00925F49 /* ios */,
+				9605FE022AFE325B00925F49 /* gyroscope_data.h */,
+				9605FE032AFE325B00925F49 /* accelerometer_data.h */,
+				9605FE042AFE325B00925F49 /* device_gyroscope_sensor.h */,
+				9605FE052AFE325B00925F49 /* neck_model.h */,
+				9605FE062AFE325B00925F49 /* mean_filter.h */,
+				9605FE072AFE325B00925F49 /* gyroscope_bias_estimator.cc */,
+				9605FE082AFE325B00925F49 /* gyroscope_bias_estimator.h */,
+				9605FE092AFE325B00925F49 /* rotation_state.h */,
+				9605FE0A2AFE325B00925F49 /* sensor_event_producer.h */,
+				9605FE0B2AFE325B00925F49 /* median_filter.h */,
+				9605FE0C2AFE325B00925F49 /* mean_filter.cc */,
+			);
+			path = sensors;
+			sourceTree = "<group>";
+		};
+		9605FDFC2AFE325B00925F49 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				9605FDFD2AFE325B00925F49 /* device_gyroscope_sensor.mm */,
+				9605FDFE2AFE325B00925F49 /* sensor_helper.h */,
+				9605FDFF2AFE325B00925F49 /* device_accelerometer_sensor.mm */,
+				9605FE002AFE325B00925F49 /* sensor_event_producer.mm */,
+				9605FE012AFE325B00925F49 /* sensor_helper.mm */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+		9605FE102AFE325B00925F49 /* sixdof */ = {
+			isa = PBXGroup;
+			children = (
+				9605FE112AFE325B00925F49 /* rotation_data.cc */,
+				9605FE122AFE325B00925F49 /* position_data.cc */,
+				9605FE132AFE325B00925F49 /* rotation_data.h */,
+				9605FE142AFE325B00925F49 /* position_data.h */,
+			);
+			path = sixdof;
+			sourceTree = "<group>";
+		};
+		9605FE162AFE325C00925F49 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				9605FE172AFE325C00925F49 /* cardboard.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		9605FE182AFE325C00925F49 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				9605FE192AFE325C00925F49 /* rotation.cc */,
+				9605FE1A2AFE325C00925F49 /* vectorutils.cc */,
+				9605FE1B2AFE325C00925F49 /* rotation.h */,
+				9605FE1C2AFE325C00925F49 /* matrix_4x4.cc */,
+				9605FE1D2AFE325C00925F49 /* logging.h */,
+				9605FE1E2AFE325C00925F49 /* is_initialized.cc */,
+				9605FE1F2AFE325C00925F49 /* matrixutils.h */,
+				9605FE202AFE325C00925F49 /* vectorutils.h */,
+				9605FE212AFE325C00925F49 /* matrix_3x3.h */,
+				9605FE222AFE325C00925F49 /* matrix_4x4.h */,
+				9605FE232AFE325C00925F49 /* is_initialized.h */,
+				9605FE242AFE325C00925F49 /* vector.h */,
+				9605FE252AFE325C00925F49 /* matrixutils.cc */,
+				9605FE262AFE325C00925F49 /* matrix_3x3.cc */,
+				9605FE272AFE325C00925F49 /* is_arg_null.h */,
+			);
+			path = util;
 			sourceTree = "<group>";
 		};
 		96602134253930CC004019A5 = {
@@ -262,7 +430,29 @@
 				4BB5587326205B7D00DC0213 /* NFCSessionController.m in Sources */,
 				4BE74F4A28853F6E0086FB89 /* HoloKitProfile.m in Sources */,
 				4B507AF528A8DC44001FD1D7 /* Utils.mm in Sources */,
+				9605FE312AFE32D200925F49 /* median_filter.cc in Sources */,
+				9605FE332AFE32D400925F49 /* sensor_fusion_ekf.cc in Sources */,
+				9605FE372AFE32DB00925F49 /* cardboard.cc in Sources */,
+				9605FE382AFE32DC00925F49 /* cardboard_input_api.mm in Sources */,
+				9605FE362AFE32DA00925F49 /* head_tracker.cc in Sources */,
+				9605FE3F2AFE331800925F49 /* device_gyroscope_sensor.mm in Sources */,
+				9605FE4B2AFE332900925F49 /* rotation_data.cc in Sources */,
+				9605FE4C2AFE332A00925F49 /* position_data.cc in Sources */,
+				9605FE412AFE331A00925F49 /* device_accelerometer_sensor.mm in Sources */,
+				9605FE422AFE331B00925F49 /* sensor_event_producer.mm in Sources */,
+				9605FE432AFE331C00925F49 /* sensor_helper.mm in Sources */,
+				9605FE322AFE32D300925F49 /* neck_model.cc in Sources */,
+				9605FE342AFE32D600925F49 /* gyroscope_bias_estimator.cc in Sources */,
+				9605FE302AFE32D100925F49 /* lowpass_filter.cc in Sources */,
 				4B6C9420261493E300CBDFB4 /* ARSessionDelegateManager.mm in Sources */,
+				9605FE352AFE32D700925F49 /* mean_filter.cc in Sources */,
+				9605FE292AFE32B400925F49 /* LowLatencyTracking.cc in Sources */,
+				9605FE2F2AFE32CD00925F49 /* rotation.cc in Sources */,
+				9605FE2E2AFE32CC00925F49 /* vectorutils.cc in Sources */,
+				9605FE2D2AFE32CB00925F49 /* matrix_4x4.cc in Sources */,
+				9605FE2C2AFE32C900925F49 /* is_initialized.cc in Sources */,
+				9605FE2A2AFE32C600925F49 /* matrixutils.cc in Sources */,
+				9605FE2B2AFE32C700925F49 /* matrix_3x3.cc in Sources */,
 				4B188AD026F432B4001FD67D /* HandTracker.mm in Sources */,
 				4BE74F4F288540DD0086FB89 /* HoloKitOptics.mm in Sources */,
 				4BD9A6A1278AA53C000BD266 /* Crypto.swift in Sources */,
@@ -278,21 +468,15 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
-					"$(SRCROOT)/sdk/third_party/eigen",
-				);
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/HoloKitSDK/LowLatencyTracking";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -309,21 +493,15 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E5MH87P5T3;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/sdk/third_party";
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/sdk/third_party/unity_plugin_api",
-					"$(SRCROOT)/sdk/third_party/eigen",
-				);
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/HoloKitSDK/LowLatencyTracking";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/sdk/third_party",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
