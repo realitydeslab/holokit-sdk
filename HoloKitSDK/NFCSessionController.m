@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Copyright 2023 Holo Interactive <dev@holoi.com>
+// SPDX-FileContributor: Yuchen Zhang <yuchen@holoi.com>
+// SPDX-License-Identifier: MIT
+
 #import <CoreNFC/CoreNFC.h>
 #import "holokit_sdk-Swift.h"
 #import "HoloKitOptics.h"

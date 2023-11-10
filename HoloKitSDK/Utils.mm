@@ -1,9 +1,6 @@
-//
-//  Utils.m
-//  holokit-sdk
-//
-//  Created by Yuchen Zhang on 2022/8/14.
-//
+// SPDX-FileCopyrightText: Copyright 2023 Holo Interactive <dev@holoi.com>
+// SPDX-FileContributor: Yuchen Zhang <yuchen@holoi.com>
+// SPDX-License-Identifier: MIT
 
 #import "Utils.h"
 
@@ -40,7 +37,10 @@
 }
 
 + (float *)getUnityMatrix:(simd_float4x4)arkitMatrix {
-    float *unityMatrix = new float[16] { arkitMatrix.columns[1].x, -arkitMatrix.columns[0].x, -arkitMatrix.columns[2].x, arkitMatrix.columns[3].x,                                                 arkitMatrix.columns[1].y, -arkitMatrix.columns[0].y, -arkitMatrix.columns[2].y, arkitMatrix.columns[3].y,                                                -arkitMatrix.columns[1].z, arkitMatrix.columns[0].z, arkitMatrix.columns[2].z, -arkitMatrix.columns[3].z,                                                  arkitMatrix.columns[0].w, arkitMatrix.columns[1].w, arkitMatrix.columns[2].w, arkitMatrix.columns[3].w };
+    float *unityMatrix = new float[16] { arkitMatrix.columns[1].x, -arkitMatrix.columns[0].x, -arkitMatrix.columns[2].x, arkitMatrix.columns[3].x, 
+        arkitMatrix.columns[1].y, -arkitMatrix.columns[0].y, -arkitMatrix.columns[2].y, arkitMatrix.columns[3].y, 
+        -arkitMatrix.columns[1].z, arkitMatrix.columns[0].z, arkitMatrix.columns[2].z, -arkitMatrix.columns[3].z,
+        arkitMatrix.columns[0].w, arkitMatrix.columns[1].w, arkitMatrix.columns[2].w, arkitMatrix.columns[3].w };
     return unityMatrix;
 }
 
