@@ -28,23 +28,6 @@ namespace HoloKit
 
         private IntPtr m_HeadTrackerPtr;
 
-        public bool IsActive
-        {
-            get => _isActive;
-            set
-            {
-                _isActive = value;
-            }
-        }
-
-        /// <summary>
-        /// If this value is set to true, HoloKitTrackedPoseDriver will take control
-        /// of the camera pose.
-        /// </summary>
-        private bool _isActive = false;
-
-        private readonly Matrix4x4 RotationMatrix = Matrix4x4.Rotate(Quaternion.Euler(0f, 0f, -90f));
-
         private void Start()
         {
             m_ARCameraManager = GetComponent<ARCameraManager>();
@@ -91,52 +74,47 @@ namespace HoloKit
 #endif
         }
 
-        private void OnBeforeRender()
-        {
-            if (m_TrackedPoseDriver != null && !m_TrackedPoseDriver.enabled) 
-            {
-                UpdateHeadTrackerPose();
-            }
-        }
-
         private void Awake()
         {
             // HoloKitARSessionControllerAPI.OnARSessionUpdatedFrame += OnARSessionUpdatedFrame;
+        }
+
+#if UNITY_IOS && !UNITY_EDITOR
+
+        private void OnBeforeRender()
+        {
+            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
+                return;
+            }
+
+            UpdateHeadTrackerPose();
         }
 
         private void OnDestroy()
         {
             // HoloKitARSessionControllerAPI.OnARSessionUpdatedFrame -= OnARSessionUpdatedFrame;
 
-#if UNITY_IOS && !UNITY_EDITOR
             HoloKitCamera.OnHoloKitRenderModeChanged -= OnHoloKitRenderModeChanged;
             m_ARCameraManager.frameReceived -= OnFrameReceived;
             Application.onBeforeRender -= OnBeforeRender;
             Delete(m_HeadTrackerPtr);
-#endif
         }
 
         private void OnHoloKitRenderModeChanged(HoloKitRenderMode renderMode)
         {
             if (renderMode == HoloKitRenderMode.Stereo)
             {
-                if (m_TrackedPoseDriver != null) {
-                    m_TrackedPoseDriver.enabled = false;
-                }
                 ResumeHeadTracker(m_HeadTrackerPtr);
             }
             else
             {
-                if (m_TrackedPoseDriver != null) {
-                    m_TrackedPoseDriver.enabled = true;
-                }
                 PauseHeadTracker(m_HeadTrackerPtr);
             }
         }
 
         private void OnFrameReceived(ARCameraFrameEventArgs args)
         {
-            if (m_TrackedPoseDriver != null && m_TrackedPoseDriver.enabled) {
+            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
                 return;
             }
 
@@ -151,19 +129,12 @@ namespace HoloKit
             }
         }
 
-        // private void OnARSessionUpdatedFrame(double timestamp, Matrix4x4 matrix)
-        // {
-        //     if (_isActive)
-        //     {
-        //         if (Screen.orientation == ScreenOrientation.LandscapeLeft)
-        //             matrix *= RotationMatrix;
-        //         transform.SetPositionAndRotation(matrix.GetPosition(), matrix.rotation);
-        //     }
-        // }
-
-#if UNITY_IOS
         private void UpdateHeadTrackerPose()
         {
+            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
+                return;
+            }
+            
             float[] positionArr = new float[3];
             float[] rotationArr = new float[4];
 
@@ -171,8 +142,8 @@ namespace HoloKit
             Vector3 position = new(positionArr[0], positionArr[1], positionArr[2]);
             Quaternion rotation = new(rotationArr[0], rotationArr[1], rotationArr[2], rotationArr[3]);
 
-            transform.position = position;
-            transform.rotation = rotation;
+            m_HoloKitCamera._centerEyePose.position = position;
+            m_HoloKitCamera._centerEyePose.rotation = rotation;
         }
 
         [DllImport("__Internal", EntryPoint = "HoloKit_LowLatencyTracking_init")]

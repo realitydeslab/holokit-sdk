@@ -252,7 +252,7 @@ GameObject:
   - component: {fileID: 1107987550}
   - component: {fileID: 1107987549}
   m_Layer: 5
-  m_Name: Button
+  m_Name: StereoButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -462,7 +462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0cb9aa70a22847b5925ee5f067c10a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Camera: {fileID: 1773589991}
+  m_Camera: {fileID: 0}
   m_OriginBaseGameObject: {fileID: 1375093355}
   m_CameraFloorOffsetObject: {fileID: 1654798080}
   m_RequestedTrackingOriginMode: 0
@@ -724,7 +724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5626992625800642033, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
       propertyPath: m_Name
-      value: HoloKit Camera
+      value: HoloKit Camera Rig
       objectReference: {fileID: 0}
     - target: {fileID: 5626992625800642041, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
       propertyPath: _renderMode
@@ -743,11 +743,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
---- !u!20 &1773589991 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 5626992625800642046, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
-  m_PrefabInstance: {fileID: 1771188767}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1773589992 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5626992625800642032, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}

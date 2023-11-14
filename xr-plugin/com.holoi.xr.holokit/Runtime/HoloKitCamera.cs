@@ -44,21 +44,21 @@ namespace HoloKit
 
         private static HoloKitCamera _instance;
 
-        [SerializeField] private Transform _centerEyePose;
+        [SerializeField] internal Transform _centerEyePose;
 
-        [SerializeField] private Camera _monoCamera;
+        [SerializeField] internal Camera _monoCamera;
 
-        [SerializeField] private Camera _leftEyeCamera;
+        [SerializeField] internal Camera _leftEyeCamera;
 
-        [SerializeField] private Camera _rightEyeCamera;
+        [SerializeField] internal Camera _rightEyeCamera;
 
-        [SerializeField] private Camera _blackCamera;
+        [SerializeField] internal Camera _blackCamera;
 
         [SerializeField]
         [Range(0.054f, 0.074f)]
-        private float _ipd = 0.064f;
+        internal float _ipd = 0.064f;
 
-        [SerializeField] private float _farClipPlane = 50f;
+        [SerializeField] internal float _farClipPlane = 50f;
 
         /// <summary>
         /// This value can only be set before the first ARSession frame.
@@ -253,7 +253,6 @@ namespace HoloKit
                 _blackCamera.gameObject.SetActive(true);
                 // Switch tracked pose driver
                 _defaultTrackedPoseDriver.enabled = false;
-                _holokitTrackedPoseDriver.IsActive = true;
             }
             else
             {
@@ -268,7 +267,6 @@ namespace HoloKit
                 _centerEyePose.localPosition = Vector3.zero;
                 // Switch tracked pose driver
                 _defaultTrackedPoseDriver.enabled = true;
-                _holokitTrackedPoseDriver.IsActive = false;
             }
         }
 

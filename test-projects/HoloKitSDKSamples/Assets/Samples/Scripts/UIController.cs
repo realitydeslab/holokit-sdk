@@ -43,5 +43,6 @@ namespace HoloKit.Samples.StereoscopicRendering
                 _renderModeText.text = "Stereo";
             }
         }
+
     }
 }

@@ -398,6 +398,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 193546642362784935, guid: 33703e991f67b48bc95296635ea2bc41, type: 3}
+      propertyPath: _isActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 193546642362784935, guid: 33703e991f67b48bc95296635ea2bc41, type: 3}
+      propertyPath: _isVisible
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4879128648065969852, guid: 33703e991f67b48bc95296635ea2bc41, type: 3}
       propertyPath: m_Name
       value: HoloKit Hand Tracker
@@ -657,7 +665,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0cb9aa70a22847b5925ee5f067c10a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Camera: {fileID: 1773589991}
+  m_Camera: {fileID: 0}
   m_OriginBaseGameObject: {fileID: 1375093355}
   m_CameraFloorOffsetObject: {fileID: 1654798080}
   m_RequestedTrackingOriginMode: 0
@@ -735,6 +743,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1654798081}
     m_Modifications:
+    - target: {fileID: 1750661715150011337, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
+      propertyPath: m_TrackingStateInput.m_Action.m_Name
+      value: Tracking State Input
+      objectReference: {fileID: 0}
     - target: {fileID: 5626992625800642032, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -781,7 +793,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5626992625800642033, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
       propertyPath: m_Name
-      value: HoloKit Camera
+      value: HoloKit Camera Rig
       objectReference: {fileID: 0}
     - target: {fileID: 5626992625800642041, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
       propertyPath: _renderMode
@@ -800,11 +812,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
---- !u!20 &1773589991 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 5626992625800642046, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
-  m_PrefabInstance: {fileID: 1771188767}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1773589992 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5626992625800642032, guid: 8c3baeda8ec2e42179a64fba10a812b1, type: 3}
