@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: MIT
 
 using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
@@ -15,7 +14,7 @@ namespace HoloKit
 {
     [RequireComponent(typeof(ARCameraManager))]
     [RequireComponent(typeof(TrackedPoseDriver))]
-    [RequireComponent(typeof(HoloKitCamera))]
+    [RequireComponent(typeof(HoloKitCameraManager))]
     public class HoloKitTrackedPoseDriver : MonoBehaviour
     {
         private TrackedPoseDriver m_TrackedPoseDriver;
@@ -24,7 +23,7 @@ namespace HoloKit
 
         private ARCameraManager m_ARCameraManager;
 
-        private HoloKitCamera m_HoloKitCamera; 
+        private HoloKitCameraManager m_HoloKitCameraManager; 
 
         private IntPtr m_HeadTrackerPtr;
 
@@ -54,8 +53,8 @@ namespace HoloKit
                 return;
             }
 
-            m_HoloKitCamera = GetComponent<HoloKitCamera>();
-            if (m_HoloKitCamera == null)
+            m_HoloKitCameraManager = GetComponent<HoloKitCameraManager>();
+            if (m_HoloKitCameraManager == null)
             {
                 Debug.LogWarning("[HoloKitTrackedPoseDriver] Failed to find HoloKitCamera");
                 return;
@@ -83,7 +82,7 @@ namespace HoloKit
 
         private void OnBeforeRender()
         {
-            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
+            if (m_HoloKitCameraManager.RenderMode == HoloKitRenderMode.Mono) {
                 return;
             }
 
@@ -114,7 +113,7 @@ namespace HoloKit
 
         private void OnFrameReceived(ARCameraFrameEventArgs args)
         {
-            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
+            if (m_HoloKitCameraManager.RenderMode == HoloKitRenderMode.Mono) {
                 return;
             }
 
@@ -131,7 +130,7 @@ namespace HoloKit
 
         private void UpdateHeadTrackerPose()
         {
-            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
+            if (m_HoloKitCameraManager.RenderMode == HoloKitRenderMode.Mono) {
                 return;
             }
             
@@ -142,8 +141,8 @@ namespace HoloKit
             Vector3 position = new(positionArr[0], positionArr[1], positionArr[2]);
             Quaternion rotation = new(rotationArr[0], rotationArr[1], rotationArr[2], rotationArr[3]);
 
-            m_HoloKitCamera._centerEyePose.position = position;
-            m_HoloKitCamera._centerEyePose.rotation = rotation;
+            m_HoloKitCameraManager._centerEyePose.position = position;
+            m_HoloKitCameraManager._centerEyePose.rotation = rotation;
         }
 
         [DllImport("__Internal", EntryPoint = "HoloKit_LowLatencyTracking_init")]

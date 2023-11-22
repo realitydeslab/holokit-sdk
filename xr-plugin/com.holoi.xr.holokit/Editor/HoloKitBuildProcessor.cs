@@ -24,8 +24,8 @@ namespace HoloKit.Editor
 
             void PostprocessBuild(BuildReport report)
             {
-                //AddXcodePlist(report.summary.outputPath);
-                //AddXcodeCapabilities(report.summary.outputPath);
+                AddXcodePlist(report.summary.outputPath);
+                AddXcodeCapabilities(report.summary.outputPath);
                 AddXcodeBuildSettings(report.summary.outputPath);
             }
 
