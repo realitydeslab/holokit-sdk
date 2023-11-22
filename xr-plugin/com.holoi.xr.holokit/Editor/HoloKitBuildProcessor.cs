@@ -1,4 +1,3 @@
-#if UNITY_IOS
 using System;
 using System.IO;
 using System.Reflection;
@@ -24,7 +23,7 @@ namespace HoloKit.Editor
 
             void PostprocessBuild(BuildReport report)
             {
-                //AddXcodePlist(report.summary.outputPath);
+                AddXcodePlist(report.summary.outputPath);
                 //AddXcodeCapabilities(report.summary.outputPath);
                 AddXcodeBuildSettings(report.summary.outputPath);
             }
@@ -83,7 +82,7 @@ namespace HoloKit.Editor
                 project = (PBXProject)projectInfo.GetValue(projectCapabilityManager);
 
                 var constructor = typeof(PBXCapabilityType).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(string), typeof(bool), typeof(string), typeof(bool) }, null);
-                PBXCapabilityType nfcCapability = (PBXCapabilityType)constructor.Invoke(new object[] { "com.apple.NearFieldCommunicationTagReading", true, "", false });
+                PBXCapabilityType nfcCapability = (PBXCapabilityType) constructor.Invoke(new object[] { "com.apple.NearFieldCommunicationTagReading", true, "", false });
                 project.AddCapability(target, nfcCapability, entitlementFileName);
 
                 projectCapabilityManager.WriteToFile();
@@ -103,4 +102,3 @@ namespace HoloKit.Editor
         }
     }
 }
-#endif

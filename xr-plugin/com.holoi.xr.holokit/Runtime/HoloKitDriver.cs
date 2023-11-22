@@ -10,19 +10,20 @@ namespace HoloKit
 {
     public class HoloKitDriver : MonoBehaviour
     {
-        [SerializeField] private string[] _arSceneNames;
+        [SerializeField] private string[] m_arSceneNames;
 
-        [SerializeField] private bool _sessionShouldAttemptRelocalization = false;
+        [SerializeField] private bool m_sessionShouldAttemptRelocalization = false;
 
         private void Awake()
         {
+            // Check whether the current device is supported by HoloKit
             DontDestroyOnLoad(gameObject);
             if (HoloKitUtils.IsRuntime)
             {
                 HoloKitNFCSessionControllerAPI.RegisterNFCSessionControllerDelegates();
                 HoloKitARSessionControllerAPI.RegisterARSessionControllerDelegates();
                 HoloKitARSessionControllerAPI.InterceptUnityARSessionDelegate();
-                HoloKitARSessionControllerAPI.SetSessionShouldAttemptRelocalization(_sessionShouldAttemptRelocalization);
+                HoloKitARSessionControllerAPI.SetSessionShouldAttemptRelocalization(m_sessionShouldAttemptRelocalization);
                 SceneManager.sceneUnloaded += OnSceneUnloaded;
             }
         }
@@ -34,7 +35,7 @@ namespace HoloKit
 
         private void OnSceneUnloaded(Scene scene)
         {
-            foreach (var arSceneName in _arSceneNames)
+            foreach (var arSceneName in m_arSceneNames)
             {
                 if (scene.name.Equals(arSceneName))
                 {

@@ -4,18 +4,18 @@
 // SPDX-License-Identifier: MIT
 
 using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.InputSystem.XR;
+using System.Runtime.InteropServices;
 
 namespace HoloKit
 {
     [RequireComponent(typeof(ARCameraManager))]
     [RequireComponent(typeof(TrackedPoseDriver))]
-    [RequireComponent(typeof(HoloKitCamera))]
+    [RequireComponent(typeof(HoloKitCameraManager))]
     public class HoloKitTrackedPoseDriver : MonoBehaviour
     {
         private TrackedPoseDriver m_TrackedPoseDriver;
@@ -24,7 +24,7 @@ namespace HoloKit
 
         private ARCameraManager m_ARCameraManager;
 
-        private HoloKitCamera m_HoloKitCamera; 
+        private HoloKitCameraManager m_HoloKitCameraManager; 
 
         private IntPtr m_HeadTrackerPtr;
 
@@ -54,20 +54,20 @@ namespace HoloKit
                 return;
             }
 
-            m_HoloKitCamera = GetComponent<HoloKitCamera>();
-            if (m_HoloKitCamera == null)
+            m_HoloKitCameraManager = GetComponent<HoloKitCameraManager>();
+            if (m_HoloKitCameraManager == null)
             {
                 Debug.LogWarning("[HoloKitTrackedPoseDriver] Failed to find HoloKitCamera");
                 return;
             }
 
-#if UNITY_IOS && !UNITY_EDITOR
-            HoloKitCamera.OnHoloKitRenderModeChanged += OnHoloKitRenderModeChanged;
+            HoloKitCameraManager.OnHoloKitRenderModeChanged += OnHoloKitRenderModeChanged;
 
             m_ARCameraManager.frameReceived += OnFrameReceived;
 
             Application.onBeforeRender += OnBeforeRender;
 
+#if UNITY_IOS && !UNITY_EDITOR
             m_HeadTrackerPtr = Init();
             InitHeadTracker(m_HeadTrackerPtr);
             PauseHeadTracker(m_HeadTrackerPtr);
@@ -79,11 +79,9 @@ namespace HoloKit
             // HoloKitARSessionControllerAPI.OnARSessionUpdatedFrame += OnARSessionUpdatedFrame;
         }
 
-#if UNITY_IOS && !UNITY_EDITOR
-
         private void OnBeforeRender()
         {
-            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
+            if (m_HoloKitCameraManager.RenderMode == HoloKitRenderMode.Mono) {
                 return;
             }
 
@@ -94,14 +92,17 @@ namespace HoloKit
         {
             // HoloKitARSessionControllerAPI.OnARSessionUpdatedFrame -= OnARSessionUpdatedFrame;
 
-            HoloKitCamera.OnHoloKitRenderModeChanged -= OnHoloKitRenderModeChanged;
+            HoloKitCameraManager.OnHoloKitRenderModeChanged -= OnHoloKitRenderModeChanged;
             m_ARCameraManager.frameReceived -= OnFrameReceived;
             Application.onBeforeRender -= OnBeforeRender;
-            Delete(m_HeadTrackerPtr);
+            if (m_HeadTrackerPtr != IntPtr.Zero) {
+                Delete(m_HeadTrackerPtr);
+            }
         }
 
         private void OnHoloKitRenderModeChanged(HoloKitRenderMode renderMode)
         {
+        #if UNITY_IOS && !UNITY_EDITOR
             if (renderMode == HoloKitRenderMode.Stereo)
             {
                 ResumeHeadTracker(m_HeadTrackerPtr);
@@ -110,14 +111,15 @@ namespace HoloKit
             {
                 PauseHeadTracker(m_HeadTrackerPtr);
             }
+        #endif
         }
 
         private void OnFrameReceived(ARCameraFrameEventArgs args)
         {
-            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
+            if (m_HoloKitCameraManager.RenderMode == HoloKitRenderMode.Mono) {
                 return;
             }
-
+        #if UNITY_IOS && !UNITY_EDITOR
             bool isPositionValid = m_InputDevice.TryGetFeatureValue(CommonUsages.centerEyePosition, out Vector3 position) || m_InputDevice.TryGetFeatureValue(CommonUsages.colorCameraPosition, out position);
             bool isRotationValid = m_InputDevice.TryGetFeatureValue(CommonUsages.centerEyeRotation, out Quaternion rotation) || m_InputDevice.TryGetFeatureValue(CommonUsages.colorCameraRotation, out rotation);
 
@@ -127,23 +129,27 @@ namespace HoloKit
                 float[] rotationArr = new float[] { rotation.x, rotation.y, rotation.z, rotation.w };
                 AddSixDoFData(m_HeadTrackerPtr, (long) args.timestampNs, positionArr, rotationArr);
             }
+        #endif
         }
 
         private void UpdateHeadTrackerPose()
         {
-            if (m_HoloKitCamera.RenderMode == HoloKitRenderMode.Mono) {
+            if (m_HoloKitCameraManager.RenderMode == HoloKitRenderMode.Mono) {
                 return;
             }
-            
+        #if UNITY_IOS && !UNITY_EDITOR
             float[] positionArr = new float[3];
             float[] rotationArr = new float[4];
 
+            
             GetHeadTrackerPose(m_HeadTrackerPtr, positionArr, rotationArr);
+
             Vector3 position = new(positionArr[0], positionArr[1], positionArr[2]);
             Quaternion rotation = new(rotationArr[0], rotationArr[1], rotationArr[2], rotationArr[3]);
 
-            m_HoloKitCamera._centerEyePose.position = position;
-            m_HoloKitCamera._centerEyePose.rotation = rotation;
+            m_HoloKitCameraManager.CenterEyePose.position = position;
+            m_HoloKitCameraManager.CenterEyePose.rotation = rotation;
+        #endif
         }
 
         [DllImport("__Internal", EntryPoint = "HoloKit_LowLatencyTracking_init")]
@@ -166,6 +172,5 @@ namespace HoloKit
 
         [DllImport("__Internal", EntryPoint = "HoloKit_LowLatencyTracking_delete")]
         static extern void Delete(IntPtr self);
-#endif
     }
 }

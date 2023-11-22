@@ -9,7 +9,7 @@ namespace HoloKit
 {
     public class HoloKitLightEstimator : MonoBehaviour
     {
-        [SerializeField] private ARCameraManager _arCameraManager;
+        [SerializeField] private ARCameraManager m_arCameraManager;
 
         public float? AverageBrightness { get; private set; }
 
@@ -19,18 +19,18 @@ namespace HoloKit
 
         private void OnEnable()
         {
-            if (_arCameraManager != null)
+            if (m_arCameraManager != null)
             {
-                _arCameraManager.requestedLightEstimation = LightEstimation.AmbientIntensity;
-                _arCameraManager.frameReceived += OnFrameReceived;
+                m_arCameraManager.requestedLightEstimation = LightEstimation.AmbientIntensity;
+                m_arCameraManager.frameReceived += OnFrameReceived;
             }
         }
 
         private void OnDisable()
         {
-            if (_arCameraManager != null)
+            if (m_arCameraManager != null)
             {
-                _arCameraManager.frameReceived -= OnFrameReceived;
+                m_arCameraManager.frameReceived -= OnFrameReceived;
             }
         }
 
