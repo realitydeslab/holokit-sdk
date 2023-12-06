@@ -6,11 +6,11 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
         registry-url: 'https://registry.npmjs.org'
     - run: npm publish
-      working-directory: xr-plugin/com.holoi.xr.holokit
+      working-directory: Packages/com.holoi.xr.holokit
       env:
         NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
