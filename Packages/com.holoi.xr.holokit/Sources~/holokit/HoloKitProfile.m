@@ -77,20 +77,20 @@
         return iPhone15Pro;
     } else if ([deviceName isEqualToString:@"iPhone16,2"]) {
         return iPhone15ProMax;
-    }else if ( [deviceName isEqualToString:@"iPad13,4"] ||
-               [deviceName isEqualToString:@"iPad13,5"] ||
-               [deviceName isEqualToString:@"iPad13,6"] ||
-               [deviceName isEqualToString:@"iPad13,7"] ||
-               [deviceName isEqualToString:@"iPad13,8"] ||
-               [deviceName isEqualToString:@"iPad13,9"] ||
-               [deviceName isEqualToString:@"iPad13,10"] ||
-               [deviceName isEqualToString:@"iPad13,11"] ||
-               [deviceName isEqualToString:@"iPad14,3"] ||
-               [deviceName isEqualToString:@"iPad14,4"] ||
-               [deviceName isEqualToString:@"iPad14,5"] ||
-               [deviceName isEqualToString:@"iPad14,6"]
+    }else if ( [deviceName isEqualToString:@"iPad13,4"] || //iPad Pro 11 inch 5th Gen
+               [deviceName isEqualToString:@"iPad13,5"] || //iPad Pro 11 inch 5th Gen
+               [deviceName isEqualToString:@"iPad13,6"] || //iPad Pro 11 inch 5th Gen
+               [deviceName isEqualToString:@"iPad13,7"] || //iPad Pro 11 inch 5th Gen
+               [deviceName isEqualToString:@"iPad13,8"] || //iPad Pro 12.9 inch 5th Gen
+               [deviceName isEqualToString:@"iPad13,9"] || //iPad Pro 12.9 inch 5th Gen
+               [deviceName isEqualToString:@"iPad13,10"] || //iPad Pro 12.9 inch 5th Gen
+               [deviceName isEqualToString:@"iPad13,11"] || //iPad Pro 12.9 inch 5th Gen
+               [deviceName isEqualToString:@"iPad14,3"] || //iPad Pro 11 inch 4th Gen
+               [deviceName isEqualToString:@"iPad14,4"] ||  //iPad Pro 11 inch 4th Gen
+               [deviceName isEqualToString:@"iPad14,5"] || //iPad Pro 12.9 inch 6th Gen
+               [deviceName isEqualToString:@"iPad14,6"]  //iPad Pro 12.9 inch 6th Gen
               ) {
-        return iPad;
+        return iPadWithLidar;
     } else {
         return Unknown;
     }
@@ -261,7 +261,7 @@
     if (phoneType == iPhone13mini) {
         return false;
     }
-    if (phoneType == iPad) {
+    if (phoneType == iPadWithLidar) {
         return false;
     }
     if (phoneType == Unknown) {
@@ -299,6 +299,9 @@
         return true;
     }
     if (phoneType == iPhone15ProMax) {
+        return true;
+    }
+    if (phoneType == iPadWithLidar) {
         return true;
     }
 
