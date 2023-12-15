@@ -17,6 +17,7 @@ EditorBuildSettings:
   m_configObjects:
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 93af5de912d4a46bab8c38c8dcd72070, type: 2}
     UnityEditor.XR.HoloKit.HoloKitPackageSettings: {fileID: 11400000, guid: c71fe194885da4326b985c172881670f, type: 2}
+    WebXR.Settings: {fileID: 11400000, guid: 1faec6f5c40d5452393cc8b51666254d, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 9b7eb16928b2240c0bbbb8691fd167ea, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: e9b83ea6f8cc948a2acfc7e79b955ac8, type: 2}
   m_UseUCBPForAssetBundles: 0

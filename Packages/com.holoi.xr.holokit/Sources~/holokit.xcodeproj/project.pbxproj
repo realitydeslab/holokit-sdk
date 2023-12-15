@@ -39,6 +39,7 @@
 		9605FE4B2AFE332900925F49 /* rotation_data.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE112AFE325B00925F49 /* rotation_data.cc */; };
 		9605FE4C2AFE332A00925F49 /* position_data.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9605FE122AFE325B00925F49 /* position_data.cc */; };
 		963F1F242B14FEC400F20056 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963F1F232B14FEC400F20056 /* Metal.framework */; };
+		9674DCF62B2173BD00F32A19 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9674DCF52B2173BD00F32A19 /* Accelerate.framework */; };
 		969F171D2B12861B00F8CA69 /* HoloKitVideoRecorder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 969F171C2B12861B00F8CA69 /* HoloKitVideoRecorder.mm */; };
 		969F17692B12998900F8CA69 /* HoloKitVideoRecorder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 969F171C2B12861B00F8CA69 /* HoloKitVideoRecorder.mm */; };
 		969F176A2B12999300F8CA69 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 969F17592B12986C00F8CA69 /* CoreVideo.framework */; };
@@ -152,6 +153,7 @@
 		963F1F232B14FEC400F20056 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		9666E9902572395C00A7F127 /* HandTracker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HandTracker.framework; path = sdk/third_party/HandTracker.framework; sourceTree = "<group>"; };
 		9666EAB32572692700A7F127 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		9674DCF52B2173BD00F32A19 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 		969F171C2B12861B00F8CA69 /* HoloKitVideoRecorder.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HoloKitVideoRecorder.mm; sourceTree = "<group>"; };
 		969F17552B12982C00F8CA69 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		969F17572B12985300F8CA69 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/CoreMedia.framework; sourceTree = DEVELOPER_DIR; };
@@ -177,6 +179,7 @@
 			files = (
 				963F1F242B14FEC400F20056 /* Metal.framework in Frameworks */,
 				969F176C2B12999B00F8CA69 /* CoreMedia.framework in Frameworks */,
+				9674DCF62B2173BD00F32A19 /* Accelerate.framework in Frameworks */,
 				969F176B2B12999600F8CA69 /* AVFoundation.framework in Frameworks */,
 				969F176A2B12999300F8CA69 /* CoreVideo.framework in Frameworks */,
 			);
@@ -358,6 +361,7 @@
 		96602188253935D7004019A5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9674DCF52B2173BD00F32A19 /* Accelerate.framework */,
 				963F1F232B14FEC400F20056 /* Metal.framework */,
 				969F17592B12986C00F8CA69 /* CoreVideo.framework */,
 				969F17572B12985300F8CA69 /* CoreMedia.framework */,
@@ -414,7 +418,7 @@
 				969F17612B12998200F8CA69 /* Headers */,
 				969F17622B12998200F8CA69 /* Sources */,
 				969F17632B12998200F8CA69 /* Frameworks */,
-				969F176D2B1299AB00F8CA69 /* ShellScript */,
+				969F176D2B1299AB00F8CA69 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -479,9 +483,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "PRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"iOS\"\nDESTDIR=\"${SRCROOT}/../Runtime/Plugins/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n";
+			shellScript = "PRODUCT=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nARCH=\"iOS\"\nDESTDIR=\"${SRCROOT}/../Runtime/Plugins/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n\nDESTDIR=\"${SRCROOT}/../../../Build/Libraries/com.holoi.xr.holokit/Runtime/Plugins/${ARCH}\"\nmkdir -p \"${DESTDIR}\"\ncp -R \"${PRODUCT}\" \"${DESTDIR}/libUnityHoloKit.a\"\n\n\n";
 		};
-		969F176D2B1299AB00F8CA69 /* ShellScript */ = {
+		969F176D2B1299AB00F8CA69 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -490,6 +494,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -557,7 +562,7 @@
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/holokit/LowLatencyTracking";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -571,6 +576,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Debug;
 		};
@@ -582,7 +588,7 @@
 				DEVELOPMENT_TEAM = E5MH87P5T3;
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/holokit/LowLatencyTracking";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -595,6 +601,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Release;
 		};
@@ -730,6 +737,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Debug;
 		};
@@ -751,6 +759,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Release;
 		};

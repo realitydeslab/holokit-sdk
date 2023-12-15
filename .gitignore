@@ -100,6 +100,13 @@ sysinfo.txt
 
 # Builds
 /*.apk
-UserSettings/*
 
-# Yuchen Custom
+# Holo Interactive Custom
+Assets/NMLBuildCache
+Assets/StreamingAssets
+#ProjectSettings/EditorBuildSettings.asset
+Assets/NMLBuildCache.meta
+Assets/TextMesh Pro
+Assets/AddressableAssetsData
+
+/*.mp4

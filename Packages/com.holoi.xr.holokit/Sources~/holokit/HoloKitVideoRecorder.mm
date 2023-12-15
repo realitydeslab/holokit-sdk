@@ -11,6 +11,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <Metal/Metal.h>
 #include <CoreMedia/CMBlockBuffer.h>
+#import <Accelerate/Accelerate.h>
 
 static AVAssetWriter* _writer;
 static AVAssetWriterInput* _videoWriterInput;
@@ -20,18 +21,17 @@ static AudioStreamBasicDescription _audioFormat;
 static CMFormatDescriptionRef _cmFormat;
 
 static bool _isRecording;
-static size_t _width;
-static size_t _height;
+static int _width;
+static int _height;
 
 extern "C" {
 
-void HoloKitVideoRecorder_StartRecording(const char* filePath, size_t width, size_t height,
-                                        float audioSampleRate, size_t audioChannelCount,
-                                        float videoBitRate, float audioBitRate) {
+int HoloKitVideoRecorder_StartRecording(const char* filePath, int width, int height,
+                                        float audioSampleRate, int audioChannelCount) {
     if (_writer)
     {
         NSLog(@"Recording has already been initiated.");
-        return;
+        return -1;
     }
     
     // Asset writer setup
@@ -45,20 +45,13 @@ void HoloKitVideoRecorder_StartRecording(const char* filePath, size_t width, siz
     if (err)
     {
         NSLog(@"Failed to initialize AVAssetWriter (%@)", err);
-        return;
+        return -1;
     }
-    
-    // Video writer input setup
-    // NSDictionary* compressionSettings = @{
-    //     AVVideoAverageBitRateKey: @(videoBitRate),
-    //     AVVideoMaxKeyFrameIntervalKey: @(30)
-    // };
     
     NSDictionary* settings = @{ 
         AVVideoCodecKey: AVVideoCodecTypeHEVC,
         AVVideoWidthKey: @(width),
         AVVideoHeightKey: @(height) };
-//        AVVideoCompressionPropertiesKey: compressionSettings};
     
     _videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType: AVMediaTypeVideo outputSettings: settings];
     _videoWriterInput.expectsMediaDataInRealTime = YES;
@@ -78,7 +71,7 @@ void HoloKitVideoRecorder_StartRecording(const char* filePath, size_t width, siz
         AVFormatIDKey: @(kAudioFormatMPEG4AAC),
         AVSampleRateKey: @(audioSampleRate),
         AVNumberOfChannelsKey: @(audioChannelCount),
-        AVEncoderBitRateKey: @(audioBitRate)
+        AVEncoderAudioQualityKey: @(AVAudioQualityHigh)
     };
     _audioWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio
                          outputSettings:audioSettings];
@@ -109,31 +102,33 @@ void HoloKitVideoRecorder_StartRecording(const char* filePath, size_t width, siz
     if (![_writer startWriting])
     {
         NSLog(@"Failed to start (%ld: %@)", _writer.status, _writer.error);
-        return;
+        return -1;
     }
 
     _width = width;
     _height = height;
     [_writer startSessionAtSourceTime:kCMTimeZero];
     _isRecording = YES;  
+
+    return 0;
 }
 
-void HoloKitVideoRecorder_AppendAudioFrame(void* source, size_t size, double time)
+int HoloKitVideoRecorder_AppendAudioFrame(void* source, int size, double time)
 {
     if (!_isRecording) {
-        return;
+        return -2;
     }
 
     if (!_writer)
     {
         NSLog(@"Recording hasn't been initiated.");
-        return;
+        return -1;
     }
 
     if (!_audioWriterInput.isReadyForMoreMediaData)
     {
         NSLog(@"Audio Writer is not ready.");
-        return;
+        return -1;
     }
 
     // Write _audioInputWriter with buffer 
@@ -147,14 +142,17 @@ void HoloKitVideoRecorder_AppendAudioFrame(void* source, size_t size, double tim
     
     if (status != noErr) {
         NSLog(@"CMBlockBufferCreateWithMemoryBlock error");
-        return;
+        return -1;
     }
 
-    size_t nSamples = size / _audioFormat.mBytesPerFrame;
+    int nSamples = size / _audioFormat.mBytesPerFrame;
+
+    AudioStreamBasicDescription audioFormat = *CMAudioFormatDescriptionGetStreamBasicDescription(_audioFormat);
 
     CMSampleBufferRef sampleBuffer;
-    status = CMAudioSampleBufferCreateWithPacketDescriptions(kCFAllocatorDefault,
+    status = CMAudioSampleBufferCreateReadyWithPacketDescriptions(kCFAllocatorDefault,
                                                              blockBuffer,
+                                                             presentationTimestamp, _cmFormat, &sampleBuffer);
                                                              TRUE,
                                                              NULL,
                                                              NULL,
@@ -166,88 +164,96 @@ void HoloKitVideoRecorder_AppendAudioFrame(void* source, size_t size, double tim
     
     if (status != noErr) {
         CFRelease(blockBuffer);
-        return;
+        return -1;
     }
 
     if (!CMSampleBufferDataIsReady(sampleBuffer))
     {
         NSLog(@"sample buffer is not ready");
-        return;
+        return -1;
     }
     if (!CMSampleBufferIsValid(sampleBuffer))
     {
         NSLog(@"Audio sapmle buffer is not valid");
-        return;
+        return -1;
     }
     
     status = CMSampleBufferMakeDataReady(sampleBuffer);
     if (status == noErr) {
         [_audioWriterInput appendSampleBuffer:sampleBuffer];
+        return -1;
     }
     
     CFRelease(sampleBuffer);
     CFRelease(blockBuffer);
+    return 0;
 }
 
-void HoloKitVideoRecorder_AppendVideoFrame(const char* source, uint32_t size, double time)
+int HoloKitVideoRecorder_AppendVideoFrame(const char* source, uint32_t size, double time)
 {
     if (!_isRecording) {
-        return;
+        return -2;
     }
 
     if (!_writer)
     {
         NSLog(@"Recording hasn't been initiated.");
-        return;
+        return -1;
     }
     
     if (!_videoWriterInput.isReadyForMoreMediaData)
     {
         NSLog(@"Video Writer is not ready.");
-        return;
+        return -1;
     }
     
     if (!_bufferAdaptor.pixelBufferPool)
     {
         NSLog(@"Video Writer pixelBufferPool is empty.");
-        return;
+        return -1;
     }
 
     // Buffer allocation
-    CVPixelBufferRef buffer;
-    CVReturn ret = CVPixelBufferPoolCreatePixelBuffer(NULL, _bufferAdaptor.pixelBufferPool, &buffer);
+    CVPixelBufferRef pixelBuffer = nil;
+    CVReturn ret = CVPixelBufferPoolCreatePixelBuffer(NULL, _bufferAdaptor.pixelBufferPool, &pixelBuffer);
     
     if (ret != kCVReturnSuccess)
     {
         NSLog(@"Can't allocate a pixel buffer (%d)", ret);
         NSLog(@"%ld: %@", _writer.status, _writer.error);
-        return;
+        return -1;
     }
     
-    // Buffer update
-    CVPixelBufferLockBaseAddress(buffer, 0);
-    void* pointer = CVPixelBufferGetBaseAddress(buffer);
-    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(buffer);
-    size_t buffer_size = CVPixelBufferGetDataSize(buffer);
-    memcpy(pointer, source, MIN(buffer_size, size));
-    printf(bytesPerRow == _width * sizeof(float) * 4);
+    // Buffer copy
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    void* baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
+    int bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
+    int bufferSize = CVPixelBufferGetDataSize(pixelBuffer);
+   
+    vImage_Buffer srcBuffer;
+    srcBuffer.data = (void*) source;
+    srcBuffer.height = _height;
+    srcBuffer.width = _width;
+    srcBuffer.rowBytes = _width * 4;
 
-    // for (unsigned long y = 0; y < _height; y++) {
-    //    memcpy((char*) pointer + bytesPerRow * (_height - y - 1), source + _width * y * 4, _width * 4);
-    // }
+    vImage_Buffer dstBuffer;
+    dstBuffer.data = baseAddress;
+    dstBuffer.height = _height;
+    dstBuffer.width = _width;
+    dstBuffer.rowBytes = bytesPerRow;
 
-    // MTLRegion region = MTLRegionMake2D(0, 0, _width, _height);
-    
-    // id<MTLTexture> texture = (__bridge id<MTLTexture>)(texture_ptr);
-    // [texture getBytes:pointer bytesPerRow:bytesPerRow fromRegion:region mipmapLevel:0];
-
-    CVPixelBufferUnlockBaseAddress(buffer, 0);
+    const uint8_t permuteMap[4] = { 2, 1, 0, 3 };
+    assert(size == _width * _height * 4);
+    vImagePermuteChannels_ARGB8888(&srcBuffer, &dstBuffer, permuteMap, kvImageNoFlags);
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
 
     // Buffer submission
-    [_bufferAdaptor appendPixelBuffer:buffer
+    [_bufferAdaptor appendPixelBuffer:pixelBuffer
                     withPresentationTime:CMTimeMakeWithSeconds(time, 240)];
     
-    CVPixelBufferRelease(buffer);
+    CVPixelBufferRelease(pixelBuffer);
+
+    return 0;
 }
 
 void HoloKitVideoRecorder_EndRecording(void)

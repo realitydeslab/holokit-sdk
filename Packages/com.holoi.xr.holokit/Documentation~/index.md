@@ -1,70 +1,64 @@
-# HoloKit Unity SDK
+# About HoloKit Unity SDK
 
-## Overview
-
-HoloKit is an optical see-through mixed reality headset that transforms your iPhone into a powerful stereoscopic AR device. With the HoloKit Unity SDK, developers can create immersive stereoscopic AR experiences in Unity, which can be viewed with HoloKit headset.
+HoloKit is an open-source optical see-through mixed reality headset that transforms your iPhone into a powerful stereoscopic AR device. 
+With the HoloKit Unity SDK, developers can create immersive stereoscopic AR experiences in Unity, which can be viewed with HoloKit headset.
 
 The SDK currently provides three core features:
 
 * Stereoscopic Rendering
 * Hand Tracking 
-* Light-weight Hand Tracking using Human Segmentation
+* 6DOF Low Latency Tracking
 * NFC Authentication
-* First-person Video Recording [WIP]
+* First-person Video Recording 
 * Hand Gesture Recognition [WIP]
 
-Stereoscopic rendering is the central feature of the SDK, allowing for the display of stereoscopic images on the iPhone screen. By inserting your iPhone into the HoloKit, you can enjoy a captivating AR experience. Utilizing Apple Vision framework, the SDK detects user hand poses. Together with LiDAR depth sensor, it allows your iPhone to track the 3D positions of the user's hands. Furthermore, the SDK can recognize hand gestures such as pinching, serving as a trigger for specific operations in your project.
+Stereoscopic rendering is the central feature of the SDK, allowing for the display of stereo images on the iPhone screen. By attaching your iPhone to the HoloKit, you can enjoy a captivating AR experience. Utilizing Apple Vision framework, the SDK detects user hand poses. Together with LiDAR depth sensor, it allows your iPhone to track the 3D positions of the user's hands. Furthermore, the SDK can recognize hand gestures such as pinching, serving as a trigger for specific operations in your project.
 
 HoloKit Unity SDK, built on the foundation of ARFoundation, is compatible with most ARFoundation features such as image tracking and plane detection. Upgrading your ARFoundation project to a stereoscopic AR project is straightforward with the HoloKit Unity SDK.
 
-## Getting started
-
-Install the package using one of the following methods
-
-<details open>
-<summary> Using scoped registry <b>(recommended)</b> </summary>
-Use OpenUPM CLI or add corresponding entries to the project's <code>manifest.json</code> manually.
-Add or modify scoped registries in the manifest
-<pre>
-  "scopedRegistries": [
-    {
-      "name": "OpenUPM",
-      "url": "https://package.openupm.com/",
-      "scopes": [
-        "com.holoi"
-      ]
-    }
-  ]
-</pre>
-and in the dependencies provide selected version of the package
-<pre>
-"dependencies": {
-    "com.holoi.xr.holokit": "1.0.0",
-    ...
-</pre>
-See Unity docs for more details https://docs.unity3d.com/2021.1/Documentation/Manual/upm-scoped.html
-</details>
-
-<details>
-<summary> <code>git</code> install </summary>
-Use package manager via git install: 
-<pre>
-"com.holoi.xr.holokit": "https://github.com/holoi/holokit-sdk.git?path=/Packages/com.holoi.xr.holokit"
-</pre>
-</details>
-
-
-## Supported Software Versions
+## Supported Unity versions
 
 HoloKit Unity SDK has been tested and found compatible with the following software versions:
 
-### Unity
-- Unity 2022.3 LTS
-
-### ARFoundation
-- ARFoundation 5.1
+- Unity
+  - Unity 2022.3 LTS
+  - Unity 2023.2 
+  
+- ARFoundation
+  - ARFoundation 5.1
 
 We aim to continually test and verify compatibility with newer versions of these softwares.
+
+## How to Install
+
+You can install HoloKit Unity SDK by using [`openupm`](openupm.com): 
+
+```
+openupm add com.holoi.netcode.transport.multipeer-connectivity
+``` 
+
+Or you can add the following line to the `Packages/manifest.json` file
+
+```
+{
+    "scopedRegistries": [
+        {
+            "name": "package.openupm.com",
+            "url": "https://package.openupm.com",
+            "scopes": [
+                "io.holokit"
+            ]
+        }
+    ],
+    "dependencies": {
+        "io.holokit.sdk": "1.0.1"
+    }
+}
+```
+Or you can install HoloKit Unity SDK from the following git URL in Package Manager:
+```
+"io.holokit.sdk": "https://github.com/holokit/holokit-unity-sdk.git?path=/Packages/io.holokit.sdk"
+```
 
 ## Phone Compatibility
 
@@ -72,22 +66,12 @@ We aim to continually test and verify compatibility with newer versions of these
 
 HoloKit was primarily built for iOS devices. Please see the [Supported iOS Devices](Supported_iOS_Devices.md) to check if your iPhone is supported.
 
-The following iPhone models are supported by HoloKit:
-
-iPhone XS / XS Max
-iPhone 11 Pro / 11 Pro Max
-iPhone 12 / 12 Pro / 12 Pro Max
-iPhone 13 / 13 Pro / 13 Pro Max
-iPhone 14 / 14 Plus / 14 Pro / 14 Pro Max
-iPhone 15 / 15 Plus / 15 Pro / 15 Pro Max
-
-HoloKit's support starts from the iPhone XS and onwards. This is due to the high computational requirements of AR applications which earlier iPhone models may not efficiently handle.
-
-Please note that HoloKit does not support iPhone Mini and iPhone SE models. The smaller screen sizes of these models limit their ability to effectively render stereo images.
-
 ### Android
 
-HoloKit currently only supports iOS. 
+HoloKit currently only supports a limited number of Android phones. Please see the [Supported Android Devices](Supported_Android_Devices.md) for more details.
+
+If your Android phone is not supported, we also provide a calibration method to let you figure out the specs of your Android phone yourself. You can then enter your Android phone specs to the SDK to have your device rendering stereo images. Please see [Phone Calibration Guide](Phone_Calibration_Guide.md), which is a step-by-step guide on how to figure out the specs of your phone model.
+
 
 ## How to Use HoloKit Unity SDK
 
@@ -95,7 +79,7 @@ HoloKit currently only supports iOS.
 
 Before using the HoloKit Unity SDK, ensure to adjust the project settings to meet ARFoundation's requirements. If you are already comfortable with ARFoundation, feel free to skip this section.
 
-Upon successfully installation of the SDK package, the ARFoundation package will be installed automatically. Please note that the HoloKit Unity SDK is only compatible with ARFoundation 5.+. If you are using ARFoundation 4.+, please update to a more recent version. 
+Upon successful installation of the SDK package, the ARFoundation package will be installed automatically. Please note that the HoloKit Unity SDK is only compatible with ARFoundation 5.+. If you are using ARFoundation 4.+, please update to a more recent version. 
 
 For iOS-targeted projects, install the `Apple ARKit XR Plugin` package. For Android-targeted projects, the `Google ARCore XR Plugin` is required.
 
@@ -126,6 +110,7 @@ For iOS-targeted projects, install the `Apple ARKit XR Plugin` package. For Andr
 4. **Enable Google ARCore**: Under `Project Settings > XR Plug-in Management > Plug-in Providers`, enable the `Google ARCore` option.
 
 <img width="600" alt="Enable Google ARCore" src="https://github.com/holoi/holokit-unity-sdk/assets/44870300/daccfe62-c90e-4ed3-8fcc-218bcae59a31">
+
 
 
 ### Samples
@@ -183,8 +168,6 @@ To obtain specific hand joint positions in code, use `HandTrackingManager.GetHan
 
 Please note, the hand tracking feature is only compatible with iOS 14.0 or higher devices equipped with a LiDAR depth sensor.
 
-
-
 ### Hand Gesture Recognition
 
 The SDK can also recognizes user's hand gesture, which can serve as input triggers in your project. Currently there are only two available hand gestures: `HandGesture.None` and `HandGesture.Pinched`.
@@ -215,3 +198,6 @@ You can use hand tracking and hand gesture recognition at the same time, simply 
 ## Community and Feedback
 
 If you encounter any issues, have queries, suggestions, or discover any bugs, we welcome you to join our [Discord](https://discord.gg/dkah5sWR) community or submit an issue. Your feedback is invaluable as we continually strive to update and improve the HoloKit Unity SDK.
+
+
+

@@ -19,7 +19,7 @@ namespace HoloKit
     [DisallowMultipleComponent]
     public class HoloKitTrackedPoseDriver : MonoBehaviour
     {
-        private TrackedPoseDriver _trackedPoseDriver;
+        private TrackedPoseDriver _monoTrackedPoseDriver;
 
         private InputDevice _inputDevice;
 
@@ -38,8 +38,8 @@ namespace HoloKit
                 return;
             }
 
-            _trackedPoseDriver = GetComponent<TrackedPoseDriver>();
-            if (_trackedPoseDriver == null)
+            _monoTrackedPoseDriver = GetComponent<TrackedPoseDriver>();
+            if (_monoTrackedPoseDriver == null)
             {
                 Debug.LogWarning("[HoloKitTrackedPoseDriver] Failed to find TrackedPoseDriver");
                 return;
@@ -62,22 +62,32 @@ namespace HoloKit
                 return;
             }
 
+            if (_holoKitCameraManager == null)
+            {
+                Debug.LogWarning("[HoloKitTrackedPoseDriver] Failed to find HoloKitCamera");
+                return;
+            }
+
+            if (_holoKitCameraManager.CenterEyePose == null) {
+                Debug.LogWarning("[HoloKitTrackedPoseDriver] Failed to find CenterEyePose from HoloKitCamera");
+                return;
+            }
+
             HoloKitCameraManager.OnHoloKitRenderModeChanged += OnHoloKitRenderModeChanged;
 
             _arCameraManager.frameReceived += OnFrameReceived;
 
             Application.onBeforeRender += OnBeforeRender;
 
-#if UNITY_IOS && !UNITY_EDITOR
+        #if UNITY_IOS && !UNITY_EDITOR
             _headTrackerPtr = Init();
             InitHeadTracker(_headTrackerPtr);
             PauseHeadTracker(_headTrackerPtr);
-#endif
+        #endif
         }
 
         private void Awake()
         {
-            // HoloKitARSessionControllerAPI.OnARSessionUpdatedFrame += OnARSessionUpdatedFrame;
         }
 
         private void OnBeforeRender()
@@ -91,14 +101,14 @@ namespace HoloKit
 
         private void OnDestroy()
         {
-            // HoloKitARSessionControllerAPI.OnARSessionUpdatedFrame -= OnARSessionUpdatedFrame;
-
             HoloKitCameraManager.OnHoloKitRenderModeChanged -= OnHoloKitRenderModeChanged;
             _arCameraManager.frameReceived -= OnFrameReceived;
             Application.onBeforeRender -= OnBeforeRender;
+        #if UNITY_IOS && !UNITY_EDITOR
             if (_headTrackerPtr != IntPtr.Zero) {
                 Delete(_headTrackerPtr);
             }
+        #endif
         }
 
         private void OnHoloKitRenderModeChanged(HoloKitRenderMode renderMode)

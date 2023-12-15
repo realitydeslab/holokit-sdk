@@ -41,6 +41,7 @@ namespace HoloKit
     [RequireComponent(typeof(ARCameraManager))]
     [RequireComponent(typeof(ARCameraBackground))]
     [RequireComponent(typeof(TrackedPoseDriver))]
+    [RequireComponent(typeof(HoloKitTrackedPoseDriver))]
     [DisallowMultipleComponent]
     public class HoloKitCameraManager : MonoBehaviour
     {
@@ -140,12 +141,12 @@ namespace HoloKit
         /// The default ARFoundation tracked pose driver. We use this to control
         /// the camera pose in mono mode.
         /// </summary>
-        private TrackedPoseDriver _defaultTrackedPoseDriver;
+        private TrackedPoseDriver _monoTrackedPoseDriver;
 
         /// <summary>
         /// We use this to control the camera pose in star mode.
         /// </summary>
-        private HoloKitTrackedPoseDriver _holokitTrackedPoseDriver;
+        private HoloKitTrackedPoseDriver _stereoTrackedPoseDriver;
 
         /// <summary>
         /// Increase iOS screen brightness gradually in each frame.
@@ -176,8 +177,8 @@ namespace HoloKit
             }
 
             // Get the reference of tracked pose drivers
-            _defaultTrackedPoseDriver = GetComponent<TrackedPoseDriver>();
-            _holokitTrackedPoseDriver = GetComponent<HoloKitTrackedPoseDriver>();
+            _monoTrackedPoseDriver = GetComponent<TrackedPoseDriver>();
+            _stereoTrackedPoseDriver = GetComponent<HoloKitTrackedPoseDriver>();
 
             HoloKitNFCSessionControllerAPI.OnNFCSessionCompleted += OnNFCSessionCompleted;
             HoloKitARSessionControllerAPI.ResetARSessionFirstFrame();
@@ -195,7 +196,7 @@ namespace HoloKit
             {
                 if (HoloKitUtils.IsRuntime)
                 {
-                    // Force screen brightness to be 1 in StAR mode
+                    // Force screen brightness to be 1 in Stereo mode
                     var screenBrightness = HoloKitARSessionControllerAPI.GetScreenBrightness();
                     if (screenBrightness < 1f)
                     {
@@ -255,8 +256,7 @@ namespace HoloKit
                 _leftEyeCamera.gameObject.SetActive(true);
                 _rightEyeCamera.gameObject.SetActive(true);
                 _blackCamera.gameObject.SetActive(true);
-                // Switch tracked pose driver
-                _defaultTrackedPoseDriver.enabled = false;
+                _monoTrackedPoseDriver.enabled = true;
             }
             else
             {
@@ -269,8 +269,7 @@ namespace HoloKit
                 _blackCamera.gameObject.SetActive(false);
                 // Reset center eye pose offset
                 _centerEyePose.localPosition = Vector3.zero;
-                // Switch tracked pose driver
-                _defaultTrackedPoseDriver.enabled = true;
+                _monoTrackedPoseDriver.enabled = true;
             }
         }
 

@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: Copyright 2023 Holo Interactive <dev@holoi.com>
+// SPDX-FileContributor: Yuchen Zhang <yuchen@holoi.com>
+// SPDX-FileContributor: Botao Amber Hu <botao@holoi.com>
+// SPDX-License-Identifier: MIT
+
 using System;
 using System.IO;
 using System.Reflection;
@@ -24,7 +29,7 @@ namespace HoloKit.Editor
             void PostprocessBuild(BuildReport report)
             {
                 AddXcodePlist(report.summary.outputPath);
-                //AddXcodeCapabilities(report.summary.outputPath);
+                AddXcodeCapabilities(report.summary.outputPath);
                 AddXcodeBuildSettings(report.summary.outputPath);
             }
 
@@ -80,6 +85,7 @@ namespace HoloKit.Editor
                 proj.SetBuildProperty(unityFrameworkTargetGuid, "ENABLE_BITCODE", "NO");
                 proj.AddBuildProperty(unityFrameworkTargetGuid, "LIBRARY_SEARCH_PATHS", "$(SDKROOT)/usr/lib/swift");
                 proj.SetBuildProperty(mainTargetGuid, "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD", "NO");
+                proj.SetBuildProperty(mainTargetGuid, "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD", "NO");
 
                 proj.WriteToFile(projPath);
             }
@@ -102,8 +108,7 @@ namespace HoloKit.Editor
                 var projectInfo = projectCapabilityManager.GetType().GetField("project", BindingFlags.NonPublic | BindingFlags.Instance);
                 project = (PBXProject)projectInfo.GetValue(projectCapabilityManager);
 
-                var constructor = typeof(PBXCapabilityType).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(string), typeof(bool), typeof(string), typeof(bool) }, null);
-                PBXCapabilityType nfcCapability = (PBXCapabilityType) constructor.Invoke(new object[] { "com.apple.NearFieldCommunicationTagReading", true, "", false });
+                PBXCapabilityType nfcCapability = PBXCapabilityType.StringToPBXCapabilityType("com.apple.NearFieldCommunicationTagReading");
                 project.AddCapability(target, nfcCapability, entitlementFileName);
 
                 projectCapabilityManager.WriteToFile();
