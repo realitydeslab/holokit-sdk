@@ -28,7 +28,7 @@ namespace HoloKit.Samples.StereoscopicRendering
             }
             else
             {
-                HoloKitCameraManager.Instance.RenderMode = HoloKitRenderMode.Stereo;
+                //HoloKitCameraManager.Instance.RenderMode = HoloKitRenderMode.Stereo;
 
                 // Skip NFC scanning
                 HoloKitCameraManager.Instance.OpenStereoWithoutNFC("SomethingForNothing");

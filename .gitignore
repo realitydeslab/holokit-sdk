@@ -64,6 +64,7 @@ obj/
 # ============================ #
 .vscode/
 .vs/
+.idea/
 
 
 # This is only needed because docfx chooses the first alphabetically occurring
@@ -102,11 +103,13 @@ sysinfo.txt
 /*.apk
 
 # Holo Interactive Custom
-Assets/NMLBuildCache
-Assets/StreamingAssets
-#ProjectSettings/EditorBuildSettings.asset
+Assets/NMLBuildCache/
 Assets/NMLBuildCache.meta
-Assets/TextMesh Pro
-Assets/AddressableAssetsData
-
+Assets/StreamingAssets/
+Assets/TextMesh Pro/
+Assets/AddressableAssetsData/
+Assets/AddressableAssetsData/iOS/addressables_content_state.bin
+Recordings/
 /*.mp4
+
+

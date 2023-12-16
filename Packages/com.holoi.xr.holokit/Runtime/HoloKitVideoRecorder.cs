@@ -294,11 +294,7 @@ namespace HoloKit {
         }
 
         void Update() {
-            if (!IsRecording) return;
-            if (!_timeQueue.TryEnqueueNow(_clock.timestamp)) return;
             CommitFrame(_recordingCamera, _bufferCamera);
-            Graphics.Blit(_bufferCamera, _bufferFrame, new Vector2(1, -1), new Vector2(0, 1));
-            AsyncGPUReadback.Request(_bufferFrame, 0, OnSourceReadback);
         }
 
         void OnDestroy()
@@ -328,12 +324,15 @@ namespace HoloKit {
         unsafe void OnAudioFilterRead(float[] data, int channels)
         {
             if (!IsRecording) return;
+            CommitSamples(data, channels);
+        }
 
+        // The sample buffer MUST be a linear PCM buffer interleaved by channel.
+        unsafe void CommitSamples(float[] data, int channels) {
             var nativeArray = new NativeArray<float>(data, Allocator.Temp);
             var ptr = (IntPtr) NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(nativeArray);
             int length = nativeArray.Length	* sizeof(float);
             double timestamp = _clock.timestamp;
-
 
             HoloKitVideoRecorder_AppendAudioFrame(ptr, length, timestamp);
             nativeArray.Dispose();
@@ -342,10 +341,15 @@ namespace HoloKit {
 
         void CommitFrame(Camera source, RenderTexture destination) 
         {
+            if (!IsRecording) return;
+            if (!_timeQueue.TryEnqueueNow(_clock.timestamp)) return;
+
             var prevTarget = source.targetTexture;
             source.targetTexture = destination;
             source.Render();
             source.targetTexture = prevTarget;
+            Graphics.Blit(_bufferCamera, _bufferFrame, new Vector2(1, -1), new Vector2(0, 1));
+            AsyncGPUReadback.Request(_bufferFrame, 0, OnSourceReadback);
         }
         public void ToggleRecording()
         {

@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "com.csound.csoundunity": {
-      "version": "3.4.0",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://package.openupm.com"
-    },
     "com.holoi.xr.holokit": {
       "version": "file:com.holoi.xr.holokit",
       "depth": 0,
