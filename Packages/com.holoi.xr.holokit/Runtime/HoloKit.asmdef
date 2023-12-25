@@ -2,12 +2,12 @@
     "name": "HoloKit",
     "rootNamespace": "HoloKit",
     "references": [
-        "GUID:e40ba710768534012815d3193fa296cb",
-        "GUID:a9420e37d7990b54abdef6688edbe313",
-        "GUID:dfd0ce20189d48e5b22bb4134b558f5a",
-        "GUID:92703082f92b41ba80f0d6912de66115",
-        "GUID:75469ad4d38634e559750d17036d5f7c",
-        "GUID:ce522b6ed64c8be4c989a1d26d0e3275"
+        "Unity.XR.Management",
+        "Unity.XR.ARFoundation",
+        "Unity.XR.ARKit",
+        "Unity.XR.ARSubsystems",
+        "Unity.InputSystem",
+        "Unity.XR.Hands"
     ],
     "includePlatforms": [
         "Editor",

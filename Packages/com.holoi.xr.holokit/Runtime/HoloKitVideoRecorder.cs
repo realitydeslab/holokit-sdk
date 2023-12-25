@@ -183,8 +183,8 @@ namespace HoloKit {
         private bool _recordMicrophone = false;
         
         private RealtimeClock _clock = null;
-        private RenderTexture _bufferCamera;
-        private RenderTexture _bufferFrame;
+        private RenderTexture _cameraRt;
+        private RenderTexture _frameRt;
         private TimeQueue _timeQueue = new TimeQueue();
 
         // private readonly RingBuffer<float> __deviceRingBuffer;
@@ -242,9 +242,10 @@ namespace HoloKit {
             var width = Screen.width;
             var height = Screen.height;
 
-            var _descriptor = new RenderTextureDescriptor(width, height, RenderTextureFormat.ARGB32, 32);
-            _bufferCamera = new RenderTexture(_descriptor);
-            _bufferFrame = new RenderTexture(width, height, 0);
+            // ARGBHalf will make sure the camera renders post-processing.
+            var _descriptor = new RenderTextureDescriptor(width, height, RenderTextureFormat.ARGBHalf, 32); 
+            _cameraRt = new RenderTexture(_descriptor);
+            _frameRt = new RenderTexture(width, height, 0);
             int status = HoloKitVideoRecorder_StartRecording(path, width, height, sampleRate, channelCount);
 
             _timeQueue.Clear();
@@ -256,6 +257,8 @@ namespace HoloKit {
             }
 
             OnHoloKitRenderModeChanged(HoloKitCameraManager.Instance.RenderMode);
+
+            StartCoroutine(CommitFrames());
         }
 
         public void EndRecording()
@@ -269,10 +272,12 @@ namespace HoloKit {
             HoloKitVideoRecorder_EndRecording();
             IsRecording = false;
 
-            Destroy(_bufferFrame);
-            _bufferFrame = null;
-            Destroy(_bufferCamera);
-            _bufferCamera = null;
+            OnHoloKitRenderModeChanged(HoloKitCameraManager.Instance.RenderMode);
+
+            Destroy(_frameRt);
+            _frameRt = null;
+            Destroy(_cameraRt);
+            _cameraRt = null;
         }
 
         unsafe void OnSourceReadback(AsyncGPUReadbackRequest request)
@@ -288,16 +293,27 @@ namespace HoloKit {
             }
         }
 
+        private IEnumerator CommitFrames () {
+            var yielder = new WaitForEndOfFrame();
+            while (IsRecording) {
+                // Check frame index
+                yield return yielder;
+                // Render cameras
+                CommitFrame(_recordingCamera);
+                // Commit
+            }
+        }
+
         void Update() {
-            CommitFrame(_recordingCamera, _bufferCamera);
+            
         }
 
         void OnDestroy()
         {
-            HoloKitCameraManager.OnHoloKitRenderModeChanged -= OnHoloKitRenderModeChanged;
             if (IsRecording) {
-                HoloKitVideoRecorder_EndRecording();
+                EndRecording();
             }
+            HoloKitCameraManager.OnHoloKitRenderModeChanged -= OnHoloKitRenderModeChanged;
         }
 
         void OnHoloKitRenderModeChanged(HoloKitRenderMode mode) {
@@ -333,17 +349,17 @@ namespace HoloKit {
             nativeArray.Dispose();
         }
 
-        void CommitFrame(Camera source, RenderTexture destination) 
+        void CommitFrame(Camera source) 
         {
             if (!IsRecording) return;
             if (!_timeQueue.TryEnqueueNow(_clock.timestamp)) return;
 
             var prevTarget = source.targetTexture;
-            source.targetTexture = destination;
+            source.targetTexture = _cameraRt;
             source.Render();
             source.targetTexture = prevTarget;
-            Graphics.Blit(_bufferCamera, _bufferFrame, new Vector2(1, -1), new Vector2(0, 1));
-            AsyncGPUReadback.Request(_bufferFrame, 0, OnSourceReadback);
+            Graphics.Blit(_cameraRt, _frameRt, new Vector2(1, -1), new Vector2(0, 1));
+            AsyncGPUReadback.Request(_frameRt, 0, OnSourceReadback);
         }
         public void ToggleRecording()
         {
